@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import Any
 
+import rule_builder.rules
 from rule_builder.rules import Has
 # Imports of base Archipelago modules must be absolute.
 from worlds.AutoWorld import World
@@ -59,8 +60,7 @@ class MSMWorld(World):
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
-        test = MSMLocation(1)
-        self.set_rule(test, Has("Sport: Basketball"))
+
 
     def set_rules(self) -> None:
         rules.set_all_rules(self)
