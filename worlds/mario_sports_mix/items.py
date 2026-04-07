@@ -76,6 +76,7 @@ sports_mix_items = {
     "Sports Mix: Star Cup": ItemData(base_id + 31, ItemClassification.progression_skip_balancing)
 }
 
+# May or may not need
 # all_cup_unlocks_n = {
 #     "Mushroom Cup (Normal)": ItemData(base_id + 32, ItemClassification.progression),
 #     "Flower Cup (Normal)": ItemData(base_id + 33, ItemClassification.progression),
