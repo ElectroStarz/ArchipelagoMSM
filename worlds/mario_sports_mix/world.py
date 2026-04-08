@@ -47,7 +47,9 @@ class MSMWorld(World):
 
     # Our world class must have a static location_name_to_id and item_name_to_id defined.
     # We define these in regions.py and items.py respectively, so we just set them here.
-    location_name_to_id = locations.LOCATION_NAME_TO_ID
+
+
+    location_name_to_id = locations.LOCATION_NAME_TO_ID # Doesn't work, trying to figure out stuff.
     item_name_to_id = items.ITEM_NAME_TO_ID
 
     # There is always one region that the generator starts from & assumes you can always go back to.

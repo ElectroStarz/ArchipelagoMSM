@@ -113,6 +113,13 @@ extra_stages = {
     "Extra Stage 3": ItemData(base_id + 45, ItemClassification.progression)
 }
 
+exhibition_difficulties = {
+    "Exhibition: Easy": ItemData(base_id + 46, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Normal": ItemData(base_id + 47, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Hard": ItemData(base_id + 48, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Expert": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
+}
+
 individual_stages = {
     "Stage: Mario Stadium": ItemData(base_id + 100, ItemClassification.progression),
     "Stage: Koopa Troopa Beach": ItemData(base_id + 101, ItemClassification.progression),
@@ -218,6 +225,7 @@ item_table: Dict[str, ItemData] = {
     **sports_mix_items,
     #**all_cup_unlocks_n,
     #**all_cup_unlocks_h,
+    **exhibition_difficulties,
     **mushroom_cup_rounds,
     **flower_cup_rounds,
     **star_cup_rounds,
@@ -259,6 +267,8 @@ def get_item_group(item_name: str) -> str:
     #     return "Normal Cup unlocks for all sports"
     # elif item_name in all_cup_unlocks_h:
     #     return "Hard Cup unlocks for all sports"
+    elif item_name in exhibition_difficulties:
+        return "Exhibition Difficulties"
     elif item_name in mushroom_cup_rounds:
         return "Mushroom Cup Rounds"
     elif item_name in flower_cup_rounds:
@@ -285,7 +295,7 @@ def get_item_group(item_name: str) -> str:
 
 ITEM_NAME_TO_ID: Dict[str, int] = {item_name: data.code for item_name, data in item_table.items()}
 
-def get_random_filler_item_name(world: MSMWorld) -> str:
+def get_random_filler_item_name(world: "MSMWorld") -> str:
     traps_list = [name for name, data in traps.items()]
     filler_list = [name for name, data in one_time_items.items()]
     if world.random.randint(0, 99) < world.options.trap_chance:
@@ -294,7 +304,7 @@ def get_random_filler_item_name(world: MSMWorld) -> str:
     return world.random.choice(filler_list)
 
 
-def create_all_items(world: MSMWorld) -> None:
+def create_all_items(world: "MSMWorld") -> None:
     itempool = []
     for name, data in characters.items():
         new_item = world.create_item(name)
@@ -332,36 +342,44 @@ def create_all_items(world: MSMWorld) -> None:
             itempool.append(new_item)
 
     if "Basketball" in world.options.enabled_sports:
-        for name, data in basketball_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        for name, data in basketball_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+        if "Normal" in world.options.cup_difficulty:
+            for name, data in basketball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+        if "Hard" in world.options.cup_difficulty:
+            for name, data in basketball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
     if "Dodgeball" in world.options.enabled_sports:
-        for name, data in dodgeball_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        for name, data in dodgeball_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+        if "Normal" in world.options.cup_difficulty:
+            for name, data in basketball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+        if "Hard" in world.options.cup_difficulty:
+            for name, data in basketball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
     if "Volleyball" in world.options.enabled_sports:
-        for name, data in volleyball_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        for name, data in volleyball_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+        if "Normal" in world.options.cup_difficulty:
+            for name, data in basketball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+        if "Hard" in world.options.cup_difficulty:
+            for name, data in basketball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
     if "Hockey" in world.options.enabled_sports:
-        for name, data in hockey_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        for name, data in hockey_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+        if "Normal" in world.options.cup_difficulty:
+            for name, data in basketball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+        if "Hard" in world.options.cup_difficulty:
+            for name, data in basketball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
     if "Sports Mix" in world.options.enabled_sports:
         for name, data in sports_mix_items:
@@ -403,7 +421,7 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
 
     item_data = item_table[name]
 
-    # Instantiate the MSMItem with the details from our table
+    # Provide the MSMItem with the details from our table
     return MSMItem(
         name,
         item_data.classification,

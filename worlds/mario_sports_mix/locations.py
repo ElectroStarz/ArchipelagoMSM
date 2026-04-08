@@ -21,7 +21,7 @@ class LocationData(NamedTuple):
 base_loc_id = 0
 
 
-def get_locations(world: MSMWorld) -> List[LocationData]:
+def get_locations(world: "MSMWorld") -> List[LocationData]:
     location_table: List[LocationData] = []
 
     if not world or "Basketball" in world.options.enabled_sports:
@@ -432,11 +432,11 @@ def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | No
     return {name: lookup.get(name) for name in location_names}
 
 
-def create_all_locations(world: MSMWorld) -> None:
+def create_all_locations(world: "MSMWorld") -> None:
     create_regular_locations(world)
     create_events(world)
 
-def create_regular_locations(world: MSMWorld) -> None:
+def create_regular_locations(world: "MSMWorld") -> None:
 
     b_exhibition = world.get_region("Basketball: Exhibition")
     b_mushroom_cup_n = world.get_region("Basketball: Mushroom Cup (Normal)")
@@ -836,7 +836,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     ])
     h_exhibition.add_locations(hockey_ex_expert)
 
-def create_events(world: MSMWorld) -> None:
+def create_events(world: "MSMWorld") -> None:
     behemoth_boss = world.get_region("Behemoth Boss Battle")
     behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
 

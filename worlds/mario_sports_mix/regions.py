@@ -17,12 +17,12 @@ if TYPE_CHECKING:
 # This is why we create regions first, and then later we create the locations (in locations.py).
 
 
-def create_and_connect_regions(world: MSMWorld) -> None:
+def create_and_connect_regions(world: "MSMWorld") -> None:
     create_all_regions(world)
     connect_regions(world)
 
 
-def create_all_regions(world: MSMWorld) -> None:
+def create_all_regions(world: "MSMWorld") -> None:
     # Creating a region is as simple as calling the constructor of the Region class.
     main_menu = Region("Main Menu", world.player, world.multiworld)
 
