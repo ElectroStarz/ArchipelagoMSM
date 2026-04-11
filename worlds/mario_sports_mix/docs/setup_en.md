@@ -11,11 +11,12 @@
 ## How to install
 ### Preparations
 1) Download the [latest version of Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) and run the setup
-2) Download the [latest version of this apworld](https://github.com/ElectroStarz/ArchipelagoMSM/releases) and put it
-into your custom_worlds folder
-3) Dump your PAL version of Mario Sports Mix - [Use this guide](https://wii.hacks.guide/dump-games) 
+2) Download the [latest version of this apworld](https://github.com/ElectroStarz/ArchipelagoMSM/releases) and put it in
+your custom_worlds folder
+3) Download [Root.zip](https://github.com/ElectroStarz/ArchipelagoMSM/releases)
+4) Dump your PAL version of Mario Sports Mix - [Use this guide](https://wii.hacks.guide/dump-games) 
 (Requires a modded Wii/Wii U)
-4) Put the dump into a folder and set it as a game folder in Dolphin (Config -> Paths)
+5) Put the dump into a folder and set it as a game folder in Dolphin (Config -> Paths)
 
 ### Dolphin Prerequisites
 1) Extract the ZIP file onto your computer, preferably to somewhere you won't delete it. Feel free to rename the root
