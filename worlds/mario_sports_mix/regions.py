@@ -1,20 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from BaseClasses import Region
-from .options import EnabledSports, GoalCondition
+from .options import GoalCondition
 
 if TYPE_CHECKING:
-    from .world import MSMWorld
-
-
-# A region is a container for locations ("checks"), which connects to other regions via "Entrance" objects.
-# Many games will model their Regions after physical in-game places, but you can also have more abstract regions.
-# For a location to be in logic, its containing region must be reachable.
-# The Entrances connecting regions can have rules - more on that in rules.py.
-# This makes regions especially useful for traversal logic ("Can the player reach this part of the map?")
-
-# Every location must be inside a region, and you must have at least one region.
-# This is why we create regions first, and then later we create the locations (in locations.py).
+    from . import MSMWorld
 
 
 def create_and_connect_regions(world: "MSMWorld") -> None:
@@ -23,122 +13,131 @@ def create_and_connect_regions(world: "MSMWorld") -> None:
 
 
 def create_all_regions(world: "MSMWorld") -> None:
-    # Creating a region is as simple as calling the constructor of the Region class.
-    main_menu = Region("Main Menu", world.player, world.multiworld)
 
-    # Let's put all these regions in a list.
+    main_menu = Region("Main Menu", world.player, world.multiworld)
     regions = [main_menu]
 
-    if "Basketball" in world.options.enabled_sports:
-        basketball = Region("Basketball", world.player, world.multiworld)
-        b_exhibition = Region("Basketball: Exhibition", world.player, world.multiworld)
-        b_stages = Region("Basketball: Stages", world.player, world.multiworld)
-        b_mushroom_cup_n = Region("Basketball: Mushroom Cup (Normal)", world.player, world.multiworld)
-        b_flower_cup_n = Region("Basketball: Flower Cup (Normal)", world.player, world.multiworld)
-        b_star_cup_n = Region("Basketball: Star Cup (Normal)", world.player, world.multiworld)
-        b_mushroom_cup_h = Region("Basketball: Mushroom Cup (Hard)", world.player, world.multiworld)
-        b_flower_cup_h = Region("Basketball: Flower Cup (Hard)", world.player, world.multiworld)
-        b_star_cup_h = Region("Basketball: Star Cup (Hard)", world.player, world.multiworld)
-        b_extra = Region("Basketball: Extra", world.player, world.multiworld)
-        regions.append(basketball)
-        regions.append(b_exhibition)
-        regions.append(b_stages)
-        regions.append(b_mushroom_cup_n)
-        regions.append(b_flower_cup_n)
-        regions.append(b_star_cup_n)
-        regions.append(b_mushroom_cup_h)
-        regions.append(b_flower_cup_h)
-        regions.append(b_star_cup_h)
-        regions.append(b_extra)
-    if "Dodgeball" in world.options.enabled_sports:
-        dodgeball = Region("Dodgeball", world.player, world.multiworld)
-        d_exhibition = Region("Dodgeball: Exhibition", world.player, world.multiworld)
-        d_stages = Region("Dodgeball: Stages", world.player, world.multiworld)
-        d_mushroom_cup_n = Region("Dodgeball: Mushroom Cup (Normal)", world.player, world.multiworld)
-        d_flower_cup_n = Region("Dodgeball: Flower Cup (Normal)", world.player, world.multiworld)
-        d_star_cup_n = Region("Dodgeball: Star Cup (Normal)", world.player, world.multiworld)
-        d_mushroom_cup_h = Region("Dodgeball: Mushroom Cup (Hard)", world.player, world.multiworld)
-        d_flower_cup_h = Region("Dodgeball: Flower Cup (Hard)", world.player, world.multiworld)
-        d_star_cup_h = Region("Dodgeball: Star Cup (Hard)", world.player, world.multiworld)
-        d_extra = Region("Dodgeball: Extra", world.player, world.multiworld)
-        regions.append(dodgeball)
-        regions.append(d_exhibition)
-        regions.append(d_stages)
-        regions.append(d_mushroom_cup_n)
-        regions.append(d_flower_cup_n)
-        regions.append(d_star_cup_n)
-        regions.append(d_mushroom_cup_h)
-        regions.append(d_flower_cup_h)
-        regions.append(d_star_cup_h)
-        regions.append(d_extra)
-    if "Volleyball" in world.options.enabled_sports:
-        volleyball = Region("Volleyball", world.player, world.multiworld)
-        v_exhibition = Region("Volleyball: Exhibition", world.player, world.multiworld)
-        v_stages = Region("Volleyball: Stages", world.player, world.multiworld)
-        v_mushroom_cup_n = Region("Volleyball: Mushroom Cup (Normal)", world.player, world.multiworld)
-        v_flower_cup_n = Region("Volleyball: Flower Cup (Normal)", world.player, world.multiworld)
-        v_star_cup_n = Region("Volleyball: Star Cup (Normal)", world.player, world.multiworld)
-        v_mushroom_cup_h = Region("Volleyball: Mushroom Cup (Hard)", world.player, world.multiworld)
-        v_flower_cup_h = Region("Volleyball: Flower Cup (Hard)", world.player, world.multiworld)
-        v_star_cup_h = Region("Volleyball: Star Cup (Hard)", world.player, world.multiworld)
-        v_extra = Region("Volleyball: Extra", world.player, world.multiworld)
-        regions.append(volleyball)
-        regions.append(v_exhibition)
-        regions.append(v_stages)
-        regions.append(v_mushroom_cup_n)
-        regions.append(v_flower_cup_n)
-        regions.append(v_star_cup_n)
-        regions.append(v_mushroom_cup_h)
-        regions.append(v_flower_cup_h)
-        regions.append(v_star_cup_h)
-        regions.append(v_extra)
-    if "Hockey" in world.options.enabled_sports:
-        hockey = Region("Hockey", world.player, world.multiworld)
-        h_exhibition = Region("Hockey: Exhibition", world.player, world.multiworld)
-        h_stages = Region("Hockey: Stages", world.player, world.multiworld)
-        h_mushroom_cup_n = Region("Hockey: Mushroom Cup (Normal)", world.player, world.multiworld)
-        h_flower_cup_n = Region("Hockey: Flower Cup (Normal)", world.player, world.multiworld)
-        h_star_cup_n = Region("Hockey: Star Cup (Normal)", world.player, world.multiworld)
-        h_mushroom_cup_h = Region("Hockey: Mushroom Cup (Hard)", world.player, world.multiworld)
-        h_flower_cup_h = Region("Hockey: Flower Cup (Hard)", world.player, world.multiworld)
-        h_star_cup_h = Region("Hockey: Star Cup (Hard)", world.player, world.multiworld)
-        h_extra = Region("Hockey: Extra", world.player, world.multiworld)
-        regions.append(hockey)
-        regions.append(h_exhibition)
-        regions.append(h_stages)
-        regions.append(h_mushroom_cup_n)
-        regions.append(h_flower_cup_n)
-        regions.append(h_star_cup_n)
-        regions.append(h_mushroom_cup_h)
-        regions.append(h_flower_cup_h)
-        regions.append(h_star_cup_h)
-        regions.append(h_extra)
-    if "Sports Mix" in world.options.enabled_sports:
-        sports_mix = Region("Sports Mix", world.player, world.multiworld)
-        sm_mushroom_cup = Region("Sports Mix: Mushroom Cup", world.player, world.multiworld)
-        sm_flower_cup = Region("Sports Mix: Flower Cup", world.player, world.multiworld)
-        sm_star_cup = Region("Sports Mix: Star Cup", world.player, world.multiworld)
-        regions.append(sports_mix)
-        regions.append(sm_mushroom_cup)
-        regions.append(sm_flower_cup)
-        regions.append(sm_star_cup)
+    # Basketball
+    basketball = Region("Basketball", world.player, world.multiworld)
+    b_exhibition = Region("Basketball: Exhibition", world.player, world.multiworld)
+    b_stages = Region("Basketball: Stages", world.player, world.multiworld)
+    b_mushroom_cup_n = Region("Basketball: Mushroom Cup (Normal)", world.player, world.multiworld)
+    b_flower_cup_n = Region("Basketball: Flower Cup (Normal)", world.player, world.multiworld)
+    b_star_cup_n = Region("Basketball: Star Cup (Normal)", world.player, world.multiworld)
+    b_mushroom_cup_h = Region("Basketball: Mushroom Cup (Hard)", world.player, world.multiworld)
+    b_flower_cup_h = Region("Basketball: Flower Cup (Hard)", world.player, world.multiworld)
+    b_star_cup_h = Region("Basketball: Star Cup (Hard)", world.player, world.multiworld)
+    b_extra = Region("Basketball: Extra", world.player, world.multiworld)
+    regions.append(basketball)
+    regions.append(b_exhibition)
+    regions.append(b_stages)
+    regions.append(b_mushroom_cup_n)
+    regions.append(b_flower_cup_n)
+    regions.append(b_star_cup_n)
+    regions.append(b_mushroom_cup_h)
+    regions.append(b_flower_cup_h)
+    regions.append(b_star_cup_h)
+    regions.append(b_extra)
+
+    #Add locations
+    b_exhibition.add_locations()
+
+    # Dodgeball Regions
+    dodgeball = Region("Dodgeball", world.player, world.multiworld)
+    d_exhibition = Region("Dodgeball: Exhibition", world.player, world.multiworld)
+    d_stages = Region("Dodgeball: Stages", world.player, world.multiworld)
+    d_mushroom_cup_n = Region("Dodgeball: Mushroom Cup (Normal)", world.player, world.multiworld)
+    d_flower_cup_n = Region("Dodgeball: Flower Cup (Normal)", world.player, world.multiworld)
+    d_star_cup_n = Region("Dodgeball: Star Cup (Normal)", world.player, world.multiworld)
+    d_mushroom_cup_h = Region("Dodgeball: Mushroom Cup (Hard)", world.player, world.multiworld)
+    d_flower_cup_h = Region("Dodgeball: Flower Cup (Hard)", world.player, world.multiworld)
+    d_star_cup_h = Region("Dodgeball: Star Cup (Hard)", world.player, world.multiworld)
+    d_extra = Region("Dodgeball: Extra", world.player, world.multiworld)
+    regions.append(dodgeball)
+    regions.append(d_exhibition)
+    regions.append(d_stages)
+    regions.append(d_mushroom_cup_n)
+    regions.append(d_flower_cup_n)
+    regions.append(d_star_cup_n)
+    regions.append(d_mushroom_cup_h)
+    regions.append(d_flower_cup_h)
+    regions.append(d_star_cup_h)
+    regions.append(d_extra)
+
+
+    # Volleyball regions
+    volleyball = Region("Volleyball", world.player, world.multiworld)
+    v_exhibition = Region("Volleyball: Exhibition", world.player, world.multiworld)
+    v_stages = Region("Volleyball: Stages", world.player, world.multiworld)
+    v_mushroom_cup_n = Region("Volleyball: Mushroom Cup (Normal)", world.player, world.multiworld)
+    v_flower_cup_n = Region("Volleyball: Flower Cup (Normal)", world.player, world.multiworld)
+    v_star_cup_n = Region("Volleyball: Star Cup (Normal)", world.player, world.multiworld)
+    v_mushroom_cup_h = Region("Volleyball: Mushroom Cup (Hard)", world.player, world.multiworld)
+    v_flower_cup_h = Region("Volleyball: Flower Cup (Hard)", world.player, world.multiworld)
+    v_star_cup_h = Region("Volleyball: Star Cup (Hard)", world.player, world.multiworld)
+    v_extra = Region("Volleyball: Extra", world.player, world.multiworld)
+    regions.append(volleyball)
+    regions.append(v_exhibition)
+    regions.append(v_stages)
+    regions.append(v_mushroom_cup_n)
+    regions.append(v_flower_cup_n)
+    regions.append(v_star_cup_n)
+    regions.append(v_mushroom_cup_h)
+    regions.append(v_flower_cup_h)
+    regions.append(v_star_cup_h)
+    regions.append(v_extra)
+
+
+
+    # Hockey Regions
+    hockey = Region("Hockey", world.player, world.multiworld)
+    h_exhibition = Region("Hockey: Exhibition", world.player, world.multiworld)
+    h_stages = Region("Hockey: Stages", world.player, world.multiworld)
+    h_mushroom_cup_n = Region("Hockey: Mushroom Cup (Normal)", world.player, world.multiworld)
+    h_flower_cup_n = Region("Hockey: Flower Cup (Normal)", world.player, world.multiworld)
+    h_star_cup_n = Region("Hockey: Star Cup (Normal)", world.player, world.multiworld)
+    h_mushroom_cup_h = Region("Hockey: Mushroom Cup (Hard)", world.player, world.multiworld)
+    h_flower_cup_h = Region("Hockey: Flower Cup (Hard)", world.player, world.multiworld)
+    h_star_cup_h = Region("Hockey: Star Cup (Hard)", world.player, world.multiworld)
+    h_extra = Region("Hockey: Extra", world.player, world.multiworld)
+    regions.append(hockey)
+    regions.append(h_exhibition)
+    regions.append(h_stages)
+    regions.append(h_mushroom_cup_n)
+    regions.append(h_flower_cup_n)
+    regions.append(h_star_cup_n)
+    regions.append(h_mushroom_cup_h)
+    regions.append(h_flower_cup_h)
+    regions.append(h_star_cup_h)
+    regions.append(h_extra)
+
+    # Sports Mix Regions
+    sports_mix = Region("Sports Mix", world.player, world.multiworld)
+    sm_mushroom_cup = Region("Sports Mix: Mushroom Cup", world.player, world.multiworld)
+    sm_flower_cup = Region("Sports Mix: Flower Cup", world.player, world.multiworld)
+    sm_star_cup = Region("Sports Mix: Star Cup", world.player, world.multiworld)
+    regions.append(sports_mix)
+    regions.append(sm_mushroom_cup)
+    regions.append(sm_flower_cup)
+    regions.append(sm_star_cup)
+
+
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
         behemoth_boss_stuff = Region("Behemoth Boss Battle", world.player, world.multiworld)
         regions.append(behemoth_boss_stuff)
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_King:
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
         behemoth_boss_stuff = Region("Behemoth Boss Battle", world.player, world.multiworld)
         behemoth_king_boss_stuff = Region("Behemoth King Boss Battle", world.player, world.multiworld)
         regions.append(behemoth_boss_stuff)
         regions.append(behemoth_king_boss_stuff)
-    # We now need to add these regions to multiworld.regions so that AP knows about their existence.
+    # Add regions to AP multiworld so it knows it exists
     world.multiworld.regions += regions
 
 
+
+
 def connect_regions(world: MSMWorld) -> None:
-    # We have regions now, but still need to connect them to each other.
-    # But wait, we no longer have access to the region variables we created in create_all_regions()!
-    # Luckily, once you've submitted your regions to multiworld.regions,
-    # you can get them at any time using world.get_region(...).
+
     main_menu = world.get_region("Main Menu")
 
     basketball = world.get_region("Basketball")
@@ -192,7 +191,7 @@ def connect_regions(world: MSMWorld) -> None:
     behemoth_boss = world.get_region("Behemoth Boss Battle")
     behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
 
-    # An even easier way is to use the region.connect helper.
+
     main_menu.connect(basketball, "Main Menu -> Basketball", lambda state: state.has("Sport: Basketball", world.player))
     main_menu.connect(dodgeball, "Main Menu -> Dodgeball", lambda state: state.has("Sport: Dodgeball", world.player))
     main_menu.connect(volleyball, "Main Menu -> Volleyball", lambda state: state.has("Sport: Volleyball", world.player))
@@ -244,13 +243,8 @@ def connect_regions(world: MSMWorld) -> None:
     sports_mix.connect(sm_star_cup, "Sports Mix -> Star Cup")
 
     b_star_cup_n.connect(behemoth_boss, "Basketball Star Cup (Normal) -> Behemoth Boss")
+    d_star_cup_n.connect(behemoth_boss, "Dodgeball Star Cup (Normal) -> Behemoth Boss")
+    v_star_cup_n.connect(behemoth_boss, "Volleyball Star Cup (Normal) -> Behemoth Boss")
+    h_star_cup_n.connect(behemoth_boss, "Hockey Star Cup (Normal) -> Behemoth Boss")
     sm_star_cup.connect(behemoth_king_boss, "Sports Mix Star Cup -> Behemoth King Boss")
 
-
-    # The region.connect helper even allows adding a rule immediately.
-    # We'll talk more about rule creation in the set_all_rules() function in rules.py.
-    # overworld.connect(top_left_room, "Overworld to Top Left Room", lambda state: state.has("Key", world.player))
-
-    # Some Entrances may only exist if the player enables certain options.
-    # In our case, the Hammer locks the top middle chest in its own room if the hammer option is enabled.
-    # In this case, we previously created an extra "Top Middle Room" region that we now need to connect to Overworld.

@@ -3,7 +3,7 @@ from BaseClasses import Item, ItemClassification
 from .options import StageUnlockType
 
 if TYPE_CHECKING:
-    from .world import MSMWorld
+    from . import MSMWorld
 
 class MSMItem(Item):
     game: str = "Mario Sports Mix"
@@ -140,6 +140,7 @@ individual_stages = {
 
 progressive_stuff = {
     "Progressive Team Size": ItemData(base_id + 120, ItemClassification.progression),
+    "Progressive Team Size": ItemData(base_id + 121, ItemClassification.progression),
 
 }
 
@@ -341,47 +342,43 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             itempool.append(new_item)
 
-    if "Basketball" in world.options.enabled_sports:
-        if "Normal" in world.options.cup_difficulty:
-            for name, data in basketball_items_n.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-        if "Hard" in world.options.cup_difficulty:
-            for name, data in basketball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+    if "Normal" in world.options.cup_difficulty:
+        # Basketball
+        for name, data in basketball_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Dodgeball
+        for name, data in dodgeball_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Volleyball
+        for name, data in volleyball_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Hockey
+        for name, data in hockey_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+            
+    if "Hard" in world.options.cup_difficulty:
+        # Basketball
+        for name, data in basketball_items_h.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Dodgeball
+        for name, data in dodgeball_items_h.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Volleyball
+        for name, data in volleyball_items_h.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Hockey
+        for name, data in hockey_items_h.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
 
-    if "Dodgeball" in world.options.enabled_sports:
-        if "Normal" in world.options.cup_difficulty:
-            for name, data in basketball_items_n.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-        if "Hard" in world.options.cup_difficulty:
-            for name, data in basketball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-    if "Volleyball" in world.options.enabled_sports:
-        if "Normal" in world.options.cup_difficulty:
-            for name, data in basketball_items_n.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-        if "Hard" in world.options.cup_difficulty:
-            for name, data in basketball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-    if "Hockey" in world.options.enabled_sports:
-        if "Normal" in world.options.cup_difficulty:
-            for name, data in basketball_items_n.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-        if "Hard" in world.options.cup_difficulty:
-            for name, data in basketball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-    if "Sports Mix" in world.options.enabled_sports:
+        # Sports Mix
         for name, data in sports_mix_items:
             new_item = world.create_item(name)
             itempool.append(new_item)
@@ -415,7 +412,7 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
-    """Creates an MSMItem for the given player based on the item name."""
+    # Creates an MSMItem for the given player based on the item name
     if name not in item_table:
         raise KeyError(f"Item '{name}' not found in the item table.")
 

@@ -6,13 +6,6 @@ class StartWithSports(DefaultOnToggle):
     """Start with the sports? Heavily recommended."""
     display_name = "Start With Sports"
 
-class EnabledSports(OptionSet):
-    """What sports do you want enabled?
-    (Basketball, Dodgeball, Volleyball, Hockey, Sports Mix)"""
-    display_name = "Enabled Sports"
-    valid_keys = {"Dodgeball", "Basketball", "Volleyball", "Hockey", "Sports Mix"}
-    default = {"Dodgeball", "Basketball", "Volleyball", "Hockey", "Sports Mix"}
-
 class ExhibitionDifficulty(OptionSet):
     """What difficulties do you want for exhibition matches? Beating a stage on each difficulty will send a check.
     (Easy, Normal, Hard, Expert)"""
@@ -38,7 +31,7 @@ class GoalCondition(Choice):
     """What is your goal?"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 0
-    option_defeat_behemoth_King = 1
+    option_defeat_behemoth_king = 1
     option_win_cups = 2
     default = 0
 
@@ -72,7 +65,7 @@ class TrapChance(Range):
 
 class TeamSanity(Choice):
     """(NOT WORKING) Turn on or off team sanity
-    (Makes playing with every team combination a check, requires Progressive Team Size level 2)"""
+    (Playing with every team combination sends a check, requires Progressive Team Size level 2)"""
     display_name = "Team Sanity"
     option_off = 0
     option_characters = 1
@@ -112,7 +105,6 @@ class CourtSanity(Choice):
 @dataclass()
 class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
-    enabled_sports: EnabledSports
     exhibition_difficulty: ExhibitionDifficulty
     cup_difficulty: CupDifficulty
     stage_unlock_type: StageUnlockType
