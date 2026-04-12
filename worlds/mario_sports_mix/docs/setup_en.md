@@ -19,8 +19,8 @@ your custom_worlds folder
 5) Put the dump into a folder and set it as a game folder in Dolphin (Config -> Paths)
 
 ### Dolphin Prerequisites
-1) Extract the Root.zip onto your computer, preferably to somewhere you won't delete it. Feel free to rename the root
-folder, just **not anything inside the root folder**.
+1) Extract the Root.zip onto your computer, preferably to somewhere you won't delete it (Yes this can be in another
+folder). Feel free to rename the root folder, just **not anything inside the root folder**.
 2) Right click Mario Sports Mix and click properties, go to Gecko Codes and click 'Add New Code'. You can name it
 anything, put the creator as "Saulf", go to the extracted folder and copy and paste the code in 'Gecko Code.txt' into the
 code box. You **MUST** use this gecko code when playing MSM Archipelago. You can now delete the txt file.
