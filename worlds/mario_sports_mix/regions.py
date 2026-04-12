@@ -40,7 +40,7 @@ def create_all_regions(world: "MSMWorld") -> None:
     regions.append(b_extra)
 
     #Add locations
-    b_exhibition.add_locations()
+    # b_exhibition.add_locations()
 
     # Dodgeball Regions
     dodgeball = Region("Dodgeball", world.player, world.multiworld)
@@ -137,7 +137,6 @@ def create_all_regions(world: "MSMWorld") -> None:
 
 
 def connect_regions(world: MSMWorld) -> None:
-
     main_menu = world.get_region("Main Menu")
 
     basketball = world.get_region("Basketball")

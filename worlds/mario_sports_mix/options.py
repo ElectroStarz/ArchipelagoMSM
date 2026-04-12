@@ -1,21 +1,22 @@
 from dataclasses import dataclass
 
-from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle
+from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup
 
 class StartWithSports(DefaultOnToggle):
-    """Start with the sports? Heavily recommended."""
+    """Start with the sports? HEAVILY RECOMMENDED
+Will cause immediate BK if off"""
     display_name = "Start With Sports"
 
 class ExhibitionDifficulty(OptionSet):
-    """What difficulties do you want for exhibition matches? Beating a stage on each difficulty will send a check.
-    (Easy, Normal, Hard, Expert)"""
+    """ Beating a stage on each difficulty will send a check
+(Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulty"
     valid_keys = {"Easy","Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
 
 class CupDifficulty(OptionSet):
-    """What cup difficulties do you want to include? Beating a cup on each difficulty will send a check.
-    (Normal, Hard, Expert - NOT IMPLEMENTED)"""
+    """Beating a cup on each difficulty will send a check
+(Normal, Hard, Expert - NOT IMPLEMENTED)"""
     display_name = "Cup Difficulty"
     valid_keys = {"Normal", "Hard"}
     default = {"Normal", "Hard"}
@@ -33,21 +34,23 @@ class GoalCondition(Choice):
     option_defeat_behemoth = 0
     option_defeat_behemoth_king = 1
     option_win_cups = 2
-    default = 0
+    default = 1
 
 class BehemothHP(Range):
-    """Behemoth Health - 2400 is base game"""
+    """Behemoth Health - 2400 is base game
+Recommended to edit this in the yaml"""
     display_name = "Behemoth HP"
-    range_start = 2400.0
-    range_end = 999999.0
-    default = 2400.0
+    range_start = 2400
+    range_end = 7000
+    default = 2400
 
 class BehemothKingHP(Range):
-    """Behemoth King Health - 3000 is base game"""
+    """Behemoth King Health - 3000 is base game
+Recommended to edit this in the yaml"""
     display_name = "Behemoth King HP"
-    range_start = 3000.0
-    range_end = 999999.0
-    default = 3000.0
+    range_start = 3000
+    range_end = 7000
+    default = 3000
 
 class CupsRequired(Range):
     """Cups required for goal"""
@@ -65,7 +68,7 @@ class TrapChance(Range):
 
 class TeamSanity(Choice):
     """(NOT WORKING) Turn on or off team sanity
-    (Playing with every team combination sends a check, requires Progressive Team Size level 2)"""
+(Playing with every team combination sends a check, requires Progressive Team Size level 2)"""
     display_name = "Team Sanity"
     option_off = 0
     option_characters = 1
@@ -78,7 +81,7 @@ class ScoreSanity(Toggle):
     default = False
 
 class ScoreSanityPoints(Range):
-    """(NOT WORKING) Every {number} points will send a check"""
+    """(NOT WORKING) Every number of points will send a check"""
     display_name = "Score Sanity Points"
     range_start = 1
     range_end = 10
@@ -86,6 +89,7 @@ class ScoreSanityPoints(Range):
 
 class ScoreSanityMax(Range):
     """(NOT WORKING) Score Sanity will go up to this number of points"""
+    display_name = "Score Sanity Max"
     range_start = 10
     range_end = 100
     default = 40
@@ -96,11 +100,36 @@ class SpecialSanity(DefaultOnToggle):
 
 class CourtSanity(Choice):
     """(NOT WORKING) Playing and/or winning on each court sends a check"""
+    display_name = "Court Sanity"
     option_off = 0
     option_playing = 1
     option_winning = 2
     option_both = 3
     default = 0
+
+msm_option_groups = [
+    OptionGroup("Game Options", [
+        StartWithSports,
+        ExhibitionDifficulty,
+        CupDifficulty,
+        StageUnlockType,
+        TrapChance
+    ]),
+    OptionGroup("Goal Options", [
+        GoalCondition,
+        BehemothHP,
+        BehemothKingHP,
+        CupsRequired
+    ]),
+    OptionGroup("Sanity Options (Only Special Sanity Works)", [
+        TeamSanity,
+        ScoreSanity,
+        ScoreSanityPoints,
+        ScoreSanityMax,
+        SpecialSanity,
+        CourtSanity
+    ])
+]
 
 @dataclass()
 class MSMOptions(PerGameCommonOptions):
@@ -115,6 +144,7 @@ class MSMOptions(PerGameCommonOptions):
     trap_chance: TrapChance
     team_sanity: TeamSanity
     score_sanity: ScoreSanity
+    score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
     special_sanity: SpecialSanity
     court_sanity: CourtSanity

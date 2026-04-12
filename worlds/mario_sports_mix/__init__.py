@@ -1,10 +1,11 @@
 from collections.abc import Mapping
 from typing import Any, TYPE_CHECKING
-from BaseClasses import Tutorial, Item, Location, Region, Rule
+from BaseClasses import Tutorial, Item, Location, Region
 from worlds.AutoWorld import WebWorld, World
+from . import regions, rules
 from .options import *
-from .locations import location_table
 from .items import ITEM_NAME_TO_ID
+from .locations import get_locations
 
 
 # For our game to display correctly on the website, we need to define a WebWorld subclass.
@@ -23,6 +24,7 @@ class MSMWebWorld(WebWorld):
         ["ElectroStarz"],
     )
     tutorials = [setup_en]
+    option_groups = msm_option_groups
 
 
 
@@ -41,7 +43,7 @@ class MSMWorld(World):
     # We define these in regions.py and items.py respectively, so we just set them here.
 
 
-    location_name_to_id = {name: data.code for name, data in location_table.items() if data.code is not None}
+    location_name_to_id = {location.name: location.code for location in get_locations(None)}
     item_name_to_id = items.ITEM_NAME_TO_ID
 
     # There is always one region that the generator starts from & assumes you can always go back to.
@@ -62,16 +64,10 @@ class MSMWorld(World):
     def create_items(self) -> None:
         items.create_all_items(self)
 
-    # Our world class must also have a create_item function that can create any one of our items by name at any time.
-    # We also put this in a different file, the same one that create_items is in.
     def create_item(self, name: str) -> items.MSMItem:
         return items.create_item_with_correct_classification(self, name)
 
-    # For features such as item links and panic-method start inventory, AP may ask your world to create extra filler.
-    # The way it does this is by calling get_filler_item_name.
-    # For this purpose, your world *must* have at least one infinitely repeatable item (usually filler).
-    # You must override this function and return this infinitely repeatable item's name.
-    # In our case, we defined a function called get_random_filler_item_name for this purpose in our items.py.
+
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)
 
@@ -79,7 +75,6 @@ class MSMWorld(World):
     # This is what slot_data exists for. Upon every client connection, the slot's slot_data is sent to the client.
     # slot_data is just a dictionary using basic types, that will be converted to json when sent to the client.
     def fill_slot_data(self) -> Mapping[str, Any]:
-        # If you need access to the player's chosen options on the client side, there is a helper for that.
         return self.options.as_dict(
             "enabled_sports", "cup_difficulty", "exhibition_difficulty"
         )

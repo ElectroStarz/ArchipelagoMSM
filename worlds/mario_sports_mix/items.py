@@ -108,16 +108,16 @@ star_cup_rounds = {
 }
 
 extra_stages = {
-    "Extra Stage 1": ItemData(base_id + 43, ItemClassification.progression),
-    "Extra Stage 2": ItemData(base_id + 44, ItemClassification.progression),
-    "Extra Stage 3": ItemData(base_id + 45, ItemClassification.progression)
+    "Extra Stage 1": ItemData(base_id + 46, ItemClassification.progression),
+    "Extra Stage 2": ItemData(base_id + 47, ItemClassification.progression),
+    "Extra Stage 3": ItemData(base_id + 48, ItemClassification.progression)
 }
 
 exhibition_difficulties = {
-    "Exhibition: Easy": ItemData(base_id + 46, ItemClassification.progression|ItemClassification.useful),
-    "Exhibition: Normal": ItemData(base_id + 47, ItemClassification.progression|ItemClassification.useful),
-    "Exhibition: Hard": ItemData(base_id + 48, ItemClassification.progression|ItemClassification.useful),
-    "Exhibition: Expert": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Easy": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Normal": ItemData(base_id + 50, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Hard": ItemData(base_id + 51, ItemClassification.progression|ItemClassification.useful),
+    "Exhibition: Expert": ItemData(base_id + 52, ItemClassification.progression|ItemClassification.useful),
 }
 
 individual_stages = {
@@ -139,30 +139,30 @@ individual_stages = {
 }
 
 progressive_stuff = {
-    "Progressive Team Size": ItemData(base_id + 120, ItemClassification.progression),
-    "Progressive Team Size": ItemData(base_id + 121, ItemClassification.progression),
+    "Progressive Team Size": ItemData(base_id + 120, ItemClassification.progression|ItemClassification.useful),
+    "Progressive Team Size": ItemData(base_id + 121, ItemClassification.progression|ItemClassification.useful),
 
 }
 
 characters = {
-    "Character: Mario": ItemData(base_id + 200, ItemClassification.progression),
-    "Character: Luigi": ItemData(base_id + 201, ItemClassification.progression),
-    "Character: Peach": ItemData(base_id + 202, ItemClassification.progression),
-    "Character: Daisy": ItemData(base_id + 203, ItemClassification.progression),
-    "Character: Yoshi": ItemData(base_id + 204, ItemClassification.progression),
-    "Character: Wario": ItemData(base_id + 205, ItemClassification.progression),
-    "Character: Waluigi": ItemData(base_id + 206, ItemClassification.progression),
-    "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.progression),
-    "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.progression),
-    "Character: Toad": ItemData(base_id + 209, ItemClassification.progression),
-    "Character: Bowser": ItemData(base_id + 210, ItemClassification.progression),
-    "Character: Bowser Jr.": ItemData(base_id + 211, ItemClassification.progression),
-    "Character: Moogle": ItemData(base_id + 212, ItemClassification.progression),
-    "Character: Cactuar": ItemData(base_id + 213, ItemClassification.progression),
-    "Character: Ninja": ItemData(base_id + 214, ItemClassification.progression),
-    "Character: White Mage": ItemData(base_id + 215, ItemClassification.progression),
-    "Character: Slime": ItemData(base_id + 216, ItemClassification.progression),
-    "Character: Black Mage": ItemData(base_id + 217, ItemClassification.progression),
+    "Character: Mario": ItemData(base_id + 200, ItemClassification.progression|ItemClassification.useful),
+    "Character: Luigi": ItemData(base_id + 201, ItemClassification.progression|ItemClassification.useful),
+    "Character: Peach": ItemData(base_id + 202, ItemClassification.progression|ItemClassification.useful),
+    "Character: Daisy": ItemData(base_id + 203, ItemClassification.progression|ItemClassification.useful),
+    "Character: Yoshi": ItemData(base_id + 204, ItemClassification.progression|ItemClassification.useful),
+    "Character: Wario": ItemData(base_id + 205, ItemClassification.progression|ItemClassification.useful),
+    "Character: Waluigi": ItemData(base_id + 206, ItemClassification.progression|ItemClassification.useful),
+    "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.progression|ItemClassification.useful),
+    "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.progression|ItemClassification.useful),
+    "Character: Toad": ItemData(base_id + 209, ItemClassification.progression|ItemClassification.useful),
+    "Character: Bowser": ItemData(base_id + 210, ItemClassification.progression|ItemClassification.useful),
+    "Character: Bowser Jr.": ItemData(base_id + 211, ItemClassification.progression|ItemClassification.useful),
+    "Character: Moogle": ItemData(base_id + 212, ItemClassification.progression|ItemClassification.useful),
+    "Character: Cactuar": ItemData(base_id + 213, ItemClassification.progression|ItemClassification.useful),
+    "Character: Ninja": ItemData(base_id + 214, ItemClassification.progression|ItemClassification.useful),
+    "Character: White Mage": ItemData(base_id + 215, ItemClassification.progression|ItemClassification.useful),
+    "Character: Slime": ItemData(base_id + 216, ItemClassification.progression|ItemClassification.useful),
+    "Character: Black Mage": ItemData(base_id + 217, ItemClassification.progression|ItemClassification.useful),
 }
 
 
@@ -359,7 +359,7 @@ def create_all_items(world: "MSMWorld") -> None:
         for name, data in hockey_items_n.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-            
+
     if "Hard" in world.options.cup_difficulty:
         # Basketball
         for name, data in basketball_items_h.items():
@@ -379,25 +379,25 @@ def create_all_items(world: "MSMWorld") -> None:
             itempool.append(new_item)
 
         # Sports Mix
-        for name, data in sports_mix_items:
+        for name, data in sports_mix_items.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
 
     if world.options.stage_unlock_type == StageUnlockType.option_by_stage_name:
-        for name, data in individual_stages:
+        for name, data in individual_stages.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
     if world.options.stage_unlock_type == StageUnlockType.option_by_cup_round:
-        for name, data in mushroom_cup_rounds:
+        for name, data in mushroom_cup_rounds.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in flower_cup_rounds:
+        for name, data in flower_cup_rounds.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in star_cup_rounds:
+        for name, data in star_cup_rounds.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in extra_stages:
+        for name, data in extra_stages.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
 
