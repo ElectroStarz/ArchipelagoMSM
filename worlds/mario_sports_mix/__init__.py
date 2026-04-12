@@ -5,7 +5,7 @@ from worlds.AutoWorld import WebWorld, World
 from . import regions, rules
 from .options import *
 from .items import ITEM_NAME_TO_ID
-from .locations import get_locations
+from . import locations
 
 
 # For our game to display correctly on the website, we need to define a WebWorld subclass.
@@ -43,7 +43,7 @@ class MSMWorld(World):
     # We define these in regions.py and items.py respectively, so we just set them here.
 
 
-    location_name_to_id = {location.name: location.code for location in get_locations(None)}
+    location_name_to_id = locations.LOCATION_NAME_TO_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
 
     # There is always one region that the generator starts from & assumes you can always go back to.
@@ -71,10 +71,8 @@ class MSMWorld(World):
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)
 
-    # There may be data that the game client will need to modify the behavior of the game.
-    # This is what slot_data exists for. Upon every client connection, the slot's slot_data is sent to the client.
-    # slot_data is just a dictionary using basic types, that will be converted to json when sent to the client.
+   # Stuff to send to the client because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
         return self.options.as_dict(
-            "enabled_sports", "cup_difficulty", "exhibition_difficulty"
+            "cup_difficulty", "goal_condition", "special_sanity"
         )

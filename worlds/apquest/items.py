@@ -41,7 +41,7 @@ class APQuestItem(Item):
 
 # Ontop of our regular itempool, our world must be able to create arbitrary amounts of filler as requested by core.
 # To do this, it must define a function called world.get_filler_item_name(), which we will define in world.py later.
-# For now, let's make a function that returns the name of a random filler item here in items.py.
+# For now, let's make a function that returns the name of a random filler item here in locations.py.
 def get_random_filler_item_name(world: APQuestWorld) -> str:
     # APQuest has an option called "trap_chance".
     # This is the percentage chance that each filler item is a Math Trap instead of a Confetti Cannon.
@@ -59,7 +59,7 @@ def create_item_with_correct_classification(world: APQuestWorld, name: str) -> A
     # Our world class must have a create_item() function that can create any of our items by name at any time.
     # So, we make this helper function that creates the item by name with the correct classification.
     # Note: This function's content could just be the contents of world.create_item in world.py directly,
-    # but it seemed nicer to have it in its own function over here in items.py.
+    # but it seemed nicer to have it in its own function over here in locations.py.
     classification = DEFAULT_ITEM_CLASSIFICATIONS[name]
 
     # It is perfectly normal and valid for an item's classification to differ based on the player's options.

@@ -8,18 +8,25 @@ Will cause immediate BK if off"""
     display_name = "Start With Sports"
 
 class ExhibitionDifficulty(OptionSet):
-    """ Beating a stage on each difficulty will send a check
+    """ Beating a stage on each difficulty will send an item
 (Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulty"
     valid_keys = {"Easy","Normal", "Hard", "Expert"}
-    default = {"Normal", "Hard"}
+    default = {"Easy", "Normal", "Hard"}
 
 class CupDifficulty(OptionSet):
-    """Beating a cup on each difficulty will send a check
+    """Beating a cup on each difficulty will send an item
 (Normal, Hard, Expert - NOT IMPLEMENTED)"""
     display_name = "Cup Difficulty"
     valid_keys = {"Normal", "Hard"}
     default = {"Normal", "Hard"}
+
+class PartyMode(OptionSet):
+    """What party mode games do you want to include?
+(Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)"""
+    display_name = "Party Mode Games"
+    valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
+    default = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
 
 class StageUnlockType(Choice):
     """How do you want stages to be unlocked?"""
@@ -38,7 +45,7 @@ class GoalCondition(Choice):
 
 class BehemothHP(Range):
     """Behemoth Health - 2400 is base game
-Recommended to edit this in the yaml"""
+Recommended to edit this in the yaml (2400 - 7000)"""
     display_name = "Behemoth HP"
     range_start = 2400
     range_end = 7000
@@ -46,10 +53,10 @@ Recommended to edit this in the yaml"""
 
 class BehemothKingHP(Range):
     """Behemoth King Health - 3000 is base game
-Recommended to edit this in the yaml"""
+Recommended to edit this in the yaml (3000 - 10000)"""
     display_name = "Behemoth King HP"
     range_start = 3000
-    range_end = 7000
+    range_end = 10000
     default = 3000
 
 class CupsRequired(Range):
@@ -136,6 +143,7 @@ class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
     exhibition_difficulty: ExhibitionDifficulty
     cup_difficulty: CupDifficulty
+    party_mode: PartyMode
     stage_unlock_type: StageUnlockType
     goal_condition : GoalCondition
     behemoth_hp: BehemothHP
