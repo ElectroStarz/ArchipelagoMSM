@@ -2,63 +2,91 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from BaseClasses import CollectionState
-from worlds.generic.Rules import add_rule, set_rule
-from rule_builder.rules import And, CanReachRegion, Has, HasAll
+from rule_builder.options import OptionFilter
+from rule_builder.rules import Has, HasAll, Rule
+
+from .options import CupDifficulty, ExhibitionDifficulty, StageUnlockType
 
 if TYPE_CHECKING:
-    from .world import MSMWorld
+    from . import MSMWorld
 
 
-def set_all_rules(world: "MSMWorld") -> None:
+def set_all_rules(world: MSMWorld) -> None:
     # In order for AP to generate an item layout that is actually possible for the player to complete,
     # we need to define rules for our Entrances and Locations.
     # Note: Regions do not have rules, the Entrances connecting them do!
     # We'll do entrances first, then locations, and then finally we set our victory condition.
 
     set_all_entrance_rules(world)
-    set_all_location_rules(world)
-    set_completion_condition(world)
+    #set_all_location_rules(world)
+    #set_completion_condition(world)
 
 
-def set_all_entrance_rules(world: "MSMWorld") -> None:
+def set_all_entrance_rules(world: MSMWorld) -> None:
     # First, we need to actually grab our entrances. Luckily, there is a helper method for this.
-    overworld_to_bottom_right_room = world.get_entrance("Overworld to Bottom Right Room")
-    overworld_to_top_left_room = world.get_entrance("Overworld to Top Left Room")
-    right_room_to_final_boss_room = world.get_entrance("Right Room to Final Boss Room")
+    menu_to_basketball = world.get_entrance("Main Menu -> Basketball")
+    menu_to_dodgeball = world.get_entrance("Main Menu -> Dodgeball")
+    menu_to_volleyball = world.get_entrance("Main Menu -> Volleyball")
+    menu_to_hockey = world.get_entrance("Main Menu -> Hockey")
+    menu_to_sports_mix = world.get_entrance("Main Menu -> Sports Mix")
 
-    # An access rule is a function. We can define this function like any other function.
-    # This function must accept exactly one parameter: A "CollectionState".
-    # A CollectionState describes the current progress of the players in the multiworld, i.e. what items they have,
-    # which regions they've reached, etc.
-    # In an access rule, we can ask whether the player has a collected a certain item.
-    # We can do this via the state.has(...) function.
-    # This function takes an item name, a player number, and an optional count parameter (more on that below)
-    # Since a rule only takes a CollectionState parameter, but we also need the player number in the state.has call,
-    # our function needs to be locally defined so that it has access to the player number from the outer scope.
-    # In our case, we are inside a function that has access to the "world" parameter, so we can use world.player.
-    def can_destroy_bush(state: CollectionState) -> bool:
-        return state.has("Sword", world.player)
+    can_play_basketball = Has("Sport: Basketball")
+    can_play_dodgeball = Has("Sport: Dodgeball")
+    can_play_volleyball = Has("Sport: Volleyball")
+    can_play_hockey = Has("Sport: Hockey")
+    can_play_sports_mix = Has("Sport: Sports Mix")
 
-    # Now we can set our "can_destroy_bush" rule to our entrance which requires slashing a bush to clear the path.
-    # One way to set rules is via the set_rule() function, which works on both Entrances and Locations.
-    set_rule(overworld_to_bottom_right_room, can_destroy_bush)
 
-    # Because the function has to be defined locally, most worlds prefer the lambda syntax.
-    set_rule(overworld_to_top_left_room, lambda state: state.has("Key", world.player))
+    world.set_rule(menu_to_basketball, can_play_basketball)
+    world.set_rule(menu_to_dodgeball, can_play_dodgeball)
+    world.set_rule(menu_to_volleyball, can_play_volleyball)
+    world.set_rule(menu_to_hockey, can_play_hockey)
+    world.set_rule(menu_to_sports_mix, can_play_sports_mix)
 
-    # Conditions can depend on event items.
-    set_rule(right_room_to_final_boss_room, lambda state: state.has("Top Left Room Button Pressed", world.player))
+
+    if world.options.stage_unlock_type == StageUnlockType.option_by_stage_name:
+        # Rules for winning Mushroom Cup
+        # Can - Sport - Cup - Unlock Type
+        can_b_mushroom_stage = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock")
+        # Volleyball and Dodgeball share the same stages
+        can_v_d_mushroom_stage = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: Peach's Castle")
+        can_h_mushroom_stage = HasAll("Stage: Mario Stadium", "Stage: Toad Park", "Stage: Peach's Castle")
+
+        # Rules for winning Flower Cup
+        can_b_flower_stage = HasAll("Stage: Luigi's Mansion", "Stage: Western Junction", "Stage: Daisy Garden")
+        can_d_flower_stage = HasAll("Stage: DK Dock", "Stage: Toad Park", "Stage: Daisy Garden")
+        can_v_flower_stage = HasAll("Stage: DK Dock", "Stage: Luigi's Mansion", "Stage: Western Junction")
+        can_v_flower_alt = Has("Stage: Daisy Garden") #& Has() # Alternate path
+        can_h_flower_stage = HasAll("Stage: Western Junction", "Stage: Wario Factory",)
+
+    if world.options.stage_unlock_type == StageUnlockType.option_by_cup_round:
+        can_mushroom_round = HasAll("Mushroom Cup Round 1", "Mushroom Cup Round 2", "Mushroom Cup Round 3")
+        can_flower_round = HasAll("Flower Cup Round 1", "Flower Cup Round 2", "Flower Cup Round 3")
+        can_star_round = HasAll("Star Cup Round 1", "Star Cup Round 2", "Star Cup Round 3")
+
+
+
+    # Conditions can also depend on event items.
+    # button_pressed = Has("Top Left Room Button Pressed")
+    # world.set_rule(right_room_to_final_boss_room, button_pressed)
 
     # Some entrance rules may only apply if the player enabled certain options.
     # In our case, if the hammer option is enabled, we need to add the Hammer requirement to the Entrance from
     # Overworld to the Top Middle Room.
-    if world.options.hammer:
-        overworld_to_top_middle_room = world.get_entrance("Overworld to Top Middle Room")
-        set_rule(overworld_to_top_middle_room, lambda state: state.has("Hammer", world.player))
+    # if world.options.hammer:
+    #     overworld_to_top_middle_room = world.get_entrance("Overworld to Top Middle Room")
+    #     can_smash_brick = Has("Hammer")
+    #     world.set_rule(overworld_to_top_middle_room, can_smash_brick)
+
+    # This style is not really recommended anymore, though.
+    # Using Rule Builder allows the core AP code to do a lot of under-the-hood optimizations.
+    # Rule Builder is quite comprehensive, and even if you have really esoteric rules,
+    # you can make custom rules by subclassing CustomRule.
+    # Since Rule Builder is preferred, we'll re-set this rule to also use "Has" from the Rule Builder.
+    # world.set_rule(overworld_to_top_left_room, Has("Key"))
 
 
-def set_all_location_rules(world: "MSMWorld") -> None:
+# def set_all_location_rules(world: MSMWorld) -> None:
     # Location rules work no differently from Entrance rules.
     # Most of our locations are chests that can simply be opened by walking up to them.
     # Thus, their logical requirements are covered by the Entrance rules of the Entrances that were required to
@@ -68,65 +96,71 @@ def set_all_location_rules(world: "MSMWorld") -> None:
     # So, we need to set requirements on the Locations themselves.
     # Since combat is a bit more complicated, we'll use this chance to cover some advanced access rule concepts.
 
-    # Sometimes, you may want to have different rules depending on the player's chosen options.
-    # There is a wrong way to do this, and a right way to do this. Let's do the wrong way first.
-    right_room_enemy = world.get_location("Right Room Enemy Drop")
+    # In "set_all_entrance_rules", we had a rule for a location that doesn't always exist.
+    # In this case, we had to check for its existence (by checking the player's chosen options) before setting the rule.
+    # Other times, you may have a situation where a location can have two different rules depending on the options.
+    # In our case, the enemy in the right room has more health if hard mode is selected,
+    # so ontop of the Sword, the player will either need one more health or a Shield in hard mode.
+    # First, let's make our sword condition.
+    #can_defeat_basic_enemy: Rule = Has("Sword")
 
-    # DON'T DO THIS!!!!
-    set_rule(
-        right_room_enemy,
-        lambda state: (
-            state.has("Sword", world.player)
-            and (not world.options.hard_mode or state.has_any(("Shield", "Health Upgrade"), world.player))
-        ),
-    )
-    # DON'T DO THIS!!!!
+    # Next, we'll check whether hard mode has been chosen in the player options.
+    #if world.options.hard_mode:
+        # We'll make the condition for "Has a Shield or a Health Upgrade".
+        # We can chain two "Has" conditions together with the | operator to make "Has Shield or has Health Upgrade".
+        #can_withstand_a_hit = Has("Shield") | Has("Health Upgrade")
 
-    # Now, what's actually wrong with this? It works perfectly fine, right?
-    # If hard mode disabled, Sword is enough. If hard mode is enabled, we also need a Shield or a Health Upgrade.
-    # The access rule we just wrote does this correctly, so what's the problem?
-    # The problem is performance.
-    # Most of your world code doesn't need to be perfectly performant, since it just runs once per slot.
-    # However, access rules in particular are by far the hottest code path in Archipelago.
-    # An access rule will potentially be called thousands or even millions of times over the course of one generation.
-    # As a result, access rules are the one place where it's really worth putting in some effort to optimize.
-    # What's the performance problem here?
-    # Every time our access rule is called, it has to evaluate whether world.options.hard_mode is True or False.
-    # Wouldn't it be better if in easy mode, the access rule only checked for Sword to begin with?
-    # Wouldn't it also be better if in hard mode, it already knew it had to check Shield and Health Upgrade as well?
-    # Well, we can achieve this by doing the "if world.options.hard_mode" check outside the set_rule call,
-    # and instead having two *different* set_rule calls depending on which case we're in.
+        # Now, we chain this rule to our Sword rule.
+        # Since we want both conditions to be true, in this case, we have to chain them in an "and" way.
+        # For this, we can use the & operator.
+        #can_defeat_basic_enemy = can_defeat_basic_enemy & can_withstand_a_hit
 
-    if world.options.hard_mode:
-        # If you have multiple conditions, you can obviously chain them via "or" or "and".
-        # However, there are also the nice helper functions "state.has_any" and "state.has_all".
-        set_rule(
-            right_room_enemy,
-            lambda state: (
-                state.has("Sword", world.player) and state.has_any(("Shield", "Health Upgrade"), world.player)
-            ),
-        )
-    else:
-        set_rule(right_room_enemy, lambda state: state.has("Sword", world.player))
+    # Finally, we set our rule onto the Right Room Eney Drop location.
+    #right_room_enemy = world.get_location("Right Room Enemy Drop")
+    #world.set_rule(right_room_enemy, can_defeat_basic_enemy)
 
-    # Another way to chain multiple conditions is via the add_rule function.
-    # This makes the access rules a bit slower though, so it should only be used if your structure justifies it.
-    # In our case, it's pretty useful because hard mode and easy mode have different requirements.
-    final_boss = world.get_location("Final Boss Defeated")
+    # For the final boss, we also need to chain multiple conditions.
+    # First of all, you always need a Sword and a Shield.
+    # So far, we used the | and & operators to chain "Has" rules.
+    # Instead, we can also use HasAny for an or-chain of items, or HasAll for an and-chain of items.
+    #has_sword_and_shield: Rule = HasAll("Sword", "Shield")
 
-    # For the "known" requirements, it's still better to chain them using a normal "and" condition.
-    add_rule(final_boss, lambda state: state.has_all(("Sword", "Shield"), world.player))
+    # In hard mode, the player also needs both Health Upgrades to survive long enough to defeat the boss.
+    # For this, we can use the optional "count" parameter for "Has".
+    #has_both_health_upgrades = Has("Health Upgrade", count=2)
 
-    if world.options.hard_mode:
-        # You can check for multiple copies of an item by using the optional count parameter of state.has().
-        add_rule(final_boss, lambda state: state.has("Health Upgrade", world.player, 2))
+    # Previously, we used an "if world.options.hard_mode" condition to check if we should apply the extra requirement.
+    # However, if you're comfortable with boolean logic, there is another way.
+    # OptionFilter is a rule which just resolves to True if the option has the specified value, or False otherwise.
+    #hard_mode_is_off = OptionFilter(HardMode, False)
+
+    # Now we can combine our rule as follows.
+    #can_defeat_final_boss = has_sword_and_shield & (hard_mode_is_off | has_both_health_upgrades)
+    # If you're not as comfortable with boolean logic, it might be somewhat confusing why this is correct.
+    # There is nothing wrong with using "if" conditions to check for options, if you find that easier to understand.
+
+    # Finally, we apply the rule to our "Final Boss Defeated" event location.
+    #final_boss = world.get_location("Final Boss Defeated")
+    #world.set_rule(final_boss, can_defeat_final_boss)
 
 
-def set_completion_condition(world: "MSMWorld") -> None:
+#def set_completion_condition(world: MSMWorld) -> None:
     # Finally, we need to set a completion condition for our world, defining what the player needs to win the game.
+    # For this, we can use world.set_completion_rule.
     # You can just set a completion condition directly like any other condition, referencing items the player receives:
-    world.multiworld.completion_condition[world.player] = lambda state: state.has_all(("Sword", "Shield"), world.player)
+    #world.set_completion_rule(HasAll("Sword", "Shield"))
 
     # In our case, we went for the Victory event design pattern (see create_events() in locations.py).
     # So lets undo what we just did, and instead set the completion condition to:
-    world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)
+    world.set_completion_rule(Has("Victory"))
+
+
+# One final comment about rules:
+# If your world exclusively uses Rule Builder rules (like APQuest), it's worth trying CachedRuleBuilderWorld.
+# CachedRuleBuilderWorld is a subclass of World that has a bunch of caching magic to make rules faster.
+# Just have your world class subclass CachedRuleBuilderWorld instead of World:
+#   class APQuestWorld(CachedRuleBuilderWorld): ...
+# This may speed up your world, or it may make it slower.
+# The exact factors are complex and not well understood, but there is no harm in trying it.
+# Generate a few seeds and see if there is a noticeable difference!
+# If you're wondering, author has checked: APQuest is too simple to see any benefits, so we'll stick with "World".
