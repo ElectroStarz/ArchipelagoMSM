@@ -10,7 +10,7 @@
 
 ## How to install
 ### Preparations
-1) Download the [latest version of Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) and run the setup
+1) Download the [latest version of Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases)
 2) Download the [latest version of this APWorld](https://github.com/ElectroStarz/ArchipelagoMSM/releases) and put it in
 your custom_worlds folder
 3) Download [Root.zip](https://github.com/ElectroStarz/ArchipelagoMSM/releases)

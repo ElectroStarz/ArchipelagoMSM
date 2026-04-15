@@ -147,82 +147,43 @@ progressive_stuff = {
 
 }
 
-if TeamSanity.option_off:
-    characters = {
-        "Character: Mario": ItemData(base_id + 200, ItemClassification.useful),
-        "Character: Luigi": ItemData(base_id + 201, ItemClassification.useful),
-        "Character: Peach": ItemData(base_id + 202, ItemClassification.useful),
-        "Character: Daisy": ItemData(base_id + 203, ItemClassification.useful),
-        "Character: Yoshi": ItemData(base_id + 204, ItemClassification.useful),
-        "Character: Wario": ItemData(base_id + 205, ItemClassification.useful),
-        "Character: Waluigi": ItemData(base_id + 206, ItemClassification.useful),
-        "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.useful),
-        "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.useful),
-        "Character: Toad": ItemData(base_id + 209, ItemClassification.useful),
-        "Character: Bowser": ItemData(base_id + 210, ItemClassification.useful),
-        "Character: Bowser Jr.": ItemData(base_id + 211, ItemClassification.useful),
-        "Character: Moogle": ItemData(base_id + 212, ItemClassification.useful),
-        "Character: Cactuar": ItemData(base_id + 213, ItemClassification.useful),
-        "Character: Ninja": ItemData(base_id + 214, ItemClassification.useful),
-        "Character: White Mage": ItemData(base_id + 215, ItemClassification.useful),
-        "Character: Slime": ItemData(base_id + 216, ItemClassification.useful),
-        "Character: Black Mage": ItemData(base_id + 217, ItemClassification.useful),
-    }
-elif TeamSanity.option_characters or TeamSanity.option_characters_and_costumes:
-    characters = {
-        "Character: Mario": ItemData(base_id + 200, ItemClassification.progression|ItemClassification.useful),
-        "Character: Luigi": ItemData(base_id + 201, ItemClassification.progression|ItemClassification.useful),
-        "Character: Peach": ItemData(base_id + 202, ItemClassification.progression|ItemClassification.useful),
-        "Character: Daisy": ItemData(base_id + 203, ItemClassification.progression|ItemClassification.useful),
-        "Character: Yoshi": ItemData(base_id + 204, ItemClassification.progression|ItemClassification.useful),
-        "Character: Wario": ItemData(base_id + 205, ItemClassification.progression|ItemClassification.useful),
-        "Character: Waluigi": ItemData(base_id + 206, ItemClassification.progression|ItemClassification.useful),
-        "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.progression|ItemClassification.useful),
-        "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.progression|ItemClassification.useful),
-        "Character: Toad": ItemData(base_id + 209, ItemClassification.progression|ItemClassification.useful),
-        "Character: Bowser": ItemData(base_id + 210, ItemClassification.progression|ItemClassification.useful),
-        "Character: Bowser Jr.": ItemData(base_id + 211, ItemClassification.progression|ItemClassification.useful),
-        "Character: Moogle": ItemData(base_id + 212, ItemClassification.progression|ItemClassification.useful),
-        "Character: Cactuar": ItemData(base_id + 213, ItemClassification.progression|ItemClassification.useful),
-        "Character: Ninja": ItemData(base_id + 214, ItemClassification.progression|ItemClassification.useful),
-        "Character: White Mage": ItemData(base_id + 215, ItemClassification.progression|ItemClassification.useful),
-        "Character: Slime": ItemData(base_id + 216, ItemClassification.progression|ItemClassification.useful),
-        "Character: Black Mage": ItemData(base_id + 217, ItemClassification.progression|ItemClassification.useful),
-    }
 
-# Change classification if Team Sanity is off/characters or characters and costumes
-if TeamSanity.option_off or TeamSanity.option_characters:
-    character_costumes = {
-        "Costume: Light Blue Yoshi": ItemData(base_id + 218, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Yellow Yoshi": ItemData(base_id + 219, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Pink Yoshi": ItemData(base_id + 220, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Tennis-wear Peach": ItemData(base_id + 221, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Tennis-wear Daisy": ItemData(base_id + 222, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Blue Toad": ItemData(base_id + 223, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Yellow Toad": ItemData(base_id + 224, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Green Toad": ItemData(base_id + 225, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Shadow White Ninja": ItemData(base_id + 226, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Pure White - White Mage": ItemData(base_id + 227,ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Magic Red Black Mage": ItemData(base_id + 228,ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: She-Slime": ItemData(base_id + 229, ItemClassification.filler|ItemClassification.deprioritized),
-        "Costume: Metal Slime": ItemData(base_id + 230, ItemClassification.filler|ItemClassification.deprioritized),
-    }
-elif TeamSanity.option_characters_and_costumes:
-    character_costumes = {
-        "Costume: Light Blue Yoshi": ItemData(base_id + 218, ItemClassification.useful),
-        "Costume: Yellow Yoshi": ItemData(base_id + 219, ItemClassification.useful),
-        "Costume: Pink Yoshi": ItemData(base_id + 220, ItemClassification.useful),
-        "Costume: Tennis-wear Peach": ItemData(base_id + 221, ItemClassification.useful),
-        "Costume: Tennis-wear Daisy": ItemData(base_id + 222, ItemClassification.useful),
-        "Costume: Blue Toad": ItemData(base_id + 223, ItemClassification.useful),
-        "Costume: Yellow Toad": ItemData(base_id + 224, ItemClassification.useful),
-        "Costume: Green Toad": ItemData(base_id + 225, ItemClassification.useful),
-        "Costume: Shadow White Ninja": ItemData(base_id + 226, ItemClassification.useful),
-        "Costume: Pure White - White Mage": ItemData(base_id + 227,ItemClassification.useful),
-        "Costume: Magic Red Black Mage": ItemData(base_id + 228,ItemClassification.useful),
-        "Costume: She-Slime": ItemData(base_id + 229, ItemClassification.useful),
-        "Costume: Metal Slime": ItemData(base_id + 230, ItemClassification.useful),
-    }
+characters = {
+    "Character: Mario": ItemData(base_id + 200, ItemClassification.useful),
+    "Character: Luigi": ItemData(base_id + 201, ItemClassification.useful),
+    "Character: Peach": ItemData(base_id + 202, ItemClassification.useful),
+    "Character: Daisy": ItemData(base_id + 203, ItemClassification.useful),
+    "Character: Yoshi": ItemData(base_id + 204, ItemClassification.useful),
+    "Character: Wario": ItemData(base_id + 205, ItemClassification.useful),
+    "Character: Waluigi": ItemData(base_id + 206, ItemClassification.useful),
+    "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.useful),
+    "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.useful),
+    "Character: Toad": ItemData(base_id + 209, ItemClassification.useful),
+    "Character: Bowser": ItemData(base_id + 210, ItemClassification.useful),
+    "Character: Bowser Jr.": ItemData(base_id + 211, ItemClassification.useful),
+    "Character: Moogle": ItemData(base_id + 212, ItemClassification.useful),
+    "Character: Cactuar": ItemData(base_id + 213, ItemClassification.useful),
+    "Character: Ninja": ItemData(base_id + 214, ItemClassification.useful),
+    "Character: White Mage": ItemData(base_id + 215, ItemClassification.useful),
+    "Character: Slime": ItemData(base_id + 216, ItemClassification.useful),
+    "Character: Black Mage": ItemData(base_id + 217, ItemClassification.useful),
+}
+
+character_costumes = {
+    "Costume: Light Blue Yoshi": ItemData(base_id + 218, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Yellow Yoshi": ItemData(base_id + 219, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Pink Yoshi": ItemData(base_id + 220, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Tennis-wear Peach": ItemData(base_id + 221, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Tennis-wear Daisy": ItemData(base_id + 222, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Blue Toad": ItemData(base_id + 223, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Yellow Toad": ItemData(base_id + 224, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Green Toad": ItemData(base_id + 225, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Shadow White Ninja": ItemData(base_id + 226, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Pure White - White Mage": ItemData(base_id + 227,ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Magic Red Black Mage": ItemData(base_id + 228,ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: She-Slime": ItemData(base_id + 229, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Metal Slime": ItemData(base_id + 230, ItemClassification.filler|ItemClassification.deprioritized),
+}
 
 # Able to use once unlocked
 unlockable_items = {
@@ -250,6 +211,7 @@ one_time_items = {
 traps = {
     "Trap: Negative Coin": ItemData(base_id + 500, ItemClassification.trap),
     "Trap: Hit Stun": ItemData(base_id + 501, ItemClassification.trap),
+    "Trap: Half time (Literally!)": ItemData(base_id + 502, ItemClassification.trap),
 }
 
 # Need custom code for Party Mode Keys
@@ -310,65 +272,6 @@ item_table: Dict[str, ItemData] = {
     **harmony_hustle_items
 }
 
-
-
-#What item group is this item in?
-def get_item_group(item_name: str) -> str:
-    if item_name in sport_items:
-        return "Sport Items"
-    elif item_name in basketball_items_n:
-        return "Basketball Normal Cups"
-    elif item_name in basketball_items_h:
-        return "Basketball Hard Cups"
-    elif item_name in dodgeball_items_n:
-        return "Dodgeball Normal Cups"
-    elif item_name in dodgeball_items_h:
-        return "Dodgeball Hard Cups"
-    elif item_name in volleyball_items_n:
-        return "Volleyball Normal Cups"
-    elif item_name in volleyball_items_h:
-        return "Volleyball Hard Cups"
-    elif item_name in hockey_items_n:
-        return "Hockey Normal Cups"
-    elif item_name in hockey_items_h:
-        return "Hockey Hard Cups"
-    elif item_name in sports_mix_items:
-        return "Sports Mix Cups"
-    # elif item_name in all_cup_unlocks_n:
-    #     return "Normal Cup unlocks for all sports"
-    # elif item_name in all_cup_unlocks_h:
-    #     return "Hard Cup unlocks for all sports"
-    elif item_name in exhibition_difficulties:
-        return "Exhibition Difficulties"
-    elif item_name in mushroom_cup_rounds:
-        return "Mushroom Cup Rounds"
-    elif item_name in flower_cup_rounds:
-        return "Flower Cup Rounds"
-    elif item_name in star_cup_rounds:
-        return "Star Cup Rounds"
-    elif item_name in extra_stages:
-        return "Extra Stages"
-    elif item_name in individual_stages:
-        return "Individual stages"
-    elif item_name in progressive_stuff:
-        return "Progressive stuff"
-    elif item_name in characters:
-        return "Characters"
-    elif item_name in character_costumes:
-        return "Character costumes"
-    elif item_name in unlockable_items:
-        return "Unlockable items"
-    elif item_name in one_time_items:
-        return "One time items"
-    elif item_name in traps:
-        return "Traps"
-    # elif item_name in party_mode_keys:
-    #     return "Party Mode Keys"
-    elif item_name in harmony_hustle_items:
-        return "Harmony Hustle Items"
-    else:
-        return "No item group for this item"
-
 ITEM_NAME_TO_ID: Dict[str, int] = {item_name: data.code for item_name, data in item_table.items()}
 
 def get_random_filler_item_name(world: "MSMWorld") -> str:
@@ -376,7 +279,6 @@ def get_random_filler_item_name(world: "MSMWorld") -> str:
     filler_list = [name for name, data in one_time_items.items()]
     if world.random.randint(0, 99) < world.options.trap_chance:
         return world.random.choice(traps_list)
-
     return world.random.choice(filler_list)
 
 
@@ -453,10 +355,10 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             itempool.append(new_item)
 
-        # Sports Mix
-        for name, data in sports_mix_items.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+    # Sports Mix
+    for name, data in sports_mix_items.items():
+        new_item = world.create_item(name)
+        itempool.append(new_item)
 
     if world.options.stage_unlock_type == StageUnlockType.option_by_stage_name:
         # Create items for actual stages
@@ -474,7 +376,14 @@ def create_all_items(world: "MSMWorld") -> None:
         for name, data in star_cup_rounds.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in extra_stages.items():
+        # for name, data in extra_stages.items():
+        #     new_item = world.create_item(name)
+        #     itempool.append(new_item)
+
+    # Party Mode Items
+    # Harmony Hustle
+    if "Harmony Hustle" in world.options.party_mode:
+        for name, data in harmony_hustle_items.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
 
@@ -489,16 +398,11 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
-    # Creates an MSMItem for the given player based on the item name
-    if name not in item_table:
-        raise KeyError(f"Item '{name}' not found in the item table.")
+    classification = item_table[name].classification
 
-    item_data = item_table[name]
+    if name in characters and world.options.team_sanity == TeamSanity.option_characters or world.options.team_sanity == TeamSanity.option_characters_and_costumes:
+        classification = ItemClassification.progression|ItemClassification.useful
+    if name in character_costumes and world.options.team_sanity == TeamSanity.option_characters_and_costumes:
+        classification = ItemClassification.progression|ItemClassification.useful
 
-    # Provide the MSMItem with the details from our table
-    return MSMItem(
-        name,
-        item_data.classification,
-        item_data.code,
-        world.player
-    )
+    return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

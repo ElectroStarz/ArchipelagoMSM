@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from BaseClasses import Region
-from rule_builder.rules import Has
 from .options import GoalCondition
 
 if TYPE_CHECKING:
@@ -222,8 +221,11 @@ def connect_regions(world: MSMWorld) -> None:
     sm_mushroom_cup = world.get_region("Sports Mix: Mushroom Cup")
     sm_flower_cup = world.get_region("Sports Mix: Flower Cup")
     sm_star_cup = world.get_region("Sports Mix: Star Cup")
-    behemoth_boss = world.get_region("Behemoth Boss Battle")
-    behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
+
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+        behemoth_boss = world.get_region("Behemoth Boss Battle")
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+        behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
 
     # Party Mode
     party_mode = world.get_region("Party Mode")
@@ -303,10 +305,12 @@ def connect_regions(world: MSMWorld) -> None:
 
     # Behemoth is accessed by completing all normal star cups, connect all to the Behemoth Boss region
     # Note: Add rule if 3 other star cups have been beaten, gonna have to figure out something
-    b_star_cup_n.connect(behemoth_boss, "Basketball Star Cup (Normal) -> Behemoth Boss")
-    d_star_cup_n.connect(behemoth_boss, "Dodgeball Star Cup (Normal) -> Behemoth Boss")
-    v_star_cup_n.connect(behemoth_boss, "Volleyball Star Cup (Normal) -> Behemoth Boss")
-    h_star_cup_n.connect(behemoth_boss, "Hockey Star Cup (Normal) -> Behemoth Boss")
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+        b_star_cup_n.connect(behemoth_boss, "Basketball Star Cup (Normal) -> Behemoth Boss")
+        d_star_cup_n.connect(behemoth_boss, "Dodgeball Star Cup (Normal) -> Behemoth Boss")
+        v_star_cup_n.connect(behemoth_boss, "Volleyball Star Cup (Normal) -> Behemoth Boss")
+        h_star_cup_n.connect(behemoth_boss, "Hockey Star Cup (Normal) -> Behemoth Boss")
     # Behemoth King is only accessed by beating the Sports Mix Star Cup
-    sm_star_cup.connect(behemoth_king_boss, "Sports Mix Star Cup -> Behemoth King Boss")
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+        sm_star_cup.connect(behemoth_king_boss, "Sports Mix Star Cup -> Behemoth King Boss")
 

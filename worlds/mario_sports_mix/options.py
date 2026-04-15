@@ -80,7 +80,7 @@ class TeamSanity(Choice):
     option_off = 0
     option_characters = 1
     option_characters_and_costumes = 2
-    default = 0
+    default = 2
 
 class ScoreSanity(Toggle):
     """(NOT WORKING) Toggle on or off score sanity"""

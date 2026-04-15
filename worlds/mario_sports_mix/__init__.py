@@ -67,7 +67,6 @@ class MSMWorld(World):
     def create_item(self, name: str) -> items.MSMItem:
         return items.create_item_with_correct_classification(self, name)
 
-
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)
 

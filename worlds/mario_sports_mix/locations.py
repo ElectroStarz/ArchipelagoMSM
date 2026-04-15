@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 from BaseClasses import Location
 from . import items
 from .options import GoalCondition
@@ -20,6 +21,7 @@ def create_all_locations(world: "MSMWorld") -> None:
 
 
 base_loc_id = 0
+
 
 LOCATION_NAME_TO_ID = {
     # Basketball
@@ -372,28 +374,28 @@ LOCATION_NAME_TO_ID = {
     "Use Slime's Special!": base_loc_id + 576,
     "Use Black Mage's Special!": base_loc_id + 577,
 
-
-    # Goal Condition Locations
-    "Defeated Behemoth!": base_loc_id + 600,
-
     # Party Mode: Feed Petey Locations
-    "FP: Get 10 Points!": base_loc_id + 700,
-    "FP: Get 20 Points!": base_loc_id + 701,
-    "FP: Get 30 Points!": base_loc_id + 702,
-    "FP: Get 40 Points!": base_loc_id + 703,
-    "FP: Get 50 Points!": base_loc_id + 704,
-    "FP: Get 60 Points!": base_loc_id + 705,
-    "FP: Get 70 Points!": base_loc_id + 706,
-    "FP: Get 80 Points!": base_loc_id + 707,
-    "FP: Get 90 Points!": base_loc_id + 708,
-    "FP: Get 100 Points!": base_loc_id + 709,
-}
+    "FP: Get 10 Points!": base_loc_id + 600,
+    "FP: Get 20 Points!": base_loc_id + 601,
+    "FP: Get 30 Points!": base_loc_id + 602,
+    "FP: Get 40 Points!": base_loc_id + 603,
+    "FP: Get 50 Points!": base_loc_id + 604,
+    "FP: Get 60 Points!": base_loc_id + 605,
+    "FP: Get 70 Points!": base_loc_id + 606,
+    "FP: Get 80 Points!": base_loc_id + 607,
+    "FP: Get 90 Points!": base_loc_id + 608,
+    "FP: Get 100 Points!": base_loc_id + 609,
 
+    # If goal condition is defeating Behemoth King create an item for defeating Behemoth
+    "Defeated Behemoth!": base_loc_id + 2000,
+
+}
 
 def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | None]:
     return {location_name: LOCATION_NAME_TO_ID[location_name] for location_name in location_names}
 
 def create_regular_locations(world: MSMWorld) -> None:
+    main_menu = world.get_region("Main Menu")
     # Basketball
     b_exhibition_e = world.get_region("Basketball: Exhibition (Easy)")
     b_exhibition_n = world.get_region("Basketball: Exhibition (Normal)")
@@ -438,6 +440,12 @@ def create_regular_locations(world: MSMWorld) -> None:
     h_mushroom_cup_h = world.get_region("Hockey: Mushroom Cup (Hard)")
     h_flower_cup_h = world.get_region("Hockey: Flower Cup (Hard)")
     h_star_cup_h = world.get_region("Hockey: Star Cup (Hard)")
+
+    feed_petey = world.get_region("Party Mode: Feed Petey")
+    feed_petey_locations = get_location_names_with_ids(["FP: Get 10 Points!", "FP: Get 20 Points!", "FP: Get 30 Points!",
+    "FP: Get 40 Points!", "FP: Get 50 Points!", "FP: Get 60 Points!", "FP: Get 70 Points!", "FP: Get 80 Points!",
+    "FP: Get 90 Points!", "FP: Get 100 Points!"])
+    feed_petey.add_locations(feed_petey_locations, MSMLocation)
 
     # Normal Difficulty
 
@@ -758,18 +766,25 @@ def create_regular_locations(world: MSMWorld) -> None:
     h_exhibition_h.add_locations(h_exhibition_locations_h)
     h_exhibition_ex.add_locations(h_exhibition_locations_ex)
 
-
 def create_events(world: "MSMWorld") -> None:
-    behemoth_boss = world.get_region("Behemoth Boss Battle")
-    behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
-
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+        behemoth_boss = world.get_region("Behemoth Boss Battle")
         behemoth_boss.add_event(
-            "Defeated Behemoth!", "Victory", location_type=MSMLocation, item_type=items.MSMItem
+            "Defeated Behemoth!", "Victory!", location_type=MSMLocation, item_type=items.MSMItem
         )
 
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+        # This is causing issues I don't like you
+        # normal_behemoth_loc = get_location_names_with_ids(["Defeated Behemoth!"])
+        # behemoth_boss = world.get_region("Behemoth Boss Battle")
+        # behemoth_boss.add_locations(normal_behemoth_loc, MSMLocation)
+        behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
         behemoth_king_boss.add_event(
-            "Defeated Behemoth King!", "Victory", location_type=MSMLocation, item_type=items.MSMItem
-        )
+            "Defeated Behemoth King!", "Victory!", location_type=MSMLocation,
+            item_type=items.MSMItem)
 
+    if world.options.goal_condition == GoalCondition.option_win_cups:
+        win_cup_value = world.options.cups_required.value
+        menu = world.get_region("Main Menu")
+        menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
+                       item_type=items.MSMItem)
