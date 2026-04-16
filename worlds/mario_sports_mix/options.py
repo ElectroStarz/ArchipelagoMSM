@@ -12,7 +12,7 @@ class ExhibitionDifficulty(OptionSet):
 (Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulty"
     valid_keys = {"Easy","Normal", "Hard", "Expert"}
-    default = {"Easy", "Normal", "Hard"}
+    default = {"Easy", "Normal", "Hard", "Expert"}
 
 class CupDifficulty(OptionSet):
     """Beating a cup on each difficulty will send an item

@@ -175,7 +175,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Western Junction (Easy)": base_loc_id + 239,
     "Hockey Ex: Beat Wario Factory (Easy)": base_loc_id + 240,
     "Hockey Ex: Beat Daisy Garden (Easy)": base_loc_id + 241,
-    "Hockey Ex: Beat Bowser Jr. Blvd (Easy)": base_loc_id + 242,
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Easy)": base_loc_id + 242,
     "Hockey Ex: Beat Waluigi Pinball (Easy)": base_loc_id + 243,
     "Hockey Ex: Beat Star Ship (Easy)": base_loc_id + 244,
     "Hockey Ex: Beat Koopa Troopa Beach (Easy)": base_loc_id + 245,
@@ -232,7 +232,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Western Junction (Normal)": base_loc_id + 339,
     "Hockey Ex: Beat Wario Factory (Normal)": base_loc_id + 340,
     "Hockey Ex: Beat Daisy Garden (Normal)": base_loc_id + 341,
-    "Hockey Ex: Beat Bowser Jr. Blvd (Normal)": base_loc_id + 342,
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Normal)": base_loc_id + 342,
     "Hockey Ex: Beat Waluigi Pinball (Normal)": base_loc_id + 343,
     "Hockey Ex: Beat Star Ship (Normal)": base_loc_id + 344,
     "Hockey Ex: Beat Koopa Troopa Beach (Normal)": base_loc_id + 345,
@@ -289,7 +289,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Western Junction (Hard)": base_loc_id + 439,
     "Hockey Ex: Beat Wario Factory (Hard)": base_loc_id + 440,
     "Hockey Ex: Beat Daisy Garden (Hard)": base_loc_id + 441,
-    "Hockey Ex: Beat Bowser Jr. Blvd (Hard)": base_loc_id + 442,
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Hard)": base_loc_id + 442,
     "Hockey Ex: Beat Waluigi Pinball (Hard)": base_loc_id + 443,
     "Hockey Ex: Beat Star Ship (Hard)": base_loc_id + 444,
     "Hockey Ex: Beat Koopa Troopa Beach (Hard)": base_loc_id + 445,
@@ -346,7 +346,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Western Junction (Expert)": base_loc_id + 539,
     "Hockey Ex: Beat Wario Factory (Expert)": base_loc_id + 540,
     "Hockey Ex: Beat Daisy Garden (Expert)": base_loc_id + 541,
-    "Hockey Ex: Beat Bowser Jr. Blvd (Expert)": base_loc_id + 542,
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Expert)": base_loc_id + 542,
     "Hockey Ex: Beat Waluigi Pinball (Expert)": base_loc_id + 543,
     "Hockey Ex: Beat Star Ship (Expert)": base_loc_id + 544,
     "Hockey Ex: Beat Koopa Troopa Beach (Expert)": base_loc_id + 545,
@@ -440,6 +440,19 @@ def create_regular_locations(world: MSMWorld) -> None:
     h_mushroom_cup_h = world.get_region("Hockey: Mushroom Cup (Hard)")
     h_flower_cup_h = world.get_region("Hockey: Flower Cup (Hard)")
     h_star_cup_h = world.get_region("Hockey: Star Cup (Hard)")
+    # Sports Mix
+    sports_mix_mushroom = world.get_region("Sports Mix: Mushroom Cup")
+    sm_mushroom_locations = get_location_names_with_ids(["Sports Mix: Beat Mushroom Cup Round 1",
+    "Sports Mix: Beat Mushroom Cup Round 2", "Sports Mix: Beat Mushroom Cup Round 3"])
+    sports_mix_mushroom.add_locations(sm_mushroom_locations, MSMLocation)
+    sports_mix_flower = world.get_region("Sports Mix: Flower Cup")
+    sm_flower_locations = get_location_names_with_ids(["Sports Mix: Beat Flower Cup Round 1",
+    "Sports Mix: Beat Flower Cup Round 2", "Sports Mix: Beat Flower Cup Round 3"])
+    sports_mix_flower.add_locations(sm_flower_locations, MSMLocation)
+    sports_mix_star = world.get_region("Sports Mix: Star Cup")
+    sm_star_locations = get_location_names_with_ids(["Sports Mix: Beat Star Cup Round 1",
+    "Sports Mix: Beat Star Cup Round 2", "Sports Mix: Beat Star Cup Round 3"])
+    sports_mix_star.add_locations(sm_star_locations, MSMLocation)
 
     feed_petey = world.get_region("Party Mode: Feed Petey")
     feed_petey_locations = get_location_names_with_ids(["FP: Get 10 Points!", "FP: Get 20 Points!", "FP: Get 30 Points!",
@@ -716,7 +729,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Western Junction (Easy)",
         "Hockey Ex: Beat Wario Factory (Easy)",
         "Hockey Ex: Beat Daisy Garden (Easy)",
-        "Hockey Ex: Beat Bowser Jr. Blvd (Easy)",
+        "Hockey Ex: Beat Bowser Jr. Blvd. (Easy)",
         "Hockey Ex: Beat Waluigi Pinball (Easy)",
         "Hockey Ex: Beat Star Ship (Easy)",
         "Hockey Ex: Beat Koopa Troopa Beach (Easy)",
@@ -729,7 +742,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Western Junction (Normal)",
         "Hockey Ex: Beat Wario Factory (Normal)",
         "Hockey Ex: Beat Daisy Garden (Normal)",
-        "Hockey Ex: Beat Bowser Jr. Blvd (Normal)",
+        "Hockey Ex: Beat Bowser Jr. Blvd. (Normal)",
         "Hockey Ex: Beat Waluigi Pinball (Normal)",
         "Hockey Ex: Beat Star Ship (Normal)",
         "Hockey Ex: Beat Koopa Troopa Beach (Normal)",
@@ -742,7 +755,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Western Junction (Hard)",
         "Hockey Ex: Beat Wario Factory (Hard)",
         "Hockey Ex: Beat Daisy Garden (Hard)",
-        "Hockey Ex: Beat Bowser Jr. Blvd (Hard)",
+        "Hockey Ex: Beat Bowser Jr. Blvd. (Hard)",
         "Hockey Ex: Beat Waluigi Pinball (Hard)",
         "Hockey Ex: Beat Star Ship (Hard)",
         "Hockey Ex: Beat Koopa Troopa Beach (Hard)",
@@ -755,7 +768,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Western Junction (Expert)",
         "Hockey Ex: Beat Wario Factory (Expert)",
         "Hockey Ex: Beat Daisy Garden (Expert)",
-        "Hockey Ex: Beat Bowser Jr. Blvd (Expert)",
+        "Hockey Ex: Beat Bowser Jr. Blvd. (Expert)",
         "Hockey Ex: Beat Waluigi Pinball (Expert)",
         "Hockey Ex: Beat Star Ship (Expert)",
         "Hockey Ex: Beat Koopa Troopa Beach (Expert)",
@@ -765,6 +778,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     h_exhibition_n.add_locations(h_exhibition_locations_n)
     h_exhibition_h.add_locations(h_exhibition_locations_h)
     h_exhibition_ex.add_locations(h_exhibition_locations_ex)
+
 
 def create_events(world: "MSMWorld") -> None:
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:

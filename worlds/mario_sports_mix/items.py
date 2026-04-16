@@ -147,7 +147,6 @@ progressive_stuff = {
 
 }
 
-
 characters = {
     "Character: Mario": ItemData(base_id + 200, ItemClassification.useful),
     "Character: Luigi": ItemData(base_id + 201, ItemClassification.useful),
@@ -238,8 +237,6 @@ harmony_hustle_items = {
     "HH: Island Athletic": ItemData(base_id + 810, ItemClassification.useful),
     "HH: Star Mix Melody": ItemData(base_id + 811, ItemClassification.useful),
 }
-
-
 
 
 # Put all into a table
