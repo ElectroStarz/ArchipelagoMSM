@@ -5,7 +5,7 @@
 - [Latest version of this APWorld](https://github.com/ElectroStarz/ArchipelagoMSM/releases)
 - [Root.zip (In the releases page)](https://github.com/ElectroStarz/ArchipelagoMSM/releases)
 - [Dolphin Emulator](https://dolphin-emu.org/download/?ref=btn)
-- Your PAL (European) ROM of Mario Sports Mix
+- Your PAL (European) ROM of Mario Sports Mix (NTSC-U may be supported in later updates)
 
 
 ## How to install
@@ -37,6 +37,7 @@ Archipelago'. Now you're ready to play!
 - Remember to have the gecko code on whenever you play AP! Enabling/Disabling it for the unmodified rom also does it for
 the version we just created and vice versa!
 - Your save data for AP is separated from your actual save data, so no need to back anything up!
+- When playing, use save file 1! (Support for other save files may come in a later update)
 
 
 ## Creating a yaml file

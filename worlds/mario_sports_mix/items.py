@@ -1,7 +1,7 @@
 from typing import Dict, NamedTuple, TYPE_CHECKING, Optional
 
 from BaseClasses import Item, ItemClassification
-from .options import StageUnlockType, TeamSanity
+from .options import StageUnlockType, TeamSanity, StartWithSports, StartWithMushroomCup, SportsMixUnlock
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -20,7 +20,10 @@ sport_items = {
     "Sport: Dodgeball": ItemData(base_id + 1, ItemClassification.progression|ItemClassification.useful),
     "Sport: Volleyball": ItemData(base_id + 2, ItemClassification.progression|ItemClassification.useful),
     "Sport: Hockey": ItemData(base_id + 3, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Sports Mix": ItemData(base_id + 4, ItemClassification.progression_skip_balancing|ItemClassification.useful),
+}
+
+sports_mix_item = {
+    "Sport: Sports Mix": ItemData(base_id + 4, ItemClassification.progression_skip_balancing|ItemClassification.useful)
 }
 
 basketball_items_n = {
@@ -71,10 +74,17 @@ hockey_items_h = {
     "Hockey: Star Cup (Hard)": ItemData(base_id + 28, ItemClassification.progression)
 }
 
-sports_mix_items = {
+sports_mix_cups = {
     "Sports Mix: Mushroom Cup": ItemData(base_id + 29, ItemClassification.progression_skip_balancing),
     "Sports Mix: Flower Cup": ItemData(base_id + 30, ItemClassification.progression_skip_balancing),
     "Sports Mix: Star Cup": ItemData(base_id + 31, ItemClassification.progression_skip_balancing)
+}
+
+sports_crystals = {
+    "Sports Crystal: Red": ItemData(base_id + 32, ItemClassification.progression|ItemClassification.useful),
+    "Sports Crystal: Green": ItemData(base_id + 33, ItemClassification.progression|ItemClassification.useful),
+    "Sports Crystal: Yellow": ItemData(base_id + 34, ItemClassification.progression|ItemClassification.useful),
+    "Sports Crystal: Blue": ItemData(base_id + 35, ItemClassification.progression|ItemClassification.useful),
 }
 
 # May or may not need
@@ -90,31 +100,25 @@ sports_mix_items = {
 #     "Star Cup (Hard)": ItemData(base_id + 36, ItemClassification.progression),
 # }
 
-mushroom_cup_rounds = {
-    "Mushroom Cup Round 1": ItemData(base_id + 37, ItemClassification.progression),
-    "Mushroom Cup Round 2": ItemData(base_id + 38, ItemClassification.progression),
-    "Mushroom Cup Round 3": ItemData(base_id + 39, ItemClassification.progression)
-}
-
-flower_cup_rounds = {
-    "Flower Cup Round 1": ItemData(base_id + 40, ItemClassification.progression),
-    "Flower Cup Round 2": ItemData(base_id + 41, ItemClassification.progression),
-    "Flower Cup Round 3": ItemData(base_id + 42, ItemClassification.progression)
-}
-
-star_cup_rounds = {
-    "Star Cup Round 1": ItemData(base_id + 43, ItemClassification.progression),
-    "Star Cup Round 2": ItemData(base_id + 44, ItemClassification.progression),
-    "Star Cup Round 3": ItemData(base_id + 45, ItemClassification.progression)
-}
-
-# Reminder to Electro: Can access all categories in exhibition, this is commented because if you unlock the stage in the
-# extra category, it'll unlock for... Idk I'm not making sense but you get what I mean!
-# extra_stages = {
-#     "Extra Stage 1": ItemData(base_id + 46, ItemClassification.progression),
-#     "Extra Stage 2": ItemData(base_id + 47, ItemClassification.progression),
-#     "Extra Stage 3": ItemData(base_id + 48, ItemClassification.progression)
+# The option related to these 3 is annoying me
+# mushroom_cup_rounds = {
+#     "Mushroom Cup Round 1": ItemData(base_id + 37, ItemClassification.progression),
+#     "Mushroom Cup Round 2": ItemData(base_id + 38, ItemClassification.progression),
+#     "Mushroom Cup Round 3": ItemData(base_id + 39, ItemClassification.progression)
 # }
+#
+# flower_cup_rounds = {
+#     "Flower Cup Round 1": ItemData(base_id + 40, ItemClassification.progression),
+#     "Flower Cup Round 2": ItemData(base_id + 41, ItemClassification.progression),
+#     "Flower Cup Round 3": ItemData(base_id + 42, ItemClassification.progression)
+# }
+#
+# star_cup_rounds = {
+#     "Star Cup Round 1": ItemData(base_id + 43, ItemClassification.progression),
+#     "Star Cup Round 2": ItemData(base_id + 44, ItemClassification.progression),
+#     "Star Cup Round 3": ItemData(base_id + 45, ItemClassification.progression)
+# }
+
 
 exhibition_difficulties = {
     "Exhibition: Easy": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
@@ -142,8 +146,8 @@ individual_stages = {
 }
 
 progressive_stuff = {
-    "Progressive Team Size": ItemData(base_id + 120, ItemClassification.progression|ItemClassification.useful),
-    "Progressive Team Size": ItemData(base_id + 121, ItemClassification.progression|ItemClassification.useful),
+    # "Progressive: Team Size": ItemData(base_id + 120, ItemClassification.progression|ItemClassification.useful),
+    # "Progressive: Team Size": ItemData(base_id + 121, ItemClassification.progression|ItemClassification.useful),
 
 }
 
@@ -186,25 +190,25 @@ character_costumes = {
 
 # Able to use once unlocked
 unlockable_items = {
-    "Question Mark Panel: Coin": ItemData(base_id + 300, ItemClassification.useful),
-    "Question Mark Panel: Green Shell": ItemData(base_id + 301, ItemClassification.useful),
-    "Question Mark Panel: Red Shell": ItemData(base_id + 302, ItemClassification.useful),
-    "Question Mark Panel: Banana": ItemData(base_id + 303, ItemClassification.useful),
-    "Question Mark Panel: Bob-omb": ItemData(base_id + 304, ItemClassification.useful),
-    "Question Mark Panel: Mini Mushroom": ItemData(base_id + 305, ItemClassification.useful),
-    "Question Mark Panel: Super Star": ItemData(base_id + 306, ItemClassification.useful),
+    "? Panel: Coin": ItemData(base_id + 300, ItemClassification.useful),
+    "? Panel: Green Shell": ItemData(base_id + 301, ItemClassification.useful),
+    "? Panel: Red Shell": ItemData(base_id + 302, ItemClassification.useful),
+    "? Panel: Banana": ItemData(base_id + 303, ItemClassification.useful),
+    "? Panel: Bob-omb": ItemData(base_id + 304, ItemClassification.useful),
+    "? Panel: Mini Mushroom": ItemData(base_id + 305, ItemClassification.useful),
+    "? Panel: Super Star": ItemData(base_id + 306, ItemClassification.useful),
     "Special Meter": ItemData(base_id + 307, ItemClassification.useful),
 }
 
 # One time use
 one_time_items = {
-    "1 Time Coin": ItemData(base_id + 400, ItemClassification.filler),
-    "1 Time Green Shell": ItemData(base_id + 401, ItemClassification.filler),
-    "1 Time Red Shell": ItemData(base_id + 402, ItemClassification.filler),
-    "1 Time Banana": ItemData(base_id + 403, ItemClassification.filler),
-    "1 Time Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
-    "1 Time Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
-    "1 Time Super Star": ItemData(base_id + 406, ItemClassification.filler),
+    "1 Time: Coin": ItemData(base_id + 400, ItemClassification.filler),
+    "1 Time: Green Shell": ItemData(base_id + 401, ItemClassification.filler),
+    "1 Time: Red Shell": ItemData(base_id + 402, ItemClassification.filler),
+    "1 Time: Banana": ItemData(base_id + 403, ItemClassification.filler),
+    "1 Time: Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
+    "1 Time: Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
+    "1 Time: Super Star": ItemData(base_id + 406, ItemClassification.filler),
 }
 
 traps = {
@@ -213,35 +217,27 @@ traps = {
     "Trap: Half time (Literally!)": ItemData(base_id + 502, ItemClassification.trap),
 }
 
-# Need custom code for Party Mode Keys
-# party_mode_keys = {
-#     "Party Mode: Feed Petey": ItemData(base_id + 700, ItemClassification.useful),
-#     "Party Mode: Harmony Hustle": ItemData(base_id + 701, ItemClassification.useful),
-#     "Party Mode: Bob-omb Dodge": ItemData(base_id + 702, ItemClassification.useful),
-#     "Party Mode: Smash Skate": ItemData(base_id + 703, ItemClassification.useful),
+
+# harmony_hustle_items = {
+#     "HH: Classic Ocean": ItemData(base_id + 800, ItemClassification.useful),
+#     "HH: Chocobo Rhythm": ItemData(base_id + 801, ItemClassification.useful),
+#     "HH: Mario Athletic": ItemData(base_id + 802, ItemClassification.useful),
+#     "HH: Mushroom Mix Melody": ItemData(base_id + 803, ItemClassification.useful),
+#     "HH: Bloocheep Ocean": ItemData(base_id + 804, ItemClassification.useful),
+#     "HH: Chocobo Pop": ItemData(base_id + 805, ItemClassification.useful),
+#     "HH: Punk Athletic": ItemData(base_id + 806, ItemClassification.useful),
+#     "HH: Blossom Mix Melody": ItemData(base_id + 807, ItemClassification.useful),
+#     "HH: Punk Ocean": ItemData(base_id + 808, ItemClassification.useful),
+#     "HH: Chocobo Beat": ItemData(base_id + 809, ItemClassification.useful),
+#     "HH: Island Athletic": ItemData(base_id + 810, ItemClassification.useful),
+#     "HH: Star Mix Melody": ItemData(base_id + 811, ItemClassification.useful),
 # }
-# feed_petey_items = {} There are none to my knowledge that could work, maybe the fruit? I'll have to ask Yoshmin or Elty.
-
-
-harmony_hustle_items = {
-    "HH: Classic Ocean": ItemData(base_id + 800, ItemClassification.useful),
-    "HH: Chocobo Rhythm": ItemData(base_id + 801, ItemClassification.useful),
-    "HH: Mario Athletic": ItemData(base_id + 802, ItemClassification.useful),
-    "HH: Mushroom Mix Melody": ItemData(base_id + 803, ItemClassification.useful),
-    "HH: Bloocheep Ocean": ItemData(base_id + 804, ItemClassification.useful),
-    "HH: Chocobo Pop": ItemData(base_id + 805, ItemClassification.useful),
-    "HH: Punk Athletic": ItemData(base_id + 806, ItemClassification.useful),
-    "HH: Blossom Mix Melody": ItemData(base_id + 807, ItemClassification.useful),
-    "HH: Punk Ocean": ItemData(base_id + 808, ItemClassification.useful),
-    "HH: Chocobo Beat": ItemData(base_id + 809, ItemClassification.useful),
-    "HH: Island Athletic": ItemData(base_id + 810, ItemClassification.useful),
-    "HH: Star Mix Melody": ItemData(base_id + 811, ItemClassification.useful),
-}
 
 
 # Put all into a table
 item_table: Dict[str, ItemData] = {
     **sport_items,
+    **sports_mix_item,
     **basketball_items_n,
     **basketball_items_h,
     **dodgeball_items_n,
@@ -250,14 +246,14 @@ item_table: Dict[str, ItemData] = {
     **volleyball_items_h,
     **hockey_items_n,
     **hockey_items_h,
-    **sports_mix_items,
+    **sports_mix_cups,
+    **sports_crystals,
     #**all_cup_unlocks_n,
     #**all_cup_unlocks_h,
     **exhibition_difficulties,
-    **mushroom_cup_rounds,
-    **flower_cup_rounds,
-    **star_cup_rounds,
-    #**extra_stages,
+    #**mushroom_cup_rounds,
+    #**flower_cup_rounds,
+    #**star_cup_rounds,
     **individual_stages,
     **progressive_stuff,
     **characters,
@@ -265,8 +261,7 @@ item_table: Dict[str, ItemData] = {
     **unlockable_items,
     **one_time_items,
     **traps,
-    #**party_mode_keys,
-    **harmony_hustle_items
+    #**harmony_hustle_items
 }
 
 ITEM_NAME_TO_ID: Dict[str, int] = {item_name: data.code for item_name, data in item_table.items()}
@@ -293,16 +288,9 @@ def create_all_items(world: "MSMWorld") -> None:
     for name, data in progressive_stuff.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
-    # for name, data in one_time_items.items():
-    #     new_item = world.create_item(name)
-    #     itempool.append(new_item)
-    # for name, data in traps.items():
-    #     new_item = world.create_item(name)
-    #     itempool.append(new_item)
-    sports_mix = world.create_item("Sport: Sports Mix")
-    itempool.append(sports_mix)
 
-    if world.options.start_with_sports:
+    # Start with sports option
+    if world.options.start_with_sports == StartWithSports.option_excluding_sports_mix:
         basketball = world.create_item("Sport: Basketball")
         world.push_precollected(basketball)
         dodgeball = world.create_item("Sport: Dodgeball")
@@ -311,10 +299,62 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(volleyball)
         hockey = world.create_item("Sport: Hockey")
         world.push_precollected(hockey)
+        sports_mix = world.create_item("Sport: Sports Mix")
+        itempool.append(sports_mix)
+    elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
+        basketball = world.create_item("Sport: Basketball")
+        world.push_precollected(basketball)
+        dodgeball = world.create_item("Sport: Dodgeball")
+        world.push_precollected(dodgeball)
+        volleyball = world.create_item("Sport: Volleyball")
+        world.push_precollected(volleyball)
+        hockey = world.create_item("Sport: Hockey")
+        world.push_precollected(hockey)
+        sports_mix = world.create_item("Sport: Sports Mix")
+        world.push_precollected(sports_mix)
     else:
         for name, data in sport_items.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
+            if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
+                sports_mix = world.create_item("Sport: Sports Mix")
+                itempool.append(sports_mix)
+            elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
+                for crystal_name, crystal_data in sports_crystals.items():
+                    new_item = world.create_item(crystal_name)
+                    itempool.append(new_item)
+
+    # # Start with mushroom cup option
+    # if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_normal_difficulty:
+    #     norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
+    #                        "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
+    #     for name in norm_mush_items:
+    #         new_item = world.create_item(name)
+    #         world.push_precollected(new_item)
+    # elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_hard_difficulty:
+    #     hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
+    #                        "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
+    #     for name in hard_mush_items:
+    #         new_item = world.create_item(name)
+    #         world.push_precollected(new_item)
+    # elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both:
+    #     norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
+    #                        "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
+    #     for name in norm_mush_items:
+    #         new_item = world.create_item(name)
+    #         world.push_precollected(new_item)
+    #
+    #     hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
+    #                        "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
+    #     for name in hard_mush_items:
+    #         new_item = world.create_item(name)
+    #         world.push_precollected(new_item)
+
+    # else:
+    # Create items for actual stages
+    for name, data in individual_stages.items():
+        new_item = world.create_item(name)
+        itempool.append(new_item)
 
     if "Normal" in world.options.cup_difficulty:
         # Basketball
@@ -352,37 +392,34 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             itempool.append(new_item)
 
-    # Sports Mix
-    for name, data in sports_mix_items.items():
+    # Sports Mix Cups
+    for name, data in sports_mix_cups.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
 
-    if world.options.stage_unlock_type == StageUnlockType.option_by_stage_name:
-        # Create items for actual stages
-        for name, data in individual_stages.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-    if world.options.stage_unlock_type == StageUnlockType.option_by_cup_round:
-        # Create items for each round of each cup - Link to stage later on in wherever (probably the client stuff)
-        for name, data in mushroom_cup_rounds.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        for name, data in flower_cup_rounds.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        for name, data in star_cup_rounds.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+    # This whole thing is kinda stupid I feel, I might put it back later, but it's causing me to overthink some stuff
+    # currently :/
+    # if world.options.stage_unlock_type == StageUnlockType.option_by_cup_round:
+    #     # Create items for each round of each cup - Link to stage later on in wherever (probably the client stuff)
+    #     for name, data in mushroom_cup_rounds.items():
+    #         new_item = world.create_item(name)
+    #         itempool.append(new_item)
+    #     for name, data in flower_cup_rounds.items():
+    #         new_item = world.create_item(name)
+    #         itempool.append(new_item)
+    #     for name, data in star_cup_rounds.items():
+    #         new_item = world.create_item(name)
+    #         itempool.append(new_item)
         # for name, data in extra_stages.items():
         #     new_item = world.create_item(name)
         #     itempool.append(new_item)
 
     # Party Mode Items
     # Harmony Hustle
-    if "Harmony Hustle" in world.options.party_mode:
-        for name, data in harmony_hustle_items.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+    # if "Harmony Hustle" in world.options.party_mode:
+    #     for name, data in harmony_hustle_items.items():
+    #         new_item = world.create_item(name)
+    #         itempool.append(new_item)
 
     # Calculate number of filler items needed, exclude costumes
     number_of_items = len(itempool)
@@ -391,6 +428,7 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
+    print(itempool)
     world.multiworld.itempool += itempool
 
 

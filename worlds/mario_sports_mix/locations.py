@@ -24,6 +24,9 @@ base_loc_id = 0
 
 
 LOCATION_NAME_TO_ID = {
+
+    # === Beating Cup Round Locations ===
+    # === Normal ===
     # Basketball
     "Basketball: Beat Normal Mushroom Cup Round 1": base_loc_id + 1,
     "Basketball: Beat Normal Mushroom Cup Round 2": base_loc_id + 2,
@@ -67,6 +70,8 @@ LOCATION_NAME_TO_ID = {
     "Hockey: Beat Normal Star Cup Round 1": base_loc_id + 34,
     "Hockey: Beat Normal Star Cup Round 2": base_loc_id + 35,
     "Hockey: Beat Normal Star Cup Round 3": base_loc_id + 36,
+
+    # === Hard ===
 
     # Basketball
     "Basketball: Beat Hard Mushroom Cup Round 1": base_loc_id + 37,
@@ -112,7 +117,8 @@ LOCATION_NAME_TO_ID = {
     "Hockey: Beat Hard Star Cup Round 2": base_loc_id + 71,
     "Hockey: Beat Hard Star Cup Round 3": base_loc_id + 72,
 
-    # Sports Mix
+
+    # === Sports Mix Locations (Can only be expert difficulty, no need for difficulty in name) ===
     "Sports Mix: Beat Mushroom Cup Round 1": base_loc_id + 73,
     "Sports Mix: Beat Mushroom Cup Round 2": base_loc_id + 74,
     "Sports Mix: Beat Mushroom Cup Round 3": base_loc_id + 75,
@@ -125,7 +131,7 @@ LOCATION_NAME_TO_ID = {
 
 
 
-    # Easy Exhibition Locations
+    # === Easy Exhibition Locations ===
     # Basketball
     "Basketball Ex: Beat Mario Stadium (Easy)": base_loc_id + 200,
     "Basketball Ex: Beat Koopa Troopa Beach (Easy)": base_loc_id + 201,
@@ -182,7 +188,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Ghoulish Galleon (Easy)": base_loc_id + 246,
     "Hockey Ex: Beat Bowser's Castle (Easy)": base_loc_id + 247,
 
-    # Normal Exhibition Locations
+    # === Normal Exhibition Locations ===
     # Basketball
     "Basketball Ex: Beat Mario Stadium (Normal)": base_loc_id + 300,
     "Basketball Ex: Beat Koopa Troopa Beach (Normal)": base_loc_id + 301,
@@ -239,7 +245,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Ghoulish Galleon (Normal)": base_loc_id + 346,
     "Hockey Ex: Beat Bowser's Castle (Normal)": base_loc_id + 347,
 
-    # Hard Exhibition Locations
+    # === Hard Exhibition Locations ===
     #Basketball
     "Basketball Ex: Beat Mario Stadium (Hard)": base_loc_id + 400,
     "Basketball Ex: Beat Koopa Troopa Beach (Hard)": base_loc_id + 401,
@@ -296,7 +302,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Ghoulish Galleon (Hard)": base_loc_id + 446,
     "Hockey Ex: Beat Bowser's Castle (Hard)": base_loc_id + 447,
 
-    # Expert Exhibition Locations
+    # === Expert Exhibition Locations ===
     # Basketball
     "Basketball Ex: Beat Mario Stadium (Expert)": base_loc_id + 500,
     "Basketball Ex: Beat Koopa Troopa Beach (Expert)": base_loc_id + 501,
@@ -354,7 +360,7 @@ LOCATION_NAME_TO_ID = {
     "Hockey Ex: Beat Bowser's Castle (Expert)": base_loc_id + 547,
 
 
-   # Special Sanity Locations
+   # == Special Sanity Locations ===
     "Use Mario's Special!": base_loc_id + 560,
     "Use Luigi's Special!": base_loc_id + 561,
     "Use Peach's Special!": base_loc_id + 562,
@@ -374,7 +380,7 @@ LOCATION_NAME_TO_ID = {
     "Use Slime's Special!": base_loc_id + 576,
     "Use Black Mage's Special!": base_loc_id + 577,
 
-    # Party Mode: Feed Petey Locations
+    # === Party Mode: Feed Petey Locations ===
     "FP: Get 10 Points!": base_loc_id + 600,
     "FP: Get 20 Points!": base_loc_id + 601,
     "FP: Get 30 Points!": base_loc_id + 602,
@@ -454,11 +460,11 @@ def create_regular_locations(world: MSMWorld) -> None:
     "Sports Mix: Beat Star Cup Round 2", "Sports Mix: Beat Star Cup Round 3"])
     sports_mix_star.add_locations(sm_star_locations, MSMLocation)
 
-    feed_petey = world.get_region("Party Mode: Feed Petey")
-    feed_petey_locations = get_location_names_with_ids(["FP: Get 10 Points!", "FP: Get 20 Points!", "FP: Get 30 Points!",
-    "FP: Get 40 Points!", "FP: Get 50 Points!", "FP: Get 60 Points!", "FP: Get 70 Points!", "FP: Get 80 Points!",
-    "FP: Get 90 Points!", "FP: Get 100 Points!"])
-    feed_petey.add_locations(feed_petey_locations, MSMLocation)
+    # feed_petey = world.get_region("Party Mode: Feed Petey")
+    # feed_petey_locations = get_location_names_with_ids(["FP: Get 10 Points!", "FP: Get 20 Points!", "FP: Get 30 Points!",
+    # "FP: Get 40 Points!", "FP: Get 50 Points!", "FP: Get 60 Points!", "FP: Get 70 Points!", "FP: Get 80 Points!",
+    # "FP: Get 90 Points!", "FP: Get 100 Points!"])
+    # feed_petey.add_locations(feed_petey_locations, MSMLocation)
 
     # Normal Difficulty
 
@@ -788,10 +794,9 @@ def create_events(world: "MSMWorld") -> None:
         )
 
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-        # This is causing issues I don't like you
-        # normal_behemoth_loc = get_location_names_with_ids(["Defeated Behemoth!"])
-        # behemoth_boss = world.get_region("Behemoth Boss Battle")
-        # behemoth_boss.add_locations(normal_behemoth_loc, MSMLocation)
+        normal_behemoth_loc = get_location_names_with_ids(["Defeated Behemoth!"])
+        behemoth_boss = world.get_region("Behemoth Boss Battle")
+        behemoth_boss.add_locations(normal_behemoth_loc, MSMLocation)
         behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
         behemoth_king_boss.add_event(
             "Defeated Behemoth King!", "Victory!", location_type=MSMLocation,

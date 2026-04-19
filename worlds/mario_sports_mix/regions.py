@@ -47,14 +47,17 @@ def create_all_regions(world: "MSMWorld") -> None:
     sm_mushroom_cup = Region("Sports Mix: Mushroom Cup", world.player, world.multiworld)
     sm_flower_cup = Region("Sports Mix: Flower Cup", world.player, world.multiworld)
     sm_star_cup = Region("Sports Mix: Star Cup", world.player, world.multiworld)
-    # Party mode
-    party_mode = Region("Party Mode", world.player, world.multiworld)
+
     regions = [main_menu, basketball, b_exhibition_e, b_exhibition_n, b_exhibition_h, b_exhibition_ex, b_extra,
                dodgeball, d_exhibition_e, d_exhibition_n, d_exhibition_h, d_exhibition_ex, d_extra,
                volleyball, v_exhibition_e, v_exhibition_n, v_exhibition_h, v_exhibition_ex, v_extra,
                hockey, h_exhibition_e, h_exhibition_n, h_exhibition_h, h_exhibition_ex, h_extra,
-               sports_mix, sm_mushroom_cup, sm_flower_cup, sm_star_cup,
-               party_mode]
+               sports_mix, sm_mushroom_cup, sm_flower_cup, sm_star_cup]
+
+    # Check for party mode, if exists create region
+    if "Feed Petey" or "Harmony Hustle" or "Bob-omb Dodge" or "Smash Skate" in world.options.party_mode:
+        party_mode = Region("Party Mode", world.player, world.multiworld)
+        regions.append(party_mode)
 
     # Regions based on options
     if "Normal" in world.options.exhibition_difficulty:
@@ -143,18 +146,15 @@ def create_all_regions(world: "MSMWorld") -> None:
 
     # Boss stuff
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-        behemoth_boss_stuff = Region("Behemoth Boss Battle", world.player, world.multiworld)
-        regions.append(behemoth_boss_stuff)
+        behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
+        regions.append(behemoth_boss)
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-        behemoth_boss_stuff = Region("Behemoth Boss Battle", world.player, world.multiworld)
-        behemoth_king_boss_stuff = Region("Behemoth King Boss Battle", world.player, world.multiworld)
-        regions.append(behemoth_boss_stuff)
-        regions.append(behemoth_king_boss_stuff)
+        behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
+        behemoth_king_boss = Region("Behemoth King Boss Battle", world.player, world.multiworld)
+        regions.append(behemoth_boss)
+        regions.append(behemoth_king_boss)
     # Add regions to AP multiworld so it knows it exists
     world.multiworld.regions += regions
-
-
-
 
 def connect_regions(world: MSMWorld) -> None:
     # Get all regions
@@ -225,14 +225,34 @@ def connect_regions(world: MSMWorld) -> None:
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
         behemoth_boss = world.get_region("Behemoth Boss Battle")
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+        behemoth_boss = world.get_region("Behemoth Boss Battle")
         behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
 
     # Party Mode
-    party_mode = world.get_region("Party Mode")
-    feed_petey = world.get_region("Party Mode: Feed Petey")
-    harmony_hustle = world.get_region("Party Mode: Harmony Hustle")
-    bob_omb_dodge = world.get_region("Party Mode: Bob-omb Dodge")
-    smash_strike = world.get_region("Party Mode: Smash Skate")
+    if "Feed Petey" or "Harmony Hustle" or "Bob-omb Dodge" or "Smash Skate" in world.options.party_mode:
+        party_mode = world.get_region("Party Mode")
+        main_menu.connect(party_mode, "Main Menu -> Party Mode")
+
+    if "Feed Petey" in world.options.party_mode:
+        party_mode = world.get_region("Party Mode")
+        feed_petey = world.get_region("Party Mode: Feed Petey")
+        party_mode.connect(feed_petey, "Party Mode -> Feed Petey")
+
+    if "Harmony Hustle" in world.options.party_mode:
+        party_mode = world.get_region("Party Mode")
+        harmony_hustle = world.get_region("Party Mode: Harmony Hustle")
+        party_mode.connect(harmony_hustle, "Party Mode -> Harmony Hustle")
+
+    if "Bob-omb Dodge" in world.options.party_mode:
+        party_mode = world.get_region("Party Mode")
+        bob_omb_dodge = world.get_region("Party Mode: Bob-omb Dodge")
+        party_mode.connect(bob_omb_dodge, "Party Mode -> Bob Omb Dodge")
+
+    if "Smash Skate" in world.options.party_mode:
+        party_mode = world.get_region("Party Mode")
+        smash_strike = world.get_region("Party Mode: Smash Skate")
+        party_mode.connect(smash_strike, "Party Mode -> Smash Strike")
+
 
     # Connect menu to sports
     main_menu.connect(basketball, "Main Menu -> Basketball", lambda state: state.has("Sport: Basketball", world.player))
@@ -240,23 +260,19 @@ def connect_regions(world: MSMWorld) -> None:
     main_menu.connect(volleyball, "Main Menu -> Volleyball", lambda state: state.has("Sport: Volleyball", world.player))
     main_menu.connect(hockey, "Main Menu -> Hockey", lambda state: state.has("Sport: Hockey", world.player))
     main_menu.connect(sports_mix, "Main Menu -> Sports Mix", lambda state: state.has("Sport: Sports Mix", world.player))
-    main_menu.connect(party_mode, "Main Menu -> Party Mode")
-    party_mode.connect(feed_petey, "Party Mode -> Feed Petey")
-    party_mode.connect(harmony_hustle, "Party Mode -> Harmony Hustle")
-    party_mode.connect(bob_omb_dodge, "Party Mode -> Bob Omb Dodge")
-    party_mode.connect(smash_strike, "Party Mode -> Smash Strike")
+
 
     # Connect Basketball to everything
-    basketball.connect(b_exhibition_e, "Basketball -> Exhibition (Easy)")
-    basketball.connect(b_exhibition_n, "Basketball -> Exhibition (Normal)")
-    basketball.connect(b_exhibition_h, "Basketball -> Exhibition (Hard)")
-    basketball.connect(b_exhibition_ex, "Basketball -> Exhibition (Expert)")
-    basketball.connect(b_mushroom_cup_n, "Basketball -> Mushroom Cup (Normal)")
-    basketball.connect(b_flower_cup_n, "Basketball -> Flower Cup (Normal)")
-    basketball.connect(b_star_cup_n, "Basketball -> Star Cup (Normal)")
-    basketball.connect(b_mushroom_cup_h, "Basketball -> Mushroom Cup (Hard)")
-    basketball.connect(b_flower_cup_h, "Basketball -> Flower Cup (Hard)")
-    basketball.connect(b_star_cup_h, "Basketball -> Star Cup (Hard)")
+    basketball.connect(b_exhibition_e, "Basketball -> Exhibition (Easy)", lambda state: state.has("Exhibition: Easy", world.player))
+    basketball.connect(b_exhibition_n, "Basketball -> Exhibition (Normal)", lambda state: state.has("Exhibition: Normal", world.player))
+    basketball.connect(b_exhibition_h, "Basketball -> Exhibition (Hard)", lambda state: state.has("Exhibition: Hard", world.player))
+    basketball.connect(b_exhibition_ex, "Basketball -> Exhibition (Expert)", lambda state: state.has("Exhibition: Expert", world.player))
+    basketball.connect(b_mushroom_cup_n, "Basketball -> Mushroom Cup (Normal)", lambda state: state.has("Basketball: Mushroom Cup (Normal)", world.player))
+    basketball.connect(b_flower_cup_n, "Basketball -> Flower Cup (Normal)", lambda state: state.has("Basketball: Flower Cup (Normal)", world.player))
+    basketball.connect(b_star_cup_n, "Basketball -> Star Cup (Normal)", lambda state: state.has("Basketball: Star Cup (Normal)", world.player))
+    basketball.connect(b_mushroom_cup_h, "Basketball -> Mushroom Cup (Hard)", lambda state: state.has("Basketball: Mushroom Cup (Hard)", world.player))
+    basketball.connect(b_flower_cup_h, "Basketball -> Flower Cup (Hard)", lambda state: state.has("Basketball: Flower Cup (Hard)", world.player))
+    basketball.connect(b_star_cup_h, "Basketball -> Star Cup (Hard)", lambda state: state.has("Basketball: Star Cup (Hard)", world.player))
     basketball.connect(b_extra, "Basketball -> Extra")
 
     # Connect Dodgeball to everything
@@ -299,12 +315,12 @@ def connect_regions(world: MSMWorld) -> None:
     hockey.connect(h_extra, "Hockey -> Extra")
 
     # Connect Sports Mix to everything
-    sports_mix.connect(sm_mushroom_cup, "Sports Mix -> Mushroom Cup", lambda state: state.has("Sports Mix: Mushroom Cup", world.player))
-    sports_mix.connect(sm_flower_cup, "Sports Mix -> Flower Cup", lambda state: state.has("Sports Mix: Flower Cup", world.player))
-    sports_mix.connect(sm_star_cup, "Sports Mix -> Star Cup", lambda state: state.has("Sports Mix: Star Cup", world.player))
+    sports_mix.connect(sm_mushroom_cup, "Sports Mix -> Mushroom Cup")
+    sports_mix.connect(sm_flower_cup, "Sports Mix -> Flower Cup")
+    sports_mix.connect(sm_star_cup, "Sports Mix -> Star Cup")
 
     # Behemoth is accessed by completing all normal star cups, connect all to the Behemoth Boss region
-    # Note: Add rule if 3 other star cups have been beaten, gonna have to figure out something
+    # Note: Add rule if 3 other star cups have been beaten, Note : "has cleared" is the same as "can reach"
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
         b_star_cup_n.connect(behemoth_boss, "Basketball Star Cup (Normal) -> Behemoth Boss")
         d_star_cup_n.connect(behemoth_boss, "Dodgeball Star Cup (Normal) -> Behemoth Boss")

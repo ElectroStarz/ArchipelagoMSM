@@ -30,8 +30,9 @@ class MSMWebWorld(WebWorld):
 
 class MSMWorld(World):
     """
-    Mario Sports Mix is a fast-paced Wii sports game featuring basketball, volleyball, dodgeball
-    and hockey, with characters using power-ups and special moves for chaotic gameplay.
+    Mario Sports Mix is a fast-paced Wii sports game that includes basketball, volleyball, dodgeball, and hockey.
+    Play as characters from the Mario, Final Fantasy and Dragon Quest franchise in order to defeat the evil in this
+    land.
     """
     game = "Mario Sports Mix"
     web = MSMWebWorld()
@@ -73,5 +74,5 @@ class MSMWorld(World):
    # Stuff to send to the client because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
         return self.options.as_dict(
-            "cup_difficulty", "goal_condition", "special_sanity"
+            "cup_difficulty", "exhibition_difficulty", "goal_condition", "special_sanity"
         )
