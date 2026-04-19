@@ -1,11 +1,25 @@
 from dataclasses import dataclass
 
-from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup
+from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup, Visibility
 
-class StartWithSports(DefaultOnToggle):
+class StartWithSports(Choice):
     """Start with the sports? HEAVILY RECOMMENDED
 Will cause immediate BK if off"""
-    display_name = "Start With Sports"
+    display_name = "Start With Sports - Recommended!"
+    option_none = 0
+    option_excluding_sports_mix = 1
+    option_with_sports_mix = 2
+    default = 1
+
+class StartWithMushroomCup(Choice):
+    """Start with Mushroom Cup for all Sports? (Also unlocks related stages)
+Also heavily recommended"""
+    display_name = "Start with Mushroom Cup (+Stages) - Recommended!"
+    option_none = 0
+    option_normal_difficulty = 1
+    option_hard_difficulty = 2
+    option_both = 3
+    default = 1
 
 class ExhibitionDifficulty(OptionSet):
     """ Beating a stage on each difficulty will send an item
@@ -24,16 +38,26 @@ class CupDifficulty(OptionSet):
 class PartyMode(OptionSet):
     """What party mode games do you want to include?
 (Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)"""
+    visibility = Visibility.none
     display_name = "Party Mode Games"
     valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
     default = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
 
 class StageUnlockType(Choice):
     """How do you want stages to be unlocked?"""
+    visibility = Visibility.none
     display_name = "Stage Unlock Type"
     option_by_cup_round = 0
     option_by_stage_name = 1
     default = 1
+
+class SportsMixUnlock(Choice):
+    """Unlock Sports Mix by getting 4 Sports Crystals from other players (Or yourself!)
+or get Sports Mix as an item"""
+    display_name = "Sports Mix Unlock"
+    option_sports_mix_item = 0
+    option_sports_crystals = 1
+    default = 0
 
 class GoalCondition(Choice):
     """What is your goal?"""
@@ -117,9 +141,11 @@ class CourtSanity(Choice):
 msm_option_groups = [
     OptionGroup("Game Options", [
         StartWithSports,
+        StartWithMushroomCup,
         ExhibitionDifficulty,
         CupDifficulty,
         StageUnlockType,
+        SportsMixUnlock,
         TrapChance
     ]),
     OptionGroup("Goal Options", [
@@ -141,10 +167,12 @@ msm_option_groups = [
 @dataclass()
 class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
+    start_with_mushroom_cup: StartWithMushroomCup
     exhibition_difficulty: ExhibitionDifficulty
     cup_difficulty: CupDifficulty
     party_mode: PartyMode
     stage_unlock_type: StageUnlockType
+    sports_mix_unlock: SportsMixUnlock
     goal_condition : GoalCondition
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
