@@ -8,7 +8,6 @@ def run_client(*args: str) -> None:
     launch(launch_msm_client, name="Mario Sports Mix Client", args=args)
 
 
-
 icon_paths["SportMixIcon"] = "ap:worlds.mario_sports_mix/icon/SportMixIcon.png"
 components.append(
     Component(

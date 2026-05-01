@@ -6,6 +6,7 @@ from . import regions, rules
 from .options import *
 from .items import ITEM_NAME_TO_ID
 from . import locations
+from . import components
 
 
 class MSMWebWorld(WebWorld):
