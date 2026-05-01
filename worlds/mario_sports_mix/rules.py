@@ -30,7 +30,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
     has_ghoulish_galleon = Has("Stage: Ghoulish Galleon")
     has_star_ship = Has("Stage: Star Ship")
     has_western_junction = Has("Stage: Western Junction")
-    has_boss_stage = Has("Boss Stage")
+    has_boss_stage = Has("Stage: Behemoth Stage")
 
             # === Continue making rules!!! (Haven't finished them yet!) ====
 
@@ -735,11 +735,11 @@ def set_all_location_rules(world: MSMWorld) -> None:
     # if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
     #     defeat_behemoth = world.get_location("Defeated Behemoth!")
     #     defeat_behemoth_king = world.get_location("Defeated Behemoth King!")
-
-
+    # if world.options.goal_condition == GoalCondition.option_win_cups:
+    #     defeat_behemoth = world.get_location("Defeated Behemoth!")
+    #     defeat_behemoth_king = world.get_location("Defeated Behemoth King!")
 
 
 
 def set_completion_condition(world: MSMWorld) -> None:
     world.set_completion_rule(Has("Victory!"))
-

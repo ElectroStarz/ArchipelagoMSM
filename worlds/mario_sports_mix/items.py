@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, TYPE_CHECKING, Optional
+from typing import Dict, NamedTuple, TYPE_CHECKING
 
 from BaseClasses import Item, ItemClassification
 from .options import StageUnlockType, TeamSanity, StartWithSports, StartWithMushroomCup, SportsMixUnlock
@@ -120,12 +120,12 @@ sports_crystals = {
 # }
 
 
-exhibition_difficulties = {
-    "Exhibition: Easy": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
-    "Exhibition: Normal": ItemData(base_id + 50, ItemClassification.progression|ItemClassification.useful),
-    "Exhibition: Hard": ItemData(base_id + 51, ItemClassification.progression|ItemClassification.useful),
-    "Exhibition: Expert": ItemData(base_id + 52, ItemClassification.progression|ItemClassification.useful),
-}
+# exhibition_difficulties = {
+#     "Exhibition: Easy": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
+#     "Exhibition: Normal": ItemData(base_id + 50, ItemClassification.progression|ItemClassification.useful),
+#     "Exhibition: Hard": ItemData(base_id + 51, ItemClassification.progression|ItemClassification.useful),
+#     "Exhibition: Expert": ItemData(base_id + 52, ItemClassification.progression|ItemClassification.useful),
+# }
 
 individual_stages = {
     "Stage: Mario Stadium": ItemData(base_id + 100, ItemClassification.progression),
@@ -142,7 +142,7 @@ individual_stages = {
     "Stage: Ghoulish Galleon": ItemData(base_id + 111, ItemClassification.progression),
     "Stage: Star Ship": ItemData(base_id + 112, ItemClassification.progression),
     "Stage: Western Junction": ItemData(base_id + 113, ItemClassification.progression),
-    "Boss Stage": ItemData(base_id + 114, ItemClassification.progression_skip_balancing),
+    "Stage: Behemoth Stage": ItemData(base_id + 114, ItemClassification.progression_skip_balancing),
 }
 
 progressive_stuff = {
@@ -184,7 +184,7 @@ character_costumes = {
     "Costume: Shadow White Ninja": ItemData(base_id + 226, ItemClassification.filler|ItemClassification.deprioritized),
     "Costume: Pure White - White Mage": ItemData(base_id + 227,ItemClassification.filler|ItemClassification.deprioritized),
     "Costume: Magic Red Black Mage": ItemData(base_id + 228,ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: She-Slime": ItemData(base_id + 229, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: She-slime": ItemData(base_id + 229, ItemClassification.filler|ItemClassification.deprioritized),
     "Costume: Metal Slime": ItemData(base_id + 230, ItemClassification.filler|ItemClassification.deprioritized),
 }
 
@@ -202,19 +202,22 @@ unlockable_items = {
 
 # One time use
 one_time_items = {
-    "1 Time: Coin": ItemData(base_id + 400, ItemClassification.filler),
-    "1 Time: Green Shell": ItemData(base_id + 401, ItemClassification.filler),
-    "1 Time: Red Shell": ItemData(base_id + 402, ItemClassification.filler),
-    "1 Time: Banana": ItemData(base_id + 403, ItemClassification.filler),
-    "1 Time: Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
-    "1 Time: Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
-    "1 Time: Super Star": ItemData(base_id + 406, ItemClassification.filler),
+    "1 Coin": ItemData(base_id + 400, ItemClassification.filler),
+    "1 Green Shell": ItemData(base_id + 401, ItemClassification.filler),
+    "1 Red Shell": ItemData(base_id + 402, ItemClassification.filler),
+    "1 Banana": ItemData(base_id + 403, ItemClassification.filler),
+    "1 Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
+    "1 Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
+    "1 Super Star": ItemData(base_id + 406, ItemClassification.filler),
 }
 
 traps = {
-    "Trap: Negative Coin": ItemData(base_id + 500, ItemClassification.trap),
+    "Trap: Opponent Coins": ItemData(base_id + 500, ItemClassification.trap),
     "Trap: Hit Stun": ItemData(base_id + 501, ItemClassification.trap),
-    "Trap: Half time (Literally!)": ItemData(base_id + 502, ItemClassification.trap),
+    "Trap: 1/2 Time": ItemData(base_id + 502, ItemClassification.trap),
+    "Trap: Freeze Character 1": ItemData(base_id + 503, ItemClassification.trap),
+    "Trap: Freeze Character 2": ItemData(base_id + 504, ItemClassification.trap),
+    "Trap: Freeze Character 3": ItemData(base_id + 505, ItemClassification.trap),
 }
 
 
@@ -233,7 +236,6 @@ traps = {
 #     "HH: Star Mix Melody": ItemData(base_id + 811, ItemClassification.useful),
 # }
 
-
 # Put all into a table
 item_table: Dict[str, ItemData] = {
     **sport_items,
@@ -250,7 +252,7 @@ item_table: Dict[str, ItemData] = {
     **sports_crystals,
     #**all_cup_unlocks_n,
     #**all_cup_unlocks_h,
-    **exhibition_difficulties,
+    #**exhibition_difficulties,
     #**mushroom_cup_rounds,
     #**flower_cup_rounds,
     #**star_cup_rounds,
@@ -276,32 +278,32 @@ def get_random_filler_item_name(world: "MSMWorld") -> str:
 
 def create_all_items(world: "MSMWorld") -> None:
     itempool = []
+    # Character items
     for name, data in characters.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
+    # Character costume items
     for name, data in character_costumes.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
+    # Unlockable items
     for name, data in unlockable_items.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
+    # Items in the progressive stuff dict - Does nothing right now
     for name, data in progressive_stuff.items():
+        new_item = world.create_item(name)
+        itempool.append(new_item)
+
+    # Sports Mix Cups
+    for name, data in sports_mix_cups.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
 
     # Start with sports option
     if world.options.start_with_sports == StartWithSports.option_excluding_sports_mix:
-        basketball = world.create_item("Sport: Basketball")
-        world.push_precollected(basketball)
-        dodgeball = world.create_item("Sport: Dodgeball")
-        world.push_precollected(dodgeball)
-        volleyball = world.create_item("Sport: Volleyball")
-        world.push_precollected(volleyball)
-        hockey = world.create_item("Sport: Hockey")
-        world.push_precollected(hockey)
         sports_mix = world.create_item("Sport: Sports Mix")
         itempool.append(sports_mix)
-    elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
         basketball = world.create_item("Sport: Basketball")
         world.push_precollected(basketball)
         dodgeball = world.create_item("Sport: Dodgeball")
@@ -310,8 +312,17 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(volleyball)
         hockey = world.create_item("Sport: Hockey")
         world.push_precollected(hockey)
+    elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
         sports_mix = world.create_item("Sport: Sports Mix")
         world.push_precollected(sports_mix)
+        basketball = world.create_item("Sport: Basketball")
+        world.push_precollected(basketball)
+        dodgeball = world.create_item("Sport: Dodgeball")
+        world.push_precollected(dodgeball)
+        volleyball = world.create_item("Sport: Volleyball")
+        world.push_precollected(volleyball)
+        hockey = world.create_item("Sport: Hockey")
+        world.push_precollected(hockey)
     else:
         for name, data in sport_items.items():
             new_item = world.create_item(name)
@@ -324,57 +335,21 @@ def create_all_items(world: "MSMWorld") -> None:
                     new_item = world.create_item(crystal_name)
                     itempool.append(new_item)
 
-    # # Start with mushroom cup option
-    # if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_normal_difficulty:
-    #     norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
-    #                        "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
-    #     for name in norm_mush_items:
-    #         new_item = world.create_item(name)
-    #         world.push_precollected(new_item)
-    # elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_hard_difficulty:
-    #     hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
-    #                        "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
-    #     for name in hard_mush_items:
-    #         new_item = world.create_item(name)
-    #         world.push_precollected(new_item)
-    # elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both:
-    #     norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
-    #                        "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
-    #     for name in norm_mush_items:
-    #         new_item = world.create_item(name)
-    #         world.push_precollected(new_item)
-    #
-    #     hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
-    #                        "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
-    #     for name in hard_mush_items:
-    #         new_item = world.create_item(name)
-    #         world.push_precollected(new_item)
 
-    # else:
-    # Create items for actual stages
-    for name, data in individual_stages.items():
-        new_item = world.create_item(name)
-        itempool.append(new_item)
+    # Start with mushroom cup option
+    if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_normal_difficulty:
+        norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
+                           "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
+        for name in norm_mush_items:
+            new_item = world.create_item(name)
+            world.push_precollected(new_item)
 
-    if "Normal" in world.options.cup_difficulty:
-        # Basketball
-        for name, data in basketball_items_n.items():
+        mush_stages = ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock", "Stage: Peach's Castle",
+                       "Stage: Toad Park"]
+        for name in mush_stages:
             new_item = world.create_item(name)
-            itempool.append(new_item)
-        # Dodgeball
-        for name, data in dodgeball_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        # Volleyball
-        for name, data in volleyball_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-        # Hockey
-        for name, data in hockey_items_n.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+            world.push_precollected(new_item)
 
-    if "Hard" in world.options.cup_difficulty:
         # Basketball
         for name, data in basketball_items_h.items():
             new_item = world.create_item(name)
@@ -392,32 +367,146 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             itempool.append(new_item)
 
-    # Sports Mix Cups
-    for name, data in sports_mix_cups.items():
-        new_item = world.create_item(name)
-        itempool.append(new_item)
+
+        # Create items for actual stages
+        other_stages = ["Stage: Luigi's Mansion", "Stage: Daisy Garden", "Stage: Wario Factory",
+                        "Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Waluigi Pinball",
+                        "Stage: Ghoulish Galleon", "Stage: Star Ship", "Stage: Western Junction", "Boss Stage"]
+
+        for name in other_stages:
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+
+    elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_hard_difficulty:
+        hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
+                           "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
+        for name in hard_mush_items:
+            new_item = world.create_item(name)
+            world.push_precollected(new_item)
+
+        mush_stages = ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock", "Stage: Peach's Castle",
+                       "Stage: Toad Park"]
+        for name in mush_stages:
+            new_item = world.create_item(name)
+            world.push_precollected(new_item)
+
+        # Basketball
+        for name, data in basketball_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Dodgeball
+        for name, data in dodgeball_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Volleyball
+        for name, data in volleyball_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+        # Hockey
+        for name, data in hockey_items_n.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+
+        # Create items for actual stages
+        other_stages = ["Stage: Luigi's Mansion", "Stage: Daisy Garden", "Stage: Wario Factory",
+                        "Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Waluigi Pinball",
+                        "Stage: Ghoulish Galleon", "Stage: Star Ship", "Stage: Western Junction", "Boss Stage"]
+
+        for name in other_stages:
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+
+    elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both:
+        # Push mushroom cups to precollected
+        norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
+                           "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
+        for name in norm_mush_items:
+            new_item = world.create_item(name)
+            world.push_precollected(new_item)
+
+        hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
+                           "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
+        for name in hard_mush_items:
+            new_item = world.create_item(name)
+            world.push_precollected(new_item)
+
+        # Push stages to do with mushroom cup to precollected
+        mush_stages = ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock", "Stage: Peach's Castle",
+                       "Stage: Toad Park"]
+        for name in mush_stages:
+            new_item = world.create_item(name)
+            world.push_precollected(new_item)
+
+        # Create items for actual stages
+        other_stages = ["Stage: Luigi's Mansion","Stage: Daisy Garden", "Stage: Wario Factory",
+                        "Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Waluigi Pinball",
+                        "Stage: Ghoulish Galleon", "Stage: Star Ship", "Stage: Western Junction", "Boss Stage"]
+
+        for name in other_stages:
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+
+        else:
+            # Basketball
+            for name, data in basketball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+            # Dodgeball
+            for name, data in dodgeball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+            # Volleyball
+            for name, data in volleyball_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+            # Hockey
+            for name, data in hockey_items_n.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+
+            # Basketball
+            for name, data in basketball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+            # Dodgeball
+            for name, data in dodgeball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+            # Volleyball
+            for name, data in volleyball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+            # Hockey
+            for name, data in hockey_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+
+            # Stages
+            for name, data in individual_stages.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
     # This whole thing is kinda stupid I feel, I might put it back later, but it's causing me to overthink some stuff
     # currently :/
     # if world.options.stage_unlock_type == StageUnlockType.option_by_cup_round:
     #     # Create items for each round of each cup - Link to stage later on in wherever (probably the client stuff)
-    #     for name, data in mushroom_cup_rounds.items():
+    #     for name, icon in mushroom_cup_rounds.items():
     #         new_item = world.create_item(name)
     #         itempool.append(new_item)
-    #     for name, data in flower_cup_rounds.items():
+    #     for name, icon in flower_cup_rounds.items():
     #         new_item = world.create_item(name)
     #         itempool.append(new_item)
-    #     for name, data in star_cup_rounds.items():
+    #     for name, icon in star_cup_rounds.items():
     #         new_item = world.create_item(name)
     #         itempool.append(new_item)
-        # for name, data in extra_stages.items():
+        # for name, icon in extra_stages.items():
         #     new_item = world.create_item(name)
         #     itempool.append(new_item)
 
     # Party Mode Items
     # Harmony Hustle
     # if "Harmony Hustle" in world.options.party_mode:
-    #     for name, data in harmony_hustle_items.items():
+    #     for name, icon in harmony_hustle_items.items():
     #         new_item = world.create_item(name)
     #         itempool.append(new_item)
 
@@ -428,7 +517,7 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    print(itempool)
+    #print(itempool)
     world.multiworld.itempool += itempool
 
 

@@ -8,11 +8,10 @@ from .items import ITEM_NAME_TO_ID
 from . import locations
 
 
-# For our game to display correctly on the website, we need to define a WebWorld subclass.
 class MSMWebWorld(WebWorld):
     game = "Mario Sports Mix"
 
-    # You can choose between dirt, grass, grassFlowers, ice, jungle, ocean, partyTime, and stone.
+    # dirt, grass, grassFlowers, ice, jungle, ocean, partyTime, and stone.
     theme = "partyTime"
 
     setup_en = Tutorial(
@@ -32,7 +31,7 @@ class MSMWorld(World):
     """
     Mario Sports Mix is a fast-paced Wii sports game that includes basketball, volleyball, dodgeball, and hockey.
     Play as characters from the Mario, Final Fantasy and Dragon Quest franchise in order to defeat the evil in this
-    land.
+    land and conquer all the sports!
     """
     game = "Mario Sports Mix"
     web = MSMWebWorld()
@@ -40,20 +39,14 @@ class MSMWorld(World):
     options_dataclass = MSMOptions
     options: MSMOptions
 
-    # Our world class must have a static location_name_to_id and item_name_to_id defined.
-    # We define these in regions.py and items.py respectively, so we just set them here.
-
 
     location_name_to_id = locations.LOCATION_NAME_TO_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
 
-    # There is always one region that the generator starts from & assumes you can always go back to.
-    # This defaults to "Menu", but you can change it by overriding origin_region_name.
+
     origin_region_name = "Main Menu"
 
-    # Our world class must have certain functions ("steps") that get called during generation.
-    # The main ones are: create_regions, set_rules, create_items.
-    # For better structure and readability, we put each of these in their own file.
+
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
@@ -74,5 +67,6 @@ class MSMWorld(World):
    # Stuff to send to the client because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
         return self.options.as_dict(
-            "cup_difficulty", "exhibition_difficulty", "goal_condition", "special_sanity"
+            "cup_difficulty", "exhibition_difficulty", "goal_condition", "behemoth_hp", "behemoth_king_hp",
+            "special_sanity", "sports_mix_unlock", "deathlink_toggle", "deathlink_action", "deathlink_consequence"
         )

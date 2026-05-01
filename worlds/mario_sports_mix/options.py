@@ -5,16 +5,18 @@ from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, Defa
 class StartWithSports(Choice):
     """Start with the sports? HEAVILY RECOMMENDED
 Will cause immediate BK if off"""
-    display_name = "Start With Sports - Recommended!"
+    visibility = Visibility.none
+    display_name = "Start With Sports - READ DESCRIPTION!"
     option_none = 0
     option_excluding_sports_mix = 1
     option_with_sports_mix = 2
     default = 1
 
 class StartWithMushroomCup(Choice):
-    """Start with Mushroom Cup for all Sports? (Also unlocks related stages)
-Also heavily recommended"""
-    display_name = "Start with Mushroom Cup (+Stages) - Recommended!"
+    """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey? (Also unlocks related stages)
+Also heavily recommended, breaks some things if off"""
+    visibility = Visibility.none
+    display_name = "Start with Mushroom Cup (+Stages) - READ DESCRIPTION!"
     option_none = 0
     option_normal_difficulty = 1
     option_hard_difficulty = 2
@@ -37,14 +39,16 @@ class CupDifficulty(OptionSet):
 
 class PartyMode(OptionSet):
     """What party mode games do you want to include?
-(Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)"""
+(Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)
+Doesn't work at the moment"""
     visibility = Visibility.none
     display_name = "Party Mode Games"
     valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
     default = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
 
 class StageUnlockType(Choice):
-    """How do you want stages to be unlocked?"""
+    """How do you want stages to be unlocked?
+DO NOT CHANGE FROM 1"""
     visibility = Visibility.none
     display_name = "Stage Unlock Type"
     option_by_cup_round = 0
@@ -59,6 +63,23 @@ or get Sports Mix as an item"""
     option_sports_crystals = 1
     default = 0
 
+class DeathlinkToggle(Toggle):
+    """Whenever you die, everyone else does and vice versa"""
+    display_name = "Deathlink"
+
+class DeathlinkAction(OptionSet):
+    """What do you want to count as sending a deathlink?"""
+    display_name = "Deathlink Action"
+    valid_keys = {"Opponent Dunks", "Opponent Scores", "Lose Match"}
+    default = {"Lose Match"}
+
+class DeathlinkConsequence(Choice):
+    """What do you want to happen when you receive a deathlink"""
+    display_name = "Deathlink Consequence"
+    option_10_points_to_enemy = 0
+    option_lose_match = 1
+    default = 1
+
 class GoalCondition(Choice):
     """What is your goal?"""
     display_name = "Goal Condition"
@@ -69,18 +90,18 @@ class GoalCondition(Choice):
 
 class BehemothHP(Range):
     """Behemoth Health - 2400 is base game
-Recommended to edit this in the yaml (2400 - 7000)"""
+Recommended to edit this in the yaml (2400 - 4000)"""
     display_name = "Behemoth HP"
     range_start = 2400
-    range_end = 7000
+    range_end = 4000
     default = 2400
 
 class BehemothKingHP(Range):
     """Behemoth King Health - 3000 is base game
-Recommended to edit this in the yaml (3000 - 10000)"""
+Recommended to edit this in the yaml (3000 - 7000)"""
     display_name = "Behemoth King HP"
     range_start = 3000
-    range_end = 10000
+    range_end = 7000
     default = 3000
 
 class CupsRequired(Range):
@@ -99,7 +120,7 @@ class TrapChance(Range):
 
 class TeamSanity(Choice):
     """(NOT WORKING) Turn on or off team sanity
-(Playing with every team combination sends a check, requires Progressive Team Size level 2)"""
+(Playing with every team combination sends a check)"""
     display_name = "Team Sanity"
     option_off = 0
     option_characters = 1
@@ -146,13 +167,18 @@ msm_option_groups = [
         CupDifficulty,
         StageUnlockType,
         SportsMixUnlock,
-        TrapChance
+        TrapChance,
+    ]),
+    OptionGroup("Deathlink Options", [
+        DeathlinkToggle,
+        DeathlinkAction,
+        DeathlinkConsequence,
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
         BehemothHP,
         BehemothKingHP,
-        CupsRequired
+        CupsRequired,
     ]),
     OptionGroup("Sanity Options (Only Special Sanity Works)", [
         TeamSanity,
@@ -160,7 +186,7 @@ msm_option_groups = [
         ScoreSanityPoints,
         ScoreSanityMax,
         SpecialSanity,
-        CourtSanity
+        CourtSanity,
     ])
 ]
 
@@ -173,6 +199,9 @@ class MSMOptions(PerGameCommonOptions):
     party_mode: PartyMode
     stage_unlock_type: StageUnlockType
     sports_mix_unlock: SportsMixUnlock
+    deathlink_toggle: DeathlinkToggle
+    deathlink_action: DeathlinkAction
+    deathlink_consequence: DeathlinkConsequence
     goal_condition : GoalCondition
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP

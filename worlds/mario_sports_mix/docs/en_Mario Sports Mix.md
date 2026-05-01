@@ -10,15 +10,15 @@ with every team combination with Team Sanity. Oh, and you start off with only Mi
 There are 2 bosses in Mario Sports Mix, Behemoth and King Behemoth. Behemoth is accessed beating all cups on each sport,
 finally beating star cup one last time to fight Behemoth at the end. King Behemoth is accessed by beating each Sports
 Mix cup. There is also a new goal we have made, winning cups. There are 27 cups in the game, you may choose any number
-of cups, from 1 to 27 to beat in order to goal.
+of cups, from 1 to 26 to beat in order to goal (27 would mean that you'd have to win star cup in Sports Mix and that
+would require you to defeat Behemoth).
 
 ## What items can appear in other worlds?
 Positive items include:
 * Each sport (Basketball, Volleyball, Dodgeball, Hockey) - There is a setting allowing you to start with them
-(Recommended if you don't want to be hard BK for 7 years immediately)
+(Currently this setting is needed otherwise things won't work :/ )
 * Each cup for each sport
-* Progressive Team Size
-* Each stage / Each round for each cup (Depending on settings)
+* Each stage
 * Characters
 * Special Meter
 * ? Panel items
@@ -33,6 +33,7 @@ Negative items include:
 * Scoresanity
 * Courtsanity
 * Teamsanity
+* Party Mode
 
 
 ## Help with hints
@@ -52,9 +53,6 @@ Here's the list:
 * ? Panel:
 * 1 Time:
 * Trap:
-
-<ins>Party Mode Items (Need to work on more)</ins>
-* HH:
 
 ## Have any ideas?
 Please tell me in the [Mario Sports Mix Thread](https://discord.com/channels/731205301247803413/1485699253450833942)
