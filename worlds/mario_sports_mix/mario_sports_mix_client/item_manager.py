@@ -1,6 +1,5 @@
 from .memory_addresses import *
 import dolphin_memory_engine as dme
-from .MSMContext import MSMContext
 
 
 class ItemManager:

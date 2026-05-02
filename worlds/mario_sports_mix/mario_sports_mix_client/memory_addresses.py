@@ -1,18 +1,16 @@
-import dolphin_memory_engine as dme
-
 class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
     current_stage = 0x8047888E  # String
     current_period = 0x804D77CC # Byte
     on_loading_screen = 0x804D8354  # Word
-    special_active = dme.follow_pointers(0x804D0F98, [0xE0, 0x154]) # Word
+    special_active = 0x804D0F98 # Word
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
 
 class BossAddresses:
-    behemoth_hp = dme.follow_pointers(0x804D0F74, [0x20, 0x34, 0x1F0]) # Float
+    behemoth_hp = 0x804D0F74 # Float
 
 class CupsWon:
     # All are halfwords (2 bytes)
@@ -37,7 +35,7 @@ class CupsWon:
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
 
-    special_meter = dme.follow_pointers(0x804D0F8C, [0x10, 0x10C]) # Float
+    special_meter = 0x804D0F8C # Float
 
     # Characters and costumes
     character_1 = 0x804D7808  # Byte
@@ -45,9 +43,8 @@ class PlayerAddresses:
     character_3 = 0x804D780C  # Byte
 
     # Following 3 are bytes | 1 = True, 0 = False
-    is_1_cpu = dme.follow_pointers(0x805C1B50,[0x54, 0x0, 0x6F])
-    is_2_cpu = dme.follow_pointers(0x805C1B50, [0x54, 0x8, 0x6F])
-    is_3_cpu = dme.follow_pointers(0x805C1B50, [0x54, 0x10, 0x6F])
+    is_cpu = 0x805C1B50
+
 
     costume_1 = 0x804D7810  # Byte
     costume_2 = 0x804D7812  # Byte
@@ -64,21 +61,8 @@ class PlayerAddresses:
 
     class Position:
         # All Floats
-        class B1:
-            x_pos = dme.follow_pointers(0x805C1B50, [0x54,0x0,0x90,0x98])
-            y_pos = dme.follow_pointers(0x805C1B50, [0x54,0x0,0x90,0x9C])
-            z_pos = dme.follow_pointers(0x805C1B50, [0x54,0x0,0x90,0xA0])
-            rotation = dme.follow_pointers(0x805C1B50, [0x54,0x0,0x90,0xB4])
-        class B2:
-            x_pos = dme.follow_pointers(0x805C1B50, [0x54,0x8,0x90,0x98])
-            y_pos = dme.follow_pointers(0x805C1B50, [0x54,0x8,0x90,0x9C])
-            z_pos = dme.follow_pointers(0x805C1B50, [0x54,0x8,0x90,0xA0])
-            rotation = dme.follow_pointers(0x805C1B50, [0x54,0x8,0x90,0xB4])
-        class B3:
-            x_pos = dme.follow_pointers(0x805C1B50, [0x54,0x10,0x90,0x98])
-            y_pos = dme.follow_pointers(0x805C1B50, [0x54,0x10,0x90,0x9C])
-            z_pos = dme.follow_pointers(0x805C1B50, [0x54,0x10,0x90,0xA0])
-            rotation = dme.follow_pointers(0x805C1B50, [0x54,0x10,0x90,0xB4])
+        pos = 0x805C1B50
+        rotation = 0x805C1B50
 
 class OpponentAddresses:
     item_held = 0x804D78A0 # Word
@@ -232,3 +216,31 @@ class SportsMixAddresses:
     is_sports_mix = 0x804d7913 # Byte
     cups = 0x90226D9C # Byte
 
+class Offsets:
+    class PlayerOffsets:
+        special_meter_offsets = [0x10, 0x10C]
+        special_active_offsets = [0xE0, 0x154]
+        class B1:
+            class Position:
+                x_offsets = [0x54,0x0,0x90,0x98]
+                y_offsets = [0x54,0x0,0x90,0x9C]
+                z_offsets = [0x54,0x0,0x90,0xA0]
+                rotation_offsets = [0x54,0x0,0x90,0xB4]
+                is_cpu = [0x54, 0x0, 0x6F]
+        class B2:
+            class Position:
+                x_offsets = [0x54,0x8,0x90,0x98]
+                y_offsets = [0x54,0x8,0x90,0x9C]
+                z_offsets = [0x54,0x8,0x90,0xA0]
+                rotation_offsets = [0x54,0x8,0x90,0xB4]
+                is_cpu = [0x54, 0x8, 0x6F]
+        class B3:
+            class Position:
+                x_offsets = [0x54,0x10,0x90,0x98]
+                y_offsets = [0x54,0x10, 0x90,0x9C]
+                z_offsets = [0x54,0x10,0x90,0xA0]
+                rotation_offsets = [0x54,0x10,0x90,0xB4]
+                is_cpu = [0x54, 0x10, 0x6F]
+
+    class BossOffsets:
+        behemoth_hp_offsets = [0x20, 0x34, 0x1F0]

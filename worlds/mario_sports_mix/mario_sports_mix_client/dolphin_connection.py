@@ -3,7 +3,8 @@ from typing import Any
 import subprocess
 import time
 import dolphin_memory_engine as dme
-import MSMFunctions
+from . import MSMFunctions
+
 
 class DolphinException(Exception):
     pass
@@ -27,95 +28,88 @@ class DolphinClient:
         else:
             return 0
 
-    def attempt_to_hook(self):
-        attempt = 1
-        while True:
-            if not self.dme.is_hooked():
-                print(f"Attempting to connect to Dolphin... Attempt {attempt}.")
-                time.sleep(0.5)
-                self.dme.hook()
+    async def attempt_to_hook(self):
+        # Only hook if not already hooked
+        if not self.dme.is_hooked():
+            self.dme.hook()
 
-                if self.dme.is_hooked():
-                    print("Successfully hooked to Dolphin!")
-                    break
+        if self.dme.is_hooked():
+            self.logger.info("Hooked successfully!")
+            MSMFunctions.unlock_tabs()
+            MSMFunctions.lock_all_cups()
+        else:
+            if self.check_for_dolphin() == 0:
+                self.logger.info("Failed to hook! Dolphin isn't running!")
+            elif self.check_for_dolphin() == 1:
+                self.logger.info("Failed to hook! Mario Sports Mix isn't running!")
+            elif self.check_for_dolphin() == 2:
+                self.logger.info("Failed to hook! Too many Dolphin are running!")
 
-                # Is the emulator open?
-                if self.check_for_dolphin() == 0:
-                    print("Failed to connect. Make sure you're running Dolphin! Retrying in 5 seconds...")
-                    attempt += 1
-                    time.sleep(5)
-                elif self.check_for_dolphin() == 1:
-                    print("Failed to connect. Are you running the game? Retrying in 5 seconds...")
-                    attempt += 1
-                    time.sleep(5)
-                elif self.check_for_dolphin() == 2:
-                    print("More than one instance of Dolphin is running! Retrying in 5 seconds...")
-                    attempt += 1
-                    time.sleep(5)
-                else:
-                    break
-            else:
-                # Already hooked
-                break
 
-    def is_hooked(self):
-        try:
-            self.dme.is_hooked()
-        except DolphinException:
+    def is_hooked_class(self):
+        if self.dme.is_hooked():
+            return True
+        else:
             return False
 
+
     def disconnect(self):
-        if self.is_hooked():
+        if self.dme.is_hooked():
             self.dme.un_hook()
 
     def read_byte(self, address: Any) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.read_byte(address)
         return result
 
     def read_bytes(self, address: Any, bytes_to_read: int) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.read_bytes(address, bytes_to_read)
         return result
 
     def read_word(self, address: Any) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.read_word(address)
         return result
 
     def read_float(self, address: Any) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.read_float(address)
         return result
 
     def read_string(self, address: Any) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         byte = self.dme.read_bytes(address, 5)
         string = byte.decode("utf-8")
         return string
 
     def write_string(self, address: Any) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         string = ""
         encoded = string.encode("utf-8")
         self.dme.write_byte(address, encoded)
 
     def write_byte(self, address: Any, data: Any):
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.write_byte(address, data)
         return result
 
     def write_bytes(self, address: Any, data: Any) -> Any:
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.write_bytes(address, data)
         return result
 
     def write_float(self, address: Any, data: Any):
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.write_float(address, data)
         return result
 
     def write_word(self, address: Any, data: Any):
-        self.is_hooked()
+        self.dme.is_hooked()
         result = self.dme.write_word(address, data)
+        return result
+
+    def follow_pointers(self, address: Any, pointers: Any):
+        self.dme.is_hooked()
+        result = self.dme.follow_pointers(address, pointers)
         return result

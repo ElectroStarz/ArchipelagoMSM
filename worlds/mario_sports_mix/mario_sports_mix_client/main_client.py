@@ -27,12 +27,10 @@ def launch_mario_sports_mix_client(*args):
         ctx.run_cli()
 
         logger.info("Running game...")
-        ctx.dolphin_sync_task = asyncio.create_task(ctx.dolphin_sync_task_func(), name="Dolphin Sync")
+        ctx.dolphin_sync_task = asyncio.create_task(ctx.dolphin_sync_task(), name="Dolphin Sync")
 
         await ctx.exit_event.wait()
         ctx.server_address = None
-
-        await ctx.shutdown()
 
         if ctx.dolphin_sync_task:
             await asyncio.sleep(3)

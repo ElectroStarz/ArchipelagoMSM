@@ -24,3 +24,4 @@ def lock_all_cups():
     dme.write_byte(VolleyballAddresses.Tournament.hard_cups, 8)
     dme.write_byte(HockeyAddresses.Tournament.normal_cups, 8)
     dme.write_byte(HockeyAddresses.Tournament.hard_cups, 8)
+    dme.write_byte(SportsMixAddresses.cups, 8)
