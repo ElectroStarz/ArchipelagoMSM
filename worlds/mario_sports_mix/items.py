@@ -189,26 +189,28 @@ character_costumes = {
 }
 
 # Able to use once unlocked
-unlockable_items = {
-    "? Panel: Coin": ItemData(base_id + 300, ItemClassification.useful),
-    "? Panel: Green Shell": ItemData(base_id + 301, ItemClassification.useful),
-    "? Panel: Red Shell": ItemData(base_id + 302, ItemClassification.useful),
-    "? Panel: Banana": ItemData(base_id + 303, ItemClassification.useful),
-    "? Panel: Bob-omb": ItemData(base_id + 304, ItemClassification.useful),
-    "? Panel: Mini Mushroom": ItemData(base_id + 305, ItemClassification.useful),
-    "? Panel: Super Star": ItemData(base_id + 306, ItemClassification.useful),
-    "Special Meter": ItemData(base_id + 307, ItemClassification.useful),
+unlockable_panel_items = {
+    "? Panel: Green Shell": ItemData(base_id + 300, ItemClassification.useful),
+    "? Panel: Red Shell": ItemData(base_id + 301, ItemClassification.useful),
+    "? Panel: Banana": ItemData(base_id + 302, ItemClassification.useful),
+    "? Panel: Bob-omb": ItemData(base_id + 303, ItemClassification.useful),
+    "? Panel: Mini Mushroom": ItemData(base_id + 304, ItemClassification.useful),
+    "? Panel: Super Star": ItemData(base_id + 305, ItemClassification.useful),
+}
+
+unlockable_abilities = {
+    "Ability: Special Meter": ItemData(base_id + 307, ItemClassification.useful),
 }
 
 # One time use
 one_time_items = {
-    "1 Time Coin": ItemData(base_id + 400, ItemClassification.filler),
-    "1 Time Green Shell": ItemData(base_id + 401, ItemClassification.filler),
-    "1 Time Red Shell": ItemData(base_id + 402, ItemClassification.filler),
-    "1 Time Banana": ItemData(base_id + 403, ItemClassification.filler),
-    "1 Time Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
-    "1 Time Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
-    "1 Time Super Star": ItemData(base_id + 406, ItemClassification.filler),
+    "1 Coin": ItemData(base_id + 400, ItemClassification.filler),
+    "1 Green Shell": ItemData(base_id + 401, ItemClassification.filler),
+    "1 Red Shell": ItemData(base_id + 402, ItemClassification.filler),
+    "1 Banana": ItemData(base_id + 403, ItemClassification.filler),
+    "1 Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
+    "1 Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
+    "1 Super Star": ItemData(base_id + 406, ItemClassification.filler),
 }
 
 traps = {
@@ -260,7 +262,8 @@ item_table: Dict[str, ItemData] = {
     **progressive_stuff,
     **characters,
     **character_costumes,
-    **unlockable_items,
+    **unlockable_panel_items,
+    **unlockable_abilities,
     **one_time_items,
     **traps,
     #**harmony_hustle_items
@@ -287,8 +290,12 @@ def create_all_items(world: "MSMWorld") -> None:
     for name, data in character_costumes.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
-    # Unlockable items
-    for name, data in unlockable_items.items():
+    # Unlockable panel items
+    for name, data in unlockable_panel_items.items():
+        new_item = world.create_item(name)
+        itempool.append(new_item)
+    # Unlockable abilities
+    for name, data in unlockable_abilities.items():
         new_item = world.create_item(name)
         itempool.append(new_item)
     # Items in the progressive stuff dict - Does nothing right now
