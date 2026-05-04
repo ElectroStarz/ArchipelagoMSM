@@ -1,9 +1,8 @@
 from logging import Logger
 from typing import Any
 import subprocess
-import time
 import dolphin_memory_engine as dme
-from . import MSMFunctions
+import asyncio
 
 
 class DolphinException(Exception):
@@ -28,22 +27,30 @@ class DolphinClient:
         else:
             return 0
 
+    attempt = 1
+
     async def attempt_to_hook(self):
         # Only hook if not already hooked
         if not self.dme.is_hooked():
+            self.logger.info(f"Attempting to hook: Attempt {self.attempt}")
+            await asyncio.sleep(1)
             self.dme.hook()
 
         if self.dme.is_hooked():
             self.logger.info("Hooked successfully!")
-            MSMFunctions.unlock_tabs()
-            MSMFunctions.lock_all_cups()
         else:
             if self.check_for_dolphin() == 0:
                 self.logger.info("Failed to hook! Dolphin isn't running!")
+                self.attempt += 1
+                await asyncio.sleep(3)
             elif self.check_for_dolphin() == 1:
                 self.logger.info("Failed to hook! Mario Sports Mix isn't running!")
+                self.attempt += 1
+                await asyncio.sleep(3)
             elif self.check_for_dolphin() == 2:
                 self.logger.info("Failed to hook! Too many Dolphin are running!")
+                self.attempt += 1
+                await asyncio.sleep(3)
 
 
     def is_hooked_class(self):
@@ -109,7 +116,7 @@ class DolphinClient:
         result = self.dme.write_word(address, data)
         return result
 
-    def follow_pointers(self, address: Any, pointers: Any):
+    def follow_pointers(self, address: Any, pointers: list):
         self.dme.is_hooked()
         result = self.dme.follow_pointers(address, pointers)
         return result
