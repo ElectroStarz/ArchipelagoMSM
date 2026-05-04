@@ -2,12 +2,19 @@ class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
     current_stage = 0x8047888E  # String
-    current_period = 0x804D77CC # Byte
+    current_period = 0x804D77CC # Byte | Starts at 0
     on_loading_screen = 0x804D8354  # Word
     special_active = 0x804D0F98 # Word
+    tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
+    exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
+
+    dodgeball_sets = 0x804D99A7
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
+
+    # 4 = 2v2, 0 = 3v3
+    game_layout = 0x804D77C6 # Byte
 
 class BossAddresses:
     behemoth_hp = 0x804D0F74 # Float
