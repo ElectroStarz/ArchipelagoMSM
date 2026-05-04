@@ -41,24 +41,25 @@ class MSMInterface:
         self.logger.info("Disconnected from Dolphin!")
 
 
-    def is_in_menu(self) -> bool:
+    def is_in_menu(self):
         current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
         if current_stage == "s39ba":
             return True
         else:
             return False
 
-    def is_in_match(self) -> bool:
+    def is_in_match(self):
         current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
         current_stage_prefix = current_stage[:3]
         if current_stage_prefix in stage_ids:
-            return False
-        else:
             return True
+        else:
+            return False
 
-    def is_in_tournament_map(self) -> bool:
+    def is_in_tournament_map(self):
         current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
-        if "s31" or "s32" or "s33" in current_stage:
+        current_stage_prefix = current_stage[:3]
+        if any(prefix in current_stage_prefix for prefix in ["s31", "s32", "s33"]):
             return True
         else:
             return False
@@ -67,7 +68,6 @@ class MSMInterface:
         try:
             if not self.dolphin_client.is_hooked_class():
                 return ConnectionState.DISCONNECTED
-
 
             if self.is_in_menu():
                 return ConnectionState.IN_MENU
