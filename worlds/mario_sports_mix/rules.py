@@ -523,7 +523,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
     # === Get locations ===
     # === Normal ===
-    if "Normal" in world.options.cup_difficulty:
+    if "Normal" in world.options.tournament_difficulty:
         # Basketball
         b_mushroom_1_n = world.get_location("Basketball: Beat Normal Mushroom Cup Round 1")
         b_mushroom_2_n = world.get_location("Basketball: Beat Normal Mushroom Cup Round 2")
@@ -627,7 +627,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
 
     # === Hard ===
-    if "Hard" in world.options.cup_difficulty:
+    if "Hard" in world.options.tournament_difficulty:
         # Basketball
         b_mushroom_1_h = world.get_location("Basketball: Beat Hard Mushroom Cup Round 1")
         b_mushroom_2_h = world.get_location("Basketball: Beat Hard Mushroom Cup Round 2")
