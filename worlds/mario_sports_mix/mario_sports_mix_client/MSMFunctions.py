@@ -10,7 +10,7 @@ sports_addresses = [
 
 cups_difficulty = ["normal_cups", "hard_cups"]
 
-cups = ["mushroom_cup", "flower_cup", "star_cup", "question_block_cup"]
+cups = ["mushroom_cup", "flower_cup", "star_cup", "question_mark_cup"]
 
 characters = [
     "mario", "luigi", "peach", "daisy", "yoshi", "wario", "waluigi", "donkey_kong", "diddy_kong", "toad", "bowser",
@@ -45,4 +45,6 @@ def lock_all_characters():
     for sport in sports_addresses:
         for char in characters:
             addr = getattr(sport.Characters, char)
+            # test = dme.read_byte(addr)
+            # print(test)
             dme.write_byte(addr, 0)

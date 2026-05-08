@@ -68,6 +68,6 @@ class MSMWorld(World):
    # Stuff to send to the client because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
         return self.options.as_dict(
-            "cup_difficulty", "exhibition_difficulty", "goal_condition", "behemoth_hp", "behemoth_king_hp",
-            "special_sanity", "sports_mix_unlock", "deathlink_toggle", "deathlink_action", "deathlink_consequence"
+            "tournament_difficulty", "exhibition_difficulty", "goal_condition", "behemoth_hp",
+            "behemoth_king_hp", "special_sanity", "sports_mix_unlock",
         )

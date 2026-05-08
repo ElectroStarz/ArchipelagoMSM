@@ -1,6 +1,7 @@
 class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
+    match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_stage = 0x8047888E  # String
     current_period = 0x804D77CC # Byte | Starts at 0
     on_loading_screen = 0x804D8354  # Word
@@ -213,14 +214,15 @@ class HockeyAddresses:
         bowser = 0x90226C99
         bowser_jr = 0x90226CA9
         moogle = 0x90226CB9
-        white_mage = 0x90226CC9
-        black_mage = 0x90226CD9
-        ninja = 0x90226CE9
-        cactuar = 0x90226D09
-        slime = 0x90226D19
+        cactuar = 0x90226CC9
+        ninja = 0x90226CD9
+        white_mage = 0x90226CE9
+        slime = 0x90226CF9
+        black_mage = 0x90226D09
 
 class SportsMixAddresses:
     is_sports_mix = 0x804d7913 # Byte
+    sports_mix_unlocked = 0x80226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
     cups = 0x90226D9C # Byte
 
 class Offsets:

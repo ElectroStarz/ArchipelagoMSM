@@ -5,6 +5,8 @@ import dolphin_memory_engine as dme
 import asyncio
 
 
+
+
 class DolphinException(Exception):
     pass
 
@@ -118,5 +120,5 @@ class DolphinClient:
 
     def follow_pointers(self, address: Any, pointers: list):
         self.dme.is_hooked()
-        result = self.dme.follow_pointers(address, pointers)
+        result = self.dme.follow_pointers(address, list(pointers))
         return result
