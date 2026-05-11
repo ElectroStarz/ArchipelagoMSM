@@ -153,6 +153,9 @@ class DodgeballAddresses:
         black_mage = 0x90226BC9
 
 class VolleyballAddresses:
+
+    last_held = 0x804D0F98
+
     class Tournament:
         tabs = 0x90226DA4 # Byte
         normal_cups = 0x90226DA5 # Byte
@@ -223,10 +226,12 @@ class HockeyAddresses:
 class SportsMixAddresses:
     is_sports_mix = 0x804d7913 # Byte
     sports_mix_unlocked = 0x80226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
-    cups = 0x90226D9C # Byte
+
+    class Tournament:
+        cups = 0x90226D9C # Byte
 
 class Offsets:
-    class PlayerOffsets:
+    class Player:
         special_meter_offsets = [0x10, 0x10C]
         special_active_offsets = [0xE0, 0x154]
         class B1:
@@ -251,5 +256,8 @@ class Offsets:
                 rotation_offsets = [0x54,0x10,0x90,0xB4]
                 is_cpu = [0x54, 0x10, 0x6F]
 
-    class BossOffsets:
+    class Volleyball:
+        last_held_offsets = [0x24, 0x214, 0x134]
+
+    class Boss:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]

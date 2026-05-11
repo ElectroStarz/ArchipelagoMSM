@@ -45,6 +45,4 @@ def lock_all_characters():
     for sport in sports_addresses:
         for char in characters:
             addr = getattr(sport.Characters, char)
-            # test = dme.read_byte(addr)
-            # print(test)
             dme.write_byte(addr, 0)

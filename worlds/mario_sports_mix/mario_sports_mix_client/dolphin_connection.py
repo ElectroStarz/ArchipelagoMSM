@@ -5,8 +5,6 @@ import dolphin_memory_engine as dme
 import asyncio
 
 
-
-
 class DolphinException(Exception):
     pass
 
@@ -44,15 +42,15 @@ class DolphinClient:
             if self.check_for_dolphin() == 0:
                 self.logger.info("Failed to hook! Dolphin isn't running!")
                 self.attempt += 1
-                await asyncio.sleep(3)
+                await asyncio.sleep(5)
             elif self.check_for_dolphin() == 1:
                 self.logger.info("Failed to hook! Mario Sports Mix isn't running!")
                 self.attempt += 1
-                await asyncio.sleep(3)
+                await asyncio.sleep(5)
             elif self.check_for_dolphin() == 2:
                 self.logger.info("Failed to hook! Too many Dolphin are running!")
                 self.attempt += 1
-                await asyncio.sleep(3)
+                await asyncio.sleep(5)
 
 
     def is_hooked_class(self):
