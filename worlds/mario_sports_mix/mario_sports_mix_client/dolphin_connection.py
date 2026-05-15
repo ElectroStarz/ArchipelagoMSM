@@ -33,7 +33,6 @@ class DolphinClient:
         # Only hook if not already hooked
         if not self.dme.is_hooked():
             self.logger.info(f"Attempting to hook: Attempt {self.attempt}")
-            await asyncio.sleep(1)
             self.dme.hook()
 
         if self.dme.is_hooked():
@@ -58,7 +57,6 @@ class DolphinClient:
             return True
         else:
             return False
-
 
     def disconnect(self):
         if self.dme.is_hooked():
@@ -87,8 +85,8 @@ class DolphinClient:
     def read_string(self, address: Any) -> Any:
         self.dme.is_hooked()
         byte = self.dme.read_bytes(address, 5)
-        string = byte.decode("utf-8")
-        return string
+        decoded = byte.decode("utf-8")
+        return decoded
 
     def write_string(self, address: Any) -> Any:
         self.dme.is_hooked()

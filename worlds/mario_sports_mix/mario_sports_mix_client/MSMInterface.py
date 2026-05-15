@@ -80,9 +80,11 @@ class MSMInterface:
         string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
         current_stage = string_stage[0:3]
         timer = self.dolphin_client.read_float(MatchAddresses.time_remaining)
+        shot_clock = self.dolphin_client.read_float(MatchAddresses.shot_clock)
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
         ready_shot_clock = bool
+
 
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
@@ -90,41 +92,44 @@ class MSMInterface:
                     ready_game = True
                 else:
                     ready_game = False
+
+                if shot_clock < 1440:
+                    ready_shot_clock = True
+                else:
+                    ready_shot_clock = False
             elif self.check_sport() == "Dodgeball":
                 if timer < 10800:
                     ready_game = True
                 else:
                     ready_game = False
+
+                if shot_clock < 1800:
+                    ready_shot_clock = True
+                else:
+                    ready_shot_clock = False
             elif self.check_sport() == "Volleyball":
                     try:
-                        last_held = self.dolphin_client.follow_pointers(
+                        # Check if you can follow pointers to the address, if so, then ready
+                        self.dolphin_client.follow_pointers(
                             VolleyballAddresses.last_held,
                             Offsets.Volleyball.last_held_offsets
                         )
-                        ready_game = bool(last_held)
+                        ready_game = True
                     except RuntimeError:
                         ready_game = False
+
+                    ready_shot_clock = True
             elif self.check_sport() == "Hockey":
                 if timer < 10800:
                     ready_game = True
                 else:
                     ready_game = False
+                ready_shot_clock = True
+        else:
+            ready_game = False
+            ready_shot_clock = False
 
-        shot_clock = self.dolphin_client.read_float(MatchAddresses.shot_clock)
-        if self.check_sport() == "Basketball":
-                if shot_clock < 1440:
-                    ready_shot_clock = True
-                else:
-                    ready_shot_clock = False
-        elif self.check_sport() == "Dodgeball":
-                if shot_clock < 1800:
-                    ready_shot_clock = True
-                else:
-                    ready_shot_clock = False
-        elif self.check_sport() == "Volleyball" or self.check_sport() == "Hockey":
-            ready_shot_clock = True
-
-        if ready_game and ready_shot_clock:
+        if ready_game:# and ready_shot_clock:
             return True
         else:
             return False
@@ -142,9 +147,12 @@ class MSMInterface:
             return 0 # Ongoing
 
     def check_sport(self):
+        is_sports_mix = self.dolphin_client.read_byte(SportsMixAddresses.is_sports_mix)
         string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
-        current_sport = string_stage[3:5]
-        if current_sport == "BA":
+        current_sport = string_stage[-2:]
+        if is_sports_mix == 1:
+            return "Sports Mix"
+        elif current_sport == "BA":
             return "Basketball"
         elif current_sport == "DO":
             return "Dodgeball"
@@ -157,16 +165,8 @@ class MSMInterface:
 
     def get_exhibition_difficulty(self):
         difficulty = self.dolphin_client.read_byte(MatchAddresses.exhibition_diff)
-        if difficulty == 0:
-            return "Easy"
-        elif difficulty == 1:
-            return "Normal"
-        elif difficulty == 2:
-            return "Hard"
-        elif difficulty == 3:
-            return "Expert"
-        else:
-            return None
+
+        return {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}.get(difficulty)
 
     def get_tournament_difficulty(self, cup: str) -> Optional[str]:
         difficulty = self.dolphin_client.read_byte(MatchAddresses.tournament_diff)
@@ -175,19 +175,6 @@ class MSMInterface:
             return {0: "Normal", 1: "Hard"}.get(difficulty)
 
         return {1: "Normal", 2: "Hard"}.get(difficulty)
-
-    def check_cup(self):
-        string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
-        current_stage = string_stage[0:2]
-        if ConnectionState.IN_TOURNAMENT_MAP:
-            if current_stage == "s31":
-                self.current_tournament = "Mushroom Cup"
-            elif current_stage == "s32":
-                self.current_tournament = "Flower Cup"
-            elif current_stage == "s33":
-                self.current_tournament = "Star Cup"
-        print(self.current_tournament)
-
 
     def get_connection_state(self):
         try:

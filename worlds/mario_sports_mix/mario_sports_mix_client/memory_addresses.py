@@ -20,7 +20,7 @@ class MatchAddresses:
 class BossAddresses:
     behemoth_hp = 0x804D0F74 # Float
 
-class CupsWon:
+class CupsWonMultiple:
     # All are halfwords (2 bytes)
     class Basketball:
         mushroom_cup = 0x902299B0
@@ -225,7 +225,7 @@ class HockeyAddresses:
 
 class SportsMixAddresses:
     is_sports_mix = 0x804d7913 # Byte
-    sports_mix_unlocked = 0x80226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
+    sports_mix_unlocked = 0x90226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
 
     class Tournament:
         cups = 0x90226D9C # Byte
