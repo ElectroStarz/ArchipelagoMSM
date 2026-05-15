@@ -21,15 +21,6 @@ components.append(
     )
 )
 
-
-
-
-
-
-
-
-
-
 # There are two optional parameters that are worth drawing attention to here: "game_name" and "supports_uri".
 # As you might know, on a room page on WebHost, clicking a slot name opens your locally installed Launcher
 # and asks you if you want to open a Text Client.

@@ -1,745 +1,212 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from rule_builder.rules import Has, HasAll, CanReachRegion
-from .options import GoalCondition
+from rule_builder.rules import Has, HasAll, CanReachLocation
+from .options import GoalCondition, BeMean
 
 if TYPE_CHECKING:
     from . import MSMWorld
 
+# Stage item mappings used for exhibition and tournament requirements
+STAGES = {
+    "Mario Stadium": "Stage: Mario Stadium",
+    "Koopa Troopa Beach": "Stage: Koopa Troopa Beach",
+    "Peach's Castle": "Stage: Peach's Castle",
+    "Toad Park": "Stage: Toad Park",
+    "DK Dock": "Stage: DK Dock",
+    "Luigi's Mansion": "Stage: Luigi's Mansion",
+    "Daisy Garden": "Stage: Daisy Garden",
+    "Wario Factory": "Stage: Wario Factory",
+    "Bowser Jr. Blvd.": "Stage: Bowser Jr. Blvd.",
+    "Bowser's Castle": "Stage: Bowser's Castle",
+    "Waluigi Pinball": "Stage: Waluigi Pinball",
+    "Ghoulish Galleon": "Stage: Ghoulish Galleon",
+    "Star Ship": "Stage: Star Ship",
+    "Western Junction": "Stage: Western Junction",
+}
+
+# Stages required for each exhibition match category
+EXHIBITION_RULES = {
+    "Basketball": [
+        "Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Luigi's Mansion",
+        "Western Junction", "Daisy Garden", "Bowser Jr. Blvd.",
+        "Bowser's Castle", "Star Ship", "Peach's Castle",
+        "Wario Factory", "Ghoulish Galleon"
+    ],
+    "Dodgeball": [
+        "Mario Stadium", "Koopa Troopa Beach", "DK Dock",
+        "Western Junction", "Daisy Garden", "Bowser's Castle",
+        "Star Ship", "Peach's Castle", "Wario Factory",
+        "Ghoulish Galleon", "Toad Park", "Waluigi Pinball"
+    ],
+    "Volleyball": [
+        "Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Luigi's Mansion",
+        "Western Junction", "Bowser Jr. Blvd.", "Bowser's Castle",
+        "Star Ship", "Peach's Castle", "Wario Factory",
+        "Ghoulish Galleon", "Waluigi Pinball"
+    ],
+    "Hockey": [
+        "Mario Stadium", "Koopa Troopa Beach", "Western Junction",
+        "Daisy Garden", "Bowser Jr. Blvd.", "Bowser's Castle",
+        "Star Ship", "Peach's Castle", "Wario Factory",
+        "Ghoulish Galleon", "Toad Park", "Waluigi Pinball"
+    ]
+}
+
+# Progressive cup requirements for each sport
+# Round 1 = first stage only
+# Round 2 = first + second stage
+# Round 3 = all three stages
+TOURNAMENT_RULES = {
+    "Basketball": {
+        "Mushroom": ["Mario Stadium", "Koopa Troopa Beach", "DK Dock"],
+        "Flower": ["Luigi's Mansion", "Western Junction", "Daisy Garden"],
+        "Star": ["Bowser Jr. Blvd.", "Bowser's Castle", "Star Ship"]
+    },
+    "Dodgeball": {
+        "Mushroom": ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"],
+        "Flower": ["DK Dock", "Toad Park", "Daisy Garden"],
+        "Star": ["Wario Factory", "Bowser's Castle", "Star Ship"]
+    },
+    "Volleyball": {
+        "Mushroom": ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"],
+        "Flower": ["DK Dock", "Luigi's Mansion", "Western Junction"],
+        "Star": ["Bowser Jr. Blvd.", "Bowser's Castle", "Star Ship"]
+    },
+    "Hockey": {
+        "Mushroom": ["Mario Stadium", "Toad Park", "Peach's Castle"],
+        "Flower": ["Western Junction", "Wario Factory", "Daisy Garden"],
+        "Star": ["Bowser Jr. Blvd.", "Waluigi Pinball", "Star Ship"]
+    }
+}
+
+EXHIBITION_DIFFICULTIES = {
+    "Easy": "Easy",
+    "Normal": "Normal",
+    "Hard": "Hard",
+    "Expert": "Expert"
+}
+
+TOURNAMENT_DIFFICULTIES = {
+    "Normal": "Normal",
+    "Hard": "Hard"
+}
+
+
+# Main rule setup entry point
+# Calls all other rule generation functions
 
 def set_all_rules(world: MSMWorld) -> None:
     set_all_location_rules(world)
+    set_all_entrance_rules(world)
+    set_goal_rules(world)
     set_completion_condition(world)
 
 
+# Creates all location access rules
+# Includes exhibitions, tournaments, and goal locations
+
 def set_all_location_rules(world: MSMWorld) -> None:
-    # Get ready for a whole lotta world.get_location
+    stage_rules = {name: Has(item) for name, item in STAGES.items()}
 
-    # Stage rules
-    has_mario_stadium = Has("Stage: Mario Stadium")
-    has_koopa_troopa_beach = Has("Stage: Koopa Troopa Beach")
-    has_peachs_castle = Has("Stage: Peach's Castle")
-    has_toad_park = Has("Stage: Toad Park")
-    has_dk_dock = Has("Stage: DK Dock")
-    has_luigi_mansion = Has("Stage: Luigi's Mansion")
-    has_daisy_garden = Has("Stage: Daisy Garden")
-    has_wario_factory = Has("Stage: Wario Factory")
-    has_bowser_jr_blvd = Has("Stage: Bowser Jr. Blvd.")
-    has_bowser_castle = Has("Stage: Bowser's Castle")
-    has_waluigi_pinball = Has("Stage: Waluigi Pinball")
-    has_ghoulish_galleon = Has("Stage: Ghoulish Galleon")
-    has_star_ship = Has("Stage: Star Ship")
-    has_western_junction = Has("Stage: Western Junction")
-    has_boss_stage = Has("Stage: Behemoth Stage")
+    # Exhibition mode rules
+    # Automatically generates every enabled difficulty
+    for difficulty in world.options.exhibition_difficulty:
+        if difficulty not in EXHIBITION_DIFFICULTIES:
+            continue
 
-            # === Continue making rules!!! (Haven't finished them yet!) ====
+        for sport, stages in EXHIBITION_RULES.items():
+            for stage in stages:
+                location = world.get_location(f"{sport} Ex: Beat {stage} ({difficulty})")
+                world.set_rule(location, stage_rules[stage])
 
-    if "Easy" in world.options.exhibition_difficulty:
-        # Basketball
-        b_mario_stadium_e = world.get_location("Basketball Ex: Beat Mario Stadium (Easy)")
-        b_koopa_troopa_beach_e = world.get_location("Basketball Ex: Beat Koopa Troopa Beach (Easy)")
-        b_dk_dock_e = world.get_location("Basketball Ex: Beat DK Dock (Easy)")
-        b_luigi_mansion_e = world.get_location("Basketball Ex: Beat Luigi's Mansion (Easy)")
-        b_western_junction_e = world.get_location("Basketball Ex: Beat Western Junction (Easy)")
-        b_daisy_garden_e = world.get_location("Basketball Ex: Beat Daisy Garden (Easy)")
-        b_bowser_jr_blvd_e = world.get_location("Basketball Ex: Beat Bowser Jr. Blvd. (Easy)")
-        b_bowsers_castle_e = world.get_location("Basketball Ex: Beat Bowser's Castle (Easy)")
-        b_star_ship_e = world.get_location("Basketball Ex: Beat Star Ship (Easy)")
-        b_peachs_castle_e = world.get_location("Basketball Ex: Beat Peach's Castle (Easy)")
-        b_wario_factory_e = world.get_location("Basketball Ex: Beat Wario Factory (Easy)")
-        b_ghoulish_galleon_e = world.get_location("Basketball Ex: Beat Ghoulish Galleon (Easy)")
-        # Dodgeball
-        d_mario_stadium_e = world.get_location("Dodgeball Ex: Beat Mario Stadium (Easy)")
-        d_koopa_troopa_beach_e = world.get_location("Dodgeball Ex: Beat Koopa Troopa Beach (Easy)")
-        d_dk_dock_e = world.get_location("Dodgeball Ex: Beat DK Dock (Easy)")
-        d_western_junction_e = world.get_location("Dodgeball Ex: Beat Western Junction (Easy)")
-        d_daisy_garden_e = world.get_location("Dodgeball Ex: Beat Daisy Garden (Easy)")
-        d_bowsers_castle_e = world.get_location("Dodgeball Ex: Beat Bowser's Castle (Easy)")
-        d_star_ship_e = world.get_location("Dodgeball Ex: Beat Star Ship (Easy)")
-        d_peachs_castle_e = world.get_location("Dodgeball Ex: Beat Peach's Castle (Easy)")
-        d_wario_factory_e = world.get_location("Dodgeball Ex: Beat Wario Factory (Easy)")
-        d_ghoulish_galleon_e = world.get_location("Dodgeball Ex: Beat Ghoulish Galleon (Easy)")
-        d_toad_park_e = world.get_location("Dodgeball Ex: Beat Toad Park (Easy)")
-        d_waluigi_pinball_e = world.get_location("Dodgeball Ex: Beat Waluigi Pinball (Easy)")
-        # Volleyball
-        v_mario_stadium_e = world.get_location("Volleyball Ex: Beat Mario Stadium (Easy)")
-        v_koopa_troopa_beach_e = world.get_location("Volleyball Ex: Beat Koopa Troopa Beach (Easy)")
-        v_dk_dock_e = world.get_location("Volleyball Ex: Beat DK Dock (Easy)")
-        v_luigi_mansion_e = world.get_location("Volleyball Ex: Beat Luigi's Mansion (Easy)")
-        v_western_junction_e = world.get_location("Volleyball Ex: Beat Western Junction (Easy)")
-        v_bowser_jr_blvd_e = world.get_location("Volleyball Ex: Beat Bowser Jr. Blvd. (Easy)")
-        v_bowsers_castle_e = world.get_location("Volleyball Ex: Beat Bowser's Castle (Easy)")
-        v_star_ship_e = world.get_location("Volleyball Ex: Beat Star Ship (Easy)")
-        v_peachs_castle_e = world.get_location("Volleyball Ex: Beat Peach's Castle (Easy)")
-        v_wario_factory_e = world.get_location("Volleyball Ex: Beat Wario Factory (Easy)")
-        v_ghoulish_galleon_e = world.get_location("Volleyball Ex: Beat Ghoulish Galleon (Easy)")
-        v_waluigi_pinball_e = world.get_location("Volleyball Ex: Beat Waluigi Pinball (Easy)")
-        # Hockey
-        h_mario_stadium_e = world.get_location("Hockey Ex: Beat Mario Stadium (Easy)")
-        h_koopa_troopa_beach_e = world.get_location("Hockey Ex: Beat Koopa Troopa Beach (Easy)")
-        h_western_junction_e = world.get_location("Hockey Ex: Beat Western Junction (Easy)")
-        h_daisy_garden_e = world.get_location("Hockey Ex: Beat Daisy Garden (Easy)")
-        h_bowser_jr_blvd_e = world.get_location("Hockey Ex: Beat Bowser Jr. Blvd. (Easy)")
-        h_bowsers_castle_e = world.get_location("Hockey Ex: Beat Bowser's Castle (Easy)")
-        h_star_ship_e = world.get_location("Hockey Ex: Beat Star Ship (Easy)")
-        h_peachs_castle_e = world.get_location("Hockey Ex: Beat Peach's Castle (Easy)")
-        h_wario_factory_e = world.get_location("Hockey Ex: Beat Wario Factory (Easy)")
-        h_ghoulish_galleon_e = world.get_location("Hockey Ex: Beat Ghoulish Galleon (Easy)")
-        h_toad_park_e = world.get_location("Hockey Ex: Beat Toad Park (Easy)")
-        h_waluigi_pinball_e = world.get_location("Hockey Ex: Beat Waluigi Pinball (Easy)")
+    # Tournament cup rules
+    # Each round progressively requires more stages
+    for difficulty in world.options.tournament_difficulty:
+        if difficulty not in TOURNAMENT_DIFFICULTIES:
+            continue
 
-        # Basketball
-        world.set_rule(b_mario_stadium_e, has_mario_stadium)
-        world.set_rule(b_koopa_troopa_beach_e, has_koopa_troopa_beach)
-        world.set_rule(b_dk_dock_e, has_dk_dock)
-        world.set_rule(b_luigi_mansion_e, has_luigi_mansion)
-        world.set_rule(b_western_junction_e, has_western_junction)
-        world.set_rule(b_daisy_garden_e, has_daisy_garden)
-        world.set_rule(b_bowser_jr_blvd_e, has_bowser_jr_blvd)
-        world.set_rule(b_bowsers_castle_e, has_bowser_castle)
-        world.set_rule(b_star_ship_e, has_star_ship)
-        world.set_rule(b_peachs_castle_e, has_peachs_castle)
-        world.set_rule(b_wario_factory_e, has_wario_factory)
-        world.set_rule(b_ghoulish_galleon_e, has_ghoulish_galleon)
-
-        # Dodgeball
-        world.set_rule(d_mario_stadium_e, has_mario_stadium)
-        world.set_rule(d_koopa_troopa_beach_e, has_koopa_troopa_beach)
-        world.set_rule(d_dk_dock_e, has_dk_dock)
-        world.set_rule(d_western_junction_e, has_western_junction)
-        world.set_rule(d_daisy_garden_e, has_daisy_garden)
-        world.set_rule(d_bowsers_castle_e, has_bowser_castle)
-        world.set_rule(d_star_ship_e, has_star_ship)
-        world.set_rule(d_peachs_castle_e, has_peachs_castle)
-        world.set_rule(d_wario_factory_e, has_wario_factory)
-        world.set_rule(d_ghoulish_galleon_e, has_ghoulish_galleon)
-        world.set_rule(d_toad_park_e, has_toad_park)
-        world.set_rule(d_waluigi_pinball_e, has_waluigi_pinball)
-
-        # Volleyball
-        world.set_rule(v_mario_stadium_e, has_mario_stadium)
-        world.set_rule(v_koopa_troopa_beach_e, has_koopa_troopa_beach)
-        world.set_rule(v_dk_dock_e, has_dk_dock)
-        world.set_rule(v_luigi_mansion_e, has_luigi_mansion)
-        world.set_rule(v_western_junction_e, has_western_junction)
-        world.set_rule(v_bowser_jr_blvd_e, has_bowser_jr_blvd)
-        world.set_rule(v_bowsers_castle_e, has_bowser_castle)
-        world.set_rule(v_star_ship_e, has_star_ship)
-        world.set_rule(v_peachs_castle_e, has_peachs_castle)
-        world.set_rule(v_wario_factory_e, has_wario_factory)
-        world.set_rule(v_ghoulish_galleon_e, has_ghoulish_galleon)
-        world.set_rule(v_waluigi_pinball_e, has_waluigi_pinball)
+        for sport, cups in TOURNAMENT_RULES.items():
+            for cup, stages in cups.items():
+                for i in range(1, 4):
+                    needed = stages[:i]
+                    rule = Has("") if not needed else HasAll(*[STAGES[s] for s in needed])
+                    location = world.get_location(
+                        f"{sport}: Beat {difficulty} {cup} Cup Round {i}"
+                    )
+                    world.set_rule(location, rule)
 
 
-        # Hockey
-        world.set_rule(h_mario_stadium_e, has_mario_stadium)
-        world.set_rule(h_koopa_troopa_beach_e, has_koopa_troopa_beach)
-        world.set_rule(h_western_junction_e, has_western_junction)
-        world.set_rule(h_daisy_garden_e, has_daisy_garden)
-        world.set_rule(h_bowser_jr_blvd_e, has_bowser_jr_blvd)
-        world.set_rule(h_bowsers_castle_e, has_bowser_castle)
-        world.set_rule(h_star_ship_e, has_star_ship)
-        world.set_rule(h_peachs_castle_e, has_peachs_castle)
-        world.set_rule(h_wario_factory_e, has_wario_factory)
-        world.set_rule(h_ghoulish_galleon_e, has_ghoulish_galleon)
-        world.set_rule(h_toad_park_e, has_toad_park)
-        world.set_rule(h_waluigi_pinball_e, has_waluigi_pinball)
+# Goal completion logic
+# Handles Behemoth and Behemoth King requirements
 
-    if "Normal" in world.options.exhibition_difficulty:
-        # Basketball
-        b_mario_stadium_n = world.get_location("Basketball Ex: Beat Mario Stadium (Normal)")
-        b_koopa_troopa_beach_n = world.get_location("Basketball Ex: Beat Koopa Troopa Beach (Normal)")
-        b_dk_dock_n = world.get_location("Basketball Ex: Beat DK Dock (Normal)")
-        b_luigi_mansion_n = world.get_location("Basketball Ex: Beat Luigi's Mansion (Normal)")
-        b_western_junction_n = world.get_location("Basketball Ex: Beat Western Junction (Normal)")
-        b_daisy_garden_n = world.get_location("Basketball Ex: Beat Daisy Garden (Normal)")
-        b_bowser_jr_blvd_n = world.get_location("Basketball Ex: Beat Bowser Jr. Blvd. (Normal)")
-        b_bowsers_castle_n = world.get_location("Basketball Ex: Beat Bowser's Castle (Normal)")
-        b_star_ship_n = world.get_location("Basketball Ex: Beat Star Ship (Normal)")
-        b_peachs_castle_n = world.get_location("Basketball Ex: Beat Peach's Castle (Normal)")
-        b_wario_factory_n = world.get_location("Basketball Ex: Beat Wario Factory (Normal)")
-        b_ghoulish_galleon_n = world.get_location("Basketball Ex: Beat Ghoulish Galleon (Normal)")
-        # Dodgeball
-        d_mario_stadium_n = world.get_location("Dodgeball Ex: Beat Mario Stadium (Normal)")
-        d_koopa_troopa_beach_n = world.get_location("Dodgeball Ex: Beat Koopa Troopa Beach (Normal)")
-        d_dk_dock_n = world.get_location("Dodgeball Ex: Beat DK Dock (Normal)")
-        d_western_junction_n = world.get_location("Dodgeball Ex: Beat Western Junction (Normal)")
-        d_daisy_garden_n = world.get_location("Dodgeball Ex: Beat Daisy Garden (Normal)")
-        d_bowsers_castle_n = world.get_location("Dodgeball Ex: Beat Bowser's Castle (Normal)")
-        d_star_ship_n = world.get_location("Dodgeball Ex: Beat Star Ship (Normal)")
-        d_peachs_castle_n = world.get_location("Dodgeball Ex: Beat Peach's Castle (Normal)")
-        d_wario_factory_n = world.get_location("Dodgeball Ex: Beat Wario Factory (Normal)")
-        d_ghoulish_galleon_n = world.get_location("Dodgeball Ex: Beat Ghoulish Galleon (Normal)")
-        d_toad_park_n = world.get_location("Dodgeball Ex: Beat Toad Park (Normal)")
-        d_waluigi_pinball_n = world.get_location("Dodgeball Ex: Beat Waluigi Pinball (Normal)")
-        # Volleyball
-        v_mario_stadium_n = world.get_location("Volleyball Ex: Beat Mario Stadium (Normal)")
-        v_koopa_troopa_beach_n = world.get_location("Volleyball Ex: Beat Koopa Troopa Beach (Normal)")
-        v_dk_dock_n = world.get_location("Volleyball Ex: Beat DK Dock (Normal)")
-        v_luigi_mansion_n = world.get_location("Volleyball Ex: Beat Luigi's Mansion (Normal)")
-        v_western_junction_n = world.get_location("Volleyball Ex: Beat Western Junction (Normal)")
-        v_bowser_jr_blvd_n = world.get_location("Volleyball Ex: Beat Bowser Jr. Blvd. (Normal)")
-        v_bowsers_castle_n = world.get_location("Volleyball Ex: Beat Bowser's Castle (Normal)")
-        v_star_ship_n = world.get_location("Volleyball Ex: Beat Star Ship (Normal)")
-        v_peachs_castle_n = world.get_location("Volleyball Ex: Beat Peach's Castle (Normal)")
-        v_wario_factory_n = world.get_location("Volleyball Ex: Beat Wario Factory (Normal)")
-        v_ghoulish_galleon_n = world.get_location("Volleyball Ex: Beat Ghoulish Galleon (Normal)")
-        v_waluigi_pinball_n = world.get_location("Volleyball Ex: Beat Waluigi Pinball (Normal)")
-        # Hockey
-        h_mario_stadium_n = world.get_location("Hockey Ex: Beat Mario Stadium (Normal)")
-        h_koopa_troopa_beach_n = world.get_location("Hockey Ex: Beat Koopa Troopa Beach (Normal)")
-        h_western_junction_n = world.get_location("Hockey Ex: Beat Western Junction (Normal)")
-        h_daisy_garden_n = world.get_location("Hockey Ex: Beat Daisy Garden (Normal)")
-        h_bowser_jr_blvd_n = world.get_location("Hockey Ex: Beat Bowser Jr. Blvd. (Normal)")
-        h_bowsers_castle_n = world.get_location("Hockey Ex: Beat Bowser's Castle (Normal)")
-        h_star_ship_n = world.get_location("Hockey Ex: Beat Star Ship (Normal)")
-        h_peachs_castle_n = world.get_location("Hockey Ex: Beat Peach's Castle (Normal)")
-        h_wario_factory_n = world.get_location("Hockey Ex: Beat Wario Factory (Normal)")
-        h_ghoulish_galleon_n = world.get_location("Hockey Ex: Beat Ghoulish Galleon (Normal)")
-        h_toad_park_n = world.get_location("Hockey Ex: Beat Toad Park (Normal)")
-        h_waluigi_pinball_n = world.get_location("Hockey Ex: Beat Waluigi Pinball (Normal)")
+def set_goal_rules(world: MSMWorld) -> None:
+    behemoth_rule = (
+        CanReachLocation("Basketball: Beat Normal Star Cup Round 3", "Basketball: Star Cup (Normal)") &
+        CanReachLocation("Dodgeball: Beat Normal Star Cup Round 3", "Dodgeball: Star Cup (Normal)") &
+        CanReachLocation("Volleyball: Beat Normal Star Cup Round 3", "Volleyball: Star Cup (Normal)") &
+        CanReachLocation("Hockey: Beat Normal Star Cup Round 3", "Hockey: Star Cup (Normal)")
+    )
 
-        # Basketball
-        world.set_rule(b_mario_stadium_n, has_mario_stadium)
-        world.set_rule(b_koopa_troopa_beach_n, has_koopa_troopa_beach)
-        world.set_rule(b_dk_dock_n, has_dk_dock)
-        world.set_rule(b_luigi_mansion_n, has_luigi_mansion)
-        world.set_rule(b_western_junction_n, has_western_junction)
-        world.set_rule(b_daisy_garden_n, has_daisy_garden)
-        world.set_rule(b_bowser_jr_blvd_n, has_bowser_jr_blvd)
-        world.set_rule(b_bowsers_castle_n, has_bowser_castle)
-        world.set_rule(b_star_ship_n, has_star_ship)
-        world.set_rule(b_peachs_castle_n, has_peachs_castle)
-        world.set_rule(b_wario_factory_n, has_wario_factory)
-        world.set_rule(b_ghoulish_galleon_n, has_ghoulish_galleon)
+    behemoth_king_rule = (
+        (HasAll("Sport: Sports Mix", "Stage: Behemoth Stage") |
+        HasAll(
+            "Sports Crystal: Red", "Sports Crystal: Green",
+            "Sports Crystal: Yellow", "Sports Crystal: Blue",
+            "Stage: Behemoth Stage"
+        )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3")
+    )
 
-        # Dodgeball
-        world.set_rule(d_mario_stadium_n, has_mario_stadium)
-        world.set_rule(d_koopa_troopa_beach_n, has_koopa_troopa_beach)
-        world.set_rule(d_dk_dock_n, has_dk_dock)
-        world.set_rule(d_western_junction_n, has_western_junction)
-        world.set_rule(d_daisy_garden_n, has_daisy_garden)
-        world.set_rule(d_bowsers_castle_n, has_bowser_castle)
-        world.set_rule(d_star_ship_n, has_star_ship)
-        world.set_rule(d_peachs_castle_n, has_peachs_castle)
-        world.set_rule(d_wario_factory_n, has_wario_factory)
-        world.set_rule(d_ghoulish_galleon_n, has_ghoulish_galleon)
-        world.set_rule(d_toad_park_n, has_toad_park)
-        world.set_rule(d_waluigi_pinball_n, has_waluigi_pinball)
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+        world.set_rule(world.get_location("Defeated Behemoth!"), behemoth_rule)
 
-        # Volleyball
-        world.set_rule(v_mario_stadium_n, has_mario_stadium)
-        world.set_rule(v_koopa_troopa_beach_n, has_koopa_troopa_beach)
-        world.set_rule(v_dk_dock_n, has_dk_dock)
-        world.set_rule(v_luigi_mansion_n, has_luigi_mansion)
-        world.set_rule(v_western_junction_n, has_western_junction)
-        world.set_rule(v_bowser_jr_blvd_n, has_bowser_jr_blvd)
-        world.set_rule(v_bowsers_castle_n, has_bowser_castle)
-        world.set_rule(v_star_ship_n, has_star_ship)
-        world.set_rule(v_peachs_castle_n, has_peachs_castle)
-        world.set_rule(v_wario_factory_n, has_wario_factory)
-        world.set_rule(v_ghoulish_galleon_n, has_ghoulish_galleon)
-        world.set_rule(v_waluigi_pinball_n, has_waluigi_pinball)
+    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+        world.set_rule(world.get_location("Defeated Behemoth King!"), behemoth_king_rule)
 
-        # Hockey
-        world.set_rule(h_mario_stadium_n, has_mario_stadium)
-        world.set_rule(h_koopa_troopa_beach_n, has_koopa_troopa_beach)
-        world.set_rule(h_western_junction_n, has_western_junction)
-        world.set_rule(h_daisy_garden_n, has_daisy_garden)
-        world.set_rule(h_bowser_jr_blvd_n, has_bowser_jr_blvd)
-        world.set_rule(h_bowsers_castle_n, has_bowser_castle)
-        world.set_rule(h_star_ship_n, has_star_ship)
-        world.set_rule(h_peachs_castle_n, has_peachs_castle)
-        world.set_rule(h_wario_factory_n, has_wario_factory)
-        world.set_rule(h_ghoulish_galleon_n, has_ghoulish_galleon)
-        world.set_rule(h_toad_park_n, has_toad_park)
-        world.set_rule(h_waluigi_pinball_n, has_waluigi_pinball)
+    if world.options.be_mean == BeMean.option_defeat_behemoth:
+        if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+            world.set_rule(world.get_location("Defeated Behemoth!"), behemoth_rule)
 
-    if "Hard" in world.options.exhibition_difficulty:
-        # Basketball
-        b_mario_stadium_h = world.get_location("Basketball Ex: Beat Mario Stadium (Hard)")
-        b_koopa_troopa_beach_h = world.get_location("Basketball Ex: Beat Koopa Troopa Beach (Hard)")
-        b_dk_dock_h = world.get_location("Basketball Ex: Beat DK Dock (Hard)")
-        b_luigi_mansion_h = world.get_location("Basketball Ex: Beat Luigi's Mansion (Hard)")
-        b_western_junction_h = world.get_location("Basketball Ex: Beat Western Junction (Hard)")
-        b_daisy_garden_h = world.get_location("Basketball Ex: Beat Daisy Garden (Hard)")
-        b_bowser_jr_blvd_h = world.get_location("Basketball Ex: Beat Bowser Jr. Blvd. (Hard)")
-        b_bowsers_castle_h = world.get_location("Basketball Ex: Beat Bowser's Castle (Hard)")
-        b_star_ship_h = world.get_location("Basketball Ex: Beat Star Ship (Hard)")
-        b_peachs_castle_h = world.get_location("Basketball Ex: Beat Peach's Castle (Hard)")
-        b_wario_factory_h = world.get_location("Basketball Ex: Beat Wario Factory (Hard)")
-        b_ghoulish_galleon_h = world.get_location("Basketball Ex: Beat Ghoulish Galleon (Hard)")
-        # Dodgeball
-        d_mario_stadium_h = world.get_location("Dodgeball Ex: Beat Mario Stadium (Hard)")
-        d_koopa_troopa_beach_h = world.get_location("Dodgeball Ex: Beat Koopa Troopa Beach (Hard)")
-        d_dk_dock_h = world.get_location("Dodgeball Ex: Beat DK Dock (Hard)")
-        d_western_junction_h = world.get_location("Dodgeball Ex: Beat Western Junction (Hard)")
-        d_daisy_garden_h = world.get_location("Dodgeball Ex: Beat Daisy Garden (Hard)")
-        d_bowsers_castle_h = world.get_location("Dodgeball Ex: Beat Bowser's Castle (Hard)")
-        d_star_ship_h = world.get_location("Dodgeball Ex: Beat Star Ship (Hard)")
-        d_peachs_castle_h = world.get_location("Dodgeball Ex: Beat Peach's Castle (Hard)")
-        d_wario_factory_h = world.get_location("Dodgeball Ex: Beat Wario Factory (Hard)")
-        d_ghoulish_galleon_h = world.get_location("Dodgeball Ex: Beat Ghoulish Galleon (Hard)")
-        d_toad_park_h = world.get_location("Dodgeball Ex: Beat Toad Park (Hard)")
-        d_waluigi_pinball_h = world.get_location("Dodgeball Ex: Beat Waluigi Pinball (Hard)")
-        # Volleyball
-        v_mario_stadium_h = world.get_location("Volleyball Ex: Beat Mario Stadium (Hard)")
-        v_koopa_troopa_beach_h = world.get_location("Volleyball Ex: Beat Koopa Troopa Beach (Hard)")
-        v_dk_dock_h = world.get_location("Volleyball Ex: Beat DK Dock (Hard)")
-        v_luigi_mansion_h = world.get_location("Volleyball Ex: Beat Luigi's Mansion (Hard)")
-        v_western_junction_h = world.get_location("Volleyball Ex: Beat Western Junction (Hard)")
-        v_bowser_jr_blvd_h = world.get_location("Volleyball Ex: Beat Bowser Jr. Blvd. (Hard)")
-        v_bowsers_castle_h = world.get_location("Volleyball Ex: Beat Bowser's Castle (Hard)")
-        v_star_ship_h = world.get_location("Volleyball Ex: Beat Star Ship (Hard)")
-        v_peachs_castle_h = world.get_location("Volleyball Ex: Beat Peach's Castle (Hard)")
-        v_wario_factory_h = world.get_location("Volleyball Ex: Beat Wario Factory (Hard)")
-        v_ghoulish_galleon_h = world.get_location("Volleyball Ex: Beat Ghoulish Galleon (Hard)")
-        v_waluigi_pinball_h = world.get_location("Volleyball Ex: Beat Waluigi Pinball (Hard)")
-        # Hockey
-        h_mario_stadium_h = world.get_location("Hockey Ex: Beat Mario Stadium (Hard)")
-        h_koopa_troopa_beach_h = world.get_location("Hockey Ex: Beat Koopa Troopa Beach (Hard)")
-        h_western_junction_h = world.get_location("Hockey Ex: Beat Western Junction (Hard)")
-        h_daisy_garden_h = world.get_location("Hockey Ex: Beat Daisy Garden (Hard)")
-        h_bowser_jr_blvd_h = world.get_location("Hockey Ex: Beat Bowser Jr. Blvd. (Hard)")
-        h_bowsers_castle_h = world.get_location("Hockey Ex: Beat Bowser's Castle (Hard)")
-        h_star_ship_h = world.get_location("Hockey Ex: Beat Star Ship (Hard)")
-        h_peachs_castle_h = world.get_location("Hockey Ex: Beat Peach's Castle (Hard)")
-        h_wario_factory_h = world.get_location("Hockey Ex: Beat Wario Factory (Hard)")
-        h_ghoulish_galleon_h = world.get_location("Hockey Ex: Beat Ghoulish Galleon (Hard)")
-        h_toad_park_h = world.get_location("Hockey Ex: Beat Toad Park (Hard)")
-        h_waluigi_pinball_h = world.get_location("Hockey Ex: Beat Waluigi Pinball (Hard)")
-
-        # Basketball
-        world.set_rule(b_mario_stadium_h, has_mario_stadium)
-        world.set_rule(b_koopa_troopa_beach_h, has_koopa_troopa_beach)
-        world.set_rule(b_dk_dock_h, has_dk_dock)
-        world.set_rule(b_luigi_mansion_h, has_luigi_mansion)
-        world.set_rule(b_western_junction_h, has_western_junction)
-        world.set_rule(b_daisy_garden_h, has_daisy_garden)
-        world.set_rule(b_bowser_jr_blvd_h, has_bowser_jr_blvd)
-        world.set_rule(b_bowsers_castle_h, has_bowser_castle)
-        world.set_rule(b_star_ship_h, has_star_ship)
-        world.set_rule(b_peachs_castle_h, has_peachs_castle)
-        world.set_rule(b_wario_factory_h, has_wario_factory)
-        world.set_rule(b_ghoulish_galleon_h, has_ghoulish_galleon)
-
-        # Dodgeball
-        world.set_rule(d_mario_stadium_h, has_mario_stadium)
-        world.set_rule(d_koopa_troopa_beach_h, has_koopa_troopa_beach)
-        world.set_rule(d_dk_dock_h, has_dk_dock)
-        world.set_rule(d_western_junction_h, has_western_junction)
-        world.set_rule(d_daisy_garden_h, has_daisy_garden)
-        world.set_rule(d_bowsers_castle_h, has_bowser_castle)
-        world.set_rule(d_star_ship_h, has_star_ship)
-        world.set_rule(d_peachs_castle_h, has_peachs_castle)
-        world.set_rule(d_wario_factory_h, has_wario_factory)
-        world.set_rule(d_ghoulish_galleon_h, has_ghoulish_galleon)
-        world.set_rule(d_toad_park_h, has_toad_park)
-        world.set_rule(d_waluigi_pinball_h, has_waluigi_pinball)
-
-        # Volleyball
-        world.set_rule(v_mario_stadium_h, has_mario_stadium)
-        world.set_rule(v_koopa_troopa_beach_h, has_koopa_troopa_beach)
-        world.set_rule(v_dk_dock_h, has_dk_dock)
-        world.set_rule(v_luigi_mansion_h, has_luigi_mansion)
-        world.set_rule(v_western_junction_h, has_western_junction)
-        world.set_rule(v_bowser_jr_blvd_h, has_bowser_jr_blvd)
-        world.set_rule(v_bowsers_castle_h, has_bowser_castle)
-        world.set_rule(v_star_ship_h, has_star_ship)
-        world.set_rule(v_peachs_castle_h, has_peachs_castle)
-        world.set_rule(v_wario_factory_h, has_wario_factory)
-        world.set_rule(v_ghoulish_galleon_h, has_ghoulish_galleon)
-        world.set_rule(v_waluigi_pinball_h, has_waluigi_pinball)
-
-        # Hockey
-        world.set_rule(h_mario_stadium_h, has_mario_stadium)
-        world.set_rule(h_koopa_troopa_beach_h, has_koopa_troopa_beach)
-        world.set_rule(h_western_junction_h, has_western_junction)
-        world.set_rule(h_daisy_garden_h, has_daisy_garden)
-        world.set_rule(h_bowser_jr_blvd_h, has_bowser_jr_blvd)
-        world.set_rule(h_bowsers_castle_h, has_bowser_castle)
-        world.set_rule(h_star_ship_h, has_star_ship)
-        world.set_rule(h_peachs_castle_h, has_peachs_castle)
-        world.set_rule(h_wario_factory_h, has_wario_factory)
-        world.set_rule(h_ghoulish_galleon_h, has_ghoulish_galleon)
-        world.set_rule(h_toad_park_h, has_toad_park)
-        world.set_rule(h_waluigi_pinball_h, has_waluigi_pinball)
-
-    if "Expert" in world.options.exhibition_difficulty:
-        # Basketball
-        b_mario_stadium_x = world.get_location("Basketball Ex: Beat Mario Stadium (Expert)")
-        b_koopa_troopa_beach_x = world.get_location("Basketball Ex: Beat Koopa Troopa Beach (Expert)")
-        b_dk_dock_x = world.get_location("Basketball Ex: Beat DK Dock (Expert)")
-        b_luigi_mansion_x = world.get_location("Basketball Ex: Beat Luigi's Mansion (Expert)")
-        b_western_junction_x = world.get_location("Basketball Ex: Beat Western Junction (Expert)")
-        b_daisy_garden_x = world.get_location("Basketball Ex: Beat Daisy Garden (Expert)")
-        b_bowser_jr_blvd_x = world.get_location("Basketball Ex: Beat Bowser Jr. Blvd. (Expert)")
-        b_bowsers_castle_x = world.get_location("Basketball Ex: Beat Bowser's Castle (Expert)")
-        b_star_ship_x = world.get_location("Basketball Ex: Beat Star Ship (Expert)")
-        b_peachs_castle_x = world.get_location("Basketball Ex: Beat Peach's Castle (Expert)")
-        b_wario_factory_x = world.get_location("Basketball Ex: Beat Wario Factory (Expert)")
-        b_ghoulish_galleon_x = world.get_location("Basketball Ex: Beat Ghoulish Galleon (Expert)")
-        # Dodgeball
-        d_mario_stadium_x = world.get_location("Dodgeball Ex: Beat Mario Stadium (Expert)")
-        d_koopa_troopa_beach_x = world.get_location("Dodgeball Ex: Beat Koopa Troopa Beach (Expert)")
-        d_dk_dock_x = world.get_location("Dodgeball Ex: Beat DK Dock (Expert)")
-        d_western_junction_x = world.get_location("Dodgeball Ex: Beat Western Junction (Expert)")
-        d_daisy_garden_x = world.get_location("Dodgeball Ex: Beat Daisy Garden (Expert)")
-        d_bowsers_castle_x = world.get_location("Dodgeball Ex: Beat Bowser's Castle (Expert)")
-        d_star_ship_x = world.get_location("Dodgeball Ex: Beat Star Ship (Expert)")
-        d_peachs_castle_x = world.get_location("Dodgeball Ex: Beat Peach's Castle (Expert)")
-        d_wario_factory_x = world.get_location("Dodgeball Ex: Beat Wario Factory (Expert)")
-        d_ghoulish_galleon_x = world.get_location("Dodgeball Ex: Beat Ghoulish Galleon (Expert)")
-        d_toad_park_x = world.get_location("Dodgeball Ex: Beat Toad Park (Expert)")
-        d_waluigi_pinball_x = world.get_location("Dodgeball Ex: Beat Waluigi Pinball (Expert)")
-        # Volleyball
-        v_mario_stadium_x = world.get_location("Volleyball Ex: Beat Mario Stadium (Expert)")
-        v_koopa_troopa_beach_x = world.get_location("Volleyball Ex: Beat Koopa Troopa Beach (Expert)")
-        v_dk_dock_x = world.get_location("Volleyball Ex: Beat DK Dock (Expert)")
-        v_luigi_mansion_x = world.get_location("Volleyball Ex: Beat Luigi's Mansion (Expert)")
-        v_western_junction_x = world.get_location("Volleyball Ex: Beat Western Junction (Expert)")
-        v_bowser_jr_blvd_x = world.get_location("Volleyball Ex: Beat Bowser Jr. Blvd. (Expert)")
-        v_bowsers_castle_x = world.get_location("Volleyball Ex: Beat Bowser's Castle (Expert)")
-        v_star_ship_x = world.get_location("Volleyball Ex: Beat Star Ship (Expert)")
-        v_peachs_castle_x = world.get_location("Volleyball Ex: Beat Peach's Castle (Expert)")
-        v_wario_factory_x = world.get_location("Volleyball Ex: Beat Wario Factory (Expert)")
-        v_ghoulish_galleon_x = world.get_location("Volleyball Ex: Beat Ghoulish Galleon (Expert)")
-        v_waluigi_pinball_x = world.get_location("Volleyball Ex: Beat Waluigi Pinball (Expert)")
-        # Hockey
-        h_mario_stadium_x = world.get_location("Hockey Ex: Beat Mario Stadium (Expert)")
-        h_koopa_troopa_beach_x = world.get_location("Hockey Ex: Beat Koopa Troopa Beach (Expert)")
-        h_western_junction_x = world.get_location("Hockey Ex: Beat Western Junction (Expert)")
-        h_daisy_garden_x = world.get_location("Hockey Ex: Beat Daisy Garden (Expert)")
-        h_bowser_jr_blvd_x = world.get_location("Hockey Ex: Beat Bowser Jr. Blvd. (Expert)")
-        h_bowsers_castle_x = world.get_location("Hockey Ex: Beat Bowser's Castle (Expert)")
-        h_star_ship_x = world.get_location("Hockey Ex: Beat Star Ship (Expert)")
-        h_peachs_castle_x = world.get_location("Hockey Ex: Beat Peach's Castle (Expert)")
-        h_wario_factory_x = world.get_location("Hockey Ex: Beat Wario Factory (Expert)")
-        h_ghoulish_galleon_x = world.get_location("Hockey Ex: Beat Ghoulish Galleon (Expert)")
-        h_toad_park_x = world.get_location("Hockey Ex: Beat Toad Park (Expert)")
-        h_waluigi_pinball_x = world.get_location("Hockey Ex: Beat Waluigi Pinball (Expert)")
-
-        # Basketball
-        world.set_rule(b_mario_stadium_x, has_mario_stadium)
-        world.set_rule(b_koopa_troopa_beach_x, has_koopa_troopa_beach)
-        world.set_rule(b_dk_dock_x, has_dk_dock)
-        world.set_rule(b_luigi_mansion_x, has_luigi_mansion)
-        world.set_rule(b_western_junction_x, has_western_junction)
-        world.set_rule(b_daisy_garden_x, has_daisy_garden)
-        world.set_rule(b_bowser_jr_blvd_x, has_bowser_jr_blvd)
-        world.set_rule(b_bowsers_castle_x, has_bowser_castle)
-        world.set_rule(b_star_ship_x, has_star_ship)
-        world.set_rule(b_peachs_castle_x, has_peachs_castle)
-        world.set_rule(b_wario_factory_x, has_wario_factory)
-        world.set_rule(b_ghoulish_galleon_x, has_ghoulish_galleon)
-
-        # Dodgeball
-        world.set_rule(d_mario_stadium_x, has_mario_stadium)
-        world.set_rule(d_koopa_troopa_beach_x, has_koopa_troopa_beach)
-        world.set_rule(d_dk_dock_x, has_dk_dock)
-        world.set_rule(d_western_junction_x, has_western_junction)
-        world.set_rule(d_daisy_garden_x, has_daisy_garden)
-        world.set_rule(d_bowsers_castle_x, has_bowser_castle)
-        world.set_rule(d_star_ship_x, has_star_ship)
-        world.set_rule(d_peachs_castle_x, has_peachs_castle)
-        world.set_rule(d_wario_factory_x, has_wario_factory)
-        world.set_rule(d_ghoulish_galleon_x, has_ghoulish_galleon)
-        world.set_rule(d_toad_park_x, has_toad_park)
-        world.set_rule(d_waluigi_pinball_x, has_waluigi_pinball)
-
-        # Volleyball
-        world.set_rule(v_mario_stadium_x, has_mario_stadium)
-        world.set_rule(v_koopa_troopa_beach_x, has_koopa_troopa_beach)
-        world.set_rule(v_dk_dock_x, has_dk_dock)
-        world.set_rule(v_luigi_mansion_x, has_luigi_mansion)
-        world.set_rule(v_western_junction_x, has_western_junction)
-        world.set_rule(v_bowser_jr_blvd_x, has_bowser_jr_blvd)
-        world.set_rule(v_bowsers_castle_x, has_bowser_castle)
-        world.set_rule(v_star_ship_x, has_star_ship)
-        world.set_rule(v_peachs_castle_x, has_peachs_castle)
-        world.set_rule(v_wario_factory_x, has_wario_factory)
-        world.set_rule(v_ghoulish_galleon_x, has_ghoulish_galleon)
-        world.set_rule(v_waluigi_pinball_x, has_waluigi_pinball)
-
-        # Hockey
-        world.set_rule(h_mario_stadium_x, has_mario_stadium)
-        world.set_rule(h_koopa_troopa_beach_x, has_koopa_troopa_beach)
-        world.set_rule(h_western_junction_x, has_western_junction)
-        world.set_rule(h_daisy_garden_x, has_daisy_garden)
-        world.set_rule(h_bowser_jr_blvd_x, has_bowser_jr_blvd)
-        world.set_rule(h_bowsers_castle_x, has_bowser_castle)
-        world.set_rule(h_star_ship_x, has_star_ship)
-        world.set_rule(h_peachs_castle_x, has_peachs_castle)
-        world.set_rule(h_wario_factory_x, has_wario_factory)
-        world.set_rule(h_ghoulish_galleon_x, has_ghoulish_galleon)
-        world.set_rule(h_toad_park_x, has_toad_park)
-        world.set_rule(h_waluigi_pinball_x, has_waluigi_pinball)
-
-    # === Rules for cups (Tournaments) ===
-
-    # Basketball
-    rule_b_mushroom_1 = Has("Stage: Mario Stadium")
-    rule_b_mushroom_2 = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach")
-    rule_b_mushroom_3 = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock")
-    rule_b_flower_1 = Has("Stage: Luigi's Mansion")
-    rule_b_flower_2 = HasAll("Stage: Luigi's Mansion", "Stage: Western Junction")
-    rule_b_flower_3 = HasAll("Stage: Luigi's Mansion", "Stage: Western Junction", "Stage: Daisy Garden")
-    rule_b_star_1 = Has("Stage: Bowser Jr. Blvd.")
-    rule_b_star_2 = HasAll("Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle")
-    rule_b_star_3 = HasAll("Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Star Ship")
-
-    # Dodgeball
-    rule_d_mushroom_1 = Has("Stage: Mario Stadium")
-    rule_d_mushroom_2 = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach")
-    rule_d_mushroom_3 = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: Peach's Castle")
-    rule_d_flower_1 = Has("Stage: DK Dock")
-    rule_d_flower_2 = HasAll("Stage: DK Dock", "Stage: Toad Park")
-    rule_d_flower_3 = HasAll("Stage: DK Dock", "Stage: Toad Park", "Stage: Daisy Garden")
-    rule_d_star_1 = Has("Stage: Wario Factory")
-    rule_d_star_2 = HasAll("Stage: Wario Factory", "Stage: Bowser's Castle")
-    rule_d_star_3 = HasAll("Stage: Wario Factory", "Stage: Bowser's Castle", "Stage: Star Ship")
-
-    # Volleyball
-    rule_v_mushroom_1 = Has("Stage: Mario Stadium")
-    rule_v_mushroom_2 = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach")
-    rule_v_mushroom_3 = HasAll("Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: Peach's Castle")
-    rule_v_flower_1 = Has("Stage: DK Dock")
-    rule_v_flower_2 = HasAll("Stage: DK Dock", "Stage: Luigi's Mansion")
-    rule_v_flower_3 = HasAll("Stage: DK Dock", "Stage: Luigi's Mansion", "Stage: Western Junction")
-    rule_v_star_1 = Has("Stage: Bowser Jr. Blvd.")
-    rule_v_star_2 = HasAll("Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle")
-    rule_v_star_3 = HasAll("Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Star Ship")
-
-    # Hockey
-    rule_h_mushroom_1 = Has("Stage: Mario Stadium")
-    rule_h_mushroom_2 = HasAll("Stage: Mario Stadium", "Stage: Toad Park")
-    rule_h_mushroom_3 = HasAll("Stage: Mario Stadium", "Stage: Toad Park", "Stage: Peach's Castle")
-    rule_h_flower_1 = Has("Stage: Western Junction")
-    rule_h_flower_2 = HasAll("Stage: Western Junction", "Stage: Wario Factory")
-    rule_h_flower_3 = HasAll("Stage: Western Junction", "Stage: Wario Factory", "Stage: Daisy Garden")
-    rule_h_star_1 = Has("Stage: Bowser Jr. Blvd.")
-    rule_h_star_2 = HasAll("Stage: Bowser Jr. Blvd.", "Stage: Waluigi Pinball")
-    rule_h_star_3 = HasAll("Stage: Bowser Jr. Blvd.", "Stage: Waluigi Pinball", "Stage: Star Ship")
-
-    # === Get locations ===
-    # === Normal ===
-    if "Normal" in world.options.tournament_difficulty:
-        # Basketball
-        b_mushroom_1_n = world.get_location("Basketball: Beat Normal Mushroom Cup Round 1")
-        b_mushroom_2_n = world.get_location("Basketball: Beat Normal Mushroom Cup Round 2")
-        b_mushroom_3_n = world.get_location("Basketball: Beat Normal Mushroom Cup Round 3")
-        b_flower_1_n = world.get_location("Basketball: Beat Normal Flower Cup Round 1")
-        b_flower_2_n = world.get_location("Basketball: Beat Normal Flower Cup Round 2")
-        b_flower_3_n = world.get_location("Basketball: Beat Normal Flower Cup Round 3")
-        b_star_1_n = world.get_location("Basketball: Beat Normal Star Cup Round 1")
-        b_star_2_n = world.get_location("Basketball: Beat Normal Star Cup Round 2")
-        b_star_3_n = world.get_location("Basketball: Beat Normal Star Cup Round 3")
-
-        # Dodgeball
-        d_mushroom_1_n = world.get_location("Dodgeball: Beat Normal Mushroom Cup Round 1")
-        d_mushroom_2_n = world.get_location("Dodgeball: Beat Normal Mushroom Cup Round 2")
-        d_mushroom_3_n = world.get_location("Dodgeball: Beat Normal Mushroom Cup Round 3")
-        d_flower_1_n = world.get_location("Dodgeball: Beat Normal Flower Cup Round 1")
-        d_flower_2_n = world.get_location("Dodgeball: Beat Normal Flower Cup Round 2")
-        d_flower_3_n = world.get_location("Dodgeball: Beat Normal Flower Cup Round 3")
-        d_star_1_n = world.get_location("Dodgeball: Beat Normal Star Cup Round 1")
-        d_star_2_n = world.get_location("Dodgeball: Beat Normal Star Cup Round 2")
-        d_star_3_n = world.get_location("Dodgeball: Beat Normal Star Cup Round 3")
-
-        # Volleyball
-        v_mushroom_1_n = world.get_location("Volleyball: Beat Normal Mushroom Cup Round 1")
-        v_mushroom_2_n = world.get_location("Volleyball: Beat Normal Mushroom Cup Round 2")
-        v_mushroom_3_n = world.get_location("Volleyball: Beat Normal Mushroom Cup Round 3")
-        v_flower_1_n = world.get_location("Volleyball: Beat Normal Flower Cup Round 1")
-        v_flower_2_n = world.get_location("Volleyball: Beat Normal Flower Cup Round 2")
-        v_flower_3_n = world.get_location("Volleyball: Beat Normal Flower Cup Round 3")
-        v_star_1_n = world.get_location("Volleyball: Beat Normal Star Cup Round 1")
-        v_star_2_n = world.get_location("Volleyball: Beat Normal Star Cup Round 2")
-        v_star_3_n = world.get_location("Volleyball: Beat Normal Star Cup Round 3")
-
-        # Hockey
-        h_mushroom_1_n = world.get_location("Hockey: Beat Normal Mushroom Cup Round 1")
-        h_mushroom_2_n = world.get_location("Hockey: Beat Normal Mushroom Cup Round 2")
-        h_mushroom_3_n = world.get_location("Hockey: Beat Normal Mushroom Cup Round 3")
-        h_flower_1_n = world.get_location("Hockey: Beat Normal Flower Cup Round 1")
-        h_flower_2_n = world.get_location("Hockey: Beat Normal Flower Cup Round 2")
-        h_flower_3_n = world.get_location("Hockey: Beat Normal Flower Cup Round 3")
-        h_star_1_n = world.get_location("Hockey: Beat Normal Star Cup Round 1")
-        h_star_2_n = world.get_location("Hockey: Beat Normal Star Cup Round 2")
-        h_star_3_n = world.get_location("Hockey: Beat Normal Star Cup Round 3")
-
-        # Settings the rules for each round of each cup (Same for each difficulty)
-        # Basketball
-        # Mushroom Cup
-        world.set_rule(b_mushroom_1_n, rule_b_mushroom_1)
-        world.set_rule(b_mushroom_2_n, rule_b_mushroom_2)
-        world.set_rule(b_mushroom_3_n, rule_b_mushroom_3)
-        # Flower Cup
-        world.set_rule(b_flower_1_n, rule_b_flower_1)
-        world.set_rule(b_flower_2_n, rule_b_flower_2)
-        world.set_rule(b_flower_3_n, rule_b_flower_3)
-        # Star Cup
-        world.set_rule(b_star_1_n, rule_b_star_1)
-        world.set_rule(b_star_2_n, rule_b_star_2)
-        world.set_rule(b_star_3_n, rule_b_star_3)
-
-        # Dodgeball
-        # Mushroom Cup
-        world.set_rule(d_mushroom_1_n, rule_d_mushroom_1)
-        world.set_rule(d_mushroom_2_n, rule_d_mushroom_2)
-        world.set_rule(d_mushroom_3_n, rule_d_mushroom_3)
-        # Flower Cup
-        world.set_rule(d_flower_1_n, rule_d_flower_1)
-        world.set_rule(d_flower_2_n, rule_d_flower_2)
-        world.set_rule(d_flower_3_n, rule_d_flower_3)
-        # Star Cup
-        world.set_rule(d_star_1_n, rule_d_star_1)
-        world.set_rule(d_star_2_n, rule_d_star_2)
-        world.set_rule(d_star_3_n, rule_d_star_3)
-
-        # Volleyball
-        # Mushroom Cup
-        world.set_rule(v_mushroom_1_n, rule_v_mushroom_1)
-        world.set_rule(v_mushroom_2_n, rule_v_mushroom_2)
-        world.set_rule(v_mushroom_3_n, rule_v_mushroom_3)
-        # Flower Cup
-        world.set_rule(v_flower_1_n, rule_v_flower_1)
-        world.set_rule(v_flower_2_n, rule_v_flower_2)
-        world.set_rule(v_flower_3_n, rule_v_flower_3)
-        # Star Cup
-        world.set_rule(v_star_1_n, rule_v_star_1)
-        world.set_rule(v_star_2_n, rule_v_star_2)
-        world.set_rule(v_star_3_n, rule_v_star_3)
-
-        # Hockey
-        # Mushroom Cup
-        world.set_rule(h_mushroom_1_n, rule_h_mushroom_1)
-        world.set_rule(h_mushroom_2_n, rule_h_mushroom_2)
-        world.set_rule(h_mushroom_3_n, rule_h_mushroom_3)
-        # Flower Cup
-        world.set_rule(h_flower_1_n, rule_h_flower_1)
-        world.set_rule(h_flower_2_n, rule_h_flower_2)
-        world.set_rule(h_flower_3_n, rule_h_flower_3)
-        # Star Cup
-        world.set_rule(h_star_1_n, rule_h_star_1)
-        world.set_rule(h_star_2_n, rule_h_star_2)
-        world.set_rule(h_star_3_n, rule_h_star_3)
+    if world.options.be_mean == BeMean.option_defeat_behemoth_king:
+        if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+            world.set_rule(world.get_location("Defeated Behemoth!"), behemoth_rule)
 
 
-    # === Hard ===
-    if "Hard" in world.options.tournament_difficulty:
-        # Basketball
-        b_mushroom_1_h = world.get_location("Basketball: Beat Hard Mushroom Cup Round 1")
-        b_mushroom_2_h = world.get_location("Basketball: Beat Hard Mushroom Cup Round 2")
-        b_mushroom_3_h = world.get_location("Basketball: Beat Hard Mushroom Cup Round 3")
-        b_flower_1_h = world.get_location("Basketball: Beat Hard Flower Cup Round 1")
-        b_flower_2_h = world.get_location("Basketball: Beat Hard Flower Cup Round 2")
-        b_flower_3_h = world.get_location("Basketball: Beat Hard Flower Cup Round 3")
-        b_star_1_h = world.get_location("Basketball: Beat Hard Star Cup Round 1")
-        b_star_2_h = world.get_location("Basketball: Beat Hard Star Cup Round 2")
-        b_star_3_h = world.get_location("Basketball: Beat Hard Star Cup Round 3")
+# Creates entrance access rules for menus and cups
+# Entrances require their matching unlock items
 
-        # Dodgeball
-        d_mushroom_1_h = world.get_location("Dodgeball: Beat Hard Mushroom Cup Round 1")
-        d_mushroom_2_h = world.get_location("Dodgeball: Beat Hard Mushroom Cup Round 2")
-        d_mushroom_3_h = world.get_location("Dodgeball: Beat Hard Mushroom Cup Round 3")
-        d_flower_1_h = world.get_location("Dodgeball: Beat Hard Flower Cup Round 1")
-        d_flower_2_h = world.get_location("Dodgeball: Beat Hard Flower Cup Round 2")
-        d_flower_3_h = world.get_location("Dodgeball: Beat Hard Flower Cup Round 3")
-        d_star_1_h = world.get_location("Dodgeball: Beat Hard Star Cup Round 1")
-        d_star_2_h = world.get_location("Dodgeball: Beat Hard Star Cup Round 2")
-        d_star_3_h = world.get_location("Dodgeball: Beat Hard Star Cup Round 3")
+def set_all_entrance_rules(world: MSMWorld) -> None:
+    sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
 
-        # Volleyball
-        v_mushroom_1_h = world.get_location("Volleyball: Beat Hard Mushroom Cup Round 1")
-        v_mushroom_2_h = world.get_location("Volleyball: Beat Hard Mushroom Cup Round 2")
-        v_mushroom_3_h = world.get_location("Volleyball: Beat Hard Mushroom Cup Round 3")
-        v_flower_1_h = world.get_location("Volleyball: Beat Hard Flower Cup Round 1")
-        v_flower_2_h = world.get_location("Volleyball: Beat Hard Flower Cup Round 2")
-        v_flower_3_h = world.get_location("Volleyball: Beat Hard Flower Cup Round 3")
-        v_star_1_h = world.get_location("Volleyball: Beat Hard Star Cup Round 1")
-        v_star_2_h = world.get_location("Volleyball: Beat Hard Star Cup Round 2")
-        v_star_3_h = world.get_location("Volleyball: Beat Hard Star Cup Round 3")
+    for sport in sports:
+        entrance = world.get_entrance(f"Main Menu -> {sport}")
+        world.set_rule(entrance, Has(f"Sport: {sport}"))
 
-        # Hockey
-        h_mushroom_1_h = world.get_location("Hockey: Beat Hard Mushroom Cup Round 1")
-        h_mushroom_2_h = world.get_location("Hockey: Beat Hard Mushroom Cup Round 2")
-        h_mushroom_3_h = world.get_location("Hockey: Beat Hard Mushroom Cup Round 3")
-        h_flower_1_h = world.get_location("Hockey: Beat Hard Flower Cup Round 1")
-        h_flower_2_h = world.get_location("Hockey: Beat Hard Flower Cup Round 2")
-        h_flower_3_h = world.get_location("Hockey: Beat Hard Flower Cup Round 3")
-        h_star_1_h = world.get_location("Hockey: Beat Hard Star Cup Round 1")
-        h_star_2_h = world.get_location("Hockey: Beat Hard Star Cup Round 2")
-        h_star_3_h = world.get_location("Hockey: Beat Hard Star Cup Round 3")
+    sports_mix = world.get_entrance("Main Menu -> Sports Mix")
+    world.set_rule(
+        sports_mix,
+        Has("Sport: Sports Mix") |
+        HasAll(
+            "Sports Crystal: Red", "Sports Crystal: Green",
+            "Sports Crystal: Yellow", "Sports Crystal: Blue"
+        )
+    )
 
-        # Settings the rules for each round of each cup (Same for each difficulty)
-        # Basketball
-        # Mushroom Cup
-        world.set_rule(b_mushroom_1_h, rule_b_mushroom_1)
-        world.set_rule(b_mushroom_2_h, rule_b_mushroom_2)
-        world.set_rule(b_mushroom_3_h, rule_b_mushroom_3)
-        # Flower Cup
-        world.set_rule(b_flower_1_h, rule_b_flower_1)
-        world.set_rule(b_flower_2_h, rule_b_flower_2)
-        world.set_rule(b_flower_3_h, rule_b_flower_3)
-        # Star Cup
-        world.set_rule(b_star_1_h, rule_b_star_1)
-        world.set_rule(b_star_2_h, rule_b_star_2)
-        world.set_rule(b_star_3_h, rule_b_star_3)
+    for sport in sports:
+        for difficulty in TOURNAMENT_DIFFICULTIES:
+            for cup in ["Mushroom", "Flower", "Star"]:
+                entrance = world.get_entrance(
+                    f"{sport} -> {cup} Cup ({difficulty})"
+                )
+                world.set_rule(
+                    entrance,
+                    Has(f"{sport}: {cup} Cup ({difficulty})")
+                )
 
-        # Dodgeball
-        # Mushroom Cup
-        world.set_rule(d_mushroom_1_h, rule_d_mushroom_1)
-        world.set_rule(d_mushroom_2_h, rule_d_mushroom_2)
-        world.set_rule(d_mushroom_3_h, rule_d_mushroom_3)
-        # Flower Cup
-        world.set_rule(d_flower_1_h, rule_d_flower_1)
-        world.set_rule(d_flower_2_h, rule_d_flower_2)
-        world.set_rule(d_flower_3_h, rule_d_flower_3)
-        # Star Cup
-        world.set_rule(d_star_1_h, rule_d_star_1)
-        world.set_rule(d_star_2_h, rule_d_star_2)
-        world.set_rule(d_star_3_h, rule_d_star_3)
-
-        # Volleyball
-        # Mushroom Cup
-        world.set_rule(v_mushroom_1_h, rule_v_mushroom_1)
-        world.set_rule(v_mushroom_2_h, rule_v_mushroom_2)
-        world.set_rule(v_mushroom_3_h, rule_v_mushroom_3)
-        # Flower Cup
-        world.set_rule(v_flower_1_h, rule_v_flower_1)
-        world.set_rule(v_flower_2_h, rule_v_flower_2)
-        world.set_rule(v_flower_3_h, rule_v_flower_3)
-        # Star Cup
-        world.set_rule(v_star_1_h, rule_v_star_1)
-        world.set_rule(v_star_2_h, rule_v_star_2)
-        world.set_rule(v_star_3_h, rule_v_star_3)
-
-        # Hockey
-        # Mushroom Cup
-        world.set_rule(h_mushroom_1_h, rule_h_mushroom_1)
-        world.set_rule(h_mushroom_2_h, rule_h_mushroom_2)
-        world.set_rule(h_mushroom_3_h, rule_h_mushroom_3)
-        # Flower Cup
-        world.set_rule(h_flower_1_h, rule_h_flower_1)
-        world.set_rule(h_flower_2_h, rule_h_flower_2)
-        world.set_rule(h_flower_3_h, rule_h_flower_3)
-        # Star Cup
-        world.set_rule(h_star_1_h, rule_h_star_1)
-        world.set_rule(h_star_2_h, rule_h_star_2)
-        world.set_rule(h_star_3_h, rule_h_star_3)
-
-    # Need to do testing for these -> Does MSM check if you've only beaten the star cups or all of the cups?
-    # if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-    #     defeat_behemoth = world.get_location("Defeated Behemoth!")
-    # if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-    #     defeat_behemoth = world.get_location("Defeated Behemoth!")
-    #     defeat_behemoth_king = world.get_location("Defeated Behemoth King!")
-    # if world.options.goal_condition == GoalCondition.option_win_cups:
-    #     defeat_behemoth = world.get_location("Defeated Behemoth!")
-    #     defeat_behemoth_king = world.get_location("Defeated Behemoth King!")
+    for cup in ["Mushroom", "Flower", "Star"]:
+        entrance = world.get_entrance(f"Sports Mix -> {cup} Cup")
+        world.set_rule(entrance, Has(f"Sports Mix: {cup} Cup"))
 
 
-
+# Player wins after obtaining the Victory! item
 def set_completion_condition(world: MSMWorld) -> None:
     world.set_completion_rule(Has("Victory!"))

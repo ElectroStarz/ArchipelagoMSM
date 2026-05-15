@@ -331,7 +331,7 @@ LOCATION_NAME_TO_ID = {
     "Dodgeball Ex: Beat Waluigi Pinball (Expert)": base_loc_id + 522,
     "Dodgeball Ex: Beat Ghoulish Galleon (Expert)": base_loc_id + 523,
 
-    # Hockey
+    # Volleyball
     "Volleyball Ex: Beat Mario Stadium (Expert)": base_loc_id + 524,
     "Volleyball Ex: Beat Koopa Troopa Beach (Expert)": base_loc_id + 525,
     "Volleyball Ex: Beat Peach's Castle (Expert)": base_loc_id + 526,
@@ -402,10 +402,7 @@ def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | No
 
 def create_regular_locations(world: MSMWorld) -> None:
     # Basketball
-    b_exhibition_e = world.get_region("Basketball: Exhibition (Easy)")
-    b_exhibition_n = world.get_region("Basketball: Exhibition (Normal)")
-    b_exhibition_h = world.get_region("Basketball: Exhibition (Hard)")
-    b_exhibition_ex = world.get_region("Basketball: Exhibition (Expert)")
+    b_exhibition = world.get_region("Basketball: Exhibition")
     b_mushroom_cup_n = world.get_region("Basketball: Mushroom Cup (Normal)")
     b_flower_cup_n = world.get_region("Basketball: Flower Cup (Normal)")
     b_star_cup_n = world.get_region("Basketball: Star Cup (Normal)")
@@ -413,10 +410,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     b_flower_cup_h = world.get_region("Basketball: Flower Cup (Hard)")
     b_star_cup_h = world.get_region("Basketball: Star Cup (Hard)")
     # Dodgeball
-    d_exhibition_e = world.get_region("Dodgeball: Exhibition (Easy)")
-    d_exhibition_n = world.get_region("Dodgeball: Exhibition (Normal)")
-    d_exhibition_h = world.get_region("Dodgeball: Exhibition (Hard)")
-    d_exhibition_ex = world.get_region("Dodgeball: Exhibition (Expert)")
+    d_exhibition = world.get_region("Dodgeball: Exhibition")
     d_mushroom_cup_n = world.get_region("Dodgeball: Mushroom Cup (Normal)")
     d_flower_cup_n = world.get_region("Dodgeball: Flower Cup (Normal)")
     d_star_cup_n = world.get_region("Dodgeball: Star Cup (Normal)")
@@ -424,10 +418,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     d_flower_cup_h = world.get_region("Dodgeball: Flower Cup (Hard)")
     d_star_cup_h = world.get_region("Dodgeball: Star Cup (Hard)")
     # Volleyball
-    v_exhibition_e = world.get_region("Volleyball: Exhibition (Easy)")
-    v_exhibition_n = world.get_region("Volleyball: Exhibition (Normal)")
-    v_exhibition_h = world.get_region("Volleyball: Exhibition (Hard)")
-    v_exhibition_ex = world.get_region("Volleyball: Exhibition (Expert)")
+    v_exhibition = world.get_region("Volleyball: Exhibition")
     v_mushroom_cup_n = world.get_region("Volleyball: Mushroom Cup (Normal)")
     v_flower_cup_n = world.get_region("Volleyball: Flower Cup (Normal)")
     v_star_cup_n = world.get_region("Volleyball: Star Cup (Normal)")
@@ -435,10 +426,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     v_flower_cup_h = world.get_region("Volleyball: Flower Cup (Hard)")
     v_star_cup_h = world.get_region("Volleyball: Star Cup (Hard)")
     # Hockey
-    h_exhibition_e = world.get_region("Hockey: Exhibition (Easy)")
-    h_exhibition_n = world.get_region("Hockey: Exhibition (Normal)")
-    h_exhibition_h = world.get_region("Hockey: Exhibition (Hard)")
-    h_exhibition_ex = world.get_region("Hockey: Exhibition (Expert)")
+    h_exhibition = world.get_region("Hockey: Exhibition")
     h_mushroom_cup_n = world.get_region("Hockey: Mushroom Cup (Normal)")
     h_flower_cup_n = world.get_region("Hockey: Flower Cup (Normal)")
     h_star_cup_n = world.get_region("Hockey: Star Cup (Normal)")
@@ -572,18 +560,18 @@ def create_regular_locations(world: MSMWorld) -> None:
     # Easy Difficulty
     if "Easy" in world.options.exhibition_difficulty:
         b_exhibition_locations_e = get_location_names_with_ids([
-    "Basketball Ex: Beat Mario Stadium (Easy)",
-    "Basketball Ex: Beat Koopa Troopa Beach (Easy)",
-    "Basketball Ex: Beat DK Dock (Easy)",
-    "Basketball Ex: Beat Luigi's Mansion (Easy)",
-    "Basketball Ex: Beat Western Junction (Easy)",
-    "Basketball Ex: Beat Daisy Garden (Easy)",
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Easy)",
-    "Basketball Ex: Beat Bowser's Castle (Easy)",
-    "Basketball Ex: Beat Star Ship (Easy)",
-    "Basketball Ex: Beat Peach's Castle (Easy)",
-    "Basketball Ex: Beat Wario Factory (Easy)",
-    "Basketball Ex: Beat Ghoulish Galleon (Easy)"])
+        "Basketball Ex: Beat Mario Stadium (Easy)",
+        "Basketball Ex: Beat Koopa Troopa Beach (Easy)",
+        "Basketball Ex: Beat DK Dock (Easy)",
+        "Basketball Ex: Beat Luigi's Mansion (Easy)",
+        "Basketball Ex: Beat Western Junction (Easy)",
+        "Basketball Ex: Beat Daisy Garden (Easy)",
+        "Basketball Ex: Beat Bowser Jr. Blvd. (Easy)",
+        "Basketball Ex: Beat Bowser's Castle (Easy)",
+        "Basketball Ex: Beat Star Ship (Easy)",
+        "Basketball Ex: Beat Peach's Castle (Easy)",
+        "Basketball Ex: Beat Wario Factory (Easy)",
+        "Basketball Ex: Beat Ghoulish Galleon (Easy)"])
         d_exhibition_locations_e = get_location_names_with_ids([
         "Dodgeball Ex: Beat Mario Stadium (Easy)",
         "Dodgeball Ex: Beat Koopa Troopa Beach (Easy)",
@@ -624,39 +612,39 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Ghoulish Galleon (Easy)",
         "Hockey Ex: Beat Bowser's Castle (Easy)"])
 
-        b_exhibition_e.add_locations(b_exhibition_locations_e)
-        d_exhibition_e.add_locations(d_exhibition_locations_e)
-        v_exhibition_e.add_locations(v_exhibition_locations_e)
-        h_exhibition_e.add_locations(h_exhibition_locations_e)
+        b_exhibition.add_locations(b_exhibition_locations_e)
+        d_exhibition.add_locations(d_exhibition_locations_e)
+        v_exhibition.add_locations(v_exhibition_locations_e)
+        h_exhibition.add_locations(h_exhibition_locations_e)
 
     # Normal Difficulty
     if "Normal" in world.options.exhibition_difficulty:
         b_exhibition_locations_n = get_location_names_with_ids([
-    "Basketball Ex: Beat Mario Stadium (Normal)",
-    "Basketball Ex: Beat Koopa Troopa Beach (Normal)",
-    "Basketball Ex: Beat DK Dock (Normal)",
-    "Basketball Ex: Beat Luigi's Mansion (Normal)",
-    "Basketball Ex: Beat Western Junction (Normal)",
-    "Basketball Ex: Beat Daisy Garden (Normal)",
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)",
-    "Basketball Ex: Beat Bowser's Castle (Normal)",
-    "Basketball Ex: Beat Star Ship (Normal)",
-    "Basketball Ex: Beat Peach's Castle (Normal)",
-    "Basketball Ex: Beat Wario Factory (Normal)",
-    "Basketball Ex: Beat Ghoulish Galleon (Normal)"])
+        "Basketball Ex: Beat Mario Stadium (Normal)",
+        "Basketball Ex: Beat Koopa Troopa Beach (Normal)",
+        "Basketball Ex: Beat DK Dock (Normal)",
+        "Basketball Ex: Beat Luigi's Mansion (Normal)",
+        "Basketball Ex: Beat Western Junction (Normal)",
+        "Basketball Ex: Beat Daisy Garden (Normal)",
+        "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)",
+        "Basketball Ex: Beat Bowser's Castle (Normal)",
+        "Basketball Ex: Beat Star Ship (Normal)",
+        "Basketball Ex: Beat Peach's Castle (Normal)",
+        "Basketball Ex: Beat Wario Factory (Normal)",
+        "Basketball Ex: Beat Ghoulish Galleon (Normal)"])
         d_exhibition_locations_n = get_location_names_with_ids([
-    "Dodgeball Ex: Beat Mario Stadium (Normal)",
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)",
-    "Dodgeball Ex: Beat Peach's Castle (Normal)",
-    "Dodgeball Ex: Beat DK Dock (Normal)",
-    "Dodgeball Ex: Beat Toad Park (Normal)",
-    "Dodgeball Ex: Beat Daisy Garden (Normal)",
-    "Dodgeball Ex: Beat Wario Factory (Normal)",
-    "Dodgeball Ex: Beat Bowser's Castle (Normal)",
-    "Dodgeball Ex: Beat Star Ship (Normal)",
-    "Dodgeball Ex: Beat Western Junction (Normal)",
-    "Dodgeball Ex: Beat Waluigi Pinball (Normal)",
-    "Dodgeball Ex: Beat Ghoulish Galleon (Normal)"])
+        "Dodgeball Ex: Beat Mario Stadium (Normal)",
+        "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)",
+        "Dodgeball Ex: Beat Peach's Castle (Normal)",
+        "Dodgeball Ex: Beat DK Dock (Normal)",
+        "Dodgeball Ex: Beat Toad Park (Normal)",
+        "Dodgeball Ex: Beat Daisy Garden (Normal)",
+        "Dodgeball Ex: Beat Wario Factory (Normal)",
+        "Dodgeball Ex: Beat Bowser's Castle (Normal)",
+        "Dodgeball Ex: Beat Star Ship (Normal)",
+        "Dodgeball Ex: Beat Western Junction (Normal)",
+        "Dodgeball Ex: Beat Waluigi Pinball (Normal)",
+        "Dodgeball Ex: Beat Ghoulish Galleon (Normal)"])
         v_exhibition_locations_n = get_location_names_with_ids([
         "Volleyball Ex: Beat Mario Stadium (Normal)",
         "Volleyball Ex: Beat Koopa Troopa Beach (Normal)",
@@ -684,10 +672,10 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Ghoulish Galleon (Normal)",
         "Hockey Ex: Beat Bowser's Castle (Normal)"])
 
-        b_exhibition_n.add_locations(b_exhibition_locations_n)
-        d_exhibition_n.add_locations(d_exhibition_locations_n)
-        v_exhibition_n.add_locations(v_exhibition_locations_n)
-        h_exhibition_n.add_locations(h_exhibition_locations_n)
+        b_exhibition.add_locations(b_exhibition_locations_n)
+        d_exhibition.add_locations(d_exhibition_locations_n)
+        v_exhibition.add_locations(v_exhibition_locations_n)
+        h_exhibition.add_locations(h_exhibition_locations_n)
 
     # Hard Difficulty
     if "Hard" in world.options.exhibition_difficulty:
@@ -718,18 +706,18 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Volleyball Ex: Beat Waluigi Pinball (Hard)",
         "Volleyball Ex: Beat Ghoulish Galleon (Hard)"])
         d_exhibition_locations_h = get_location_names_with_ids([
-    "Dodgeball Ex: Beat Mario Stadium (Hard)",
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Hard)",
-    "Dodgeball Ex: Beat Peach's Castle (Hard)",
-    "Dodgeball Ex: Beat DK Dock (Hard)",
-    "Dodgeball Ex: Beat Toad Park (Hard)",
-    "Dodgeball Ex: Beat Daisy Garden (Hard)",
-    "Dodgeball Ex: Beat Wario Factory (Hard)",
-    "Dodgeball Ex: Beat Bowser's Castle (Hard)",
-    "Dodgeball Ex: Beat Star Ship (Hard)",
-    "Dodgeball Ex: Beat Western Junction (Hard)",
-    "Dodgeball Ex: Beat Waluigi Pinball (Hard)",
-    "Dodgeball Ex: Beat Ghoulish Galleon (Hard)"])
+        "Dodgeball Ex: Beat Mario Stadium (Hard)",
+        "Dodgeball Ex: Beat Koopa Troopa Beach (Hard)",
+        "Dodgeball Ex: Beat Peach's Castle (Hard)",
+        "Dodgeball Ex: Beat DK Dock (Hard)",
+        "Dodgeball Ex: Beat Toad Park (Hard)",
+        "Dodgeball Ex: Beat Daisy Garden (Hard)",
+        "Dodgeball Ex: Beat Wario Factory (Hard)",
+        "Dodgeball Ex: Beat Bowser's Castle (Hard)",
+        "Dodgeball Ex: Beat Star Ship (Hard)",
+        "Dodgeball Ex: Beat Western Junction (Hard)",
+        "Dodgeball Ex: Beat Waluigi Pinball (Hard)",
+        "Dodgeball Ex: Beat Ghoulish Galleon (Hard)"])
         h_exhibition_locations_h = get_location_names_with_ids([
         "Hockey Ex: Beat Mario Stadium (Hard)",
         "Hockey Ex: Beat Toad Park (Hard)",
@@ -744,10 +732,10 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Ghoulish Galleon (Hard)",
         "Hockey Ex: Beat Bowser's Castle (Hard)"])
 
-        b_exhibition_h.add_locations(b_exhibition_locations_h)
-        d_exhibition_h.add_locations(d_exhibition_locations_h)
-        v_exhibition_h.add_locations(v_exhibition_locations_h)
-        h_exhibition_h.add_locations(h_exhibition_locations_h)
+        b_exhibition.add_locations(b_exhibition_locations_h)
+        d_exhibition.add_locations(d_exhibition_locations_h)
+        v_exhibition.add_locations(v_exhibition_locations_h)
+        h_exhibition.add_locations(h_exhibition_locations_h)
 
     # Expert Difficulty
     if "Expert" in world.options.exhibition_difficulty:
@@ -765,18 +753,18 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Basketball Ex: Beat Wario Factory (Expert)",
         "Basketball Ex: Beat Ghoulish Galleon (Expert)"])
         d_exhibition_locations_ex = get_location_names_with_ids([
-    "Dodgeball Ex: Beat Mario Stadium (Expert)",
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)",
-    "Dodgeball Ex: Beat Peach's Castle (Expert)",
-    "Dodgeball Ex: Beat DK Dock (Expert)",
-    "Dodgeball Ex: Beat Toad Park (Expert)",
-    "Dodgeball Ex: Beat Daisy Garden (Expert)",
-    "Dodgeball Ex: Beat Wario Factory (Expert)",
-    "Dodgeball Ex: Beat Bowser's Castle (Expert)",
-    "Dodgeball Ex: Beat Star Ship (Expert)",
-    "Dodgeball Ex: Beat Western Junction (Expert)",
-    "Dodgeball Ex: Beat Waluigi Pinball (Expert)",
-    "Dodgeball Ex: Beat Ghoulish Galleon (Expert)"])
+        "Dodgeball Ex: Beat Mario Stadium (Expert)",
+        "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)",
+        "Dodgeball Ex: Beat Peach's Castle (Expert)",
+        "Dodgeball Ex: Beat DK Dock (Expert)",
+        "Dodgeball Ex: Beat Toad Park (Expert)",
+        "Dodgeball Ex: Beat Daisy Garden (Expert)",
+        "Dodgeball Ex: Beat Wario Factory (Expert)",
+        "Dodgeball Ex: Beat Bowser's Castle (Expert)",
+        "Dodgeball Ex: Beat Star Ship (Expert)",
+        "Dodgeball Ex: Beat Western Junction (Expert)",
+        "Dodgeball Ex: Beat Waluigi Pinball (Expert)",
+        "Dodgeball Ex: Beat Ghoulish Galleon (Expert)"])
         v_exhibition_locations_ex = get_location_names_with_ids([
         "Volleyball Ex: Beat Mario Stadium (Expert)",
         "Volleyball Ex: Beat Koopa Troopa Beach (Expert)",
@@ -804,10 +792,10 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey Ex: Beat Ghoulish Galleon (Expert)",
         "Hockey Ex: Beat Bowser's Castle (Expert)"])
 
-        b_exhibition_ex.add_locations(b_exhibition_locations_ex)
-        d_exhibition_ex.add_locations(d_exhibition_locations_ex)
-        v_exhibition_ex.add_locations(v_exhibition_locations_ex)
-        h_exhibition_ex.add_locations(h_exhibition_locations_ex)
+        b_exhibition.add_locations(b_exhibition_locations_ex)
+        d_exhibition.add_locations(d_exhibition_locations_ex)
+        v_exhibition.add_locations(v_exhibition_locations_ex)
+        h_exhibition.add_locations(h_exhibition_locations_ex)
 
 
 def create_events(world: "MSMWorld") -> None:
@@ -831,24 +819,19 @@ def create_events(world: "MSMWorld") -> None:
             behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_location, MSMLocation)
 
-    if world.options.goal_condition == GoalCondition.option_win_cups:
-        win_cup_value = world.options.cups_required.value
-        menu = world.get_region("Main Menu")
-        menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
-                       item_type=items.MSMItem)
+    # if world.options.goal_condition == GoalCondition.option_win_cups:
+    #     win_cup_value = world.options.cups_required.value
+    #     menu = world.get_region("Main Menu")
+    #     menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
+    #                    item_type=items.MSMItem)
 
-        if world.options.be_mean == BeMean.option_defeat_behemoth:
+        if (world.options.be_mean == BeMean.option_defeat_behemoth and
+                world.options.goal_condition == GoalCondition.option_defeat_behemoth_king):
             behemoth_locations = get_location_names_with_ids(["Defeated Behemoth!"])
             behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
-        elif world.options.be_mean == BeMean.option_defeat_behemoth_king:
-            behemoth_king_locations = get_location_names_with_ids(["Defeated Behemoth King!"])
-            behemoth_king = world.get_region("Behemoth King Boss Battle")
-            behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
-        elif world.options.be_mean == BeMean.option_both:
-            behemoth_locations = get_location_names_with_ids(["Defeated Behemoth!"])
-            behemoth_boss = world.get_region("Behemoth Boss Battle")
-            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+        elif (world.options.be_mean == BeMean.option_defeat_behemoth_king and
+            world.options.goal_condition == GoalCondition.option_defeat_behemoth):
             behemoth_king_locations = get_location_names_with_ids(["Defeated Behemoth King!"])
             behemoth_king = world.get_region("Behemoth King Boss Battle")
             behemoth_king.add_locations(behemoth_king_locations, MSMLocation)

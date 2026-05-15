@@ -1,17 +1,30 @@
 # Mario Sports Mix
 
 ## What does randomisation do to this game?
-Mario Sports Mix is a game where you fight against 2 or 3 opponents to win the match. Winning an exhibition match may
-send a check, winning a round of a cup may send a check. Since this is early in development, many other planned things 
-will also send checks later on, like every 5 points may send a check, up to a max of 40 with Score Sanity. Or playing
-with every team combination with Team Sanity. Oh, and you start off with only Mii unlocked.
+### Items
+Each character, costume, stage, cup and ?-Panel item are randomised into the AP item pool. When you receive a costume,
+you will only be able to access that costume if you have the character for it. 
+
+For each cup, if you do not have the associated stages for it, you will not be able to score points for that round,
+blocking you from sending checks. For example, Basketball Mushroom Cup requires Mario Stadium, Koopa Troopa Beach and DK
+Dock. If you have Mario Stadium but not Koopa Troopa Beach or DK Dock, you will be able to complete round 1 of Mushroom
+Cup but not round 2 and 3.
+
+You can unlock Sports Mix in 2 ways depending on your options, receiving the item "Sport: Sports Mix", or receiving each
+Sports Crystal (Red, Blue, Green, Yellow)
+
+### Locations 
+There can be many different locations depending on your settings, for example, if you have all 4 difficulties on for
+Exhibition Difficulty, you will have a location for beating each stage on each difficulty, for example, Basketball Ex:
+Beat Mario Stadium ([Difficulty]).
+
+For cups, if you have both Normal and Hard in Tournament Difficulty, you will have locations for each round of each cup,
+for example, Basketball: Beat [Difficulty] Mushroom Cup Round [1, 2 or 3].
 
 ## What is the goal of the game?
-There are 2 bosses in Mario Sports Mix, Behemoth and King Behemoth. Behemoth is accessed beating all cups on each sport,
-finally beating star cup one last time to fight Behemoth at the end. King Behemoth is accessed by beating each Sports
-Mix cup. There is also a new goal we have made, winning cups. There are 27 cups in the game, you may choose any number
-of cups, from 1 to 26 to beat in order to goal (27 would mean that you'd have to win star cup in Sports Mix and that
-would require you to defeat Behemoth).
+There are 2 bosses in Mario Sports Mix, Behemoth and King Behemoth. Behemoth is accessed beating the star cups on each
+for each sport, finally beating star cup one last time to fight Behemoth at the end. King Behemoth is accessed by
+beating each Sports Mix cup.
 
 ## What items can appear in other worlds?
 Positive items include:
@@ -25,34 +38,31 @@ Positive items include:
 
 Negative items include:
 * Negative coin
-* Hit stun trap
+* Freeze Characters
 * Half your time!
 
 ## What isn't included yet?
-* Alternate Paths (Priority to make!)
+* Alternate Paths
 * Scoresanity
-* Courtsanity
+* Stagesanity
 * Teamsanity
 * Party Mode
 
 
 ## Help with hints
 Hinting items can be confusing, especially if you don't know what to look for, so every item has a tag before it!
-Here's the list:
-* Sport:
-* Basketball:
-* Dodgeball:
-* Volleyball:
-* Hockey:
-* Sports Mix:
-* Exhibition:
-* Stage:
-* Progressive:
-* Character:
-* Costume:
-* ? Panel:
-* 1 Time:
-* Trap:
+Here's the list and some examples:
+* Sport: Sports Mix
+* Basketball: Mushroom Cup (Hard)
+* Dodgeball: Flower Cup (Normal)
+* Volleyball: Star Cup (Normal)
+* Hockey: Star Cup (Hard)
+* Sports Mix: Star Cup
+* Sports Crystal: Red
+* Stage: Star Ship | Stage: Behemoth Stage
+* Character: Luigi
+* Costume: Tennis-wear Peach
+* ? Panel: Green Shell
 
 ## Have any ideas?
 Please tell me in the [Mario Sports Mix Thread](https://discord.com/channels/731205301247803413/1485699253450833942)

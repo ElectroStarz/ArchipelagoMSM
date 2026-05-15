@@ -1,7 +1,6 @@
 from typing import Dict, NamedTuple, TYPE_CHECKING
-
 from BaseClasses import Item, ItemClassification
-from .options import StageUnlockType, TeamSanity, StartWithSports, StartWithMushroomCup, SportsMixUnlock
+from .options import *
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -163,7 +162,7 @@ characters = {
     "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.useful),
     "Character: Toad": ItemData(base_id + 209, ItemClassification.useful),
     "Character: Bowser": ItemData(base_id + 210, ItemClassification.useful),
-    "Character: Bowser Jr.": ItemData(base_id + 211, ItemClassification.useful),
+    "Character: Bowser Jr": ItemData(base_id + 211, ItemClassification.useful),
     "Character: Moogle": ItemData(base_id + 212, ItemClassification.useful),
     "Character: Cactuar": ItemData(base_id + 213, ItemClassification.useful),
     "Character: Ninja": ItemData(base_id + 214, ItemClassification.useful),
@@ -215,7 +214,7 @@ one_time_items = {
 
 traps = {
     "Trap: Opponent Coins": ItemData(base_id + 500, ItemClassification.trap),
-    "Trap: Hit Stun": ItemData(base_id + 501, ItemClassification.trap),
+    #"Trap: Hit Stun": ItemData(base_id + 501, ItemClassification.trap),
     "Trap: 1/2 Time": ItemData(base_id + 502, ItemClassification.trap),
     "Trap: Freeze Character 1": ItemData(base_id + 503, ItemClassification.trap),
     "Trap: Freeze Character 2": ItemData(base_id + 504, ItemClassification.trap),
@@ -282,10 +281,6 @@ def get_random_filler_item_name(world: "MSMWorld") -> str:
 
 def create_all_items(world: "MSMWorld") -> None:
     itempool = []
-    # Character items
-    for name, data in characters.items():
-        new_item = world.create_item(name)
-        itempool.append(new_item)
     # Character costume items
     for name, data in character_costumes.items():
         new_item = world.create_item(name)
@@ -308,10 +303,40 @@ def create_all_items(world: "MSMWorld") -> None:
         new_item = world.create_item(name)
         itempool.append(new_item)
 
+    # Start with random characters option
+    if world.options.start_with_characters == StartWithCharacters.option_2_characters:
+        character_1, character_2 = world.random.sample(list(characters), 2)
+        item_1 = world.create_item(character_1)
+        item_2 = world.create_item(character_2)
+        world.push_precollected(item_1)
+        world.push_precollected(item_2)
+
+        for name, data in characters.items():
+            if name != character_1 or name != character_2:
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+    elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
+        character_1, character_2, character_3 = world.random.sample(list(characters), 3)
+        item_1 = world.create_item(character_1)
+        item_2 = world.create_item(character_2)
+        item_3 = world.create_item(character_3)
+        world.push_precollected(item_1)
+        world.push_precollected(item_2)
+        world.push_precollected(item_3)
+
+        for name, data in characters.items():
+            if name != character_1 or name != character_2 or name != character_3:
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+
+    else:
+        for name, data in characters.items():
+            new_item = world.create_item(name)
+            itempool.append(new_item)
+
+
     # Start with sports option
     if world.options.start_with_sports == StartWithSports.option_excluding_sports_mix:
-        sports_mix = world.create_item("Sport: Sports Mix")
-        itempool.append(sports_mix)
         basketball = world.create_item("Sport: Basketball")
         world.push_precollected(basketball)
         dodgeball = world.create_item("Sport: Dodgeball")
@@ -320,6 +345,13 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(volleyball)
         hockey = world.create_item("Sport: Hockey")
         world.push_precollected(hockey)
+        if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
+            sports_mix = world.create_item("Sport: Sports Mix")
+            itempool.append(sports_mix)
+        elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
+            for name, data in sports_crystals.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
     elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
         basketball = world.create_item("Sport: Basketball")
@@ -366,6 +398,7 @@ def create_all_items(world: "MSMWorld") -> None:
             world.push_precollected(new_item)
 
         # Basketball
+        # Create items that aren't in precollected
         for name, data in basketball_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
@@ -493,6 +526,7 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             itempool.append(new_item)
 
+
         # Create items for other items not being pushed
         # Basketball
         for name, data in basketball_items_n.items():
@@ -596,6 +630,7 @@ def create_all_items(world: "MSMWorld") -> None:
     #         itempool.append(new_item)
 
     # Calculate number of filler items needed, exclude costumes
+
     number_of_items = len(itempool)
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
     needed_number_of_filler_items = number_of_unfilled_locations - number_of_items
@@ -609,8 +644,6 @@ def create_all_items(world: "MSMWorld") -> None:
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
 
-    if name in characters and world.options.team_sanity == TeamSanity.option_characters or world.options.team_sanity == TeamSanity.option_characters_and_costumes:
-        classification = ItemClassification.progression|ItemClassification.useful
     if name in character_costumes and world.options.team_sanity == TeamSanity.option_characters_and_costumes:
         classification = ItemClassification.progression|ItemClassification.useful
 

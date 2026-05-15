@@ -3,32 +3,40 @@
 ## Required Software
 - [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) (0.6.7 or newer)
 - [Latest version of this APWorld](https://github.com/ElectroStarz/ArchipelagoMSM/releases)
-- [Root.zip (In the releases page)](https://github.com/ElectroStarz/ArchipelagoMSM/releases)
+- [AP Gecko Codes](https://github.com/ElectroStarz/ArchipelagoMSM/releases)
 - [Dolphin Emulator](https://dolphin-emu.org/download/?ref=btn)
-- Your PAL (European) ROM of Mario Sports Mix (NTSC-U **will** be supported in later updates, maybe NTSC-J)
+- Your **PAL (European) ROM of Mario Sports Mix** (NTSC-U will be supported in later updates, _maybe_ NTSC-J)
 
 
 ## How to install
-### Preparations
+### Archipelago
 1) Download the [latest version of Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases)
 2) Download the [latest version of this APWorld](https://github.com/ElectroStarz/ArchipelagoMSM/releases) and put it in
-your custom_worlds folder
-3) Dump your PAL version of Mario Sports Mix - [Use this guide](https://wii.hacks.guide/dump-games) 
+your custom_worlds folder, or click Install APWorld in the Archipelago Launcher.
+
+### Dolphin
+1) Dump your PAL version of Mario Sports Mix - [Use this guide](https://wii.hacks.guide/dump-games) 
 (Requires a modded Wii/Wii U)
-4) Put the dump into a folder and set it as a game folder in Dolphin (Config -> Paths)
+2) Put the dump into a folder and set it as a game folder in Dolphin (Config → Paths)
+3) Click 'Config' and click 'Enable Cheats'
+4) Right click Mario Sports Mix and click 'Properties', then 'Gecko Codes' and click 'Add New Code...'. Name it 'AP
+Codes' and put the creator as Saulf, and in the code box copy as paste the code in the AP Gecko Codes.txt file into the
+box.
 
 ## Read both!
 ### Archipelago Notes
 - Make sure to use the Mario Sports Mix Client when playing MSM AP, or else it won't work!
 
 ### Dolphin notes
-- When playing, use save file 1! (Support for other save files may come in a later update but is highly unlikely due to
-to the amount of research I'll need to do :[ (Sorry folks, back up your save data if you have any!)
+- <ins>**BACK UP YOUR SAVE DATA**</ins>
+- **Remember to use the gecko codes or else things will not work!**
+- When playing, use **save file 1!** (Support for other save files may come in a later update but is highly unlikely due to
+the amount of research I'll need to do :[ )
 
 ## Creating a yaml file
 ### What is a yaml and why do I need one?
 A yaml file tells Archipelago how it should generate your game. It may have certain options that can effect your game
-like what difficulties are enabled, certain sanities, etc.
+like what difficulties are enabled, your goal condition, etc.
 
 ### How do I create one?
 There are 2 ways of creating your yaml file. The 1st is the recommended way, while the 2nd is the less popular. 

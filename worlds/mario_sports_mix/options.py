@@ -14,8 +14,7 @@ class StartWithSports(Choice):
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey? (Also unlocks related stages)
-    Also heavily recommended, breaks some things if off"""
-    visibility = Visibility.none
+    Also heavily recommended, may break some things if off"""
     display_name = "Start with Mushroom Cup (+Stages) - READ DESCRIPTION!"
     option_none = 0
     option_normal_difficulty = 1
@@ -23,12 +22,20 @@ class StartWithMushroomCup(Choice):
     option_both = 3
     default = 1
 
+class StartWithCharacters(Choice):
+    """Start with 2 or 3 random characters"""
+    display_name = "Start with Random Characters"
+    option_none = 0
+    option_2_characters = 2
+    option_3_characters = 3
+    default = 0
+
 class ExhibitionDifficulty(OptionSet):
     """Which exhibition difficulties should be included? If the difficulty is off, you won't be able to send checks with
     that difficulty
     (Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulty"
-    valid_keys = {"Easy","Normal", "Hard", "Expert"}
+    valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
 
 class TournamentDifficulty(OptionSet):
@@ -65,14 +72,11 @@ class SportsMixUnlock(Choice):
     option_sports_crystals = 1
     default = 0
 
-
-
 class GoalCondition(Choice):
     """What is your goal?"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 0
     option_defeat_behemoth_king = 1
-    option_win_cups = 2
     default = 1
 
 class BeMean(Choice):
@@ -81,7 +85,6 @@ class BeMean(Choice):
     option_no = 0
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
-    option_both = 3
     default = 0
 
 class BehemothHP(Range):
@@ -99,13 +102,6 @@ class BehemothKingHP(Range):
     range_start = 3000
     range_end = 7000
     default = 3000
-
-class CupsRequired(Range):
-    """Cups required for goal"""
-    display_name = "Required Cups to goal"
-    range_start = 5
-    range_end = 27
-    default = 10
 
 class TrapChance(Range):
     """The chance a filler is swapped with a trap"""
@@ -142,13 +138,14 @@ class ScoreSanityMax(Range):
     range_end = 100
     default = 40
 
-class SpecialSanity(DefaultOnToggle):
+class SpecialSanity(Toggle):
     """(NOT WORKING) Using each character's special sends a check"""
     display_name = "Special Sanity"
+    default = False
 
-class CourtSanity(Choice):
-    """(NOT WORKING) Playing and/or winning on each court sends a check"""
-    display_name = "Court Sanity"
+class StageSanity(Choice):
+    """(NOT WORKING) Playing and/or winning on each stage sends a check"""
+    display_name = "Stage Sanity"
     option_off = 0
     option_playing = 1
     option_winning = 2
@@ -159,6 +156,7 @@ msm_option_groups = [
     OptionGroup("Game Options", [
         StartWithSports,
         StartWithMushroomCup,
+        StartWithCharacters,
         ExhibitionDifficulty,
         TournamentDifficulty,
         StageUnlockType,
@@ -170,15 +168,14 @@ msm_option_groups = [
         BeMean,
         BehemothHP,
         BehemothKingHP,
-        CupsRequired,
     ]),
-    OptionGroup("Sanity Options (Only Special Sanity Works)", [
+    OptionGroup("Sanity Options (NOT WORKING)", [
         TeamSanity,
         ScoreSanity,
         ScoreSanityPoints,
         ScoreSanityMax,
         SpecialSanity,
-        CourtSanity,
+        StageSanity,
     ])
 ]
 
@@ -186,6 +183,7 @@ msm_option_groups = [
 class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
+    start_with_characters: StartWithCharacters
     exhibition_difficulty: ExhibitionDifficulty
     tournament_difficulty: TournamentDifficulty
     party_mode: PartyMode
@@ -195,11 +193,10 @@ class MSMOptions(PerGameCommonOptions):
     be_mean: BeMean
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
-    cups_required: CupsRequired
     trap_chance: TrapChance
     team_sanity: TeamSanity
     score_sanity: ScoreSanity
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
     special_sanity: SpecialSanity
-    court_sanity: CourtSanity
+    stage_sanity: StageSanity
