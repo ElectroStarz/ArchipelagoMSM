@@ -10,12 +10,12 @@ class ConnectionState(Enum):
     IN_MENU = 2
     IN_TOURNAMENT_MAP = 4
     IN_MATCH = 5
-    GOALED = 6
+    IN_BOSS = 6
+    GOALED = 7
 
 _supported_versions = ["RMKP01"]
 
-stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17",
-             "s20"]
+stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
 
 class MSMInterface:
     dolphin_client: DolphinClient
@@ -29,20 +29,6 @@ class MSMInterface:
         self.dolphin_client = DolphinClient(logger)
         self.current_tournament = None
 
-    def connect_to_dolphin(self):
-        try:
-            self.dolphin_client.attempt_to_hook()
-
-            current_game_ver = self.dolphin_client.read_string(MatchAddresses.game_code)
-            if current_game_ver in _supported_versions:
-                self.game_ver = current_game_ver
-
-        except DolphinException:
-            print("Unsupported game version detected! Make sure you're using PAL!")
-
-    def disconnect_from_dolphin(self):
-        self.dolphin_client.disconnect()
-        self.logger.info("Disconnected from Dolphin!")
 
     def is_in_menu(self):
         current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
@@ -55,6 +41,13 @@ class MSMInterface:
         current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
         current_stage_prefix = current_stage[:3]
         if current_stage_prefix in stage_ids:
+            return True
+        else:
+            return False
+
+    def is_in_boss(self):
+        current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        if current_stage == "s20VO":
             return True
         else:
             return False
@@ -145,7 +138,6 @@ class MSMInterface:
         else:
             return False
 
-
     def match_status(self):
         match_status = self.dolphin_client.read_byte(MatchAddresses.match_status)
         if match_status == 1:
@@ -156,7 +148,6 @@ class MSMInterface:
             return 3 # Tied
         else:
             return 0 # Ongoing
-
 
     def check_sport(self):
         string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
@@ -192,7 +183,6 @@ class MSMInterface:
 
         return {1: "Normal", 2: "Hard"}.get(difficulty)
 
-
     def get_connection_state(self):
         try:
             if not self.dolphin_client.is_hooked_class():
@@ -206,6 +196,9 @@ class MSMInterface:
 
             if self.is_in_match():
                 return ConnectionState.IN_MATCH
+
+            if self.is_in_boss():
+                return ConnectionState.IN_BOSS
 
             # Fallback, likely connected
             return ConnectionState.CONNECTED
