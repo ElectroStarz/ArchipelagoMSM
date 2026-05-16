@@ -1,6 +1,7 @@
 from logging import Logger
 from typing import Any
-import subprocess
+import sys
+import psutil
 import dolphin_memory_engine as dme
 import asyncio
 
@@ -12,44 +13,57 @@ class DolphinClient:
     def __init__(self, logger: Logger):
         self.dme = dme
         self.logger = logger
+        self.attempt = 1
 
     @staticmethod
     def check_for_dolphin():
-        cmd = 'tasklist /FI "IMAGENAME eq Dolphin.exe"'
-        output = subprocess.check_output(cmd, shell=True).decode()
-        dolphin_amount = output.count("Dolphin.exe")
+        # Determine the expected executable name based on the OS
+        # Windows uses Dolphin.exe, while Mac/Linux use lowercase 'dolphin'
+        if sys.platform == "win32":
+            target_process = "dolphin.exe"
+        else:
+            target_process = "dolphin"
 
-        if "Dolphin.exe" in output:
-            if dolphin_amount > 1:
-                return 2
-            else:
-                return 1
+        dolphin_count = 0
+
+        # Iterate through all running processes across the OS
+        for proc in psutil.process_iter(['name']):
+            try:
+                # Lowercase comparison to avoid case-sensitivity issues across different OS environments
+                if proc.info['name'] and proc.info['name'].lower() == target_process:
+                    dolphin_count += 1
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                continue
+
+        if dolphin_count > 1:
+            return 2
+        elif dolphin_count == 1:
+            return 1
         else:
             return 0
 
-    attempt = 1
 
     async def attempt_to_hook(self):
-        # Only hook if not already hooked
         if not self.dme.is_hooked():
+            # Fixed: Changed from self.attempt to tracking via your instance variable properly
             self.logger.info(f"Attempting to hook: Attempt {self.attempt}")
             self.dme.hook()
 
         if self.dme.is_hooked():
             self.logger.info("Hooked successfully!")
+            self.attempt = 1  # Reset counter on success
         else:
-            if self.check_for_dolphin() == 0:
+            dolphin_status = self.check_for_dolphin()
+
+            if dolphin_status == 0:
                 self.logger.info("Failed to hook! Dolphin isn't running!")
-                self.attempt += 1
-                await asyncio.sleep(5)
-            elif self.check_for_dolphin() == 1:
+            elif dolphin_status == 1:
                 self.logger.info("Failed to hook! Mario Sports Mix isn't running!")
-                self.attempt += 1
-                await asyncio.sleep(5)
-            elif self.check_for_dolphin() == 2:
-                self.logger.info("Failed to hook! Too many Dolphin are running!")
-                self.attempt += 1
-                await asyncio.sleep(5)
+            elif dolphin_status == 2:
+                self.logger.info("Failed to hook! Too many Dolphin instances are running!")
+
+            self.attempt += 1
+            await asyncio.sleep(5)
 
 
     def is_hooked_class(self):

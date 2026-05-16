@@ -14,7 +14,8 @@ class ConnectionState(Enum):
 
 _supported_versions = ["RMKP01"]
 
-stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
+stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17",
+             "s20"]
 
 class MSMInterface:
     dolphin_client: DolphinClient
@@ -88,7 +89,7 @@ class MSMInterface:
 
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
-                if timer < 8900:
+                if timer < 9000:
                     ready_game = True
                 else:
                     ready_game = False
@@ -108,6 +109,16 @@ class MSMInterface:
                 else:
                     ready_shot_clock = False
             elif self.check_sport() == "Volleyball":
+                if current_stage == "s20":
+                    try:
+                        self.dolphin_client.follow_pointers(
+                            BossAddresses.behemoth_hp,
+                            Offsets.Boss.behemoth_hp_offsets
+                        )
+                        ready_game = True
+                    except RuntimeError:
+                        ready_game = False
+                else:
                     try:
                         # Check if you can follow pointers to the address, if so, then ready
                         self.dolphin_client.follow_pointers(
@@ -146,13 +157,11 @@ class MSMInterface:
         else:
             return 0 # Ongoing
 
+
     def check_sport(self):
-        is_sports_mix = self.dolphin_client.read_byte(SportsMixAddresses.is_sports_mix)
         string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
         current_sport = string_stage[-2:]
-        if is_sports_mix == 1:
-            return "Sports Mix"
-        elif current_sport == "BA":
+        if current_sport == "BA":
             return "Basketball"
         elif current_sport == "DO":
             return "Dodgeball"
@@ -162,6 +171,13 @@ class MSMInterface:
             return "Hockey"
         else:
             return None
+
+    def check_sports_mix(self):
+        is_sports_mix = self.dolphin_client.read_byte(SportsMixAddresses.is_sports_mix)
+        if is_sports_mix == 1:
+            return True
+        else:
+            return False
 
     def get_exhibition_difficulty(self):
         difficulty = self.dolphin_client.read_byte(MatchAddresses.exhibition_diff)
@@ -175,6 +191,7 @@ class MSMInterface:
             return {0: "Normal", 1: "Hard"}.get(difficulty)
 
         return {1: "Normal", 2: "Hard"}.get(difficulty)
+
 
     def get_connection_state(self):
         try:

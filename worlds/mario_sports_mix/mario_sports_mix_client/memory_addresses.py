@@ -224,7 +224,7 @@ class HockeyAddresses:
         black_mage = 0x90226D09
 
 class SportsMixAddresses:
-    is_sports_mix = 0x804d7913 # Byte
+    is_sports_mix = 0x804D7913 # Byte
     sports_mix_unlocked = 0x90226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
 
     class Tournament:
@@ -261,3 +261,4 @@ class Offsets:
 
     class Boss:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
+        max_hp_offsets = [0x20, 0x34, 0x1F4]
