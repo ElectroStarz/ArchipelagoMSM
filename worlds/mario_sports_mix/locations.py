@@ -393,8 +393,8 @@ LOCATION_NAME_TO_ID = {
     "FP: Get 100 Points!": base_loc_id + 609,
 
     # If goal condition is defeating Behemoth King create an item for defeating Behemoth
-    "Defeated Behemoth!": base_loc_id + 2000,
-    "Defeated Behemoth King!": base_loc_id + 2001,
+    "Defeat Behemoth!": base_loc_id + 2000,
+    "Defeat Behemoth King!": base_loc_id + 2001,
 }
 
 def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | None]:
@@ -802,20 +802,20 @@ def create_events(world: "MSMWorld") -> None:
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
         behemoth_boss = world.get_region("Behemoth Boss Battle")
         behemoth_boss.add_event(
-            "Defeated Behemoth!", "Victory!", location_type=MSMLocation, item_type=items.MSMItem
+            "Defeat Behemoth!", "Victory!", location_type=MSMLocation, item_type=items.MSMItem
         )
         if world.options.be_mean == BeMean.option_defeat_behemoth_king:
-            behemoth_king_location = get_location_names_with_ids(["Defeated Behemoth King!"])
+            behemoth_king_location = get_location_names_with_ids(["Defeat Behemoth King!"])
             behemoth_boss = world.get_region("Behemoth King Boss Battle")
             behemoth_boss.add_locations(behemoth_king_location, MSMLocation)
 
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
         behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
         behemoth_king_boss.add_event(
-            "Defeated Behemoth King!", "Victory!", location_type=MSMLocation,
+            "Defeat Behemoth King!", "Victory!", location_type=MSMLocation,
             item_type=items.MSMItem)
         if world.options.be_mean == BeMean.option_defeat_behemoth:
-            behemoth_location = get_location_names_with_ids(["Defeated Behemoth!"])
+            behemoth_location = get_location_names_with_ids(["Defeat Behemoth!"])
             behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_location, MSMLocation)
 
@@ -827,11 +827,11 @@ def create_events(world: "MSMWorld") -> None:
 
         if (world.options.be_mean == BeMean.option_defeat_behemoth and
                 world.options.goal_condition == GoalCondition.option_defeat_behemoth_king):
-            behemoth_locations = get_location_names_with_ids(["Defeated Behemoth!"])
+            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
             behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
         elif (world.options.be_mean == BeMean.option_defeat_behemoth_king and
             world.options.goal_condition == GoalCondition.option_defeat_behemoth):
-            behemoth_king_locations = get_location_names_with_ids(["Defeated Behemoth King!"])
+            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
             behemoth_king = world.get_region("Behemoth King Boss Battle")
             behemoth_king.add_locations(behemoth_king_locations, MSMLocation)

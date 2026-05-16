@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from rule_builder.rules import Has, HasAll, CanReachLocation
+from rule_builder.rules import Has, HasAll, HasAny, CanReachLocation
 from .options import GoalCondition, BeMean
 
 if TYPE_CHECKING:
@@ -157,18 +157,18 @@ def set_goal_rules(world: MSMWorld) -> None:
     )
 
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-        world.set_rule(world.get_location("Defeated Behemoth!"), behemoth_rule)
+        world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-        world.set_rule(world.get_location("Defeated Behemoth King!"), behemoth_king_rule)
+        world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
     if world.options.be_mean == BeMean.option_defeat_behemoth:
         if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-            world.set_rule(world.get_location("Defeated Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
     if world.options.be_mean == BeMean.option_defeat_behemoth_king:
         if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-            world.set_rule(world.get_location("Defeated Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
 
 # Creates entrance access rules for menus and cups
