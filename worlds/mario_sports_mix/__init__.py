@@ -2,12 +2,11 @@ from collections.abc import Mapping
 from typing import Any, TYPE_CHECKING
 from BaseClasses import Tutorial, Item, Location, Region
 from worlds.AutoWorld import WebWorld, World
-from . import regions, rules
+from . import regions, rules, locations, components
 from .options import *
 from .items import ITEM_NAME_TO_ID
-from . import locations
-from . import components
 
+WORLD_VERSION = "0.0.1"
 
 class MSMWebWorld(WebWorld):
     game = "Mario Sports Mix"
@@ -23,9 +22,18 @@ class MSMWebWorld(WebWorld):
         "setup/en",
         ["ElectroStarz"],
     )
-    tutorials = [setup_en]
-    option_groups = msm_option_groups
 
+    setup_fr = Tutorial(
+        "Guide de configuration Multimonde.",
+        "Un guide pour configurer Mario Sports Mix MultiWorld.",
+        "Français",
+        "setup_fr.md",
+        "setup/fr",
+        ["Sylaaz"]
+    )
+
+    tutorials = [setup_en, setup_fr]
+    option_groups = msm_option_groups
 
 
 class MSMWorld(World):
@@ -52,7 +60,6 @@ class MSMWorld(World):
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
 
-
     def set_rules(self) -> None:
         rules.set_all_rules(self)
 
@@ -67,6 +74,12 @@ class MSMWorld(World):
 
    # Stuff to send to the client because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
-        return self.options.as_dict(
-            "goal_condition", "behemoth_hp", "behemoth_king_hp", "sports_mix_unlock",
-        )
+        slot_data = {
+        "version": WORLD_VERSION,
+        "goal_condition": self.options.goal_condition.value,
+        "behemoth_hp": self.options.behemoth_hp.value,
+        "behemoth_king_hp": self.options.behemoth_king_hp.value,
+        "sports_mix_unlock": self.options.sports_mix_unlock.value,
+        }
+
+        return slot_data

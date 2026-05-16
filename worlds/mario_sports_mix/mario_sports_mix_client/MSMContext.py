@@ -15,10 +15,12 @@ from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
 
 id_to_name = {data.code: name for name, data in item_table.items()}
+CLIENT_VERSION = "0.0.1"
 
 
 status_messages = {
     ConnectionState.IN_MATCH: "In match",
+    ConnectionState.IN_BOSS: "In boss",
     ConnectionState.IN_MENU: "In main menu",
     ConnectionState.DISCONNECTED: "Unable to connect to the Dolphin instance, attempting to reconnect...",
     ConnectionState.CONNECTED: "Connected to Dolphin!",
@@ -338,6 +340,20 @@ class MSMContext(CommonContext):
             self.sports_mix_unlock = self.slot_data["sports_mix_unlock"]
 
             self.load_consumed_item_indices()
+
+            generation_version = self.slot_data.get("version", "0.0.0")
+
+            if CLIENT_VERSION != generation_version:
+                logger.error(
+                    f"\n=========================================\n"
+                    f"VERSION MISMATCH DETECTED!\n"
+                    f"Your Client version: {CLIENT_VERSION}\n"
+                    f"Seed was generated on version: {generation_version}\n"
+                    f"Please update your client or regenerate the seed as things may break!\n"
+                    f"========================================="
+                )
+            else:
+                logger.info(f"Version check passed! (v{CLIENT_VERSION})")
 
         elif cmd == "RoomInfo":
             self.seed = args.get("seed_name", "unknown")
@@ -741,7 +757,6 @@ class MSMContext(CommonContext):
 
     # === Exhibition Unlocks ===
 
-
     async def handle_stage_unlocks(self, unlocked_stages):
         # Link variables to the address in the correct class
         # Basketball
@@ -821,7 +836,6 @@ class MSMContext(CommonContext):
 
 
     # === Sports Mix ===
-
 
     async def handle_sports_mix_unlock(self, unlocked_sports, unlocked_sports_crystals):
         if self.sports_mix_unlock == 0:
@@ -952,6 +966,7 @@ class MSMContext(CommonContext):
             self.replace_due_to_score_running = True
             self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.forced_item_id)
             debug_log(f"Forced item back to {self.forced_item_id}")
+            await asyncio.sleep(1)
             self.replace_due_to_score_running = False
 
     async def handle_question_mark_panel_items(self, unlocked_panel_items):
@@ -1169,7 +1184,7 @@ class MSMContext(CommonContext):
 
     async def has_goaled(self):
         # If we already sent the goal or location check for the boss, stop running
-        if getattr(self, "boss_defeat_handled", False):
+        if self.boss_defeat_handled:
             return
 
         # Behemoth Handling
@@ -1182,7 +1197,6 @@ class MSMContext(CommonContext):
             if address_behemoth_hp:
                 behemoth_hp = self.game_interface.dolphin_client.read_float(address_behemoth_hp)
 
-                # Safe float check (<= instead of ==)
                 if behemoth_hp is not None and behemoth_hp <= 0:
                     self.boss_defeat_handled = True  # Lock execution immediately
 
@@ -1201,7 +1215,6 @@ class MSMContext(CommonContext):
             if address_behemoth_hp:
                 behemoth_hp = self.game_interface.dolphin_client.read_float(address_behemoth_hp)
 
-                # Safe float check (<= instead of ==)
                 if behemoth_hp is not None and behemoth_hp <= 0:
                     self.boss_defeat_handled = True  # Lock execution immediately
 
@@ -1246,78 +1259,6 @@ class MSMContext(CommonContext):
                 self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_king_hp)
                 debug_log(f"Behemoth King HP set to {self.behemoth_king_hp}")
                 self.boss_hp_handled = True
-
-
-    # === Misc stuff idk where to put ===
-
-    async def dolphin_sync_task(self) -> None:
-        """
-        The main loop managing the connection to Dolphin and game-state logic routing.
-        """
-
-        while not self.exit_event.is_set():
-            try:
-                if not self.game_interface.dolphin_client.is_hooked_class():
-                    await self.game_interface.dolphin_client.attempt_to_hook()
-
-                # Ensure we are connected to the AP Server first
-                if not self.server or not self.server.socket or self.server.socket.closed:
-                    message = "Waiting for player to connect to Archipelago server..."
-                    self.start_process = True
-                    if self.last_error_message != message:
-                        logger.info("Make sure you have backed up your save file!")
-                        logger.info(message)
-                        self.last_error_message = message
-                    await asyncio.sleep(1)
-                    continue
-
-                if self.game_interface.dolphin_client.is_hooked_class() and self.slot:
-                    if self.start_process:
-                        MSMFunctions.unlock_tabs()
-                        logger.info("Unlocked tabs!")
-                        MSMFunctions.lock_all_cups()
-                        logger.info("Locked cups!")
-                        MSMFunctions.lock_all_stages()
-                        logger.info("Locked stages!")
-                        MSMFunctions.lock_all_characters()
-                        logger.info("Locked characters!")
-                        self.start_process = False
-
-                # Ensure we have received slot data
-                if not self.slot:
-                    await asyncio.sleep(1)
-                    continue
-
-                # Reset error message once connected
-                self.last_error_message = None
-
-
-                connection_state = self.game_interface.get_connection_state()
-                self.update_connection_status()
-
-                if connection_state == ConnectionState.IN_MATCH:
-                    await self.handle_in_match()
-
-                elif connection_state == ConnectionState.IN_TOURNAMENT_MAP:
-                    await self.handle_in_tournament_map()
-
-                elif connection_state == ConnectionState.IN_MENU:
-                    await self.handle_in_main_menu()
-
-                else:
-                    await asyncio.sleep(1)
-                    continue
-
-                await asyncio.sleep(0.1)
-
-
-            except Exception as e:
-                if "Dolphin" in str(e):
-                    logger.error(f"Dolphin Connection Error: {e}")
-                    self.update_connection_status()
-                else:
-                    logger.error(f"Sync Task Error:\n{traceback.format_exc()}")
-                await asyncio.sleep(3)
 
 
     # === Location Handling ===
@@ -1391,9 +1332,7 @@ class MSMContext(CommonContext):
 
         difficulty = self.game_interface.get_tournament_difficulty(cup)
 
-        if difficulty is None and sports_mix_activated:
-            debug_log(f"Sports Mix activated, no difficulty")
-        elif difficulty is None and not sports_mix_activated:
+        if difficulty is None and not sports_mix_activated:
             debug_log(f"Could not find tournament difficulty for cup={cup}")
             return None
 
@@ -1442,9 +1381,6 @@ class MSMContext(CommonContext):
         else:
             required_cup = f"{sport}: {cup} ({difficulty})"
 
-        print(required_cup)
-        print(required_stage)
-
         if required_stage in self.unlocked_stages and required_cup in self.unlocked_cups:
             return
 
@@ -1455,8 +1391,11 @@ class MSMContext(CommonContext):
         elif required_cup not in self.unlocked_cups:
             debug_log(f"Blocked points for {sport} {cup}; missing {required_cup}")
 
-        self.clear_player_score()
-        self.lock_special_meter()
+        try:
+            self.clear_player_score()
+            self.lock_special_meter()
+        finally:
+            pass
 
     async def handle_exhibition_win(self):
         # Already marked as tournament
@@ -1529,29 +1468,116 @@ class MSMContext(CommonContext):
         self.last_tournament_location_name = None
 
 
+    # === Misc stuff idk where to put ===
+
+    async def dolphin_sync_task(self) -> None:
+        """
+        The main loop managing the connection to Dolphin and game-state logic routing.
+        """
+
+        while not self.exit_event.is_set():
+            try:
+                if not self.game_interface.dolphin_client.is_hooked_class():
+                    await self.game_interface.dolphin_client.attempt_to_hook()
+
+                # Ensure we are connected to the AP Server first
+                if not self.server or not self.server.socket or self.server.socket.closed:
+                    message = "Waiting for player to connect to Archipelago server..."
+                    self.start_process = True
+                    if self.last_error_message != message:
+                        logger.info("Make sure you have backed up your save file!")
+                        logger.info(message)
+                        self.last_error_message = message
+                    await asyncio.sleep(1)
+                    continue
+
+                if self.game_interface.dolphin_client.is_hooked_class() and self.start_process and self.slot:
+                    MSMFunctions.unlock_tabs()
+                    logger.info("Unlocked tabs!")
+                    MSMFunctions.lock_all_cups()
+                    logger.info("Locked cups!")
+                    MSMFunctions.lock_all_stages()
+                    logger.info("Locked stages!")
+                    MSMFunctions.lock_all_characters()
+                    logger.info("Locked characters!")
+                    self.start_process = False
+
+                # Ensure we have received slot data
+                if not self.slot:
+                    await asyncio.sleep(1)
+                    continue
+
+                # Reset error message once connected
+                self.last_error_message = None
+
+
+                connection_state = self.game_interface.get_connection_state()
+                self.update_connection_status()
+
+                if connection_state == ConnectionState.IN_MATCH:
+                    await self.handle_in_match()
+
+                elif connection_state == ConnectionState.IN_BOSS:
+                    await self.handle_in_boss()
+
+                elif connection_state == ConnectionState.IN_TOURNAMENT_MAP:
+                    await self.handle_in_tournament_map()
+
+                elif connection_state == ConnectionState.IN_MENU:
+                    await self.handle_in_main_menu()
+
+                else:
+                    await asyncio.sleep(1)
+                    continue
+
+                await asyncio.sleep(0.1)
+
+
+            except Exception as e:
+                if "Dolphin" in str(e):
+                    logger.error(f"Dolphin Connection Error: {e}")
+                    self.update_connection_status()
+                else:
+                    logger.error(f"Sync Task Error:\n{traceback.format_exc()}")
+                await asyncio.sleep(3)
+
+    def check_version(slot_data: dict) -> bool:
+        # Grab the version the seed was generated with
+        generation_version = slot_data.get("version", "0.0.0")
+
+        if CLIENT_VERSION != generation_version:
+            print(f"!!! VERSION MISMATCH !!!")
+            print(f"Your Client version: {CLIENT_VERSION}")
+            print(f"Seed was generated on version: {generation_version}")
+            print("Please ensure your client and apworld match, or things will break!")
+            return False
+
+        print("Version check passed. Good luck!")
+        return True
+
+    async def stop_stupid_games_played_notifs(self):
+        # Stop unlock messages from appearing constantly
+        basket_played = BasketballAddresses.games_played
+        dodge_played = DodgeballAddresses.games_played
+        volley_played = VolleyballAddresses.games_played
+        hockey_played = HockeyAddresses.games_played
+        address_list = [basket_played, dodge_played, volley_played, hockey_played]
+
+        for address in address_list:
+            value = self.game_interface.dolphin_client.read_word(address)
+            if value != 0:
+                self.game_interface.dolphin_client.write_word(address, 0)
+
+
     # === Where to handle what ===
 
     async def handle_in_match(self):
         # Lock points if you don't have the stage/cup
         await self.handle_locked_tournament_stage_points()
 
-        # print(f"Awaiting use: {self.awaiting_use}")
-        # print(f"Forced Item ID: {self.forced_item_id}")
-        # print(f"Current Tournament: {self.game_interface.current_tournament}")
-        # print(f"In Tournament Match: {self.in_tournament_match}")
-        # print(f"Sport: {self.game_interface.check_sport()}")
-        # print(f"Sport Mix?: {self.game_interface.check_sports_mix()}")
-        # print(f"Is Behemoth: {self.is_behemoth}")
-        # print(f"Is Behemoth King: {self.is_behemoth_king}")
-
-        # Boss Stuff
-        await self.handle_boss_hp()
-        await self.check_boss_type()
-
         # Locations
         await self.handle_exhibition_win()
         await self.handle_cup_round_win()
-        await self.has_goaled()
 
         # Items
         await self.handle_one_time_items(self.filler_to_give)
@@ -1562,10 +1588,24 @@ class MSMContext(CommonContext):
 
         await asyncio.sleep(0.1)
 
+    async def handle_in_boss(self):
+        await self.handle_locked_tournament_stage_points()
+
+        await self.handle_boss_hp()
+        await self.check_boss_type()
+        await self.has_goaled()
+
+        # Items
+        await self.handle_one_time_items(self.filler_to_give)
+        await self.handle_replace_due_to_scoring()
+        await self.handle_traps(self.traps_to_give)
+        await self.handle_question_mark_panel_items(self.unlocked_panel_items)
+        await self.handle_unlocked_abilities()
+
+
     async def handle_in_tournament_map(self):
         await self.check_current_cup()
         await self.check_pending_tournament_location()
-        await self.has_goaled()
         await asyncio.sleep(0.1)
 
     async def handle_in_main_menu(self):
@@ -1574,6 +1614,6 @@ class MSMContext(CommonContext):
         self.boss_hp_handled = False
         self.game_interface.current_tournament = None
         await self.handle_received_items()
-        await self.has_goaled()
+        await self.stop_stupid_games_played_notifs()
 
         await asyncio.sleep(0.1)
