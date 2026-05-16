@@ -1,4 +1,7 @@
 # <ins>Bugs</ins>
-- When you only have Mii, do not press left or right when you haven't selected the Mii yet, it will crash the game.
-Only press up and down, then you can press left or right. This can't be fixed at the moment as this is literally just
-the game freaking out
+You may not be able to reach certain characters in the character select menu, if so, use random. **However**, if you
+use random when:
+- Only have 1 character
+- Are on that character
+
+It **will** crash. In this case, only use random on the Mii Character
