@@ -644,7 +644,8 @@ def create_all_items(world: "MSMWorld") -> None:
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
 
-    if name in character_costumes and world.options.team_sanity == TeamSanity.option_characters_and_costumes:
-        classification = ItemClassification.progression|ItemClassification.useful
+    # if name in character_costumes:
+    #     if world.options.team_sanity == TeamSanity.option_characters_and_costumes:
+    #         classification = ItemClassification.useful
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

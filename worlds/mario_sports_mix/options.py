@@ -88,7 +88,7 @@ class BeMean(Choice):
     default = 0
 
 class BehemothHP(Range):
-    """Behemoth Health - 2400 is base game
+    """Behemoth Health - 2400 is default
     Recommended to edit this in the yaml (2400 - 4000)"""
     display_name = "Behemoth HP"
     range_start = 2400
@@ -96,7 +96,7 @@ class BehemothHP(Range):
     default = 2400
 
 class BehemothKingHP(Range):
-    """Behemoth King Health - 3000 is base game
+    """Behemoth King Health - 3000 is default
     Recommended to edit this in the yaml (3000 - 7000)"""
     display_name = "Behemoth King HP"
     range_start = 3000
@@ -110,47 +110,47 @@ class TrapChance(Range):
     range_end = 100
     default = 25
 
-class TeamSanity(Choice):
-    """(NOT WORKING) Turn on or off team sanity
-    (Playing with every team combination sends a check)"""
-    display_name = "Team Sanity"
-    option_off = 0
-    option_characters = 1
-    option_characters_and_costumes = 2
-    default = 2
-
-class ScoreSanity(Toggle):
-    """(NOT WORKING) Toggle on or off score sanity"""
-    display_name = "Score Sanity"
-    default = False
-
-class ScoreSanityPoints(Range):
-    """(NOT WORKING) Every number of points will send a check"""
-    display_name = "Score Sanity Points"
-    range_start = 1
-    range_end = 10
-    default = 5
-
-class ScoreSanityMax(Range):
-    """(NOT WORKING) Score Sanity will go up to this number of points"""
-    display_name = "Score Sanity Max"
-    range_start = 10
-    range_end = 100
-    default = 40
-
-class SpecialSanity(Toggle):
-    """(NOT WORKING) Using each character's special sends a check"""
-    display_name = "Special Sanity"
-    default = False
-
-class StageSanity(Choice):
-    """(NOT WORKING) Playing and/or winning on each stage sends a check"""
-    display_name = "Stage Sanity"
-    option_off = 0
-    option_playing = 1
-    option_winning = 2
-    option_both = 3
-    default = 0
+# class TeamSanity(Choice):
+#     """(NOT WORKING) Turn on or off team sanity
+#     (Playing with every team combination sends a check)"""
+#     display_name = "Team Sanity"
+#     option_off = 0
+#     option_characters = 1
+#     option_characters_and_costumes = 2
+#     default = 0
+#
+# class ScoreSanity(Toggle):
+#     """(NOT WORKING) Toggle on or off score sanity"""
+#     display_name = "Score Sanity"
+#     default = False
+#
+# class ScoreSanityPoints(Range):
+#     """(NOT WORKING) Every number of points will send a check"""
+#     display_name = "Score Sanity Points"
+#     range_start = 1
+#     range_end = 10
+#     default = 5
+#
+# class ScoreSanityMax(Range):
+#     """(NOT WORKING) Score Sanity will go up to this number of points"""
+#     display_name = "Score Sanity Max"
+#     range_start = 10
+#     range_end = 100
+#     default = 40
+#
+# class SpecialSanity(Toggle):
+#     """(NOT WORKING) Using each character's special sends a check"""
+#     display_name = "Special Sanity"
+#     default = False
+#
+# class StageSanity(Choice):
+#     """(NOT WORKING) Playing and/or winning on each stage sends a check"""
+#     display_name = "Stage Sanity"
+#     option_off = 0
+#     option_playing = 1
+#     option_winning = 2
+#     option_both = 3
+#     default = 0
 
 msm_option_groups = [
     OptionGroup("Game Options", [
@@ -169,14 +169,14 @@ msm_option_groups = [
         BehemothHP,
         BehemothKingHP,
     ]),
-    OptionGroup("Sanity Options (NOT WORKING)", [
-        TeamSanity,
-        ScoreSanity,
-        ScoreSanityPoints,
-        ScoreSanityMax,
-        SpecialSanity,
-        StageSanity,
-    ])
+    # OptionGroup("Sanity Options (NOT WORKING)", [
+    #     TeamSanity,
+    #     ScoreSanity,
+    #     ScoreSanityPoints,
+    #     ScoreSanityMax,
+    #     SpecialSanity,
+    #     StageSanity,
+    # ])
 ]
 
 @dataclass()
@@ -193,10 +193,10 @@ class MSMOptions(PerGameCommonOptions):
     be_mean: BeMean
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
-    trap_chance: TrapChance
-    team_sanity: TeamSanity
-    score_sanity: ScoreSanity
-    score_sanity_points: ScoreSanityPoints
-    score_sanity_max: ScoreSanityMax
-    special_sanity: SpecialSanity
-    stage_sanity: StageSanity
+    # trap_chance: TrapChance
+    # team_sanity: TeamSanity
+    # score_sanity: ScoreSanity
+    # score_sanity_points: ScoreSanityPoints
+    # score_sanity_max: ScoreSanityMax
+    # special_sanity: SpecialSanity
+    # stage_sanity: StageSanity
