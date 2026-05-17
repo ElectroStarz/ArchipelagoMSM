@@ -85,6 +85,8 @@ class OpponentAddresses:
         score_period_5 = 0x804D7E3C # Word
 
 class BasketballAddresses:
+    games_played = 0x902299AC # Word
+
     class Tournament:
         tabs = 0x90226D98 # Byte
         normal_cups = 0x90226D99 # Byte
@@ -119,6 +121,8 @@ class BasketballAddresses:
         black_mage = 0x90226949
 
 class DodgeballAddresses:
+    games_played = 0x90229A34 # Word
+
     class Tournament:
         tabs = 0x90226DB0 # Byte
         normal_cups = 0x90226DB1 # Byte
@@ -153,7 +157,7 @@ class DodgeballAddresses:
         black_mage = 0x90226BC9
 
 class VolleyballAddresses:
-
+    games_played = 0x902299F0 # Word
     last_held = 0x804D0F98
 
     class Tournament:
@@ -190,6 +194,8 @@ class VolleyballAddresses:
         black_mage = 0x90226A89
 
 class HockeyAddresses:
+    games_played = 0x90229A78 # Word
+
     class Tournament:
         tabs = 0x90226DBC # Byte
         normal_cups = 0x90226DBD # Byte

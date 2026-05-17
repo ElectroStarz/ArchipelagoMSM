@@ -605,22 +605,6 @@ def create_all_items(world: "MSMWorld") -> None:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
 
-    # This whole thing is kinda stupid I feel, I might put it back later, but it's causing me to overthink some stuff
-    # currently :/
-    # if world.options.stage_unlock_type == StageUnlockType.option_by_cup_round:
-    #     # Create items for each round of each cup - Link to stage later on in wherever (probably the client stuff)
-    #     for name, icon in mushroom_cup_rounds.items():
-    #         new_item = world.create_item(name)
-    #         itempool.append(new_item)
-    #     for name, icon in flower_cup_rounds.items():
-    #         new_item = world.create_item(name)
-    #         itempool.append(new_item)
-    #     for name, icon in star_cup_rounds.items():
-    #         new_item = world.create_item(name)
-    #         itempool.append(new_item)
-        # for name, icon in extra_stages.items():
-        #     new_item = world.create_item(name)
-        #     itempool.append(new_item)
 
     # Party Mode Items
     # Harmony Hustle
