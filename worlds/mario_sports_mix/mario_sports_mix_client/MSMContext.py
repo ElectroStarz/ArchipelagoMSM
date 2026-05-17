@@ -543,7 +543,6 @@ class MSMContext(CommonContext):
         # Traps + Filler aren't here because they can only be received in game and this function gets awaited during
         # every connection state, if you were to receive a trap or filler in the menu it wouldn't work.
 
-
     # Can't make this yet until there's a way to lock sports
     #async def handle_unlocked_sports(self, unlocked_sports):
 
@@ -836,6 +835,7 @@ class MSMContext(CommonContext):
 
     # === Sports Mix ===
 
+
     async def handle_sports_mix_unlock(self, unlocked_sports, unlocked_sports_crystals):
         if self.sports_mix_unlock == 0:
             if "Sport: Sports Mix" in unlocked_sports:
@@ -850,6 +850,7 @@ class MSMContext(CommonContext):
 
 
     # === Ability Unlocks ===
+
 
     async def handle_unlocked_abilities(self):
         await self.handle_special_meter_unlock(self.unlocked_abilities)
@@ -870,6 +871,7 @@ class MSMContext(CommonContext):
 
 
     # === Filler + ?-Panel Handling ===
+
 
     async def handle_one_time_items(self, filler_to_give):
         # Queue empty? Nothing to do.
@@ -961,7 +963,6 @@ class MSMContext(CommonContext):
             debug_log(f"Forced item back to {self.forced_item_id}")
             await asyncio.sleep(2)
 
-
     async def handle_question_mark_panel_items(self, unlocked_panel_items):
         item_data = self.current_item_func()
         # If we don't have an item, reset and bail early.
@@ -1012,6 +1013,7 @@ class MSMContext(CommonContext):
 
 
     # === Trap Handling ===
+
 
     async def handle_traps(self, traps_to_give):
         # If no traps in queue, bail
@@ -1174,6 +1176,7 @@ class MSMContext(CommonContext):
 
     # === Boss Stuff ===
 
+
     async def has_goaled(self):
         # If we already sent the goal or location check for the boss, stop running
         if self.boss_defeat_handled:
@@ -1293,6 +1296,7 @@ class MSMContext(CommonContext):
 
 
     # === Location Handling ===
+
 
     async def check_location(self, location_name: str):
         location_id = LOCATION_NAME_TO_ID.get(location_name)
@@ -1495,7 +1499,9 @@ class MSMContext(CommonContext):
         if value != 0.0:
             self.game_interface.dolphin_client.write_float(special_meter, 0.0)
 
+
     # === Misc stuff idk where to put ===
+
 
     async def dolphin_sync_task(self) -> None:
         """
@@ -1583,6 +1589,7 @@ class MSMContext(CommonContext):
 
 
     # === Where to handle what ===
+
 
     async def handle_in_match(self):
         # Lock points if you don't have the stage/cup
