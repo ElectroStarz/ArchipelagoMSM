@@ -30,7 +30,6 @@ status_messages = {
     ConnectionState.GOALED: "Goaled game!"
 }
 
-
 character_names = [
     "mario", "luigi", "peach", "daisy", "yoshi", "wario", "waluigi",
     "donkey_kong", "diddy_kong", "toad", "bowser", "bowser_jr",
@@ -215,7 +214,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
             4: "Super Star",
             5: "Banana",
         }
-        logger.info(f"Current Item: {item_map[current_item]}")
+        logger.info(f"Current Item: {item_map.get(current_item, f'Unknown ({current_item})')}")
 
 
     def _cmd_filler(self):
@@ -477,24 +476,15 @@ class MSMContext(CommonContext):
             debug_log("Handled consumable in memory only; storage key is not ready")
 
     def current_item_func(self):
-        current_item = self.game_interface.dolphin_client.read_byte(PlayerAddresses.item_held)
+        current_item = self.game_interface.dolphin_client.read_word(PlayerAddresses.item_held)
         if current_item == self.minus_one:
-            result = -1 #"No Item"
-        elif current_item == 0:
-            result = 0 #"Green Shell"
-        elif current_item == 1:
-            result = 1 #"Red Shell"
-        elif current_item == 2:
-            result = 2 #"Mini Mushroom"
-        elif current_item == 3:
-            result = 3 #"Bob-omb"
-        elif current_item == 4:
-            result = 4 #"Super Star"
-        elif current_item == 5:
-            result = 5 #"Banana"
-        else:
-            result = -1
-        return result
+            return -1
+
+        if current_item in range(6):
+            return current_item
+
+        debug_log(f"Unknown held item value: {current_item}")
+        return -1
 
     # === Item Receiving ===
 
@@ -911,10 +901,6 @@ class MSMContext(CommonContext):
             debug_log(f"Waiting to give {filler}; player already has an item")
             return
 
-        # Prevent question mark panel replacement while giving item
-        self.one_time_running = True
-        self.awaiting_use = True
-
         # Take the oldest queued filler item
         filler_to_give.popleft()
         logger.info(f"Processing from Queue: {filler}")
@@ -932,6 +918,10 @@ class MSMContext(CommonContext):
             debug_log(f"Coins changed from {current_coins} to {new_coins}")
             self.mark_consumable_handled(item_index)
             return
+
+        # Prevent question mark panel replacement while giving item
+        self.one_time_running = True
+        self.awaiting_use = True
 
         item_map = {
             "1 Green Shell": 0,
