@@ -29,7 +29,7 @@ class MSMWebWorld(WebWorld):
         "Français",
         "setup_fr.md",
         "setup/fr",
-        ["Sylaaz"]
+        ["Sylaaz", "Solz"]
     )
 
     tutorials = [setup_en, setup_fr]

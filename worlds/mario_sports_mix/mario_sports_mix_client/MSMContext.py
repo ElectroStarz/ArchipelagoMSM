@@ -304,6 +304,7 @@ class MSMContext(CommonContext):
         self.in_tournament_match = False
         self.last_tournament_location_name: Optional[str] = None
         self.current_item = None
+        self.test = False
         self.minus_one = 0xFFFFFFFF
 
 
@@ -961,19 +962,22 @@ class MSMContext(CommonContext):
             # Game tried to overwrite our item, force it back
             self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.forced_item_id)
             debug_log(f"Forced item back to {self.forced_item_id}")
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
 
     async def handle_question_mark_panel_items(self, unlocked_panel_items):
         item_data = self.current_item_func()
-        # If we don't have an item, reset and bail early.
+        # If we don't have an item, pause.
         if item_data == -1:
             self.item_processed = False
             return
 
-        # If a filler item is given, or we're not ready to be given items, or we've processed an item, or the forced
-        # item id is not none, pause.
-        if (self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed or
-                self.awaiting_use):
+        # If we are currently forcing an item from a scoring replacement
+        # or a one-time item, DO NOT let the ?-panel code claim credit for it.
+        if self.awaiting_use and (item_data == self.forced_item_id or self.item_processed):
+            return
+
+        # Standard pauses
+        if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed:
             return
 
         # Handle Empty List

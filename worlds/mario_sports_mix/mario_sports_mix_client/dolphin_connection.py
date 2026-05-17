@@ -102,31 +102,26 @@ class DolphinClient:
         decoded = byte.decode("utf-8")
         return decoded
 
-    def write_string(self, address: Any) -> Any:
+    def write_string(self, address: Any, string: str) -> Any:
         self.dme.is_hooked()
-        string = ""
         encoded = string.encode("utf-8")
         self.dme.write_byte(address, encoded)
 
     def write_byte(self, address: Any, data: Any):
         self.dme.is_hooked()
-        result = self.dme.write_byte(address, data)
-        return result
+        self.dme.write_byte(address, data)
 
     def write_bytes(self, address: Any, data: Any) -> Any:
         self.dme.is_hooked()
-        result = self.dme.write_bytes(address, data)
-        return result
+        self.dme.write_bytes(address, data)
 
     def write_float(self, address: Any, data: Any):
         self.dme.is_hooked()
-        result = self.dme.write_float(address, data)
-        return result
+        self.dme.write_float(address, data)
 
     def write_word(self, address: Any, data: Any):
         self.dme.is_hooked()
-        result = self.dme.write_word(address, data)
-        return result
+        self.dme.write_word(address, data)
 
     def follow_pointers(self, address: Any, pointers: list):
         self.dme.is_hooked()

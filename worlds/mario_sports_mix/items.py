@@ -80,51 +80,11 @@ sports_mix_cups = {
 }
 
 sports_crystals = {
-    "Sports Crystal: Red": ItemData(base_id + 32, ItemClassification.progression|ItemClassification.useful),
-    "Sports Crystal: Green": ItemData(base_id + 33, ItemClassification.progression|ItemClassification.useful),
-    "Sports Crystal: Yellow": ItemData(base_id + 34, ItemClassification.progression|ItemClassification.useful),
-    "Sports Crystal: Blue": ItemData(base_id + 35, ItemClassification.progression|ItemClassification.useful),
+    "Sports Crystal: Red": ItemData(base_id + 32, ItemClassification.progression_skip_balancing|ItemClassification.useful),
+    "Sports Crystal: Green": ItemData(base_id + 33, ItemClassification.progression_skip_balancing|ItemClassification.useful),
+    "Sports Crystal: Yellow": ItemData(base_id + 34, ItemClassification.progression_skip_balancing|ItemClassification.useful),
+    "Sports Crystal: Blue": ItemData(base_id + 35, ItemClassification.progression_skip_balancing|ItemClassification.useful),
 }
-
-# May or may not need
-# all_cup_unlocks_n = {
-#     "Mushroom Cup (Normal)": ItemData(base_id + 32, ItemClassification.progression),
-#     "Flower Cup (Normal)": ItemData(base_id + 33, ItemClassification.progression),
-#     "Star Cup (Normal)": ItemData(base_id + 33, ItemClassification.progression),
-# }
-#
-# all_cup_unlocks_h = {
-#     "Mushroom Cup (Hard)": ItemData(base_id + 34, ItemClassification.progression),
-#     "Flower Cup (Hard)": ItemData(base_id + 35, ItemClassification.progression),
-#     "Star Cup (Hard)": ItemData(base_id + 36, ItemClassification.progression),
-# }
-
-# The option related to these 3 is annoying me
-# mushroom_cup_rounds = {
-#     "Mushroom Cup Round 1": ItemData(base_id + 37, ItemClassification.progression),
-#     "Mushroom Cup Round 2": ItemData(base_id + 38, ItemClassification.progression),
-#     "Mushroom Cup Round 3": ItemData(base_id + 39, ItemClassification.progression)
-# }
-#
-# flower_cup_rounds = {
-#     "Flower Cup Round 1": ItemData(base_id + 40, ItemClassification.progression),
-#     "Flower Cup Round 2": ItemData(base_id + 41, ItemClassification.progression),
-#     "Flower Cup Round 3": ItemData(base_id + 42, ItemClassification.progression)
-# }
-#
-# star_cup_rounds = {
-#     "Star Cup Round 1": ItemData(base_id + 43, ItemClassification.progression),
-#     "Star Cup Round 2": ItemData(base_id + 44, ItemClassification.progression),
-#     "Star Cup Round 3": ItemData(base_id + 45, ItemClassification.progression)
-# }
-
-
-# exhibition_difficulties = {
-#     "Exhibition: Easy": ItemData(base_id + 49, ItemClassification.progression|ItemClassification.useful),
-#     "Exhibition: Normal": ItemData(base_id + 50, ItemClassification.progression|ItemClassification.useful),
-#     "Exhibition: Hard": ItemData(base_id + 51, ItemClassification.progression|ItemClassification.useful),
-#     "Exhibition: Expert": ItemData(base_id + 52, ItemClassification.progression|ItemClassification.useful),
-# }
 
 individual_stages = {
     "Stage: Mario Stadium": ItemData(base_id + 100, ItemClassification.progression),
@@ -251,12 +211,6 @@ item_table: Dict[str, ItemData] = {
     **hockey_items_h,
     **sports_mix_cups,
     **sports_crystals,
-    #**all_cup_unlocks_n,
-    #**all_cup_unlocks_h,
-    #**exhibition_difficulties,
-    #**mushroom_cup_rounds,
-    #**flower_cup_rounds,
-    #**star_cup_rounds,
     **individual_stages,
     **progressive_stuff,
     **characters,

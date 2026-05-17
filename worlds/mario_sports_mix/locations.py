@@ -824,14 +824,20 @@ def create_events(world: "MSMWorld") -> None:
     #     menu = world.get_region("Main Menu")
     #     menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
     #                    item_type=items.MSMItem)
-
-        if (world.options.be_mean == BeMean.option_defeat_behemoth and
-                world.options.goal_condition == GoalCondition.option_defeat_behemoth_king):
-            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
-            behemoth_boss = world.get_region("Behemoth Boss Battle")
-            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
-        elif (world.options.be_mean == BeMean.option_defeat_behemoth_king and
-            world.options.goal_condition == GoalCondition.option_defeat_behemoth):
-            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
-            behemoth_king = world.get_region("Behemoth King Boss Battle")
-            behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
+    #
+    #     if world.options.be_mean == BeMean.option_defeat_behemoth:
+    #         behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+    #         behemoth_boss = world.get_region("Behemoth Boss Battle")
+    #         behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+    #     elif world.options.be_mean == BeMean.option_defeat_behemoth_king:
+    #         behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+    #         behemoth_king = world.get_region("Behemoth King Boss Battle")
+    #         behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
+    #     elif world.options.be_mean == BeMean.option_both:
+    #         behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+    #         behemoth_boss = world.get_region("Behemoth Boss Battle")
+    #         behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+    # 
+    #         behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+    #         behemoth_king = world.get_region("Behemoth King Boss Battle")
+    #         behemoth_king.add_locations(behemoth_king_locations, MSMLocation)

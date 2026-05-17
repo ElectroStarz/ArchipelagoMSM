@@ -71,7 +71,8 @@ class GoalCondition(Choice):
     default = 1
 
 class BeMean(Choice):
-    """Have locations behind bosses even if your goal isn't that boss!"""
+    """Have locations behind bosses even if your goal isn't that boss!
+Cannot be the same as the goal condition!"""
     display_name = "Be mean?"
     option_no = 0
     option_defeat_behemoth = 1
