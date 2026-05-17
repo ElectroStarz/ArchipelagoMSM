@@ -74,11 +74,9 @@ class MSMInterface:
         string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
         current_stage = string_stage[0:3]
         timer = self.dolphin_client.read_float(MatchAddresses.time_remaining)
-        shot_clock = self.dolphin_client.read_float(MatchAddresses.shot_clock)
+        on_loading_screen = self.dolphin_client.read_word(MatchAddresses.on_loading_screen)
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
-        ready_shot_clock = bool
-
 
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
@@ -87,20 +85,12 @@ class MSMInterface:
                 else:
                     ready_game = False
 
-                if shot_clock < 1440:
-                    ready_shot_clock = True
-                else:
-                    ready_shot_clock = False
             elif self.check_sport() == "Dodgeball":
                 if timer < 10800:
                     ready_game = True
                 else:
                     ready_game = False
 
-                if shot_clock < 1800:
-                    ready_shot_clock = True
-                else:
-                    ready_shot_clock = False
             elif self.check_sport() == "Volleyball":
                 if current_stage == "s20":
                     try:
@@ -121,19 +111,21 @@ class MSMInterface:
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
-
-                    ready_shot_clock = True
             elif self.check_sport() == "Hockey":
                 if timer < 10800:
                     ready_game = True
                 else:
                     ready_game = False
-                ready_shot_clock = True
         else:
             ready_game = False
-            ready_shot_clock = False
 
-        if ready_game:# and ready_shot_clock:
+        if on_loading_screen == 1:
+            loading_screen_active = False
+        else:
+            loading_screen_active = True
+
+
+        if ready_game and not loading_screen_active:
             return True
         else:
             return False

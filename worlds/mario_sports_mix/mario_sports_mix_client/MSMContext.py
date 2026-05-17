@@ -89,6 +89,14 @@ player_score_addresses = [
     PlayerAddresses.Score.score_period_5,
 ]
 
+opponent_score_addresses = [
+    OpponentAddresses.Score.score_period_1,
+    OpponentAddresses.Score.score_period_2,
+    OpponentAddresses.Score.score_period_3,
+    OpponentAddresses.Score.score_period_4,
+    OpponentAddresses.Score.score_period_5,
+]
+
 
 logger = logging.getLogger("Client")
 CONSUMABLE_STORAGE_CATEGORY = "mario_sports_mix_client"
@@ -299,6 +307,8 @@ class MSMContext(CommonContext):
         self.item_processed = False
         self.awaiting_use = False
         self.forced_item_id = None
+        self.last_match_score_total: Optional[int] = None
+        self.suppress_panel_until = 0.0
         self.boss_hp_handled = False
         self.boss_defeat_handled = False
         self.in_tournament_match = False
@@ -756,6 +766,7 @@ class MSMContext(CommonContext):
 
     # === Exhibition Unlocks ===
 
+
     async def handle_stage_unlocks(self, unlocked_stages):
         # Link variables to the address in the correct class
         # Basketball
@@ -854,22 +865,23 @@ class MSMContext(CommonContext):
 
 
     async def handle_unlocked_abilities(self):
-        await self.handle_special_meter_unlock(self.unlocked_abilities)
+        await self.handle_special_meter_unlock()
 
-    async def handle_special_meter_unlock(self, unlocked_abilities):
+    async def handle_special_meter_unlock(self):
         if self.game_interface.ready_to_handle():
+            try:
 
-            special_meter = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.special_meter,
+                special_meter = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.special_meter,
                                                                                 Offsets.Player.special_meter_offsets)
-            # If you don't have the special meter, if the value isn't 0, set it to 0
-            if "Ability: Special Meter" not in unlocked_abilities:
-                value = self.game_interface.dolphin_client.read_float(special_meter)
-                if value != 0.0:
-                    self.game_interface.dolphin_client.write_byte(special_meter, 0.0)
-                    debug_log("Changed Special Meter to 0.0")
-            elif "Ability: Special Meter" in unlocked_abilities:
-                pass
-
+                # If you don't have the special meter, if the value isn't 0, set it to 0
+                if "Ability: Special Meter" not in self.unlocked_abilities:
+                    value = self.game_interface.dolphin_client.read_float(special_meter)
+                    if value != 0.0:
+                        self.game_interface.dolphin_client.write_byte(special_meter, 0.0)
+                        debug_log("Changed Special Meter to 0.0")
+                elif "Ability: Special Meter" in self.unlocked_abilities:
+                    pass
+            finally: pass
 
     # === Filler + ?-Panel Handling ===
 
@@ -935,8 +947,6 @@ class MSMContext(CommonContext):
         try:
             # Extract the integer ID (e.g., 0, 1, 2...)
             item_id = item_map[filler]
-
-            # FIX: Make absolutely sure we save the INTEGER id, not the string name!
             self.forced_item_id = int(item_id)
 
             # Give the item
@@ -947,8 +957,8 @@ class MSMContext(CommonContext):
             debug_log(f"Wrote held item id {item_id} for {filler}")
 
         finally:
-            await asyncio.sleep(1)
             self.one_time_running = False
+            await asyncio.sleep(1)
 
     async def handle_replace_due_to_scoring(self):
         item_data = self.current_item_func()
@@ -964,16 +974,39 @@ class MSMContext(CommonContext):
             debug_log(f"Forced item back to {self.forced_item_id}")
             await asyncio.sleep(1)
 
+    def current_match_score_total(self):
+        player_score = sum(self.game_interface.dolphin_client.read_word(address) for address in player_score_addresses)
+        opponent_score = sum(self.game_interface.dolphin_client.read_word(address) for address in opponent_score_addresses)
+        return player_score + opponent_score
+
+    def update_scoring_item_suppression(self):
+        score_total = self.current_match_score_total()
+
+        if self.last_match_score_total is None:
+            self.last_match_score_total = score_total
+            return
+
+        if score_total != self.last_match_score_total:
+            self.last_match_score_total = score_total
+            self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
+            debug_log("Match score changed; suppressing ?-panel item replacement briefly")
+
     async def handle_question_mark_panel_items(self, unlocked_panel_items):
+        self.update_scoring_item_suppression()
         item_data = self.current_item_func()
         # If we don't have an item, pause.
         if item_data == -1:
             self.item_processed = False
             return
 
+        if asyncio.get_event_loop().time() < self.suppress_panel_until:
+            self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.minus_one)
+            debug_log("Ignored item-slot change caused by scoring")
+            return
+
         # If we are currently forcing an item from a scoring replacement
         # or a one-time item, DO NOT let the ?-panel code claim credit for it.
-        if self.awaiting_use and (item_data == self.forced_item_id or self.item_processed):
+        if self.awaiting_use or item_data == self.forced_item_id or self.item_processed:
             return
 
         # Standard pauses
