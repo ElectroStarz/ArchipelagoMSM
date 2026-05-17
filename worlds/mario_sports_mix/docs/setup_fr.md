@@ -16,10 +16,10 @@ partie lorsque j’en saurais plus.)
 
 ### Archipelago
 
-1) Téléchargez la version la plus récente d’Archipelago
-2) Téléchargez la version la plus récente de l’Apworld et glissez-la dans votre fichier “Custom_Worlds”. Une méthode
-plus simple consiste à utiliser la fonction “Install APworld” directement dans l’application, et sélectionnez le fichier
-installé.
+1) Téléchargez [la version la plus récente d’Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases)
+2) Téléchargez [la version la plus récente de l’Apworld](https://github.com/ElectroStarz/ArchipelagoMSM/releases) et
+glissez-la dans votre fichier “Custom_Worlds”. Une méthode plus simple consiste à utiliser la fonction “Install APworld”
+directement dans l’application, et sélectionnez le fichier installé.
 
 ### Dolphin 
 
@@ -40,7 +40,7 @@ précédemment installé avec l’APworld.
 ### Dolphin
 
 - <ins>**Sauvegardez bien vos données lorsque vous jouez!**</ins>
-- Assurez vous que vous avez bien mis en place les Gecko code, sans quoi, ça ne marchera pas.
+- **Assurez vous que vous avez bien mis en place les Gecko code, sans quoi, ça ne marchera pas.**
 - Quand vous jouez, n’utilisez que la sauvegarde 1 ! (Le support des autres fichiers de sauvegardes sera possiblement
 supporté plus tard.)
 

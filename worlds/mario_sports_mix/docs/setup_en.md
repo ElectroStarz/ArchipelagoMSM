@@ -15,8 +15,7 @@
 your custom_worlds folder, or click Install APWorld in the Archipelago Launcher.
 
 ### Dolphin
-1) Dump your PAL version of Mario Sports Mix - [Use this guide](https://wii.hacks.guide/dump-games) 
-(Requires a modded Wii/Wii U)
+1) Dump your PAL version of Mario Sports Mix
 2) Put the dump into a folder and set it as a game folder in Dolphin (Config → Paths)
 3) Click 'Config' and click 'Enable Cheats'
 4) Right click Mario Sports Mix and click 'Properties', then 'Gecko Codes' and click 'Add New Code...'. Name it 'AP
