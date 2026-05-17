@@ -1,4 +1,4 @@
-from .memory_addresses_pal import *
+from .memory_addresses import *
 import dolphin_memory_engine as dme
 
 

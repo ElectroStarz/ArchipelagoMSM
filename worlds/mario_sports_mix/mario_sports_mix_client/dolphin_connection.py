@@ -4,7 +4,6 @@ import sys
 import psutil
 import dolphin_memory_engine as dme
 import asyncio
-from .memory_loader import load_memory_module
 
 GAME_VERSION = None
 
@@ -53,7 +52,6 @@ class DolphinClient:
 
         if self.dme.is_hooked():
             self.logger.info("Hooked successfully!")
-            self.check_region()
             self.attempt = 1  # Reset counter on success
         else:
             dolphin_status = self.check_for_dolphin()
@@ -68,19 +66,7 @@ class DolphinClient:
             self.attempt += 1
             await asyncio.sleep(5)
 
-    def check_region(self):
-        self.dme.is_hooked()
-        global GAME_VERSION
-        byte = self.read_bytes(0x800000, 6)
-        decoded = byte.decode("utf-8")
 
-        if decoded == "RMKP01":
-            GAME_VERSION = "PAL"
-            self.logger.info("PAL Detected!")
-
-        elif decoded == "RMKE01":
-            GAME_VERSION = "NTSC-U"
-            self.logger.info("NTSC-U Detected!")
 
     def is_hooked_class(self):
         if self.dme.is_hooked():

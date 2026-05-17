@@ -5,14 +5,13 @@ import traceback
 from collections import deque
 from random import randint
 from typing import Dict, Set, Optional
-import importlib
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
 from NetUtils import ClientStatus
 from . import MSMFunctions
 from .MSMInterface import MSMInterface, ConnectionState
-from .memory_addresses_pal import *
+from .memory_addresses import *
 from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
 
