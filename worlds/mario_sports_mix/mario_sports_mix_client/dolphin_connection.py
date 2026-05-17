@@ -4,7 +4,9 @@ import sys
 import psutil
 import dolphin_memory_engine as dme
 import asyncio
+from .memory_loader import load_memory_module
 
+GAME_VERSION = None
 
 class DolphinException(Exception):
     pass
@@ -64,6 +66,20 @@ class DolphinClient:
 
             self.attempt += 1
             await asyncio.sleep(5)
+
+    def check_region(self):
+        global GAME_VERSION
+
+        byte = self.read_bytes(0x800000, 6)
+        decoded = byte.decode("utf-8")
+
+        if decoded == "RMKP01":
+            GAME_VERSION = "PAL"
+
+        elif decoded == "RMKE01":
+            GAME_VERSION = "NTSC-U"
+
+        load_memory_module()
 
 
     def is_hooked_class(self):

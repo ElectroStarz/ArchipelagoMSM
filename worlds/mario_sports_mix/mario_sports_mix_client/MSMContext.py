@@ -4,13 +4,17 @@ import random
 import traceback
 from collections import deque
 from random import randint
-from typing import Dict, Set
+from typing import Dict, Set, Optional
+from .memory_loader import load_memory_module
+
+load_memory_module()
+
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
 from NetUtils import ClientStatus
 from . import MSMFunctions
-from .MSMInterface import *
+from .MSMInterface import MSMInterface, ConnectionState
 from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
 
