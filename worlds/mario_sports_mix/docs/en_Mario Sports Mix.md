@@ -28,41 +28,41 @@ beating each Sports Mix cup.
 
 ## What items can appear in other worlds?
 Positive items include:
-* Each sport (Basketball, Volleyball, Dodgeball, Hockey) - There is a setting allowing you to start with them
+- Each sport (Basketball, Volleyball, Dodgeball, Hockey) - There is a setting allowing you to start with them
 (Currently this setting is needed otherwise things won't work :/ )
-* Each cup for each sport
-* Each stage
-* Characters
-* Special Meter
-* ? Panel items
+- Each cup for each sport
+- Each stage
+- Characters
+- Special Meter
+- ? Panel items
 
 Negative items include:
-* Negative coin
-* Freeze Characters
-* Half your time!
+- Negative coin
+- Freeze Characters
+- Half your time!
 
 ## What isn't included yet?
-* Alternate Paths
-* Scoresanity
-* Stagesanity
-* Teamsanity
-* Party Mode
+- Alternate Paths
+- Scoresanity
+- Stagesanity
+- Teamsanity
+- Party Mode
 
 
 ## Help with hints
 Hinting items can be confusing, especially if you don't know what to look for, so every item has a tag before it!
 Here's the list and some examples:
-* Sport: Sports Mix
-* Basketball: Mushroom Cup (Hard)
-* Dodgeball: Flower Cup (Normal)
-* Volleyball: Star Cup (Normal)
-* Hockey: Star Cup (Hard)
-* Sports Mix: Star Cup
-* Sports Crystal: Red
-* Stage: Star Ship | Stage: Behemoth Stage
-* Character: Luigi
-* Costume: Tennis-wear Peach
-* ? Panel: Green Shell
+- Sport: Sports Mix
+- Basketball: Mushroom Cup (Hard)
+- Dodgeball: Flower Cup (Normal)
+- Volleyball: Star Cup (Normal)
+- Hockey: Star Cup (Hard)
+- Sports Mix: Star Cup
+- Sports Crystal: Red
+- Stage: Star Ship | Stage: Behemoth Stage
+- Character: Luigi
+- Costume: Tennis-wear Peach
+- ? Panel: Green Shell
 
 ## Have any ideas?
 Please tell me in the [Mario Sports Mix Thread](https://discord.com/channels/731205301247803413/1485699253450833942)
