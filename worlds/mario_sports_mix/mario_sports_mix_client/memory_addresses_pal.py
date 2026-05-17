@@ -1,3 +1,6 @@
+from .dolphin_connection import GAME_VERSION
+
+
 class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
@@ -8,8 +11,6 @@ class MatchAddresses:
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
     exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
-
-    dodgeball_sets = 0x804D99A7
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
@@ -38,7 +39,6 @@ class CupsWonMultiple:
         mushroom_cup = 0x90229A7C
         flower_cup = 0x90229A7E
         star_cup = 0x90229A80
-
 
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
