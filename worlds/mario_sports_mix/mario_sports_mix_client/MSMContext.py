@@ -4,15 +4,18 @@ import random
 import traceback
 from collections import deque
 from random import randint
-from typing import Dict, Set
+from typing import Dict, Set, Optional
+import importlib
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
 from NetUtils import ClientStatus
 from . import MSMFunctions
-from .MSMInterface import *
+from .MSMInterface import MSMInterface, ConnectionState
+from .memory_addresses_pal import *
 from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
+
 
 id_to_name = {data.code: name for name, data in item_table.items()}
 CLIENT_VERSION = "0.0.1"
@@ -876,9 +879,9 @@ class MSMContext(CommonContext):
                 # If you don't have the special meter, if the value isn't 0, set it to 0
                 if "Ability: Special Meter" not in self.unlocked_abilities:
                     value = self.game_interface.dolphin_client.read_float(special_meter)
-                    if value != 0.0:
-                        self.game_interface.dolphin_client.write_byte(special_meter, 0.0)
-                        debug_log("Changed Special Meter to 0.0")
+                    if value != 0:
+                        self.game_interface.dolphin_client.write_byte(special_meter, 0)
+                        debug_log("Changed Special Meter to 0")
                 elif "Ability: Special Meter" in self.unlocked_abilities:
                     pass
             finally: pass
@@ -1534,8 +1537,8 @@ class MSMContext(CommonContext):
                                                                            Offsets.Player.special_meter_offsets)
         value = self.game_interface.dolphin_client.read_float(special_meter)
 
-        if value != 0.0:
-            self.game_interface.dolphin_client.write_float(special_meter, 0.0)
+        if value != 0:
+            self.game_interface.dolphin_client.write_float(special_meter, 0)
 
 
     # === Misc stuff idk where to put ===

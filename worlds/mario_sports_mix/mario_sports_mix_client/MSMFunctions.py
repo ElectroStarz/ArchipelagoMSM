@@ -1,12 +1,7 @@
-from .memory_addresses import *
+from .memory_addresses_pal import *
 import dolphin_memory_engine as dme
 
-sports_addresses = [
-    BasketballAddresses,
-    DodgeballAddresses,
-    VolleyballAddresses,
-    HockeyAddresses,
-]
+
 
 cups_difficulty = ["normal_cups", "hard_cups"]
 
@@ -19,27 +14,27 @@ characters = [
 
 def unlock_tabs():
     # Tournament
-    for sport in sports_addresses:
+    for sport in [BasketballAddresses, DodgeballAddresses, VolleyballAddresses, HockeyAddresses]:
         dme.write_byte(sport.Tournament.tabs, 3)
 
     # Exhibition
-    for sport in sports_addresses:
+    for sport in [BasketballAddresses, DodgeballAddresses, VolleyballAddresses, HockeyAddresses]:
         dme.write_byte(sport.Exhibition.tabs, 15)
 
 def lock_all_cups():
-    for sport in sports_addresses:
+    for sport in [BasketballAddresses, DodgeballAddresses, VolleyballAddresses, HockeyAddresses]:
         for diff in cups_difficulty:
             addr = getattr(sport.Tournament, diff)
             dme.write_byte(addr, 8)
 
 def lock_all_stages():
-    for sport in sports_addresses:
+    for sport in [BasketballAddresses, DodgeballAddresses, VolleyballAddresses, HockeyAddresses]:
         for cup in cups:
             addr = getattr(sport.Exhibition, cup)
             dme.write_byte(addr, 8)
 
 def lock_all_characters():
-    for sport in sports_addresses:
+    for sport in [BasketballAddresses, DodgeballAddresses, VolleyballAddresses, HockeyAddresses]:
         for char in characters:
             addr = getattr(sport.Characters, char)
             dme.write_byte(addr, 0)

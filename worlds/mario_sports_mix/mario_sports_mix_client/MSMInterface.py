@@ -1,6 +1,6 @@
 from enum import Enum
 from .dolphin_connection import *
-from .memory_addresses import *
+from .memory_addresses_pal import *
 from typing import Optional
 
 

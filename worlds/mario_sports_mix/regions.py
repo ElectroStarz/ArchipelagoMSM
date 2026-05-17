@@ -1,10 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from BaseClasses import Region
-from .options import GoalCondition
 
 if TYPE_CHECKING:
-    from . import MSMWorld
+    from . import MSMWorld, HardTournamentDifficulty
 
 
 def create_and_connect_regions(world: "MSMWorld") -> None:
@@ -42,75 +41,74 @@ def create_all_regions(world: "MSMWorld") -> None:
     #     regions.append(party_mode)
 
     # Regions based on options
-    if "Normal" in world.options.tournament_difficulty:
-        # Basketball
-        b_mushroom_cup_n = Region("Basketball: Mushroom Cup (Normal)", world.player, world.multiworld)
-        b_flower_cup_n = Region("Basketball: Flower Cup (Normal)", world.player, world.multiworld)
-        b_star_cup_n = Region("Basketball: Star Cup (Normal)", world.player, world.multiworld)
-        # Dodgeball
-        d_mushroom_cup_n = Region("Dodgeball: Mushroom Cup (Normal)", world.player, world.multiworld)
-        d_flower_cup_n = Region("Dodgeball: Flower Cup (Normal)", world.player, world.multiworld)
-        d_star_cup_n = Region("Dodgeball: Star Cup (Normal)", world.player, world.multiworld)
-        # Volleyball
-        v_mushroom_cup_n = Region("Volleyball: Mushroom Cup (Normal)", world.player, world.multiworld)
-        v_flower_cup_n = Region("Volleyball: Flower Cup (Normal)", world.player, world.multiworld)
-        v_star_cup_n = Region("Volleyball: Star Cup (Normal)", world.player, world.multiworld)
-        # Hockey
-        h_mushroom_cup_n = Region("Hockey: Mushroom Cup (Normal)", world.player, world.multiworld)
-        h_flower_cup_n = Region("Hockey: Flower Cup (Normal)", world.player, world.multiworld)
-        h_star_cup_n = Region("Hockey: Star Cup (Normal)", world.player, world.multiworld)
-        # Append to regions list
-        # Basketball
-        regions.append(b_mushroom_cup_n)
-        regions.append(b_flower_cup_n)
-        regions.append(b_star_cup_n)
-        # Dodgeball
-        regions.append(d_mushroom_cup_n)
-        regions.append(d_flower_cup_n)
-        regions.append(d_star_cup_n)
-        # Volleyball
-        regions.append(v_mushroom_cup_n)
-        regions.append(v_flower_cup_n)
-        regions.append(v_star_cup_n)
-        # Hockey
-        regions.append(h_mushroom_cup_n)
-        regions.append(h_flower_cup_n)
-        regions.append(h_star_cup_n)
+    # Basketball
+    b_mushroom_cup_n = Region("Basketball: Mushroom Cup (Normal)", world.player, world.multiworld)
+    b_flower_cup_n = Region("Basketball: Flower Cup (Normal)", world.player, world.multiworld)
+    b_star_cup_n = Region("Basketball: Star Cup (Normal)", world.player, world.multiworld)
+    # Dodgeball
+    d_mushroom_cup_n = Region("Dodgeball: Mushroom Cup (Normal)", world.player, world.multiworld)
+    d_flower_cup_n = Region("Dodgeball: Flower Cup (Normal)", world.player, world.multiworld)
+    d_star_cup_n = Region("Dodgeball: Star Cup (Normal)", world.player, world.multiworld)
+    # Volleyball
+    v_mushroom_cup_n = Region("Volleyball: Mushroom Cup (Normal)", world.player, world.multiworld)
+    v_flower_cup_n = Region("Volleyball: Flower Cup (Normal)", world.player, world.multiworld)
+    v_star_cup_n = Region("Volleyball: Star Cup (Normal)", world.player, world.multiworld)
+    # Hockey
+    h_mushroom_cup_n = Region("Hockey: Mushroom Cup (Normal)", world.player, world.multiworld)
+    h_flower_cup_n = Region("Hockey: Flower Cup (Normal)", world.player, world.multiworld)
+    h_star_cup_n = Region("Hockey: Star Cup (Normal)", world.player, world.multiworld)
+    # Append to regions list
+    # Basketball
+    regions.append(b_mushroom_cup_n)
+    regions.append(b_flower_cup_n)
+    regions.append(b_star_cup_n)
+    # Dodgeball
+    regions.append(d_mushroom_cup_n)
+    regions.append(d_flower_cup_n)
+    regions.append(d_star_cup_n)
+    # Volleyball
+    regions.append(v_mushroom_cup_n)
+    regions.append(v_flower_cup_n)
+    regions.append(v_star_cup_n)
+    # Hockey
+    regions.append(h_mushroom_cup_n)
+    regions.append(h_flower_cup_n)
+    regions.append(h_star_cup_n)
 
-    if "Hard" in world.options.tournament_difficulty:
-        # Basketball
-        b_mushroom_cup_h = Region("Basketball: Mushroom Cup (Hard)", world.player, world.multiworld)
-        b_flower_cup_h = Region("Basketball: Flower Cup (Hard)", world.player, world.multiworld)
-        b_star_cup_h = Region("Basketball: Star Cup (Hard)", world.player, world.multiworld)
-        # Dodgeball
-        d_mushroom_cup_h = Region("Dodgeball: Mushroom Cup (Hard)", world.player, world.multiworld)
-        d_flower_cup_h = Region("Dodgeball: Flower Cup (Hard)", world.player, world.multiworld)
-        d_star_cup_h = Region("Dodgeball: Star Cup (Hard)", world.player, world.multiworld)
-        # Volleyball
-        v_mushroom_cup_h = Region("Volleyball: Mushroom Cup (Hard)", world.player, world.multiworld)
-        v_flower_cup_h = Region("Volleyball: Flower Cup (Hard)", world.player, world.multiworld)
-        v_star_cup_h = Region("Volleyball: Star Cup (Hard)", world.player, world.multiworld)
-        # Hockey
-        h_mushroom_cup_h = Region("Hockey: Mushroom Cup (Hard)", world.player, world.multiworld)
-        h_flower_cup_h = Region("Hockey: Flower Cup (Hard)", world.player, world.multiworld)
-        h_star_cup_h = Region("Hockey: Star Cup (Hard)", world.player, world.multiworld)
-        # Append to regions list
-        # Basketball
-        regions.append(b_mushroom_cup_h)
-        regions.append(b_flower_cup_h)
-        regions.append(b_star_cup_h)
-        # Dodgeball
-        regions.append(d_mushroom_cup_h)
-        regions.append(d_flower_cup_h)
-        regions.append(d_star_cup_h)
-        # Volleyball
-        regions.append(v_mushroom_cup_h)
-        regions.append(v_flower_cup_h)
-        regions.append(v_star_cup_h)
-        # Hockey
-        regions.append(h_mushroom_cup_h)
-        regions.append(h_flower_cup_h)
-        regions.append(h_star_cup_h)
+
+    # Basketball
+    b_mushroom_cup_h = Region("Basketball: Mushroom Cup (Hard)", world.player, world.multiworld)
+    b_flower_cup_h = Region("Basketball: Flower Cup (Hard)", world.player, world.multiworld)
+    b_star_cup_h = Region("Basketball: Star Cup (Hard)", world.player, world.multiworld)
+    # Dodgeball
+    d_mushroom_cup_h = Region("Dodgeball: Mushroom Cup (Hard)", world.player, world.multiworld)
+    d_flower_cup_h = Region("Dodgeball: Flower Cup (Hard)", world.player, world.multiworld)
+    d_star_cup_h = Region("Dodgeball: Star Cup (Hard)", world.player, world.multiworld)
+    # Volleyball
+    v_mushroom_cup_h = Region("Volleyball: Mushroom Cup (Hard)", world.player, world.multiworld)
+    v_flower_cup_h = Region("Volleyball: Flower Cup (Hard)", world.player, world.multiworld)
+    v_star_cup_h = Region("Volleyball: Star Cup (Hard)", world.player, world.multiworld)
+    # Hockey
+    h_mushroom_cup_h = Region("Hockey: Mushroom Cup (Hard)", world.player, world.multiworld)
+    h_flower_cup_h = Region("Hockey: Flower Cup (Hard)", world.player, world.multiworld)
+    h_star_cup_h = Region("Hockey: Star Cup (Hard)", world.player, world.multiworld)
+    # Append to regions list
+    # Basketball
+    regions.append(b_mushroom_cup_h)
+    regions.append(b_flower_cup_h)
+    regions.append(b_star_cup_h)
+    # Dodgeball
+    regions.append(d_mushroom_cup_h)
+    regions.append(d_flower_cup_h)
+    regions.append(d_star_cup_h)
+    # Volleyball
+    regions.append(v_mushroom_cup_h)
+    regions.append(v_flower_cup_h)
+    regions.append(v_star_cup_h)
+    # Hockey
+    regions.append(h_mushroom_cup_h)
+    regions.append(h_flower_cup_h)
+    regions.append(h_star_cup_h)
 
     # if "Feed Petey" in world.options.party_mode:
     #     feed_petey = Region("Party Mode: Feed Petey", world.player, world.multiworld)
@@ -127,14 +125,10 @@ def create_all_regions(world: "MSMWorld") -> None:
 
 
     # Boss stuff
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-        behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
-        regions.append(behemoth_boss)
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-        behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
-        behemoth_king_boss = Region("Behemoth King Boss Battle", world.player, world.multiworld)
-        regions.append(behemoth_boss)
-        regions.append(behemoth_king_boss)
+    behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
+    behemoth_king_boss = Region("Behemoth King Boss Battle", world.player, world.multiworld)
+    regions.append(behemoth_boss)
+    regions.append(behemoth_king_boss)
     # Add regions to AP multiworld so it knows it exists
     world.multiworld.regions += regions
 

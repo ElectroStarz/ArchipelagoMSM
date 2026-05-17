@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Location
 from . import items
-from .options import GoalCondition, BeMean
+from .options import GoalCondition, BeMean, HardTournamentDifficulty
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -456,57 +456,56 @@ def create_regular_locations(world: MSMWorld) -> None:
     # === Exhibition Locations for each difficulty ===
 
     # Normal Difficulty
-    if "Normal" in world.options.tournament_difficulty:
-        # Basketball
-        b_mushroom_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Mushroom Cup Round 1",
+    # Basketball
+    b_mushroom_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Mushroom Cup Round 1",
     "Basketball: Beat Normal Mushroom Cup Round 2", "Basketball: Beat Normal Mushroom Cup Round 3"])
-        b_flower_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Flower Cup Round 1",
+    b_flower_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Flower Cup Round 1",
     "Basketball: Beat Normal Flower Cup Round 2", "Basketball: Beat Normal Flower Cup Round 3"])
-        b_star_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Star Cup Round 1",
+    b_star_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Star Cup Round 1",
     "Basketball: Beat Normal Star Cup Round 2", "Basketball: Beat Normal Star Cup Round 3"])
 
-        b_mushroom_cup_n.add_locations(b_mushroom_n_locations, MSMLocation)
-        b_flower_cup_n.add_locations(b_flower_n_locations, MSMLocation)
-        b_star_cup_n.add_locations(b_star_n_locations, MSMLocation)
+    b_mushroom_cup_n.add_locations(b_mushroom_n_locations, MSMLocation)
+    b_flower_cup_n.add_locations(b_flower_n_locations, MSMLocation)
+    b_star_cup_n.add_locations(b_star_n_locations, MSMLocation)
 
-        # Dodgeball
-        d_mushroom_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Mushroom Cup Round 1",
+    # Dodgeball
+    d_mushroom_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Mushroom Cup Round 1",
     "Dodgeball: Beat Normal Mushroom Cup Round 2", "Dodgeball: Beat Normal Mushroom Cup Round 3"])
-        d_flower_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Flower Cup Round 1",
+    d_flower_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Flower Cup Round 1",
     "Dodgeball: Beat Normal Flower Cup Round 2", "Dodgeball: Beat Normal Flower Cup Round 3"])
-        d_star_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Star Cup Round 1",
+    d_star_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Star Cup Round 1",
     "Dodgeball: Beat Normal Star Cup Round 2", "Dodgeball: Beat Normal Star Cup Round 3"])
 
-        d_mushroom_cup_n.add_locations(d_mushroom_n_locations, MSMLocation)
-        d_flower_cup_n.add_locations(d_flower_n_locations, MSMLocation)
-        d_star_cup_n.add_locations(d_star_n_locations, MSMLocation)
+    d_mushroom_cup_n.add_locations(d_mushroom_n_locations, MSMLocation)
+    d_flower_cup_n.add_locations(d_flower_n_locations, MSMLocation)
+    d_star_cup_n.add_locations(d_star_n_locations, MSMLocation)
 
-        # Volleyball
-        v_mushroom_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Mushroom Cup Round 1",
+    # Volleyball
+    v_mushroom_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Mushroom Cup Round 1",
     "Volleyball: Beat Normal Mushroom Cup Round 2", "Volleyball: Beat Normal Mushroom Cup Round 3"])
-        v_flower_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Flower Cup Round 1",
+    v_flower_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Flower Cup Round 1",
     "Volleyball: Beat Normal Flower Cup Round 2", "Volleyball: Beat Normal Flower Cup Round 3"])
-        v_star_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Star Cup Round 1",
+    v_star_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Star Cup Round 1",
     "Volleyball: Beat Normal Star Cup Round 2", "Volleyball: Beat Normal Star Cup Round 3"])
 
-        v_mushroom_cup_n.add_locations(v_mushroom_n_locations, MSMLocation)
-        v_flower_cup_n.add_locations(v_flower_n_locations, MSMLocation)
-        v_star_cup_n.add_locations(v_star_n_locations, MSMLocation)
+    v_mushroom_cup_n.add_locations(v_mushroom_n_locations, MSMLocation)
+    v_flower_cup_n.add_locations(v_flower_n_locations, MSMLocation)
+    v_star_cup_n.add_locations(v_star_n_locations, MSMLocation)
 
-        # Hockey
-        h_mushroom_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Mushroom Cup Round 1",
+    # Hockey
+    h_mushroom_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Mushroom Cup Round 1",
     "Hockey: Beat Normal Mushroom Cup Round 2", "Hockey: Beat Normal Mushroom Cup Round 3"])
-        h_flower_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Flower Cup Round 1",
+    h_flower_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Flower Cup Round 1",
     "Hockey: Beat Normal Flower Cup Round 2", "Hockey: Beat Normal Flower Cup Round 3"])
-        h_star_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Star Cup Round 1",
+    h_star_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Star Cup Round 1",
     "Hockey: Beat Normal Star Cup Round 2", "Hockey: Beat Normal Star Cup Round 3"])
 
-        h_mushroom_cup_n.add_locations(h_mushroom_n_locations, MSMLocation)
-        h_flower_cup_n.add_locations(h_flower_n_locations, MSMLocation)
-        h_star_cup_n.add_locations(h_star_n_locations, MSMLocation)
+    h_mushroom_cup_n.add_locations(h_mushroom_n_locations, MSMLocation)
+    h_flower_cup_n.add_locations(h_flower_n_locations, MSMLocation)
+    h_star_cup_n.add_locations(h_star_n_locations, MSMLocation)
 
     # Hard Difficulty
-    if "Hard" in world.options.tournament_difficulty:
+    if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
         # Basketball
         b_mushroom_h_locations = get_location_names_with_ids(["Basketball: Beat Hard Mushroom Cup Round 1",
     "Basketball: Beat Hard Mushroom Cup Round 2", "Basketball: Beat Hard Mushroom Cup Round 3"])
