@@ -8,9 +8,6 @@
 - [L’émulateur Dolphin](https://dolphin-emu.org/download/?ref=btn)
 - Votre rom légal de Mario Sports Mix Européenne. (La version US sera supporté plus tard dans le développement, la version
 JPN possiblement.)
-
-(Note du traducteur : je ne sais pas s'il est possible de jouer en français, j’essayerais et je remettrai à jour cette
-partie lorsque j’en saurais plus.)
  
 ## Installation
 
