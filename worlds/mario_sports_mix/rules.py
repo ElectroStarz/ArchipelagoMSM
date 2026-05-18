@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from rule_builder.rules import Has, HasAll, HasAny, CanReachLocation
-from .options import GoalCondition, BeMean
+from .options import GoalCondition, BeMean, HardTournamentDifficulty
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -121,7 +121,13 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
     # Tournament cup rules
     # Each round progressively requires more stages
-    for difficulty in world.options.tournament_difficulty:
+    cup_difficulties = ["Normal"]
+
+    if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+        cup_difficulties.append("Hard")
+
+
+    for difficulty in cup_difficulties:
         if difficulty not in TOURNAMENT_DIFFICULTIES:
             continue
 

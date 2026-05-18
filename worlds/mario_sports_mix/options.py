@@ -38,13 +38,9 @@ that difficulty
     valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
 
-class TournamentDifficulty(OptionSet):
-    """What tournament difficulty would you like to include? If a difficulty is off, you will not receive the item for
-that difficulty.
-    (Normal, Hard)"""
-    display_name = "Tournament Difficulty"
-    valid_keys = {"Normal", "Hard"}
-    default = {"Normal", "Hard"}
+class HardTournamentDifficulty(DefaultOnToggle):
+    """Would you like to include location checks for Hard Tournaments?"""
+    display_name = "Include Hard Tournaments"
 
 class PartyMode(OptionSet):
     """What party mode games do you want to include?
@@ -150,7 +146,7 @@ msm_option_groups = [
         StartWithMushroomCup,
         StartWithCharacters,
         ExhibitionDifficulty,
-        TournamentDifficulty,
+        HardTournamentDifficulty,
         SportsMixUnlock,
         TrapChance,
     ]),
@@ -176,7 +172,7 @@ class MSMOptions(PerGameCommonOptions):
     start_with_mushroom_cup: StartWithMushroomCup
     start_with_characters: StartWithCharacters
     exhibition_difficulty: ExhibitionDifficulty
-    tournament_difficulty: TournamentDifficulty
+    hard_tournament_difficulty: HardTournamentDifficulty
     party_mode: PartyMode
     sports_mix_unlock: SportsMixUnlock
     goal_condition: GoalCondition

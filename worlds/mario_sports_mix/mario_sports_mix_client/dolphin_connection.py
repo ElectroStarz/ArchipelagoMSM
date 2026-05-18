@@ -90,6 +90,7 @@ class DolphinClient:
         return True
 
 
+
     def is_hooked_class(self):
         if self.dme.is_hooked():
             return True

@@ -282,7 +282,6 @@ def create_all_items(world: "MSMWorld") -> None:
             if name != character_1 or name != character_2 or name != character_3:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-
     else:
         for name, data in characters.items():
             new_item = world.create_item(name)
@@ -357,33 +356,46 @@ def create_all_items(world: "MSMWorld") -> None:
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in basketball_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+
         # Dodgeball
         for name, data in dodgeball_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in dodgeball_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+
         # Volleyball
         for name, data in volleyball_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in volleyball_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+
         # Hockey
         for name, data in hockey_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in hockey_items_h.items():
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+
+
+        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+            # Basketball Hard items
+            for name, data in basketball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+
+            # Dodgeball Hard items
+            for name, data in dodgeball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+
+            # Volleyball Hard items
+            for name, data in volleyball_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+
+            # Hockey Hard items
+            for name, data in hockey_items_h.items():
+                new_item = world.create_item(name)
+                itempool.append(new_item)
 
 
         # Create items for actual stages
@@ -412,34 +424,44 @@ def create_all_items(world: "MSMWorld") -> None:
         for name, data in basketball_items_n.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in basketball_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
         # Dodgeball
         for name, data in dodgeball_items_n.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in dodgeball_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
         # Volleyball
         for name, data in volleyball_items_n.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in volleyball_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
         # Hockey
         for name, data in hockey_items_n.items():
             new_item = world.create_item(name)
             itempool.append(new_item)
-        for name, data in hockey_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
+
+        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+            # Basketball Hard items
+            for name, data in basketball_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+            # Dodgeball Hard items
+            for name, data in dodgeball_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+            # Volleyball Hard items
+            for name, data in volleyball_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+            # Hockey Hard items
+            for name, data in hockey_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
 
         # Create items for actual stages
         other_stages = ["Stage: Luigi's Mansion", "Stage: Daisy Garden", "Stage: Wario Factory",
@@ -487,37 +509,46 @@ def create_all_items(world: "MSMWorld") -> None:
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in basketball_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
         # Dodgeball
         for name, data in dodgeball_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in dodgeball_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
         # Volleyball
         for name, data in volleyball_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in volleyball_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
         # Hockey
         for name, data in hockey_items_n.items():
             if name not in norm_mush_items:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
-        for name, data in hockey_items_h.items():
-            if name not in hard_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+
+        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+            # Basketball Hard items
+            for name, data in basketball_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+            # Dodgeball Hard items
+            for name, data in dodgeball_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+            # Volleyball Hard items
+            for name, data in volleyball_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+            # Hockey Hard items
+            for name, data in hockey_items_h.items():
+                if name not in hard_mush_items:
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
 
         else:
             # Basketball
@@ -537,22 +568,23 @@ def create_all_items(world: "MSMWorld") -> None:
                 new_item = world.create_item(name)
                 itempool.append(new_item)
 
-            # Basketball
-            for name, data in basketball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-            # Dodgeball
-            for name, data in dodgeball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-            # Volleyball
-            for name, data in volleyball_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-            # Hockey
-            for name, data in hockey_items_h.items():
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+            if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+                # Basketball Hard items
+                for name, data in basketball_items_h.items():
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+                # Dodgeball Hard items
+                for name, data in dodgeball_items_h.items():
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+                # Volleyball Hard items
+                for name, data in volleyball_items_h.items():
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
+                # Hockey Hard items
+                for name, data in hockey_items_h.items():
+                    new_item = world.create_item(name)
+                    itempool.append(new_item)
 
             # Stages
             for name, data in individual_stages.items():
