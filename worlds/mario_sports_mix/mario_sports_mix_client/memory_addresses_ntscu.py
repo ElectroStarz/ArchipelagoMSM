@@ -81,6 +81,15 @@ class OpponentAddresses:
         score_period_5 = 0x804D6EBC
         cups = 0x90226D9C
 
+
+class SportsMixAddresses:
+    is_sports_mix = 0x804D6993
+    sports_mix_unlocked = 0x90226D98
+
+    class Tournament:
+        cups = 0x90226D9C
+
+
 class Offsets:
     class Player:
         special_meter_offsets = [0x10, 0x10C]

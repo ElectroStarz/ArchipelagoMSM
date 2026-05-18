@@ -1,6 +1,3 @@
-from .dolphin_connection import GAME_VERSION
-
-
 class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte

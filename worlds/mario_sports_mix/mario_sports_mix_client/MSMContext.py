@@ -5,9 +5,7 @@ import traceback
 from collections import deque
 from random import randint
 from typing import Dict, Set, Optional
-from .memory_loader import load_memory_module
-
-load_memory_module()
+from . import memory_loader as ml
 
 
 import Utils
@@ -85,21 +83,24 @@ tournament_map_cups = {
     "s33": "Star Cup",
 }
 
-player_score_addresses = [
-    PlayerAddresses.Score.score_period_1,
-    PlayerAddresses.Score.score_period_2,
-    PlayerAddresses.Score.score_period_3,
-    PlayerAddresses.Score.score_period_4,
-    PlayerAddresses.Score.score_period_5,
-]
+def player_score_addresses():
+    return [
+        ml.PlayerAddresses.Score.score_period_1,
+        ml.PlayerAddresses.Score.score_period_2,
+        ml.PlayerAddresses.Score.score_period_3,
+        ml.PlayerAddresses.Score.score_period_4,
+        ml.PlayerAddresses.Score.score_period_5,
+    ]
 
-opponent_score_addresses = [
-    OpponentAddresses.Score.score_period_1,
-    OpponentAddresses.Score.score_period_2,
-    OpponentAddresses.Score.score_period_3,
-    OpponentAddresses.Score.score_period_4,
-    OpponentAddresses.Score.score_period_5,
-]
+
+def opponent_score_addresses():
+    return [
+        ml.OpponentAddresses.Score.score_period_1,
+        ml.OpponentAddresses.Score.score_period_2,
+        ml.OpponentAddresses.Score.score_period_3,
+        ml.OpponentAddresses.Score.score_period_4,
+        ml.OpponentAddresses.Score.score_period_5,
+    ]
 
 
 logger = logging.getLogger("Client")
@@ -110,6 +111,7 @@ last_debug_message = None
 
 def debug_log(message: str) -> None:
     global last_debug_message
+
     if DEBUGGING:
         if message != last_debug_message:
             last_debug_message = message
@@ -363,7 +365,7 @@ class MSMContext(CommonContext):
                     f"VERSION MISMATCH DETECTED!\n"
                     f"Your Client version: {CLIENT_VERSION}\n"
                     f"Seed was generated on version: {generation_version}\n"
-                    f"Please update your client or regenerate the seed as things may break!\n"
+                    f"Please update your client, downgrade, or regenerate the seed as things may break!\n"
                     f"========================================="
                 )
             else:
@@ -479,7 +481,7 @@ class MSMContext(CommonContext):
             debug_log("Handled consumable in memory only; storage key is not ready")
 
     def current_item_func(self):
-        current_item = self.game_interface.dolphin_client.read_byte(PlayerAddresses.item_held)
+        current_item = self.game_interface.dolphin_client.read_byte(ml.PlayerAddresses.item_held)
         if current_item == self.minus_one:
             result = -1 #"No Item"
         elif current_item == 0:
@@ -593,10 +595,10 @@ class MSMContext(CommonContext):
 
 
             sports_classes = [
-                BasketballAddresses,
-                DodgeballAddresses,
-                VolleyballAddresses,
-                HockeyAddresses
+                ml.BasketballAddresses,
+                ml.DodgeballAddresses,
+                ml.VolleyballAddresses,
+                ml.HockeyAddresses
             ]
 
             for sport in sports_classes:
@@ -704,23 +706,23 @@ class MSMContext(CommonContext):
 
     async def handle_cup_unlocks(self, unlocked_cups):
         # Basketball
-        b_normal = BasketballAddresses.Tournament.normal_cups
-        b_hard = BasketballAddresses.Tournament.hard_cups
+        b_normal = ml.BasketballAddresses.Tournament.normal_cups
+        b_hard = ml.BasketballAddresses.Tournament.hard_cups
 
         # Dodgeball
-        d_normal = DodgeballAddresses.Tournament.normal_cups
-        d_hard = DodgeballAddresses.Tournament.hard_cups
+        d_normal = ml.DodgeballAddresses.Tournament.normal_cups
+        d_hard = ml.DodgeballAddresses.Tournament.hard_cups
 
         # Volleyball
-        v_normal = VolleyballAddresses.Tournament.normal_cups
-        v_hard = VolleyballAddresses.Tournament.hard_cups
+        v_normal = ml.VolleyballAddresses.Tournament.normal_cups
+        v_hard = ml.VolleyballAddresses.Tournament.hard_cups
 
         # Hockey
-        h_normal = HockeyAddresses.Tournament.normal_cups
-        h_hard = HockeyAddresses.Tournament.hard_cups
+        h_normal = ml.HockeyAddresses.Tournament.normal_cups
+        h_hard = ml.HockeyAddresses.Tournament.hard_cups
 
         # Sports Mix
-        sports_mix = SportsMixAddresses.Tournament.cups
+        sports_mix = ml.SportsMixAddresses.Tournament.cups
 
         cup_mapping = {
             # Basketball
@@ -774,28 +776,28 @@ class MSMContext(CommonContext):
     async def handle_stage_unlocks(self, unlocked_stages):
         # Link variables to the address in the correct class
         # Basketball
-        b_mushroom = BasketballAddresses.Exhibition.mushroom_cup
-        b_flower = BasketballAddresses.Exhibition.flower_cup
-        b_star = BasketballAddresses.Exhibition.star_cup
-        b_block = BasketballAddresses.Exhibition.question_mark_cup
+        b_mushroom = ml.BasketballAddresses.Exhibition.mushroom_cup
+        b_flower = ml.BasketballAddresses.Exhibition.flower_cup
+        b_star = ml.BasketballAddresses.Exhibition.star_cup
+        b_block = ml.BasketballAddresses.Exhibition.question_mark_cup
 
         # Volleyball
-        v_mushroom = VolleyballAddresses.Exhibition.mushroom_cup
-        v_flower = VolleyballAddresses.Exhibition.flower_cup
-        v_star = VolleyballAddresses.Exhibition.star_cup
-        v_block = VolleyballAddresses.Exhibition.question_mark_cup
+        v_mushroom = ml.VolleyballAddresses.Exhibition.mushroom_cup
+        v_flower = ml.VolleyballAddresses.Exhibition.flower_cup
+        v_star = ml.VolleyballAddresses.Exhibition.star_cup
+        v_block = ml.VolleyballAddresses.Exhibition.question_mark_cup
 
         # Dodgeball
-        d_mushroom = DodgeballAddresses.Exhibition.mushroom_cup
-        d_flower = DodgeballAddresses.Exhibition.flower_cup
-        d_star = DodgeballAddresses.Exhibition.star_cup
-        d_block = DodgeballAddresses.Exhibition.question_mark_cup
+        d_mushroom = ml.DodgeballAddresses.Exhibition.mushroom_cup
+        d_flower = ml.DodgeballAddresses.Exhibition.flower_cup
+        d_star = ml.DodgeballAddresses.Exhibition.star_cup
+        d_block = ml.DodgeballAddresses.Exhibition.question_mark_cup
 
         # Hockey
-        h_mushroom = HockeyAddresses.Exhibition.mushroom_cup
-        h_flower = HockeyAddresses.Exhibition.flower_cup
-        h_star = HockeyAddresses.Exhibition.star_cup
-        h_block = HockeyAddresses.Exhibition.question_mark_cup
+        h_mushroom = ml.HockeyAddresses.Exhibition.mushroom_cup
+        h_flower = ml.HockeyAddresses.Exhibition.flower_cup
+        h_star = ml.HockeyAddresses.Exhibition.star_cup
+        h_block = ml.HockeyAddresses.Exhibition.question_mark_cup
 
         # Link stages to variable
         stage_mapping = {
@@ -855,13 +857,13 @@ class MSMContext(CommonContext):
     async def handle_sports_mix_unlock(self, unlocked_sports, unlocked_sports_crystals):
         if self.sports_mix_unlock == 0:
             if "Sport: Sports Mix" in unlocked_sports:
-                self.game_interface.dolphin_client.write_byte(SportsMixAddresses.sports_mix_unlocked, 11)
+                self.game_interface.dolphin_client.write_byte(ml.SportsMixAddresses.sports_mix_unlocked, 11)
                 debug_log("Sports Mix unlocked by Sports Mix item")
 
         elif self.sports_mix_unlock == 1:
             if ("Sports Crystal: Red" and "Sports Crystal: Green" and "Sports Crystal: Yellow" and
                     "Sports Crystal: Blue") in unlocked_sports_crystals:
-                self.game_interface.dolphin_client.write_byte(SportsMixAddresses.sports_mix_unlocked, 11)
+                self.game_interface.dolphin_client.write_byte(ml.SportsMixAddresses.sports_mix_unlocked, 11)
                 debug_log("Sports Mix unlocked by Sports Crystals")
 
 
@@ -875,8 +877,8 @@ class MSMContext(CommonContext):
         if self.game_interface.ready_to_handle():
             try:
 
-                special_meter = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.special_meter,
-                                                                                Offsets.Player.special_meter_offsets)
+                special_meter = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.special_meter,
+                                                                                ml.Offsets.Player.special_meter_offsets)
                 # If you don't have the special meter, if the value isn't 0, set it to 0
                 if "Ability: Special Meter" not in self.unlocked_abilities:
                     value = self.game_interface.dolphin_client.read_float(special_meter)
@@ -924,11 +926,11 @@ class MSMContext(CommonContext):
 
         # Coins are handled here because they do not use the item slot.
         if filler == "1 Coin":
-            current_coins = self.game_interface.dolphin_client.read_word(PlayerAddresses.Score.coins)
+            current_coins = self.game_interface.dolphin_client.read_word(ml.PlayerAddresses.Score.coins)
 
             new_coins = min(current_coins + 1, 10)
 
-            self.game_interface.dolphin_client.write_word(PlayerAddresses.Score.coins, new_coins)
+            self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.Score.coins, new_coins)
 
             logger.info(f"Gave 1 Coin ({new_coins}/10)")
             debug_log(f"Coins changed from {current_coins} to {new_coins}")
@@ -955,7 +957,7 @@ class MSMContext(CommonContext):
             self.forced_item_id = int(item_id)
 
             # Give the item
-            self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.forced_item_id)
+            self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.item_held, self.forced_item_id)
 
             logger.info(f"Dolphin Write Success: {filler}")
             self.mark_consumable_handled(item_index)
@@ -975,13 +977,13 @@ class MSMContext(CommonContext):
 
         elif self.awaiting_use and item_data != self.forced_item_id:
             # Game tried to overwrite our item, force it back
-            self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.forced_item_id)
+            self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.item_held, self.forced_item_id)
             debug_log(f"Forced item back to {self.forced_item_id}")
             await asyncio.sleep(1)
 
     def current_match_score_total(self):
-        player_score = sum(self.game_interface.dolphin_client.read_word(address) for address in player_score_addresses)
-        opponent_score = sum(self.game_interface.dolphin_client.read_word(address) for address in opponent_score_addresses)
+        player_score = sum(self.game_interface.dolphin_client.read_word(address) for address in player_score_addresses())
+        opponent_score = sum(self.game_interface.dolphin_client.read_word(address) for address in opponent_score_addresses())
         return player_score + opponent_score
 
     def update_scoring_item_suppression(self):
@@ -1005,7 +1007,7 @@ class MSMContext(CommonContext):
             return
 
         if asyncio.get_event_loop().time() < self.suppress_panel_until:
-            self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.minus_one)
+            self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.item_held, self.minus_one)
             debug_log("Ignored item-slot change caused by scoring")
             return
 
@@ -1021,7 +1023,7 @@ class MSMContext(CommonContext):
         # Handle Empty List
         if not unlocked_panel_items:
             #
-            self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, self.minus_one)
+            self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.item_held, self.minus_one)
             debug_log("There are no items available, replaced with -1 (self.minus_one)")
             logger.info("?-Panel Activated! No items available! Sucks to be you >;]")
             self.item_processed = True  # Mark processed so we don't spam the log
@@ -1047,7 +1049,7 @@ class MSMContext(CommonContext):
 
         if item_id is not None:
             item_id_int = int(item_id)
-            self.game_interface.dolphin_client.write_word(PlayerAddresses.item_held, item_id_int)
+            self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.item_held, item_id_int)
             logger.info(f"?-Panel activated! Item replaced with {random_item}!")
             self.item_processed = True
             self.awaiting_use = True
@@ -1113,12 +1115,12 @@ class MSMContext(CommonContext):
 
         # 1. Get the actual memory addresses for X, Y, and Z
         # We do this ONCE before the loop starts
-        addr_x = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B1.Position.x_offsets)
-        addr_y = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B1.Position.y_offsets)
-        addr_z = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B1.Position.z_offsets)
+        addr_x = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B1.Position.x_offsets)
+        addr_y = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B1.Position.y_offsets)
+        addr_z = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B1.Position.z_offsets)
 
         # Capture location
         freeze_x = self.game_interface.dolphin_client.read_float(addr_x)
@@ -1143,12 +1145,12 @@ class MSMContext(CommonContext):
         if not self.game_interface.ready_to_handle():
             return
 
-        addr_x = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B2.Position.x_offsets)
-        addr_y = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B2.Position.y_offsets)
-        addr_z = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B2.Position.z_offsets)
+        addr_x = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B2.Position.x_offsets)
+        addr_y = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B2.Position.y_offsets)
+        addr_z = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B2.Position.z_offsets)
 
         # Capture location
         freeze_x = self.game_interface.dolphin_client.read_float(addr_x)
@@ -1173,12 +1175,12 @@ class MSMContext(CommonContext):
         if not self.game_interface.ready_to_handle():
             return
 
-        addr_x = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B3.Position.x_offsets)
-        addr_y = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B3.Position.y_offsets)
-        addr_z = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.Position.pos,
-                                                                    Offsets.Player.B3.Position.z_offsets)
+        addr_x = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B3.Position.x_offsets)
+        addr_y = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B3.Position.y_offsets)
+        addr_z = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.Position.pos,
+                                                                    ml.Offsets.Player.B3.Position.z_offsets)
 
         # Capture location
         freeze_x = self.game_interface.dolphin_client.read_float(addr_x)
@@ -1201,18 +1203,18 @@ class MSMContext(CommonContext):
 
     async def opponent_coins(self):
         if self.game_interface.ready_to_handle():
-            current_coins = self.game_interface.dolphin_client.read_word(OpponentAddresses.Score.coins)
+            current_coins = self.game_interface.dolphin_client.read_word(ml.OpponentAddresses.Score.coins)
             random_int = randint(1,5)
             new_coins = current_coins + random_int
             # Coin count in MSM cannot go above 10
             final_coins = min(new_coins, 10)
-            self.game_interface.dolphin_client.write_word(OpponentAddresses.Score.coins, final_coins)
+            self.game_interface.dolphin_client.write_word(ml.OpponentAddresses.Score.coins, final_coins)
             debug_log(f"Opponent coins set to {final_coins}")
 
     async def half_timer(self):
         if self.game_interface.ready_to_handle():
-            current_time = self.game_interface.dolphin_client.read_float(MatchAddresses.time_remaining)
-            self.game_interface.dolphin_client.write_float(MatchAddresses.time_remaining, current_time / 2)
+            current_time = self.game_interface.dolphin_client.read_float(ml.MatchAddresses.time_remaining)
+            self.game_interface.dolphin_client.write_float(ml.MatchAddresses.time_remaining, current_time / 2)
             debug_log("Timer cut in half")
 
 
@@ -1227,7 +1229,7 @@ class MSMContext(CommonContext):
         # Behemoth Handling
         if self.is_behemoth:
             address_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(
-                BossAddresses.behemoth_hp, Offsets.Boss.behemoth_hp_offsets
+                ml.BossAddresses.behemoth_hp, ml.Offsets.Boss.behemoth_hp_offsets
             )
 
             # Ensure pointer resolution didn't fail/return a bad address
@@ -1246,7 +1248,7 @@ class MSMContext(CommonContext):
         # Behemoth King Handling
         if self.is_behemoth_king:
             address_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(
-                BossAddresses.behemoth_hp, Offsets.Boss.behemoth_hp_offsets
+                ml.BossAddresses.behemoth_hp, ml.Offsets.Boss.behemoth_hp_offsets
             )
 
             if address_behemoth_hp:
@@ -1263,8 +1265,8 @@ class MSMContext(CommonContext):
 
     async def check_boss_type(self):
         is_sports_mix = self.game_interface.check_sports_mix()
-        current_stage = self.game_interface.dolphin_client.read_string(MatchAddresses.current_stage)
-        match_status = self.game_interface.dolphin_client.read_byte(MatchAddresses.match_status)
+        current_stage = self.game_interface.dolphin_client.read_string(ml.MatchAddresses.current_stage)
+        match_status = self.game_interface.dolphin_client.read_byte(ml.MatchAddresses.match_status)
 
         if current_stage == "s20VO":
             if is_sports_mix:
@@ -1282,10 +1284,10 @@ class MSMContext(CommonContext):
 
     async def handle_boss_hp(self):
         if not self.boss_hp_handled and self.game_interface.ready_to_handle():
-            max_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(BossAddresses.behemoth_hp,
-                                                                                 Offsets.Boss.max_hp_offsets)
-            behemoth_hp = self.game_interface.dolphin_client.follow_pointers(BossAddresses.behemoth_hp,
-                                                                             Offsets.Boss.behemoth_hp_offsets)
+            max_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(ml.BossAddresses.behemoth_hp,
+                                                                                 ml.Offsets.Boss.max_hp_offsets)
+            behemoth_hp = self.game_interface.dolphin_client.follow_pointers(ml.BossAddresses.behemoth_hp,
+                                                                             ml.Offsets.Boss.behemoth_hp_offsets)
             if self.is_behemoth:
                 self.game_interface.dolphin_client.write_float(max_behemoth_hp, self.behemoth_hp)
                 self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
@@ -1325,8 +1327,8 @@ class MSMContext(CommonContext):
             pass
 
     def lock_behemoth_hp(self):
-        behemoth_hp = self.game_interface.dolphin_client.follow_pointers(BossAddresses.behemoth_hp,
-                                                                         Offsets.Boss.behemoth_hp_offsets)
+        behemoth_hp = self.game_interface.dolphin_client.follow_pointers(ml.BossAddresses.behemoth_hp,
+                                                                         ml.Offsets.Boss.behemoth_hp_offsets)
         value = self.game_interface.dolphin_client.read_float(behemoth_hp)
         if self.is_behemoth:
             if value != self.behemoth_hp:
@@ -1373,7 +1375,7 @@ class MSMContext(CommonContext):
         return None, None
 
     def get_current_cup_location_name(self) -> Optional[str]:
-        current_stage = self.game_interface.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.game_interface.dolphin_client.read_string(ml.MatchAddresses.current_stage)
 
         stage_code = current_stage[:3]
         sports_mix_activated = self.game_interface.check_sports_mix()
@@ -1423,7 +1425,7 @@ class MSMContext(CommonContext):
         if self.game_interface.check_sports_mix():
             return
 
-        current_stage = self.game_interface.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.game_interface.dolphin_client.read_string(ml.MatchAddresses.current_stage)
         match_status = self.game_interface.match_status()
 
         if match_status != 1:
@@ -1441,7 +1443,7 @@ class MSMContext(CommonContext):
         await self.check_location(location_name)
 
     async def check_current_cup(self):
-        current_stage = self.game_interface.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.game_interface.dolphin_client.read_string(ml.MatchAddresses.current_stage)
         stage_code = current_stage[:3]
 
         # Check standard bracket maps first
@@ -1488,7 +1490,7 @@ class MSMContext(CommonContext):
         if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.game_interface.ready_to_handle():
             return
 
-        current_stage = self.game_interface.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.game_interface.dolphin_client.read_string(ml.MatchAddresses.current_stage)
         stage_code = current_stage[:3]
         stage = stage_names.get(stage_code)
         sports_mix_activated = self.game_interface.check_sports_mix()
@@ -1529,13 +1531,13 @@ class MSMContext(CommonContext):
             pass
 
     def clear_player_score(self):
-        for address in player_score_addresses:
+        for address in player_score_addresses():
             if self.game_interface.dolphin_client.read_word(address) != 0:
                 self.game_interface.dolphin_client.write_word(address, 0)
 
     def lock_special_meter(self):
-        special_meter = self.game_interface.dolphin_client.follow_pointers(PlayerAddresses.special_meter,
-                                                                           Offsets.Player.special_meter_offsets)
+        special_meter = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.special_meter,
+                                                                           ml.Offsets.Player.special_meter_offsets)
         value = self.game_interface.dolphin_client.read_float(special_meter)
 
         if value != 0.0:
@@ -1555,6 +1557,11 @@ class MSMContext(CommonContext):
                 if not self.game_interface.dolphin_client.is_hooked_class():
                     await self.game_interface.dolphin_client.attempt_to_hook()
 
+                if self.game_interface.dolphin_client.is_hooked_class() and not ml.is_memory_loaded():
+                    if not self.game_interface.dolphin_client.check_region():
+                        await asyncio.sleep(1)
+                        continue
+
                 # Ensure we are connected to the AP Server first
                 if not self.server or not self.server.socket or self.server.socket.closed:
                     message = "Waiting for player to connect to Archipelago server..."
@@ -1567,6 +1574,11 @@ class MSMContext(CommonContext):
                     continue
 
                 if self.game_interface.dolphin_client.is_hooked_class() and self.start_process and self.slot:
+                    if not ml.is_memory_loaded():
+                        if not self.game_interface.dolphin_client.check_region():
+                            await asyncio.sleep(1)
+                            continue
+
                     MSMFunctions.unlock_tabs()
                     logger.info("Unlocked tabs!")
                     MSMFunctions.lock_all_cups()
@@ -1618,10 +1630,10 @@ class MSMContext(CommonContext):
 
     async def stop_stupid_games_played_notifs(self):
         # Stop unlock messages from appearing constantly
-        basket_played = BasketballAddresses.games_played
-        dodge_played = DodgeballAddresses.games_played
-        volley_played = VolleyballAddresses.games_played
-        hockey_played = HockeyAddresses.games_played
+        basket_played = ml.BasketballAddresses.games_played
+        dodge_played = ml.DodgeballAddresses.games_played
+        volley_played = ml.VolleyballAddresses.games_played
+        hockey_played = ml.HockeyAddresses.games_played
         address_list = [basket_played, dodge_played, volley_played, hockey_played]
 
         for address in address_list:
