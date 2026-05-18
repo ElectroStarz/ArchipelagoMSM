@@ -360,7 +360,7 @@ class MSMContext(CommonContext):
                     f"VERSION MISMATCH DETECTED!\n"
                     f"Your Client version: {CLIENT_VERSION}\n"
                     f"Seed was generated on version: {generation_version}\n"
-                    f"Please update your client or regenerate the seed as things may break!\n"
+                    f"Please update your client, downgrade, or regenerate the seed as things may break!\n"
                     f"========================================="
                 )
             else:
