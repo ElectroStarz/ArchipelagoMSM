@@ -1,4 +1,4 @@
-# Mario Sports Mix AP First Release!
+# Mario Sports Mix AP
 # English
 ## To Read
 ### [Information Doc](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/worlds/mario_sports_mix/docs/en_Mario%20Sports%20Mix.md)
