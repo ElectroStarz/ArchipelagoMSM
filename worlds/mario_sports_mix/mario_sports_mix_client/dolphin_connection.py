@@ -74,9 +74,11 @@ class DolphinClient:
 
         if decoded == "RMKP01":
             GAME_VERSION = "PAL"
+            self.logger.info("PAL Detected!")
 
         elif decoded == "RMKE01":
             GAME_VERSION = "NTSC-U"
+            self.logger.info("NTSC-U Detected!")
 
         else:
             GAME_VERSION = None

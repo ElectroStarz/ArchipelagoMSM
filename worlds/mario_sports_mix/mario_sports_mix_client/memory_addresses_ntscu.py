@@ -1,7 +1,7 @@
 class MatchAddresses:
     game_code = 0x800000
     match_status = 0x804D693C
-    match_started = 0x805C1977
+    match_started = 0x805C09F7
     current_stage = 0x8047796E
     current_period = 0x804D684C
     on_loading_screen = 0x804D8354
@@ -14,9 +14,157 @@ class MatchAddresses:
 
     game_layout = 0x804D6846
 
+class BasketballAddresses:
+    games_played = 0x90228A2C # Word
+
+    class Tournament:
+        tabs = 0x90225E18 # Byte
+        normal_cups = 0x90225E19 # Byte
+        hard_cups = 0x90225E1A # Byte
+
+    class Exhibition:
+        tabs = 0x90225DB8 # Byte
+        mushroom_cup = 0x90225DB9 # Byte
+        flower_cup = 0x90225DBA # Byte
+        star_cup = 0x90225DBB # Byte
+        question_mark_cup = 0x90225DBC # Byte
+
+    class Characters:
+        # All Byte
+        mario = 0x902258B9
+        luigi = 0x902258C9
+        peach = 0x902258D9
+        daisy = 0x902258E9
+        yoshi = 0x902258F9
+        wario = 0x90225909
+        waluigi = 0x90225919
+        donkey_kong = 0x90225929
+        diddy_kong = 0x90225939
+        toad = 0x90225949
+        bowser = 0x90225959
+        bowser_jr = 0x90225969
+        moogle = 0x90225979
+        cactuar = 0x90225989
+        ninja = 0x90225999
+        white_mage = 0x902259A9
+        slime = 0x902259B9
+        black_mage = 0x902259C9
+
+
+class DodgeballAddresses:
+    games_played = 0x90228AB4 # Word
+
+    class Tournament:
+        tabs = 0x90225E30 # Byte
+        normal_cups = 0x90225E31 # Byte
+        hard_cups = 0x90225E32 # Byte
+
+    class Exhibition:
+        tabs = 0x90225DD0 # Byte
+        mushroom_cup = 0x90225DD1 # Byte
+        flower_cup = 0x90225DD2 # Byte
+        star_cup = 0x90225DD3 # Byte
+        question_mark_cup = 0x90225DD4 # Byte
+
+    class Characters:
+        # All Byte
+        mario = 0x90225B39
+        luigi = 0x90225B49
+        peach = 0x90225B59
+        daisy = 0x90225B69
+        yoshi = 0x90225B79
+        wario = 0x90225B89
+        waluigi = 0x90225B99
+        donkey_kong = 0x90225BA9
+        diddy_kong = 0x90225BB9
+        toad = 0x90225BC9
+        bowser = 0x90225BD9
+        bowser_jr = 0x90225BE9
+        moogle = 0x90225BF9
+        cactuar = 0x90225C09
+        ninja = 0x90225C19
+        white_mage = 0x90225C29
+        slime = 0x90225C39
+        black_mage = 0x90225C49
+
+
+class VolleyballAddresses:
+    games_played = 0x90228A70 # Word
+    last_held = 0x804D0018
+
+    class Tournament:
+        tabs = 0x90225E24 # Byte
+        normal_cups = 0x90225E25 # Byte
+        hard_cups = 0x90225E26 # Byte
+
+    class Exhibition:
+        tabs = 0x90225DC4 # Byte
+        mushroom_cup = 0x90225DC5 # Byte
+        flower_cup = 0x90225DC6 # Byte
+        star_cup = 0x90225DC7 # Byte
+        question_mark_cup = 0x90225DC8 # Byte
+
+    class Characters:
+        # All Byte
+        mario = 0x902259F9
+        luigi = 0x90225A09
+        peach = 0x90225A19
+        daisy = 0x90225A29
+        yoshi = 0x90225A39
+        wario = 0x90225A49
+        waluigi = 0x90225A59
+        donkey_kong = 0x90225A69
+        diddy_kong = 0x90225A79
+        toad = 0x90225A89
+        bowser = 0x90225A99
+        bowser_jr = 0x90225AA9
+        moogle = 0x90225AB9
+        cactuar = 0x90225AC9
+        ninja = 0x90225AD9
+        white_mage = 0x90225AE9
+        slime = 0x90225AF9
+        black_mage = 0x90225B09
+
+
+class HockeyAddresses:
+    games_played = 0x90228AF8 # Word
+
+    class Tournament:
+        tabs = 0x90225E3C # Byte
+        normal_cups = 0x90225E3D # Byte
+        hard_cups = 0x90225E3E # Byte
+
+    class Exhibition:
+        tabs = 0x90225DDC # Byte
+        mushroom_cup = 0x90225DDD # Byte
+        flower_cup = 0x90225DDE # Byte
+        star_cup = 0x90225DDF # Byte
+        question_mark_cup = 0x90225DE0 # Byte
+
+    class Characters:
+        # All Byte
+        mario = 0x90225C79
+        luigi = 0x90225C89
+        peach = 0x90225C99
+        daisy = 0x90225CA9
+        yoshi = 0x90225CB9
+        wario = 0x90225CC9
+        waluigi = 0x90225CD9
+        donkey_kong = 0x90225CE9
+        diddy_kong = 0x90225CF9
+        toad = 0x90225D09
+        bowser = 0x90225D19
+        bowser_jr = 0x90225D29
+        moogle = 0x90225D39
+        cactuar = 0x90225D49
+        ninja = 0x90225D59
+        white_mage = 0x90225D69
+        slime = 0x90225D79
+        black_mage = 0x90225D89
+
 
 class BossAddresses:
-    behemoth_hp = 0x804D0F74
+    behemoth_hp = 0x804CFFF4
 
 
 class CupsWonMultiple:
@@ -44,7 +192,7 @@ class CupsWonMultiple:
 class PlayerAddresses:
     item_held = 0x804D691E
 
-    special_meter = 0x804D0F8C
+    special_meter = 0x804D000C
 
     character_1 = 0x804D6888
     character_2 = 0x804D688A
@@ -79,7 +227,6 @@ class OpponentAddresses:
         score_period_3 = 0x804D6EB4
         score_period_4 = 0x804D6EB8
         score_period_5 = 0x804D6EBC
-        cups = 0x90226D9C
 
 
 class SportsMixAddresses:
