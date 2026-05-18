@@ -17,7 +17,7 @@ from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
 
 id_to_name = {data.code: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.0.1"
+CLIENT_VERSION = "0.1.0-beta"
 
 
 status_messages = {
@@ -357,7 +357,7 @@ class MSMContext(CommonContext):
 
             self.load_consumed_item_indices()
 
-            generation_version = self.slot_data.get("version", "0.0.0")
+            generation_version = self.slot_data.get("version", "0.0.1")
 
             if CLIENT_VERSION != generation_version:
                 logger.error(
@@ -882,9 +882,9 @@ class MSMContext(CommonContext):
                 # If you don't have the special meter, if the value isn't 0, set it to 0
                 if "Ability: Special Meter" not in self.unlocked_abilities:
                     value = self.game_interface.dolphin_client.read_float(special_meter)
-                    if value != 0.0:
-                        self.game_interface.dolphin_client.write_byte(special_meter, 0.0)
-                        debug_log("Changed Special Meter to 0.0")
+                    if value != 0:
+                        self.game_interface.dolphin_client.write_byte(special_meter, 0)
+                        debug_log("Changed Special Meter to 0")
                 elif "Ability: Special Meter" in self.unlocked_abilities:
                     pass
             finally: pass
@@ -1540,8 +1540,8 @@ class MSMContext(CommonContext):
                                                                            ml.Offsets.Player.special_meter_offsets)
         value = self.game_interface.dolphin_client.read_float(special_meter)
 
-        if value != 0.0:
-            self.game_interface.dolphin_client.write_float(special_meter, 0.0)
+        if value != 0:
+            self.game_interface.dolphin_client.write_float(special_meter, 0)
 
 
     # === Misc stuff idk where to put ===

@@ -6,7 +6,7 @@ from . import regions, rules, locations, components
 from .options import *
 from .items import ITEM_NAME_TO_ID
 
-WORLD_VERSION = "0.0.1"
+WORLD_VERSION = "0.1.0-beta"
 
 class MSMWebWorld(WebWorld):
     game = "Mario Sports Mix"

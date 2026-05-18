@@ -119,13 +119,13 @@ class MSMInterface:
         else:
             ready_game = False
 
-        if on_loading_screen == 1:
-            loading_screen_active = False
-        else:
-            loading_screen_active = True
+        # if on_loading_screen == 1:
+        #     loading_screen_active = False
+        # else:
+        #     loading_screen_active = True
 
 
-        if ready_game and not loading_screen_active:
+        if ready_game:#and not loading_screen_active:
             return True
         else:
             return False

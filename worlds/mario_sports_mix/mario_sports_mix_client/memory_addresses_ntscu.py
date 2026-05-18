@@ -4,7 +4,6 @@ class MatchAddresses:
     match_started = 0x805C09F7
     current_stage = 0x8047796E
     current_period = 0x804D684C
-    on_loading_screen = 0x804D8354
     special_active = 0x804D0F98
     tournament_diff = 0x804D5038
     exhibition_diff = 0x804D6853
