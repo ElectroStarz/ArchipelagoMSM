@@ -8,6 +8,8 @@ class MatchAddresses:
     tournament_diff = 0x804D5038
     exhibition_diff = 0x804D6853
     paused = 0x804CF71B
+    cutscene_on = 0x805C0A19
+    loading_screen_active = 0x804D73D4
 
     shot_clock = 0x804D6864
     time_remaining = 0x804D6864
@@ -80,6 +82,7 @@ class OpponentAddresses:
 
 class BasketballAddresses:
     games_played = 0x902299AC # Word
+    time = 0x804D89F7 # Byte
 
     class Tournament:
         tabs = 0x90226D98 # Byte
@@ -116,6 +119,7 @@ class BasketballAddresses:
 
 class DodgeballAddresses:
     games_played = 0x90229A34 # Word
+    time = 0x804D8A2B # Byte
 
     class Tournament:
         tabs = 0x90226DB0 # Byte
@@ -189,6 +193,7 @@ class VolleyballAddresses:
 
 class HockeyAddresses:
     games_played = 0x90229A78 # Word
+    time = 0x804D8A4B # Byte
 
     class Tournament:
         tabs = 0x90226DBC # Byte

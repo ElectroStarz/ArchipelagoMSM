@@ -4,11 +4,12 @@ class MatchAddresses:
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_stage = 0x8047888E  # String
     current_period = 0x804D77CC # Byte | Starts at 0
-    on_loading_screen = 0x804D8354  # Word
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
     exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
     paused = 0x804D069B # Byte
+    cutscene_on = 0x805C1999 # Byte
+    on_loading_screen = 0x804D8354  # Word
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
@@ -120,6 +121,7 @@ class BasketballAddresses:
 
 class DodgeballAddresses:
     games_played = 0x90229A34 # Word
+    time = 0x804D99AB # Byte
 
     class Tournament:
         tabs = 0x90226DB0 # Byte

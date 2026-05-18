@@ -75,21 +75,29 @@ class MSMInterface:
         paused = self.dolphin_client.read_byte(ml.MatchAddresses.paused)
         current_stage = string_stage[0:3]
         timer = self.dolphin_client.read_float(ml.MatchAddresses.time_remaining)
+        cutscene_active = self.dolphin_client.read_byte(ml.MatchAddresses.cutscene_on)
+        loading_screen_active = self.dolphin_client.read_word(ml.MatchAddresses.loading_screen_active)
+        basket_timer = self.get_basketball_time()
+        dodge_timer = self.get_dodgeball_time()
+        hockey_timer = self.get_hockey_time()
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
 
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
-                if timer < 9000:
+                if timer < basket_timer:
                     ready_game = True
                 else:
                     ready_game = False
 
             elif self.check_sport() == "Dodgeball":
-                if timer < 10800:
+                if dodge_timer == "Off":
                     ready_game = True
                 else:
-                    ready_game = False
+                    if timer < dodge_timer:
+                        ready_game = True
+                    else:
+                        ready_game = False
 
             elif self.check_sport() == "Volleyball":
                 if current_stage == "s20":
@@ -112,7 +120,7 @@ class MSMInterface:
                     except RuntimeError:
                         ready_game = False
             elif self.check_sport() == "Hockey":
-                if timer < 10800:
+                if timer < hockey_timer:
                     ready_game = True
                 else:
                     ready_game = False
@@ -120,12 +128,21 @@ class MSMInterface:
             ready_game = False
 
         if paused == 1:
-            ready_paused = True
+            is_paused = True
         else:
-            ready_paused = False
+            is_paused = False
 
+        if cutscene_active == 0:
+            is_cutscene = False
+        else:
+            is_cutscene = True
 
-        if ready_game and not ready_paused:
+        if loading_screen_active == 0:
+            is_loading = True
+        else:
+            is_loading = False
+
+        if ready_game and not is_cutscene and not is_paused and not is_loading:
             return True
         else:
             return False
@@ -154,6 +171,56 @@ class MSMInterface:
             return "Hockey"
         else:
             return None
+
+    def get_basketball_time(self):
+        time = self.dolphin_client.read_byte(ml.BasketballAddresses.time)
+
+        if time == 0:
+            return 5400
+        elif time == 1:
+            return 7200
+        elif time == 2:
+            return 9000
+        elif time == 3:
+            return 10800
+        elif time == 4:
+            return 12600
+        else:
+            return 99999
+
+    def get_dodgeball_time(self):
+        time = self.dolphin_client.read_byte(ml.DodgeballAddresses.time)
+
+        if time == 0:
+            return 7200
+        elif time == 1:
+            return 9000
+        elif time == 2:
+            return 10800
+        elif time == 3:
+            return 12600
+        elif time == 4:
+            return 14400
+        elif time == 5:
+            return "Off"
+        else:
+            return 99999
+
+    def get_hockey_time(self):
+        time = self.dolphin_client.read_byte(ml.HockeyAddresses.time)
+
+        if time == 0:
+            return 7200
+        elif time == 1:
+            return 9000
+        elif time == 2:
+            return 10800
+        elif time == 3:
+            return 12600
+        elif time == 4:
+            return 14400
+        else:
+            return 99999
 
     def check_sports_mix(self):
         is_sports_mix = self.dolphin_client.read_byte(ml.SportsMixAddresses.is_sports_mix)
