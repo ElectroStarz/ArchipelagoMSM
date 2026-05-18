@@ -14,6 +14,71 @@ class MatchAddresses:
 
     game_layout = 0x804D6846
 
+class BossAddresses:
+    behemoth_hp = 0x804CFFF4
+
+
+class CupsWonMultiple:
+    class Basketball:
+        mushroom_cup = 0x902299B0
+        flower_cup = 0x902299B2
+        star_cup = 0x902299B4
+
+    class Dodgeball:
+        mushroom_cup = 0x90229A38
+        flower_cup = 0x90229A3A
+        star_cup = 0x90229A3C
+
+    class Volleyball:
+        mushroom_cup = 0x902299F4
+        flower_cup = 0x902299F6
+        star_cup = 0x902299F8
+
+    class Hockey:
+        mushroom_cup = 0x90229A7C
+        flower_cup = 0x90229A7E
+        star_cup = 0x90229A80
+
+
+class PlayerAddresses:
+    item_held = 0x804D691E
+
+    special_meter = 0x804D000C
+
+    character_1 = 0x804D6888
+    character_2 = 0x804D688A
+    character_3 = 0x804D688C
+
+    is_cpu = 0x805C1B50
+
+    costume_1 = 0x804D7810
+    costume_2 = 0x804D7812
+    costume_3 = 0x804D7814
+
+    class Score:
+        coins = 0x804D68DC
+        score_period_1 = 0x804D6E98
+        score_period_2 = 0x804D6E9C
+        score_period_3 = 0x804D6EA0
+        score_period_4 = 0x804D6EA4
+        score_period_5 = 0x804D6EA8
+
+    class Position:
+        pos = 0x805C1B50
+        rotation = 0x805C1B50
+
+
+class OpponentAddresses:
+    item_held = 0x804D6922
+
+    class Score:
+        coins = 0x804D68E0
+        score_period_1 = 0x804D6EAC
+        score_period_2 = 0x804D6EB0
+        score_period_3 = 0x804D6EB4
+        score_period_4 = 0x804D6EB8
+        score_period_5 = 0x804D6EBC
+
 class BasketballAddresses:
     games_played = 0x90228A2C # Word
 
@@ -161,72 +226,6 @@ class HockeyAddresses:
         white_mage = 0x90225D69
         slime = 0x90225D79
         black_mage = 0x90225D89
-
-
-class BossAddresses:
-    behemoth_hp = 0x804CFFF4
-
-
-class CupsWonMultiple:
-    class Basketball:
-        mushroom_cup = 0x902299B0
-        flower_cup = 0x902299B2
-        star_cup = 0x902299B4
-
-    class Dodgeball:
-        mushroom_cup = 0x90229A38
-        flower_cup = 0x90229A3A
-        star_cup = 0x90229A3C
-
-    class Volleyball:
-        mushroom_cup = 0x902299F4
-        flower_cup = 0x902299F6
-        star_cup = 0x902299F8
-
-    class Hockey:
-        mushroom_cup = 0x90229A7C
-        flower_cup = 0x90229A7E
-        star_cup = 0x90229A80
-
-
-class PlayerAddresses:
-    item_held = 0x804D691E
-
-    special_meter = 0x804D000C
-
-    character_1 = 0x804D6888
-    character_2 = 0x804D688A
-    character_3 = 0x804D688C
-
-    is_cpu = 0x805C1B50
-
-    costume_1 = 0x804D7810
-    costume_2 = 0x804D7812
-    costume_3 = 0x804D7814
-
-    class Score:
-        coins = 0x804D68DC
-        score_period_1 = 0x804D6E98
-        score_period_2 = 0x804D6E9C
-        score_period_3 = 0x804D6EA0
-        score_period_4 = 0x804D6EA4
-        score_period_5 = 0x804D6EA8
-
-    class Position:
-        pos = 0x805C1B50
-        rotation = 0x805C1B50
-
-
-class OpponentAddresses:
-    item_held = 0x804D6922
-
-    class Score:
-        coins = 0x804D68E0
-        score_period_1 = 0x804D6EAC
-        score_period_2 = 0x804D6EB0
-        score_period_3 = 0x804D6EB4
-        score_period_4 = 0x804D6EB8
-        score_period_5 = 0x804D6EBC
 
 
 class SportsMixAddresses:
