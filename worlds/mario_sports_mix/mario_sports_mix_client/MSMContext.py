@@ -876,7 +876,6 @@ class MSMContext(CommonContext):
     async def handle_special_meter_unlock(self):
         if self.game_interface.ready_to_handle():
             try:
-
                 special_meter = self.game_interface.dolphin_client.follow_pointers(ml.PlayerAddresses.special_meter,
                                                                                 ml.Offsets.Player.special_meter_offsets)
                 # If you don't have the special meter, if the value isn't 0, set it to 0
@@ -1648,6 +1647,16 @@ class MSMContext(CommonContext):
     async def handle_in_match(self):
         # Lock points if you don't have the stage/cup
         await self.handle_locked_tournament_stage_points()
+
+        print(f"In Tournament Match: {self.in_tournament_match}")
+        stage_code = self.game_interface.dolphin_client.read_string(ml.MatchAddresses.current_stage)
+        print(f"Current Stage: {stage_names.get(stage_code)}")
+        print(f"Sports Mix Activated: {self.game_interface.check_sports_mix()}")
+        sport = self.game_interface.check_sport()
+        print(f"Current Match Status: {self.game_interface.match_status()}")
+        cup, round_number = self.get_tournament_cup_and_round(sport, stage_code)
+        print(f"Current Cup: {cup}")
+        print(f"Round Number: {round_number}")
 
         # Locations
         await self.handle_exhibition_win()

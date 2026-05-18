@@ -7,6 +7,7 @@ class MatchAddresses:
     special_active = 0x804D0F98
     tournament_diff = 0x804D5038
     exhibition_diff = 0x804D6853
+    paused = 0x804CF71B
 
     shot_clock = 0x804D6864
     time_remaining = 0x804D6864
@@ -40,7 +41,7 @@ class CupsWonMultiple:
 
 
 class PlayerAddresses:
-    item_held = 0x804D691E
+    item_held = 0x804D691C
 
     special_meter = 0x804D000C
 
@@ -50,9 +51,9 @@ class PlayerAddresses:
 
     is_cpu = 0x805C1B50
 
-    costume_1 = 0x804D7810
-    costume_2 = 0x804D7812
-    costume_3 = 0x804D7814
+    costume_1 = 0x804D6890
+    costume_2 = 0x804D6892
+    costume_3 = 0x804D6894
 
     class Score:
         coins = 0x804D68DC
@@ -63,9 +64,8 @@ class PlayerAddresses:
         score_period_5 = 0x804D6EA8
 
     class Position:
-        pos = 0x805C1B50
-        rotation = 0x805C1B50
-
+        pos = 0x805C0BD0
+        rotation = 0x805C0BD0
 
 class OpponentAddresses:
     item_held = 0x804D6922
@@ -79,160 +79,156 @@ class OpponentAddresses:
         score_period_5 = 0x804D6EBC
 
 class BasketballAddresses:
-    games_played = 0x90228A2C # Word
+    games_played = 0x902299AC # Word
 
     class Tournament:
-        tabs = 0x90225E18 # Byte
-        normal_cups = 0x90225E19 # Byte
-        hard_cups = 0x90225E1A # Byte
+        tabs = 0x90226D98 # Byte
+        normal_cups = 0x90226D99 # Byte
+        hard_cups = 0x90226D9A # Byte
 
     class Exhibition:
-        tabs = 0x90225DB8 # Byte
-        mushroom_cup = 0x90225DB9 # Byte
-        flower_cup = 0x90225DBA # Byte
-        star_cup = 0x90225DBB # Byte
-        question_mark_cup = 0x90225DBC # Byte
+        tabs = 0x90226D38 # Byte
+        mushroom_cup = 0x90226D39 # Byte
+        flower_cup = 0x90226D3A # Byte
+        star_cup = 0x90226D3B # Byte
+        question_mark_cup = 0x90226D3C # Byte
 
     class Characters:
         # All Byte
-        mario = 0x902258B9
-        luigi = 0x902258C9
-        peach = 0x902258D9
-        daisy = 0x902258E9
-        yoshi = 0x902258F9
-        wario = 0x90225909
-        waluigi = 0x90225919
-        donkey_kong = 0x90225929
-        diddy_kong = 0x90225939
-        toad = 0x90225949
-        bowser = 0x90225959
-        bowser_jr = 0x90225969
-        moogle = 0x90225979
-        cactuar = 0x90225989
-        ninja = 0x90225999
-        white_mage = 0x902259A9
-        slime = 0x902259B9
-        black_mage = 0x902259C9
-
+        mario = 0x90226839
+        luigi = 0x90226849
+        peach = 0x90226859
+        daisy = 0x90226869
+        yoshi = 0x90226879
+        wario = 0x90226889
+        waluigi = 0x90226899
+        donkey_kong = 0x902268A9
+        diddy_kong = 0x902268B9
+        toad = 0x902268C9
+        bowser = 0x902268D9
+        bowser_jr = 0x902268E9
+        moogle = 0x902268F9
+        cactuar = 0x90226909
+        ninja = 0x90226919
+        white_mage = 0x90226929
+        slime = 0x90226939
+        black_mage = 0x90226949
 
 class DodgeballAddresses:
-    games_played = 0x90228AB4 # Word
+    games_played = 0x90229A34 # Word
 
     class Tournament:
-        tabs = 0x90225E30 # Byte
-        normal_cups = 0x90225E31 # Byte
-        hard_cups = 0x90225E32 # Byte
+        tabs = 0x90226DB0 # Byte
+        normal_cups = 0x90226DB1 # Byte
+        hard_cups = 0x90226DB2 # Byte
 
     class Exhibition:
-        tabs = 0x90225DD0 # Byte
-        mushroom_cup = 0x90225DD1 # Byte
-        flower_cup = 0x90225DD2 # Byte
-        star_cup = 0x90225DD3 # Byte
-        question_mark_cup = 0x90225DD4 # Byte
+        tabs = 0x90226D50 # Byte
+        mushroom_cup = 0x90226D51 # Byte
+        flower_cup = 0x90226D52 # Byte
+        star_cup = 0x90226D53 # Byte
+        question_mark_cup = 0x90226D54 # Byte
 
     class Characters:
         # All Byte
-        mario = 0x90225B39
-        luigi = 0x90225B49
-        peach = 0x90225B59
-        daisy = 0x90225B69
-        yoshi = 0x90225B79
-        wario = 0x90225B89
-        waluigi = 0x90225B99
-        donkey_kong = 0x90225BA9
-        diddy_kong = 0x90225BB9
-        toad = 0x90225BC9
-        bowser = 0x90225BD9
-        bowser_jr = 0x90225BE9
-        moogle = 0x90225BF9
-        cactuar = 0x90225C09
-        ninja = 0x90225C19
-        white_mage = 0x90225C29
-        slime = 0x90225C39
-        black_mage = 0x90225C49
-
+        mario = 0x90226AB9
+        luigi = 0x90226AC9
+        peach = 0x90226AD9
+        daisy = 0x90226AE9
+        yoshi = 0x90226AF9
+        wario = 0x90226B09
+        waluigi = 0x90226B19
+        donkey_kong = 0x90226B29
+        diddy_kong = 0x90226B39
+        toad = 0x90226B49
+        bowser = 0x90226B59
+        bowser_jr = 0x90226B69
+        moogle = 0x90226B79
+        cactuar = 0x90226B89
+        ninja = 0x90226B99
+        white_mage = 0x90226BA9
+        slime = 0x90226BB9
+        black_mage = 0x90226BC9
 
 class VolleyballAddresses:
-    games_played = 0x90228A70 # Word
-    last_held = 0x804D0018
+    games_played = 0x902299F0 # Word
+    last_held = 0x804D0F98
 
     class Tournament:
-        tabs = 0x90225E24 # Byte
-        normal_cups = 0x90225E25 # Byte
-        hard_cups = 0x90225E26 # Byte
+        tabs = 0x90226DA4 # Byte
+        normal_cups = 0x90226DA5 # Byte
+        hard_cups = 0x90226DA6 # Byte
 
     class Exhibition:
-        tabs = 0x90225DC4 # Byte
-        mushroom_cup = 0x90225DC5 # Byte
-        flower_cup = 0x90225DC6 # Byte
-        star_cup = 0x90225DC7 # Byte
-        question_mark_cup = 0x90225DC8 # Byte
+        tabs = 0x90226D44 # Byte
+        mushroom_cup = 0x90226D45 # Byte
+        flower_cup = 0x90226D46 # Byte
+        star_cup = 0x90226D47 # Byte
+        question_mark_cup = 0x90226D48 # Byte
 
     class Characters:
         # All Byte
-        mario = 0x902259F9
-        luigi = 0x90225A09
-        peach = 0x90225A19
-        daisy = 0x90225A29
-        yoshi = 0x90225A39
-        wario = 0x90225A49
-        waluigi = 0x90225A59
-        donkey_kong = 0x90225A69
-        diddy_kong = 0x90225A79
-        toad = 0x90225A89
-        bowser = 0x90225A99
-        bowser_jr = 0x90225AA9
-        moogle = 0x90225AB9
-        cactuar = 0x90225AC9
-        ninja = 0x90225AD9
-        white_mage = 0x90225AE9
-        slime = 0x90225AF9
-        black_mage = 0x90225B09
-
+        mario = 0x90226979
+        luigi = 0x90226989
+        peach = 0x90226999
+        daisy = 0x902269A9
+        yoshi = 0x902269B9
+        wario = 0x902269C9
+        waluigi = 0x902269D9
+        donkey_kong = 0x902269E9
+        diddy_kong = 0x902269F9
+        toad = 0x90226A09
+        bowser = 0x90226A19
+        bowser_jr = 0x90226A29
+        moogle = 0x90226A39
+        cactuar = 0x90226A49
+        ninja = 0x90226A59
+        white_mage = 0x90226A69
+        slime = 0x90226A79
+        black_mage = 0x90226A89
 
 class HockeyAddresses:
-    games_played = 0x90228AF8 # Word
+    games_played = 0x90229A78 # Word
 
     class Tournament:
-        tabs = 0x90225E3C # Byte
-        normal_cups = 0x90225E3D # Byte
-        hard_cups = 0x90225E3E # Byte
+        tabs = 0x90226DBC # Byte
+        normal_cups = 0x90226DBD # Byte
+        hard_cups = 0x90226DBE # Byte
 
     class Exhibition:
-        tabs = 0x90225DDC # Byte
-        mushroom_cup = 0x90225DDD # Byte
-        flower_cup = 0x90225DDE # Byte
-        star_cup = 0x90225DDF # Byte
-        question_mark_cup = 0x90225DE0 # Byte
+        tabs = 0x90226D5C # Byte
+        mushroom_cup = 0x90226D5D # Byte
+        flower_cup = 0x90226D5E # Byte
+        star_cup = 0x90226D5F # Byte
+        question_mark_cup = 0x90226D60 # Byte
 
     class Characters:
         # All Byte
-        mario = 0x90225C79
-        luigi = 0x90225C89
-        peach = 0x90225C99
-        daisy = 0x90225CA9
-        yoshi = 0x90225CB9
-        wario = 0x90225CC9
-        waluigi = 0x90225CD9
-        donkey_kong = 0x90225CE9
-        diddy_kong = 0x90225CF9
-        toad = 0x90225D09
-        bowser = 0x90225D19
-        bowser_jr = 0x90225D29
-        moogle = 0x90225D39
-        cactuar = 0x90225D49
-        ninja = 0x90225D59
-        white_mage = 0x90225D69
-        slime = 0x90225D79
-        black_mage = 0x90225D89
-
+        mario = 0x90226BF9
+        luigi = 0x90226C09
+        peach = 0x90226C19
+        daisy = 0x90226C29
+        yoshi = 0x90226C39
+        wario = 0x90226C49
+        waluigi = 0x90226C59
+        donkey_kong = 0x90226C69
+        diddy_kong = 0x90226C79
+        toad = 0x90226C89
+        bowser = 0x90226C99
+        bowser_jr = 0x90226CA9
+        moogle = 0x90226CB9
+        cactuar = 0x90226CC9
+        ninja = 0x90226CD9
+        white_mage = 0x90226CE9
+        slime = 0x90226CF9
+        black_mage = 0x90226D09
 
 class SportsMixAddresses:
-    is_sports_mix = 0x804D6993
-    sports_mix_unlocked = 0x90226D98
+    is_sports_mix = 0x804D7913 # Byte
+    sports_mix_unlocked = 0x90226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
 
     class Tournament:
-        cups = 0x90226D9C
+        cups = 0x90226D9C # Byte
 
 
 class Offsets:

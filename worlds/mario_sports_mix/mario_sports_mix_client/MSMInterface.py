@@ -72,9 +72,9 @@ class MSMInterface:
     def ready_to_handle(self):
         match_status = self.dolphin_client.read_byte(ml.MatchAddresses.match_status)
         string_stage = self.dolphin_client.read_string(ml.MatchAddresses.current_stage)
+        paused = self.dolphin_client.read_byte(ml.MatchAddresses.paused)
         current_stage = string_stage[0:3]
         timer = self.dolphin_client.read_float(ml.MatchAddresses.time_remaining)
-        on_loading_screen = self.dolphin_client.read_word(ml.MatchAddresses.on_loading_screen)
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
 
@@ -119,13 +119,13 @@ class MSMInterface:
         else:
             ready_game = False
 
-        # if on_loading_screen == 1:
-        #     loading_screen_active = False
-        # else:
-        #     loading_screen_active = True
+        if paused == 1:
+            ready_paused = True
+        else:
+            ready_paused = False
 
 
-        if ready_game:#and not loading_screen_active:
+        if ready_game and not ready_paused:
             return True
         else:
             return False
