@@ -80,6 +80,8 @@ class MSMWorld(World):
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
+        "exhibition_difficulty": self.options.exhibition_difficulty.value,
+        "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
         }
 
         return slot_data

@@ -1586,6 +1586,8 @@ class MSMContext(CommonContext):
                     logger.info("Locked stages!")
                     MSMFunctions.lock_all_characters()
                     logger.info("Locked characters!")
+                    #self.handle_gecko_codes()
+                    #logger.info("Gecko Codes Applied!")
                     self.start_process = False
 
                 # Ensure we have received slot data
@@ -1640,6 +1642,11 @@ class MSMContext(CommonContext):
             if value != 0:
                 self.game_interface.dolphin_client.write_word(address, 0)
 
+    # def handle_gecko_codes(self):
+    #     for address, code in ml.gecko_codes.items():
+    #         print(f"Address: {address}")
+    #         print(f"Code: {code}")
+    #         self.game_interface.dolphin_client.write_bytes(address, code)
 
     # === Where to handle what ===
 

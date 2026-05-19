@@ -9,7 +9,7 @@ class MatchAddresses:
     exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
     paused = 0x804D069B # Byte
     cutscene_on = 0x805C1999 # Byte
-    on_loading_screen = 0x804D8354  # Word
+    loading_screen_active = 0x804D8354  # Word
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
