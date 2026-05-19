@@ -987,15 +987,16 @@ class MSMContext(CommonContext):
 
     def update_scoring_item_suppression(self):
         score_total = self.current_match_score_total()
+        time = self.game_interface.dolphin_client.read_byte(ml.MatchAddresses.time_remaining)
 
         if self.last_match_score_total is None:
             self.last_match_score_total = score_total
             return
 
-        if score_total != self.last_match_score_total:
+        if score_total != self.last_match_score_total or time == 0:
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
-            debug_log("Match score changed; suppressing ?-panel item replacement briefly")
+            debug_log("Event Occured; suppressing ?-panel item replacement briefly")
 
     async def handle_question_mark_panel_items(self, unlocked_panel_items):
         self.update_scoring_item_suppression()
