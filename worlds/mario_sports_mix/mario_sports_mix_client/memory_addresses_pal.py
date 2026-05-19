@@ -85,6 +85,7 @@ class OpponentAddresses:
 
 class BasketballAddresses:
     games_played = 0x902299AC # Word
+    time = 0x804D9977 # Byte
 
     class Tournament:
         tabs = 0x90226D98 # Byte
@@ -195,6 +196,7 @@ class VolleyballAddresses:
 
 class HockeyAddresses:
     games_played = 0x90229A78 # Word
+    time = 0x804D99CB #Byte
 
     class Tournament:
         tabs = 0x90226DBC # Byte
