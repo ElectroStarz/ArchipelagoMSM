@@ -13,7 +13,6 @@ VolleyballAddresses: Any = None
 HockeyAddresses: Any = None
 SportsMixAddresses: Any = None
 Offsets: Any = None
-#gecko_codes: Any = None
 
 _ADDRESS_CLASSES = (
     "PlayerAddresses",
@@ -40,22 +39,17 @@ def load_memory_module() -> None:
 
     if dolphin_connection.GAME_VERSION == "PAL":
         module_name = ".memory_addresses_pal"
-        #gecko_codes_name = ".gecko_codes_pal"
     elif dolphin_connection.GAME_VERSION == "NTSC-U":
         module_name = ".memory_addresses_ntscu"
-        #gecko_codes_name = ".gecko_codes_nstcu"
     else:
         raise RuntimeError(f"Unsupported GAME_VERSION: {dolphin_connection.GAME_VERSION}")
 
     memory_module = importlib.import_module(module_name, package=__package__)
-    #gecko_module = importlib.import_module(gecko_codes_name, package=__package__)
 
 
     # Callers should use `import memory_loader as ml`; replacing these module
     # globals then updates every future `ml.PlayerAddresses` lookup.
     for name in _ADDRESS_CLASSES:
         globals()[name] = getattr(memory_module, name)
-
-    #globals()["gecko_codes"] = getattr(gecko_module, "gecko_codes")
 
     _loaded_game_version = dolphin_connection.GAME_VERSION

@@ -11,7 +11,6 @@ class ConnectionState(Enum):
     IN_TOURNAMENT_MAP = 4
     IN_MATCH = 5
     IN_BOSS = 6
-    GOALED = 7
 
 _supported_versions = ["RMKP01", "RMKE01"]
 

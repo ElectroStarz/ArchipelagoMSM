@@ -17,7 +17,7 @@ from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
 
 id_to_name = {data.code: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.1.0-beta"
+CLIENT_VERSION = "0.1.0"
 
 
 status_messages = {
@@ -27,7 +27,6 @@ status_messages = {
     ConnectionState.DISCONNECTED: "Unable to connect to the Dolphin instance, attempting to reconnect...",
     ConnectionState.CONNECTED: "Connected to Dolphin!",
     ConnectionState.IN_TOURNAMENT_MAP: "In tournament map",
-    ConnectionState.GOALED: "Goaled game!"
 }
 
 
@@ -482,6 +481,7 @@ class MSMContext(CommonContext):
 
     def current_item_func(self):
         current_item = self.game_interface.dolphin_client.read_byte(ml.PlayerAddresses.item_held)
+
         if current_item == self.minus_one:
             result = -1 #"No Item"
         elif current_item == 0:
@@ -498,6 +498,7 @@ class MSMContext(CommonContext):
             result = 5 #"Banana"
         else:
             result = -1
+
         return result
 
     # === Item Receiving ===
@@ -548,50 +549,50 @@ class MSMContext(CommonContext):
 
 
         # Cups / Sports Mix
-        await self.handle_cup_unlocks(self.unlocked_cups)
-        await self.handle_sports_mix_unlock(self.unlocked_sports, self.unlocked_sports_crystals)
+        await self.handle_cup_unlocks()
+        await self.handle_sports_mix_unlock()
 
         # Stages
-        await self.handle_stage_unlocks(self.unlocked_stages)
+        await self.handle_stage_unlocks()
 
         # Characters
-        await self.handle_all_characters(self.unlocked_characters, self.unlocked_costumes)
+        await self.handle_all_characters()
 
         # Traps + Filler aren't here because they can only be received in game and this function gets awaited during
         # every connection state, if you were to receive a trap or filler in the menu it wouldn't work.
 
     # Can't make this yet until there's a way to lock sports
-    #async def handle_unlocked_sports(self, unlocked_sports):
+    #async def handle_unlocked_sports(self):
 
 
     # === Character Unlocks ===
 
 
-    async def handle_all_characters(self, unlocked_characters, unlocked_costumes):
+    async def handle_all_characters(self):
         for char in character_names:
             # Format character name for value
             item_name = f"Character: {char.replace('_', ' ').title()}"
 
             # Have separate values for characters with costumes, adding values can equal different combinations
             if char == "yoshi":
-                value = self.yoshi_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.yoshi_unlocks_value()
             elif char == "peach":
-                value = self.peach_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.peach_unlocks_value()
             elif char == "daisy":
-                value = self.daisy_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.daisy_unlocks_value()
             elif char == "toad":
-                value = self.toad_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.toad_unlocks_value()
             elif char == "ninja":
-                value = self.ninja_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.ninja_unlocks_value()
             elif char == "white_mage":
-                value = self.white_mage_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.white_mage_unlocks_value()
             elif char == "black_mage":
-                value = self.black_mage_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.black_mage_unlocks_value()
             elif char == "slime":
-                value = self.slime_unlocks_value(unlocked_characters, unlocked_costumes)
+                value = self.slime_unlocks_value()
             else:
                 # Else, value is 1 if the item name is in characters, if not it's 0
-                value = 1 if item_name in unlocked_characters else 0
+                value = 1 if item_name in self.unlocked_characters else 0
 
 
             sports_classes = [
@@ -609,102 +610,94 @@ class MSMContext(CommonContext):
                 except AttributeError:
                     print(f"Warning: {char} not found in {sport.__name__}!")
 
-    @staticmethod
-    def yoshi_unlocks_value(unlocked_characters, unlocked_costumes):
+    def yoshi_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Yoshi" not in unlocked_characters:
+        if "Character: Yoshi" not in self.unlocked_characters:
             value = 0
             return value
         else:
 
             value = 1
-            if "Costume: Pink Yoshi" in unlocked_costumes: value += 4
-            if "Costume: Light Blue Yoshi" in unlocked_costumes: value += 16
-            if "Costume: Yellow Yoshi" in unlocked_costumes: value += 64
+            if "Costume: Pink Yoshi" in self.unlocked_costumes: value += 4
+            if "Costume: Light Blue Yoshi" in self.unlocked_costumes: value += 16
+            if "Costume: Yellow Yoshi" in self.unlocked_costumes: value += 64
         return value
 
-    @staticmethod
-    def peach_unlocks_value(unlocked_characters, unlocked_costumes):
+    def peach_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Peach" not in unlocked_characters:
+        if "Character: Peach" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Tennis-wear Peach" in unlocked_costumes: value += 4
+        if "Costume: Tennis-wear Peach" in self.unlocked_costumes: value += 4
         return value
 
-    @staticmethod
-    def daisy_unlocks_value(unlocked_characters, unlocked_costumes):
+    def daisy_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Daisy" not in unlocked_characters:
+        if "Character: Daisy" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Tennis-wear Daisy" in unlocked_costumes: value += 4
+        if "Costume: Tennis-wear Daisy" in self.unlocked_costumes: value += 4
         return value
 
-    @staticmethod
-    def toad_unlocks_value(unlocked_characters, unlocked_costumes):
+    def toad_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Toad" not in unlocked_characters:
+        if "Character: Toad" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Blue Toad" in unlocked_costumes: value += 4
-        if "Costume: Green Toad" in unlocked_costumes: value += 16
-        if "Costume: Yellow Toad" in unlocked_costumes: value += 64
+        if "Costume: Blue Toad" in self.unlocked_costumes: value += 4
+        if "Costume: Green Toad" in self.unlocked_costumes: value += 16
+        if "Costume: Yellow Toad" in self.unlocked_costumes: value += 64
         return value
 
-    @staticmethod
-    def ninja_unlocks_value(unlocked_characters, unlocked_costumes):
-        if "Character: Ninja" not in unlocked_characters:
+    def ninja_unlocks_value(self):
+        if "Character: Ninja" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Shadow White Ninja" in unlocked_costumes: value += 4
+        if "Costume: Shadow White Ninja" in self.unlocked_costumes: value += 4
         return value
 
-    @staticmethod
-    def white_mage_unlocks_value(unlocked_characters, unlocked_costumes):
-        if "Character: White Mage" not in unlocked_characters:
+    def white_mage_unlocks_value(self):
+        if "Character: White Mage" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Pure White - White Mage" in unlocked_costumes: value += 4
+        if "Costume: Pure White - White Mage" in self.unlocked_costumes: value += 4
         return value
 
-    @staticmethod
-    def black_mage_unlocks_value(unlocked_characters, unlocked_costumes):
-        if "Character: Black Mage" not in unlocked_characters:
+    def black_mage_unlocks_value(self):
+        if "Character: Black Mage" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Magic Red Black Mage" in unlocked_costumes: value += 4
+        if "Costume: Magic Red Black Mage" in self.unlocked_costumes: value += 4
         return value
 
-    @staticmethod
-    def slime_unlocks_value(unlocked_characters, unlocked_costumes):
+    def slime_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Slime" not in unlocked_characters:
+        if "Character: Slime" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: She-slime" in unlocked_costumes: value += 4
-        if "Costume: Metal Slime" in unlocked_costumes: value += 16
+        if "Costume: She-slime" in self.unlocked_costumes: value += 4
+        if "Costume: Metal Slime" in self.unlocked_costumes: value += 16
         return value
 
 
     # === Cup Unlocks ===
 
 
-    async def handle_cup_unlocks(self, unlocked_cups):
+    async def handle_cup_unlocks(self):
         # Basketball
         b_normal = ml.BasketballAddresses.Tournament.normal_cups
         b_hard = ml.BasketballAddresses.Tournament.hard_cups
@@ -750,17 +743,17 @@ class MSMContext(CommonContext):
 
             # Mushroom Cup
             # If the Mushroom Cup is in unlocked cups, add 1
-            if cups[0] in unlocked_cups:
+            if cups[0] in self.unlocked_cups:
                 value += 1
 
             # Flower Cup
             # If the Flower Cup is in unlocked cups, add 2
-            if cups[1] in unlocked_cups:
+            if cups[1] in self.unlocked_cups:
                 value += 2
 
             # Star Cup
             # If the Star Cup is in unlocked cups, add 4
-            if cups[2] in unlocked_cups:
+            if cups[2] in self.unlocked_cups:
                 value += 4
 
             # If no cups are unlocked (value is 0), set final_value to 8 which locks all cups, otherwise set
@@ -770,10 +763,26 @@ class MSMContext(CommonContext):
             self.game_interface.dolphin_client.write_byte(address, final_value)
 
 
+    # === Sports Mix ===
+
+
+    async def handle_sports_mix_unlock(self):
+        if self.sports_mix_unlock == 0:
+            if "Sport: Sports Mix" in self.unlocked_sports:
+                self.game_interface.dolphin_client.write_byte(ml.SportsMixAddresses.sports_mix_unlocked, 11)
+                debug_log("Sports Mix unlocked by Sports Mix item")
+
+        elif self.sports_mix_unlock == 1:
+            if ("Sports Crystal: Red" and "Sports Crystal: Green" and "Sports Crystal: Yellow" and
+                    "Sports Crystal: Blue") in self.unlocked_sports_crystals:
+                self.game_interface.dolphin_client.write_byte(ml.SportsMixAddresses.sports_mix_unlocked, 11)
+                debug_log("Sports Mix unlocked by Sports Crystals")
+
+
     # === Exhibition Unlocks ===
 
 
-    async def handle_stage_unlocks(self, unlocked_stages):
+    async def handle_stage_unlocks(self):
         # Link variables to the address in the correct class
         # Basketball
         b_mushroom = ml.BasketballAddresses.Exhibition.mushroom_cup
@@ -831,17 +840,17 @@ class MSMContext(CommonContext):
 
             # First Stage
             # If the first stage is in unlocked stages, add 1
-            if stages[0] in unlocked_stages:
+            if stages[0] in self.unlocked_stages:
                 value += 1
 
             # Second Stage
             # If the second stage is in unlocked stages, add 2
-            if stages[1] in unlocked_stages:
+            if stages[1] in self.unlocked_stages:
                 value += 2
 
             # Third Stage
             # If the third stage is in unlocked stages, add 4
-            if stages[2] in unlocked_stages:
+            if stages[2] in self.unlocked_stages:
                 value += 4
 
             # If no stages are unlocked (value is 0), set final_value to 8 which locks all stages, otherwise set
@@ -849,22 +858,6 @@ class MSMContext(CommonContext):
             final_value = 8 if value == 0 else value
 
             self.game_interface.dolphin_client.write_byte(address, final_value)
-
-
-    # === Sports Mix ===
-
-
-    async def handle_sports_mix_unlock(self, unlocked_sports, unlocked_sports_crystals):
-        if self.sports_mix_unlock == 0:
-            if "Sport: Sports Mix" in unlocked_sports:
-                self.game_interface.dolphin_client.write_byte(ml.SportsMixAddresses.sports_mix_unlocked, 11)
-                debug_log("Sports Mix unlocked by Sports Mix item")
-
-        elif self.sports_mix_unlock == 1:
-            if ("Sports Crystal: Red" and "Sports Crystal: Green" and "Sports Crystal: Yellow" and
-                    "Sports Crystal: Blue") in unlocked_sports_crystals:
-                self.game_interface.dolphin_client.write_byte(ml.SportsMixAddresses.sports_mix_unlocked, 11)
-                debug_log("Sports Mix unlocked by Sports Crystals")
 
 
     # === Ability Unlocks ===
@@ -892,17 +885,17 @@ class MSMContext(CommonContext):
     # === Filler + ?-Panel Handling ===
 
 
-    async def handle_one_time_items(self, filler_to_give):
+    async def handle_one_time_items(self):
         # Queue empty? Nothing to do.
-        if not filler_to_give:
+        if not self.filler_to_give:
             return
 
         # Game not in a valid state? Wait until later.
         if not self.game_interface.ready_to_handle():
-            debug_log(f"Waiting to give filler; game not ready. Queue size: {len(filler_to_give)}")
+            debug_log(f"Waiting to give filler; game not ready. Queue size: {len(self.filler_to_give)}")
             return
 
-        queued_filler = filler_to_give[0]
+        queued_filler = self.filler_to_give[0]
         if isinstance(queued_filler, tuple):
             item_index, filler = queued_filler
         else:
@@ -919,9 +912,9 @@ class MSMContext(CommonContext):
         self.awaiting_use = True
 
         # Take the oldest queued filler item
-        filler_to_give.popleft()
+        self.filler_to_give.popleft()
         logger.info(f"Processing from Queue: {filler}")
-        debug_log(f"Processing filler index={item_index}, remaining filler queue={len(filler_to_give)}")
+        debug_log(f"Processing filler index={item_index}, remaining filler queue={len(self.filler_to_give)}")
 
         # Coins are handled here because they do not use the item slot.
         if filler == "1 Coin":
@@ -996,9 +989,9 @@ class MSMContext(CommonContext):
         if score_total != self.last_match_score_total or time == 0:
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
-            debug_log("Event Occured; suppressing ?-panel item replacement briefly")
+            debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
 
-    async def handle_question_mark_panel_items(self, unlocked_panel_items):
+    async def handle_question_mark_panel_items(self):
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
         # If we don't have an item, pause.
@@ -1021,7 +1014,7 @@ class MSMContext(CommonContext):
             return
 
         # Handle Empty List
-        if not unlocked_panel_items:
+        if not self.unlocked_panel_items:
             #
             self.game_interface.dolphin_client.write_word(ml.PlayerAddresses.item_held, self.minus_one)
             debug_log("There are no items available, replaced with -1 (self.minus_one)")
@@ -1040,7 +1033,7 @@ class MSMContext(CommonContext):
         }
 
         # Random Selection & Execution
-        random_item = random.choice(unlocked_panel_items)
+        random_item = random.choice(self.unlocked_panel_items)
 
         # Extract the base name (e.g., if item is "1 Banana", get "Banana")
         # This searches the keys of our map to find a match
@@ -1059,13 +1052,13 @@ class MSMContext(CommonContext):
     # === Trap Handling ===
 
 
-    async def handle_traps(self, traps_to_give):
+    async def handle_traps(self):
         # If no traps in queue, bail
-        if not traps_to_give:
+        if not self.traps_to_give:
             return
 
         if not self.game_interface.ready_to_handle():
-            debug_log(f"Waiting to trigger trap; game not ready. Queue size: {len(traps_to_give)}")
+            debug_log(f"Waiting to trigger trap; game not ready. Queue size: {len(self.traps_to_give)}")
             return
 
         # Add new traps here. If the trap has an item in items.py but not in this map, it will be skipped once.
@@ -1077,7 +1070,7 @@ class MSMContext(CommonContext):
             "Trap: 1/2 Time": self.half_timer,
         }
 
-        queued_trap = traps_to_give.popleft()
+        queued_trap = self.traps_to_give.popleft()
         if isinstance(queued_trap, tuple):
             item_index, trap = queued_trap
         else:
@@ -1085,7 +1078,7 @@ class MSMContext(CommonContext):
             trap = queued_trap
 
         logger.info(f"Triggering {trap}")
-        debug_log(f"Processing trap index={item_index}, remaining trap queue={len(traps_to_give)}")
+        debug_log(f"Processing trap index={item_index}, remaining trap queue={len(self.traps_to_give)}")
 
         # Handle Function-based traps
         if trap in trap_mapping:
@@ -1587,8 +1580,6 @@ class MSMContext(CommonContext):
                     logger.info("Locked stages!")
                     MSMFunctions.lock_all_characters()
                     logger.info("Locked characters!")
-                    #self.handle_gecko_codes()
-                    #logger.info("Gecko Codes Applied!")
                     self.start_process = False
 
                 # Ensure we have received slot data
@@ -1643,11 +1634,6 @@ class MSMContext(CommonContext):
             if value != 0:
                 self.game_interface.dolphin_client.write_word(address, 0)
 
-    # def handle_gecko_codes(self):
-    #     for address, code in ml.gecko_codes.items():
-    #         print(f"Address: {address}")
-    #         print(f"Code: {code}")
-    #         self.game_interface.dolphin_client.write_bytes(address, code)
 
     # === Where to handle what ===
 
@@ -1656,23 +1642,24 @@ class MSMContext(CommonContext):
         # Lock points if you don't have the stage/cup
         await self.handle_locked_tournament_stage_points()
 
-        if self.game_interface.ready_to_handle():
-            debug_log("Ready To Handle!")
-        else:
-            debug_log("Not ready to handle...")
-
         # Locations
         await self.handle_exhibition_win()
         await self.handle_cup_round_win()
 
         # Items
-        await self.handle_one_time_items(self.filler_to_give)
+        await self.handle_one_time_items()
         await self.handle_replace_due_to_scoring()
-        await self.handle_traps(self.traps_to_give)
-        await self.handle_question_mark_panel_items(self.unlocked_panel_items)
+        await self.handle_traps()
+        await self.handle_question_mark_panel_items()
         await self.handle_unlocked_abilities()
 
+        if self.game_interface.ready_to_handle():
+            debug_log("Ready To Handle!")
+        else:
+            debug_log("Not ready to handle...")
+
         await asyncio.sleep(0.1)
+
 
     async def handle_in_boss(self):
         await self.handle_boss_hp()
@@ -1681,24 +1668,29 @@ class MSMContext(CommonContext):
         await self.has_goaled()
 
         # Items
-        await self.handle_one_time_items(self.filler_to_give)
+        await self.handle_one_time_items()
         await self.handle_replace_due_to_scoring()
-        await self.handle_traps(self.traps_to_give)
-        await self.handle_question_mark_panel_items(self.unlocked_panel_items)
+        await self.handle_traps()
+        await self.handle_question_mark_panel_items()
         await self.handle_unlocked_abilities()
+
+        await asyncio.sleep(0.1)
 
 
     async def handle_in_tournament_map(self):
         await self.check_current_cup()
         await self.check_pending_tournament_location()
+        
         await asyncio.sleep(0.1)
+
 
     async def handle_in_main_menu(self):
         await self.check_pending_tournament_location()
+        await self.handle_received_items()
+        await self.stop_stupid_games_played_notifs()
+
         self.in_tournament_match = False
         self.boss_hp_handled = False
         self.game_interface.current_tournament = None
-        await self.handle_received_items()
-        await self.stop_stupid_games_played_notifs()
 
         await asyncio.sleep(0.1)

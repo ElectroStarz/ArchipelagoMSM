@@ -29,17 +29,20 @@ def unlock_tabs():
     for sport in sports_addresses():
         dme.write_byte(sport.Exhibition.tabs, 15)
 
+
 def lock_all_cups():
     for sport in sports_addresses():
         for diff in cups_difficulty:
             addr = getattr(sport.Tournament, diff)
             dme.write_byte(addr, 8)
 
+
 def lock_all_stages():
     for sport in sports_addresses():
         for cup in cups:
             addr = getattr(sport.Exhibition, cup)
             dme.write_byte(addr, 8)
+
 
 def lock_all_characters():
     for sport in sports_addresses():
