@@ -266,9 +266,10 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(item_2)
 
         for name, data in characters.items():
-            if name != character_1 or name != character_2:
+            if name not in (character_1, character_2):
                 new_item = world.create_item(name)
                 itempool.append(new_item)
+
     elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
         character_1, character_2, character_3 = world.random.sample(list(characters), 3)
         item_1 = world.create_item(character_1)
@@ -279,7 +280,7 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(item_3)
 
         for name, data in characters.items():
-            if name != character_1 or name != character_2 or name != character_3:
+            if name not in (character_1, character_2, character_3):
                 new_item = world.create_item(name)
                 itempool.append(new_item)
     else:
