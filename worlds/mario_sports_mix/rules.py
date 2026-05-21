@@ -155,12 +155,12 @@ def set_goal_rules(world: MSMWorld) -> None:
     )
 
     behemoth_king_rule = (
-        (HasAll("Sport: Sports Mix", "Stage: Behemoth Stage", options=[OptionFilter(SportsMixUnlock, 0)]) |
+        (Has("Sport: Sports Mix", options=[OptionFilter(SportsMixUnlock, 0)]) |
         HasAll(
             "Sports Crystal: Red", "Sports Crystal: Green",
             "Sports Crystal: Yellow", "Sports Crystal: Blue",
-            "Stage: Behemoth Stage", options=[OptionFilter(SportsMixUnlock, 1)]
-        )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3")
+            options=[OptionFilter(SportsMixUnlock, 1)]
+        )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3") & Has("Stage: Behemoth Stage")
     )
 
     # Behemoth Rules
