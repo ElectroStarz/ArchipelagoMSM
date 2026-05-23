@@ -77,7 +77,7 @@ Cannot be the same as the goal condition!"""
 
 class BehemothHP(Range):
     """Behemoth Health - 2400 is default
-Recommended to edit this in the yaml (2400 - 4000)"""
+Recommended to edit this in the YAML (2400 - 4000)"""
     display_name = "Behemoth HP"
     range_start = 2400
     range_end = 4000
@@ -85,7 +85,7 @@ Recommended to edit this in the yaml (2400 - 4000)"""
 
 class BehemothKingHP(Range):
     """Behemoth King Health - 3000 is default
-Recommended to edit this in the yaml (3000 - 7000)"""
+Recommended to edit this in the YAML (3000 - 7000)"""
     display_name = "Behemoth King HP"
     range_start = 3000
     range_end = 7000
@@ -97,6 +97,32 @@ class TrapChance(Range):
     range_start = 0
     range_end = 100
     default = 25
+
+class DeathlinkEnabled(Toggle):
+    """When you die, everyone else does and vice versa"""
+    display_name = "Deathlink"
+    default = False
+
+class DeathlinkAction(Choice):
+    """What counts as sending a deathlink? Requires Deathlink on"""
+    display_name = "Deathlink Action"
+    option_losing_a_match = 0
+    default = 0
+
+class DeathlinkConsequence(Choice):
+    """What happens when you receive a deathlink? Requires Deathlink on"""
+    display_name = "Deathlink Consequence"
+    option_lose_match = 0
+    option_opponent_gains_points = 1
+    default = 0
+
+class DeathlinkOpponentPoints(Range):
+    """How many points should the opponent get when receiving a deathlink?
+Requires Deathlink on & Opponent Gains Point consequence"""
+    display_name = "Deathlink Opponent Points"
+    range_start = 0
+    range_end = 20
+    default = 10
 
 # class TeamSanity(Choice):
 #     """(NOT WORKING) Turn on or off team sanity
@@ -156,6 +182,11 @@ msm_option_groups = [
         BehemothHP,
         BehemothKingHP,
     ]),
+    OptionGroup("Deathlink Options", [
+        DeathlinkEnabled,
+        DeathlinkAction,
+        DeathlinkConsequence,
+    ])
     # OptionGroup("Sanity Options (NOT WORKING)", [
     #     TeamSanity,
     #     ScoreSanity,
@@ -180,6 +211,9 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
+    deathlink_enabled: DeathlinkEnabled
+    deathlink_action: DeathlinkAction
+    deathlink_consequence: DeathlinkConsequence
     # team_sanity: TeamSanity
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints

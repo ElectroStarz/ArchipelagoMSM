@@ -4,6 +4,7 @@ class MatchAddresses:
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_stage = 0x8047888E  # String | Uses -0xF20
     current_period = 0x804D77CC # Byte | Starts at 0
+    current_module = 0x804D1154 # Word
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
     exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
@@ -88,7 +89,7 @@ class BasketballAddresses:
     time = 0x804D9977 # Byte
 
     class Tournament:
-        tabs = 0x90226D98 # Byte
+        tabs = 0x90226D98 # Byte | 2 = Normal, 3 = Normal + Hard
         normal_cups = 0x90226D99 # Byte
         hard_cups = 0x90226D9A # Byte
 
@@ -239,6 +240,9 @@ class SportsMixAddresses:
         cups = 0x90226D9C # Byte
 
 class Offsets:
+    class Match:
+        current_module_offsets = [0x1F5]
+
     class Player:
         special_meter_offsets = [0x10, 0x10C]
         special_active_offsets = [0xE0, 0x154]
@@ -273,3 +277,30 @@ class Offsets:
     class Boss:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
         max_hp_offsets = [0x20, 0x34, 0x1F4]
+
+class GeckoCodes:
+    gecko_codes_pal = {
+        #One Character Random
+        0x8013f8a0: b'\x4B\xEC\x09\x38',
+        0x800001d8: b'\x38\x60\x00\x00\x2C\x17\x00\x01\x40\x82\x00\x0C\x72\xD6\xF0\x00\x62\xD6\x00\x50\x48\x13\xf6\xb8',
+
+        #No Fill Button
+        0x801b75c4: b'\x4B\xE4\x8B\xEC',
+        0x800001b0: b'\x7c\x8c\x7e\x70\x2c\x0c\x00\x01\x40\x82\x00\x14\x2c\x00\x00\x00\x40\x82\x00\x0c\x38\x80\x00\x00\x60\x84\x80\x50\x7c\x08\x02\xa6\x60\x00\x00\x00\x48\x1B\x73\xF4',
+
+        #Select More than Once (ONLY WRITE WHEN IN THE MENU MODULE; only needs to be written after module loads)
+        0x815B40B0: b'\x60\x00\x00\x00',
+        0x815B40B4: b'\x60\x00\x00\x00',
+        0x815B41A0: b'\x38\x60\x00\x01',
+        0x815B41A4: b'\x4E\x80\x00\x20',
+        0x81618F64: b'\x38\xA0\x00\x00',
+        0x81619250: b'\x38\x00\x00\x03',
+        0x8161925c: b'\x38\x00\x00\x03',
+        0x81619268: b'\x38\x00\x00\x03',
+        0x81619274: b'\x38\x00\x00\x03',
+        0x816186b0: b'\x7E\x9E\xA3\x78',
+        0x816188d4: b'\x72\x84\xF0\x00',
+        0x8161868c: b'\x72\x9E\xF0\x00',
+        0x81618898: b'\x72\x84\xF0\x00',
+        0x8161b538: b'\x38\xA0\x00\x13'
+    }

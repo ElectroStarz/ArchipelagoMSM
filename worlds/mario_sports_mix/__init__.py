@@ -94,6 +94,9 @@ class MSMWorld(World):
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
+        "deathlink_enabled": self.options.deathlink_enabled.value,
+        "deathlink_action": self.options.deathlink_action.value,
+        "deathlink_consequence": self.options.deathlink_consequence.value,
         }
 
         return slot_data

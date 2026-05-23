@@ -12,6 +12,10 @@ class AddressLib:
         return get_address(MatchAddresses.current_stage)
 
     @cached_property
+    def current_module_addr(self):
+        return get_address(MatchAddresses.current_module)
+
+    @cached_property
     def match_status_addr(self):
         return get_address(MatchAddresses.match_status)
 
@@ -26,6 +30,10 @@ class AddressLib:
     @cached_property
     def timer_addr(self):
         return get_address(MatchAddresses.time_remaining)
+
+    @cached_property
+    def current_period(self):
+        return get_address(MatchAddresses.current_period)
 
     @cached_property
     def cutscene_active_addr(self):
@@ -93,7 +101,7 @@ class AddressLib:
 
         address_properties = [
             "current_stage_addr", "match_status_addr", "game_layout_addr",
-            "paused_addr", "timer_addr", "cutscene_active_addr",
+            "paused_addr", "timer_addr", "current_period", "cutscene_active_addr",
             "loading_screen_addr", "behemoth_hp_addr", "volley_last_held_addr",
             "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
             "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
