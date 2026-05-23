@@ -1,12 +1,24 @@
 from collections.abc import Mapping
-from typing import Any, TYPE_CHECKING
-from BaseClasses import Tutorial, Item, Location, Region
+from typing import Any
+from BaseClasses import Tutorial
 from worlds.AutoWorld import WebWorld, World
 from . import regions, rules, locations, components
 from .options import *
 from .items import ITEM_NAME_TO_ID
+import json
+import pkgutil
 
-WORLD_VERSION = "0.0.1"
+# Find world version
+
+# Read the file data from the APWorld
+data = pkgutil.get_data(__name__, "archipelago.json")
+
+if data is not None:
+    file = json.loads(data.decode("utf-8"))
+    WORLD_VERSION = file["world_version"]
+else:
+    raise FileNotFoundError("Could not find archipelago.json in the APWorld!")
+
 
 class MSMWebWorld(WebWorld):
     game = "Mario Sports Mix"
@@ -72,7 +84,7 @@ class MSMWorld(World):
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)
 
-   # Stuff to send to the client because it needs to know that
+   # Stuff to send to the client/tracker because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
         slot_data = {
         "version": WORLD_VERSION,
@@ -80,6 +92,8 @@ class MSMWorld(World):
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
+        "exhibition_difficulty": self.options.exhibition_difficulty.value,
+        "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
         }
 
         return slot_data

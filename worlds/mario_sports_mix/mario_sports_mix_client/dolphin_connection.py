@@ -5,6 +5,7 @@ import psutil
 import dolphin_memory_engine as dme
 import asyncio
 
+
 GAME_VERSION = None
 
 class DolphinException(Exception):
@@ -15,6 +16,7 @@ class DolphinClient:
         self.dme = dme
         self.logger = logger
         self.attempt = 1
+        self.told_region = False
 
     @staticmethod
     def check_for_dolphin():
@@ -46,7 +48,6 @@ class DolphinClient:
 
     async def attempt_to_hook(self):
         if not self.dme.is_hooked():
-            # Fixed: Changed from self.attempt to tracking via your instance variable properly
             self.logger.info(f"Attempting to hook: Attempt {self.attempt}")
             self.dme.hook()
 
@@ -65,6 +66,31 @@ class DolphinClient:
 
             self.attempt += 1
             await asyncio.sleep(5)
+
+    def check_region(self):
+        global GAME_VERSION
+
+        byte = self.read_bytes(0x80000000, 6)
+        decoded = byte.decode("utf-8", errors="ignore")
+
+        if decoded == "RMKP01":
+            GAME_VERSION = "PAL"
+            if not self.told_region:
+                self.logger.info("PAL Detected!")
+                self.told_region = True
+
+        elif decoded == "RMKE01":
+            GAME_VERSION = "NTSC-U"
+            if not self.told_region:
+                self.logger.info("NTSC-U Detected!")
+                self.told_region = True
+
+        else:
+            GAME_VERSION = None
+            self.logger.info(f"Unsupported or unreadable game ID: {decoded!r}")
+            return False
+
+        return True
 
 
 
@@ -98,10 +124,11 @@ class DolphinClient:
         result = self.dme.read_float(address)
         return result
 
-    def read_string(self, address: Any) -> Any:
+    def read_string(self, address: int) -> str:
         self.dme.is_hooked()
         byte = self.dme.read_bytes(address, 5)
-        decoded = byte.decode("utf-8")
+        # Decode and strip out the invisible null bytes
+        decoded = byte.decode("utf-8", errors="ignore").rstrip('\x00')
         return decoded
 
     def write_string(self, address: Any, string: str) -> Any:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from rule_builder.rules import Has, HasAll, HasAny, CanReachLocation
-from .options import GoalCondition, BeMean, HardTournamentDifficulty
+from rule_builder.rules import Has, HasAll, HasAny, CanReachLocation, OptionFilter
+from .options import *
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -150,31 +150,35 @@ def set_goal_rules(world: MSMWorld) -> None:
         CanReachLocation("Basketball: Beat Normal Star Cup Round 3", "Basketball: Star Cup (Normal)") &
         CanReachLocation("Dodgeball: Beat Normal Star Cup Round 3", "Dodgeball: Star Cup (Normal)") &
         CanReachLocation("Volleyball: Beat Normal Star Cup Round 3", "Volleyball: Star Cup (Normal)") &
-        CanReachLocation("Hockey: Beat Normal Star Cup Round 3", "Hockey: Star Cup (Normal)")
+        CanReachLocation("Hockey: Beat Normal Star Cup Round 3", "Hockey: Star Cup (Normal)") &
+        Has("Stage: Behemoth Stage")
     )
 
     behemoth_king_rule = (
-        (HasAll("Sport: Sports Mix", "Stage: Behemoth Stage") |
+        (Has("Sport: Sports Mix", options=[OptionFilter(SportsMixUnlock, 0)]) |
         HasAll(
             "Sports Crystal: Red", "Sports Crystal: Green",
             "Sports Crystal: Yellow", "Sports Crystal: Blue",
-            "Stage: Behemoth Stage"
-        )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3")
+            options=[OptionFilter(SportsMixUnlock, 1)]
+        )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3") & Has("Stage: Behemoth Stage")
     )
 
+    # Behemoth Rules
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
         world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
+    if world.options.be_mean == BeMean.option_defeat_behemoth_king:
+        if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+
+
+    # Behemoth King Rules
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
         world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
     if world.options.be_mean == BeMean.option_defeat_behemoth:
         if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
-
-    if world.options.be_mean == BeMean.option_defeat_behemoth_king:
-        if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
 
 # Creates entrance access rules for menus and cups
@@ -190,10 +194,10 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
     sports_mix = world.get_entrance("Main Menu -> Sports Mix")
     world.set_rule(
         sports_mix,
-        Has("Sport: Sports Mix") |
+        Has("Sport: Sports Mix", options=[OptionFilter(SportsMixUnlock, 0)]) |
         HasAll(
             "Sports Crystal: Red", "Sports Crystal: Green",
-            "Sports Crystal: Yellow", "Sports Crystal: Blue"
+            "Sports Crystal: Yellow", "Sports Crystal: Blue", options=[OptionFilter(SportsMixUnlock, 1)]
         )
     )
 

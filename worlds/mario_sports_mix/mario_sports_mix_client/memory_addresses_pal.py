@@ -2,14 +2,14 @@ class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
-    current_stage = 0x8047888E  # String
+    current_stage = 0x8047888E  # String | Uses -0xF20
     current_period = 0x804D77CC # Byte | Starts at 0
-    on_loading_screen = 0x804D8354  # Word
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
     exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
-
-    dodgeball_sets = 0x804D99A7
+    paused = 0x804D069B # Byte
+    cutscene_on = 0x805C1999 # Byte
+    loading_screen_active = 0x804D8354  # Word
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
@@ -38,7 +38,6 @@ class CupsWonMultiple:
         mushroom_cup = 0x90229A7C
         flower_cup = 0x90229A7E
         star_cup = 0x90229A80
-
 
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
@@ -86,6 +85,7 @@ class OpponentAddresses:
 
 class BasketballAddresses:
     games_played = 0x902299AC # Word
+    time = 0x804D9977 # Byte
 
     class Tournament:
         tabs = 0x90226D98 # Byte
@@ -122,6 +122,7 @@ class BasketballAddresses:
 
 class DodgeballAddresses:
     games_played = 0x90229A34 # Word
+    time = 0x804D99AB # Byte
 
     class Tournament:
         tabs = 0x90226DB0 # Byte
@@ -195,6 +196,7 @@ class VolleyballAddresses:
 
 class HockeyAddresses:
     games_played = 0x90229A78 # Word
+    time = 0x804D99CB #Byte
 
     class Tournament:
         tabs = 0x90226DBC # Byte
@@ -240,6 +242,7 @@ class Offsets:
     class Player:
         special_meter_offsets = [0x10, 0x10C]
         special_active_offsets = [0xE0, 0x154]
+
         class B1:
             class Position:
                 x_offsets = [0x54,0x0,0x90,0x98]
@@ -247,6 +250,7 @@ class Offsets:
                 z_offsets = [0x54,0x0,0x90,0xA0]
                 rotation_offsets = [0x54,0x0,0x90,0xB4]
                 is_cpu = [0x54, 0x0, 0x6F]
+
         class B2:
             class Position:
                 x_offsets = [0x54,0x8,0x90,0x98]
@@ -254,6 +258,7 @@ class Offsets:
                 z_offsets = [0x54,0x8,0x90,0xA0]
                 rotation_offsets = [0x54,0x8,0x90,0xB4]
                 is_cpu = [0x54, 0x8, 0x6F]
+
         class B3:
             class Position:
                 x_offsets = [0x54,0x10,0x90,0x98]

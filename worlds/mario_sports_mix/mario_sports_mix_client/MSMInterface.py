@@ -1,8 +1,8 @@
 from enum import Enum
 from .dolphin_connection import *
-from .memory_addresses import *
 from typing import Optional
-
+from .memory_addresses_pal import *
+from .common_address_library import AddressLib
 
 class ConnectionState(Enum):
     DISCONNECTED = 0
@@ -11,9 +11,8 @@ class ConnectionState(Enum):
     IN_TOURNAMENT_MAP = 4
     IN_MATCH = 5
     IN_BOSS = 6
-    GOALED = 7
 
-_supported_versions = ["RMKP01"]
+_supported_versions = ["RMKP01", "RMKE01"]
 
 stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
 
@@ -28,40 +27,46 @@ class MSMInterface:
         self.logger = logger
         self.dolphin_client = DolphinClient(logger)
         self.current_tournament = None
+        self.addresslib = AddressLib()
+
 
 
     def is_in_menu(self):
-        current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         if current_stage == "s39ba":
             return True
         else:
             return False
 
     def is_in_match(self):
-        current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         current_stage_prefix = current_stage[:3]
+
         if current_stage_prefix in stage_ids:
             return True
         else:
             return False
 
     def is_in_boss(self):
-        current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+
         if current_stage == "s20VO":
             return True
         else:
             return False
 
     def is_in_tournament_map(self):
-        current_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         current_stage_prefix = current_stage[:3]
+
         if any(prefix in current_stage_prefix for prefix in ["s31", "s32", "s33"]):
             return True
         else:
             return False
 
     def check_player_amount(self):
-        value = self.dolphin_client.read_byte(MatchAddresses.game_layout)
+        value = self.dolphin_client.read_byte(self.addresslib.game_layout_addr)
+        
         if value == 0:
             return 3
         elif value == 4:
@@ -70,68 +75,81 @@ class MSMInterface:
             return -1
 
     def ready_to_handle(self):
-        match_status = self.dolphin_client.read_byte(MatchAddresses.match_status)
-        string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)
+        string_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         current_stage = string_stage[0:3]
-        timer = self.dolphin_client.read_float(MatchAddresses.time_remaining)
-        on_loading_screen = self.dolphin_client.read_word(MatchAddresses.on_loading_screen)
+        paused = self.dolphin_client.read_byte(self.addresslib.paused_addr)
+        timer = self.dolphin_client.read_float(self.addresslib.timer_addr)
+        cutscene_active = self.dolphin_client.read_byte(self.addresslib.cutscene_active_addr)
+        loading_screen_active = self.dolphin_client.read_word(self.addresslib.loading_screen_addr)
+        basket_timer = self.get_basketball_time()
+        dodge_timer = self.get_dodgeball_time()
+        hockey_timer = self.get_hockey_time()
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
 
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
-                if timer < 9000:
+                if timer < basket_timer:
                     ready_game = True
                 else:
                     ready_game = False
 
             elif self.check_sport() == "Dodgeball":
-                if timer < 10800:
+                if dodge_timer == "Off":
                     ready_game = True
                 else:
-                    ready_game = False
+                    if timer < dodge_timer:
+                        ready_game = True
+                    else:
+                        ready_game = False
 
             elif self.check_sport() == "Volleyball":
                 if current_stage == "s20":
                     try:
-                        self.dolphin_client.follow_pointers(
-                            BossAddresses.behemoth_hp,
-                            Offsets.Boss.behemoth_hp_offsets
-                        )
+                        self.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
+                                                            Offsets.Boss.behemoth_hp_offsets)
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
                 else:
                     try:
                         # Check if you can follow pointers to the address, if so, then ready
-                        self.dolphin_client.follow_pointers(
-                            VolleyballAddresses.last_held,
-                            Offsets.Volleyball.last_held_offsets
-                        )
+                        self.dolphin_client.follow_pointers(self.addresslib.volley_last_held_addr,
+                                                            Offsets.Volleyball.last_held_offsets)
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
             elif self.check_sport() == "Hockey":
-                if timer < 10800:
+                if timer < hockey_timer:
                     ready_game = True
                 else:
                     ready_game = False
         else:
             ready_game = False
 
-        if on_loading_screen == 1:
-            loading_screen_active = False
+        if paused == 1:
+            is_paused = True
         else:
-            loading_screen_active = True
+            is_paused = False
 
+        if cutscene_active == 0:
+            is_cutscene = False
+        else:
+            is_cutscene = True
 
-        if ready_game and not loading_screen_active:
+        if loading_screen_active == 0:
+            is_loading = True
+        else:
+            is_loading = False
+
+        if ready_game and not is_cutscene and not is_paused and not is_loading:
             return True
         else:
             return False
 
     def match_status(self):
-        match_status = self.dolphin_client.read_byte(MatchAddresses.match_status)
+        match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)
         if match_status == 1:
             return 1 # Won
         elif match_status == 2:
@@ -142,7 +160,7 @@ class MSMInterface:
             return 0 # Ongoing
 
     def check_sport(self):
-        string_stage = self.dolphin_client.read_string(MatchAddresses.current_stage)
+        string_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         current_sport = string_stage[-2:]
         if current_sport == "BA":
             return "Basketball"
@@ -155,20 +173,70 @@ class MSMInterface:
         else:
             return None
 
+    def get_basketball_time(self):
+        time = self.dolphin_client.read_byte(self.addresslib.basket_time_addr)
+
+        if time == 0:
+            return 5400
+        elif time == 1:
+            return 7200
+        elif time == 2:
+            return 9000
+        elif time == 3:
+            return 10800
+        elif time == 4:
+            return 12600
+        else:
+            return 99999
+
+    def get_dodgeball_time(self):
+        time = self.dolphin_client.read_byte(self.addresslib.dodge_time_addr)
+
+        if time == 0:
+            return 7200
+        elif time == 1:
+            return 9000
+        elif time == 2:
+            return 10800
+        elif time == 3:
+            return 12600
+        elif time == 4:
+            return 14400
+        elif time == 5:
+            return "Off"
+        else:
+            return 99999
+
+    def get_hockey_time(self):
+        time = self.dolphin_client.read_byte(self.addresslib.hockey_time_addr)
+
+        if time == 0:
+            return 7200
+        elif time == 1:
+            return 9000
+        elif time == 2:
+            return 10800
+        elif time == 3:
+            return 12600
+        elif time == 4:
+            return 14400
+        else:
+            return 99999
+
     def check_sports_mix(self):
-        is_sports_mix = self.dolphin_client.read_byte(SportsMixAddresses.is_sports_mix)
+        is_sports_mix = self.dolphin_client.read_byte(self.addresslib.is_sports_mix_addr)
         if is_sports_mix == 1:
             return True
         else:
             return False
 
     def get_exhibition_difficulty(self):
-        difficulty = self.dolphin_client.read_byte(MatchAddresses.exhibition_diff)
+        difficulty = self.dolphin_client.read_byte(self.addresslib.exhibition_diff_addr)
 
         return {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}.get(difficulty)
 
     def get_tournament_difficulty(self, cup: str) -> Optional[str]:
-        difficulty = self.dolphin_client.read_byte(MatchAddresses.tournament_diff)
+        difficulty = self.dolphin_client.read_byte(self.addresslib.tournament_diff_addr)
 
         if cup == "Mushroom Cup":
             return {0: "Normal", 1: "Hard"}.get(difficulty)
@@ -197,3 +265,4 @@ class MSMInterface:
 
         except (DolphinException, RuntimeError):
             return ConnectionState.DISCONNECTED
+
