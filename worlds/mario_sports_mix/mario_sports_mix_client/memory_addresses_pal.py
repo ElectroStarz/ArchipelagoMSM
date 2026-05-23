@@ -242,6 +242,7 @@ class Offsets:
     class Player:
         special_meter_offsets = [0x10, 0x10C]
         special_active_offsets = [0xE0, 0x154]
+
         class B1:
             class Position:
                 x_offsets = [0x54,0x0,0x90,0x98]
@@ -249,6 +250,7 @@ class Offsets:
                 z_offsets = [0x54,0x0,0x90,0xA0]
                 rotation_offsets = [0x54,0x0,0x90,0xB4]
                 is_cpu = [0x54, 0x0, 0x6F]
+
         class B2:
             class Position:
                 x_offsets = [0x54,0x8,0x90,0x98]
@@ -256,6 +258,7 @@ class Offsets:
                 z_offsets = [0x54,0x8,0x90,0xA0]
                 rotation_offsets = [0x54,0x8,0x90,0xB4]
                 is_cpu = [0x54, 0x8, 0x6F]
+
         class B3:
             class Position:
                 x_offsets = [0x54,0x10,0x90,0x98]
