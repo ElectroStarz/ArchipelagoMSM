@@ -143,6 +143,11 @@ class MSMCommandProcessor(ClientCommandProcessor):
         asyncio.create_task(self.ctx.handle_received_items())
         logger.info("Reapplied unlocks!")
 
+    def _cmd_reset_cached(self):
+        """Manually reset the cached values if address errors are coming up when switching regions"""
+        self.ctx.addresslib.reset_all_addresses()
+        logger.info("Reset cached values!")
+
     def _cmd_unlocked_characters(self):
         """Display what characters you have unlocked."""
         unlocked_characters = self.ctx.unlocked_characters
@@ -424,6 +429,7 @@ class MSMContext(CommonContext):
 
     async def disconnect(self, allow_auto_reconnect: bool = False):
         self.game_interface.dolphin_client.disconnect()
+        self.addresslib.reset_all_addresses()
         await super().disconnect(allow_auto_reconnect)
 
     def update_connection_status(self):
@@ -506,7 +512,9 @@ class MSMContext(CommonContext):
 
         return result
 
+
     # === Item Receiving ===
+
 
     async def handle_received_items(self):
         prefix = ("Basketball:", "Dodgeball:", "Volleyball:", "Hockey:", "Sports Mix:")
@@ -615,6 +623,8 @@ class MSMContext(CommonContext):
                     self.game_interface.dolphin_client.write_byte(new_addr, value)
                 except AttributeError:
                     print(f"Warning: {char} not found in {sport.__name__}!")
+
+    # Specific value functions for characters with costumes
 
     def yoshi_unlocks_value(self):
         # If they don't have the character item, character is locked
@@ -1556,7 +1566,6 @@ class MSMContext(CommonContext):
                     message = "Waiting for player to connect to Archipelago server..."
                     self.start_process = True
                     if self.last_error_message != message:
-                        logger.info("Make sure you have backed up your save file!")
                         logger.info(message)
                         self.last_error_message = message
                     await asyncio.sleep(1)

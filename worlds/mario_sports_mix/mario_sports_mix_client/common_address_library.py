@@ -2,6 +2,9 @@ from functools import cached_property
 from .memory_addresses_pal import *
 from .MSMFunctions import get_address
 
+# This is a file with commonly used addresses. These values are cached and saved as the user if probably not going to
+# change regions midway through a sync/async. If needed though, there is a command to reset these values in the client.
+
 class AddressLib:
 
     @cached_property
@@ -83,3 +86,22 @@ class AddressLib:
     @cached_property
     def p_special_meter_addr(self):
         return get_address(PlayerAddresses.special_meter)
+
+
+    def reset_all_addresses(self):
+        """Safely clears the cache for all memory addresses."""
+
+        address_properties = [
+            "current_stage_addr", "match_status_addr", "game_layout_addr",
+            "paused_addr", "timer_addr", "cutscene_active_addr",
+            "loading_screen_addr", "behemoth_hp_addr", "volley_last_held_addr",
+            "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
+            "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
+            "p_pos_addr", "p_item_held_addr", "p_coins_addr",
+            "o_coins_addr", "p_special_meter_addr"
+        ]
+
+        # Loop through the list and delete the cached variables if they exist
+        for prop in address_properties:
+            if prop in self.__dict__:
+                delattr(self, prop)
