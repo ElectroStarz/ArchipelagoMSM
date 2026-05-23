@@ -4,8 +4,7 @@ import sys
 import psutil
 import dolphin_memory_engine as dme
 import asyncio
-from .memory_addresses_pal import MatchAddresses as PAL
-from .memory_addresses_ntscu import MatchAddresses as NTSCU
+
 
 GAME_VERSION = None
 

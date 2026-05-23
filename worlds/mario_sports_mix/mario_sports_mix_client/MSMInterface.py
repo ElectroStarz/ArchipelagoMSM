@@ -1,9 +1,8 @@
 from enum import Enum
 from .dolphin_connection import *
-#from . import memory_loader as ml
 from typing import Optional
 from .memory_addresses_pal import *
-from .address_library import AddressLib
+from .common_address_library import AddressLib
 
 class ConnectionState(Enum):
     DISCONNECTED = 0

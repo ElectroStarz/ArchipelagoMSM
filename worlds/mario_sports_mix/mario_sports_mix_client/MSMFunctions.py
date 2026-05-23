@@ -1,5 +1,3 @@
-#from . import memory_loader as ml
-import dolphin_memory_engine
 import dolphin_memory_engine as dme
 from . import dolphin_connection as dc
 from .memory_addresses_pal import *
@@ -57,23 +55,20 @@ def lock_all_characters():
             dme.write_byte(new_addr, 0)
 
 
-# Map the PAL addresses to their exact NTSC-U equivalents
-NTSC_U_EXCEPTIONS = {
-    MatchAddresses.current_stage: 0x8047796E,
-}
-
 
 def get_address(address, offset=0xF80):
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
-    #print(f"[DEBUG] Target Match (Hex): {hex(target_match_address)}")
 
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_stage:
-            #print("[DEBUG] EXCEPTION MATCHED! Returning hardcoded string address.")
-            return 0x8047796E
+            #print(f"[DEBUG] Current Stage detected! Returning NTSC-U Address {new_addr}")
+            new_addr = 0x8047796E
+            return new_addr
 
-        #print("[DEBUG] Exception failed. Returning standard math offset.")
-        return address - offset
+        #print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
+        new_addr = address - offset
+        return new_addr
 
-    return address
+    new_addr = address
+    return new_addr

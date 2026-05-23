@@ -5,7 +5,6 @@ import traceback
 from collections import deque
 from random import randint
 from typing import Dict, Set, Optional
-#from . import memory_loader as ml
 from .memory_addresses_pal import *
 
 
@@ -16,7 +15,7 @@ from .MSMInterface import MSMInterface, ConnectionState
 from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
 from .MSMFunctions import get_address
-from .address_library import AddressLib
+from .common_address_library import AddressLib
 
 id_to_name = {data.code: name for name, data in item_table.items()}
 CLIENT_VERSION = "0.1.0"
@@ -1539,9 +1538,8 @@ class MSMContext(CommonContext):
 
 
     async def dolphin_sync_task(self) -> None:
-        """
-        The main loop managing the connection to Dolphin and game-state logic routing.
-        """
+        #The main loop managing the connection to Dolphin and game-state logic routing.
+
 
         while not self.exit_event.is_set():
             try:

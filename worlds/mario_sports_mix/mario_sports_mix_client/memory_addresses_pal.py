@@ -2,7 +2,7 @@ class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
-    current_stage = 0x8047888E  # String
+    current_stage = 0x8047888E  # String | Uses -0xF20
     current_period = 0x804D77CC # Byte | Starts at 0
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
