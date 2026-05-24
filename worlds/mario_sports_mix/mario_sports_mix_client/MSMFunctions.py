@@ -20,6 +20,8 @@ sports_addresses = [
 
 
 async def unlock_tournament_tabs_option(self, hard_tournament_difficulty):
+    """Unlocks the tournament tabs depending on if the player has checked Hard Tournament Difficulty in their YAML"""
+
     b_address = get_address(BasketballAddresses.Tournament.tabs)
     d_address = get_address(DodgeballAddresses.Tournament.tabs)
     v_address = get_address(VolleyballAddresses.Tournament.tabs)

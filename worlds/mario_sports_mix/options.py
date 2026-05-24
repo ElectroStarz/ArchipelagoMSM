@@ -107,7 +107,8 @@ class DeathlinkEnabled(DeathLink):
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on"""
     display_name = "Deathlink Action"
-    option_losing_a_match = 0
+    option_losing_or_tying_a_match = 0
+    option_every_number_of_points = 1
     default = 0
 
 class DeathlinkConsequence(Choice):
@@ -117,11 +118,21 @@ class DeathlinkConsequence(Choice):
     option_opponent_gains_points = 1
     default = 0
 
-class DeathlinkOpponentPoints(Range):
+# Action
+class DeathlinkOpponentScorePoints(Range):
+    """How many points should the opponent get to send a deathlink?
+Requires Deathlink on & Every number of points action"""
+    display_name = "[DL-A] Opponent Scores Points"
+    range_start = 1
+    range_end = 20
+    default = 10
+
+# Consequence
+class DeathlinkOpponentGetPoints(Range):
     """How many points should the opponent get when receiving a deathlink?
 Requires Deathlink on & Opponent Gains Point consequence"""
-    display_name = "Deathlink Opponent Points"
-    range_start = 0
+    display_name = "[DL-C] Opponent Gets Points"
+    range_start = 1
     range_end = 20
     default = 10
 
@@ -186,8 +197,9 @@ msm_option_groups = [
     OptionGroup("Deathlink Options", [
         DeathlinkEnabled,
         DeathlinkAction,
+        DeathlinkOpponentScorePoints,
         DeathlinkConsequence,
-        DeathlinkOpponentPoints,
+        DeathlinkOpponentGetPoints,
     ])
     # OptionGroup("Sanity Options (NOT WORKING)", [
     #     TeamSanity,
@@ -216,7 +228,8 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_enabled: DeathlinkEnabled
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
-    deathlink_opponent_points: DeathlinkOpponentPoints
+    deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
+    deathlink_opponent_get_points: DeathlinkOpponentGetPoints
     # team_sanity: TeamSanity
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints

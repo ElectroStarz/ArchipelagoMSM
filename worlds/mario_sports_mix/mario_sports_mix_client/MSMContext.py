@@ -297,7 +297,8 @@ class MSMContext(CommonContext):
     deathlink_enabled: bool = False
     deathlink_action = int
     deathlink_consequence = int
-    deathlink_o_points = int
+    deathlink_o_get_points = int
+    deathlink_o_scores_points = int
 
     # Sanity stuff
     special_sanity = False
@@ -341,6 +342,7 @@ class MSMContext(CommonContext):
         # Deathlink Stuff
         self.has_sent_death = False
         self.received_death = False
+        self.previous_opponent_score = None
 
         # Lists for items
         self.unlocked_sports = []
@@ -401,7 +403,8 @@ class MSMContext(CommonContext):
             self.deathlink_enabled = self.slot_data["deathlink_enabled"]
             self.deathlink_action = self.slot_data["deathlink_action"]
             self.deathlink_consequence = self.slot_data["deathlink_consequence"]
-            self.deathlink_o_points = self.slot_data["deathlink_opponent_points"]
+            self.deathlink_o_get_points = self.slot_data["deathlink_opponent_get_points"]
+            self.deathlink_o_scores_points = self.slot_data["deathlink_opponent_scores_points"]
 
             Utils.async_start(self.update_death_link(self.deathlink_enabled))
 
@@ -1383,7 +1386,7 @@ class MSMContext(CommonContext):
 
                     if behemoth_hp is not None and behemoth_hp <= 0:
                         self.boss_defeat_handled = True  # Lock execution immediately
-    
+
                         if self.goal_condition == 1:
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth King!")
@@ -1676,21 +1679,66 @@ class MSMContext(CommonContext):
 
     async def handle_send_deathlink(self):
         """Gets awaited during in match and sends a deathlink depending on what the deathlink_action is"""
-        possible_messages = ["lost the match!", "isn't good enough!", "has a MASSIVE skill issue!",
-                             "needs to take a break..."]
+
+        possible_messages_0 = ["lost the match!", "isn't good enough!", "has a MASSIVE skill issue!",
+                             "needs to take a break...", "couldn't sport their mix..."]
+
+        possible_messages_1 = ["got DUNKED on!", "can't handle the heat!", "is throwing a fit!", "crashed out!"]
+
+        match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
 
         if self.deathlink_enabled:
+
+            # Lose Match Action
             if self.deathlink_action == 0:
-                match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
                 if (match_status == 2 or match_status == 3) and not self.received_death:
                     if not self.has_sent_death and self.slot is not None:
-                        message = random.choice(possible_messages)
+                        message = random.choice(possible_messages_0) # Pick a random message to send
                         await self.send_death(f"{self.player_names[self.slot]} {message}")
                         self.has_sent_death = True
-                        self.debug_log("Sent deathlink")
-                else:
+                        self.debug_log("Sent deathlink due to losing the match")
+
+                if match_status == 0:
                     self.has_sent_death = False
-                    self.debug_log("Deathlink reset")
+
+
+            # Opponent Scores Points Action
+            elif self.deathlink_action == 1:
+                if self.has_score_reached_threshold():
+                    if not self.has_sent_death and self.slot is not None:
+                        message = random.choice(possible_messages_1) # Pick a random message to send
+                        await self.send_death(f"{self.player_names[self.slot]} {message}")
+                        self.has_sent_death = True
+                        self.debug_log("Sent deathlink due to the opponent scoring")
+                        self.has_sent_death = False
+
+
+    def has_score_reached_threshold(self) -> bool:
+        current_opponent_score = sum(
+            self.game_interface.dolphin_client.read_word(get_address(addr)) for addr in opponent_score_addresses)
+
+        if self.previous_opponent_score is None:
+            self.previous_opponent_score = current_opponent_score
+            return False
+
+        # If the score drops, a new match started.
+        # Reset our tracker to the new lower score and return False.
+        if current_opponent_score < self.previous_opponent_score:
+            self.previous_opponent_score = current_opponent_score
+            return False
+
+        # Check the difference
+        score_increase = current_opponent_score - self.previous_opponent_score
+
+        # If the threshold is met, update the tracker and return True
+        if score_increase >= self.deathlink_o_scores_points:
+            # Reset the "previous" score to the current one so it can start counting up again
+            self.previous_opponent_score = current_opponent_score
+            return True
+
+        # If the threshold isn't met yet, do nothing and return False
+        return False
+
 
     def on_deathlink(self, data: dict[str, Any]):
         self.debug_log("Deathlink Received")
@@ -1706,6 +1754,7 @@ class MSMContext(CommonContext):
                 current_stage_value = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
                 current_stage = current_stage_value[:3]
                 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
+
                 # Lose Match Consequence
                 if self.deathlink_consequence == 0:
                     # Force opponent to win
@@ -1718,14 +1767,16 @@ class MSMContext(CommonContext):
                     # If we're not in the state where we've died to deathlink, set received_death to false
                     if (match_status != 2 and match_status != 3) or current_stage in not_match_prefix:
                         self.received_death = False
+
                 # Opponent gains points
                 elif self.deathlink_consequence == 1:
                     self.received_death = True
                     value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
                     addr = get_address(opponent_score_addresses[value]) # Get the address for current period
                     points = self.game_interface.dolphin_client.read_word(addr)
-                    new_points = points + self.deathlink_o_points
+                    new_points = points + self.deathlink_o_get_points
                     self.game_interface.dolphin_client.write_word(addr, new_points)
+                    logger.info(f"Opponent now has {new_points} points!")
                     self.received_death = False
 
 
@@ -1899,8 +1950,12 @@ class MSMContext(CommonContext):
 
         await self.handle_gecko_codes()
 
+        self.has_sent_death = False
+
         self.in_tournament_match = False
         self.boss_hp_handled = False
+        self.is_behemoth = False
+        self.is_behemoth_king = False
         self.game_interface.current_tournament = None
 
         await asyncio.sleep(0.1)
