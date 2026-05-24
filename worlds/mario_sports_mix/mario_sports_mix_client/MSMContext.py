@@ -103,6 +103,9 @@ opponent_score_addresses = [
 
 logger = logging.getLogger("Client")
 CONSUMABLE_STORAGE_CATEGORY = "mario_sports_mix_client"
+LOCATION_STORAGE_CATEGORY = "mario_sports_mix_locations"
+# Build the reverse lookup once so persisted AP location IDs can be shown as local names.
+LOCATION_ID_TO_NAME = {location_id: name for name, location_id in LOCATION_NAME_TO_ID.items()}
 
 
 class MSMCommandProcessor(ClientCommandProcessor):
@@ -130,18 +133,19 @@ class MSMCommandProcessor(ClientCommandProcessor):
         asyncio.create_task(self.ctx.handle_received_items())
         logger.info("Reapplied unlocks!")
 
-    def _cmd_reapply_codes(self):
-        """Reapply the patch codes if something isn't working, must be on main menu"""
-        self.ctx.handled_gecko_codes = False
-        self.ctx.handle_gecko_codes()
-        logger.info("Patches Reapplied!")
+    # def _cmd_reapply_codes(self):
+    #     """Reapply the patch codes if something isn't working, must be on main menu"""
+    #     self.ctx.handled_gecko_codes = False
+    #     print(self.ctx.handled_gecko_codes)
+    #     self.ctx.handle_gecko_codes()
+    #     logger.info("Patches Reapplied!")
 
     def _cmd_reset_cached(self):
         """Manually reset the cached values if address errors are coming up when switching regions"""
         self.ctx.addresslib.reset_all_addresses()
         logger.info("Reset cached values!")
 
-    def _cmd_toggle_deathlink(self):
+    def _cmd_deathlink(self):
         """Toggle deathlink from client. Overrides default setting."""
         self.ctx.deathlink_enabled = not self.ctx.deathlink_enabled
         Utils.async_start(self.ctx.update_death_link(self.ctx.deathlink_enabled))
@@ -278,7 +282,6 @@ class MSMContext(CommonContext):
     items_handling = 0b111
     want_slot_data = True
     items_handled = []
-    locations_handled = []
     last_error_message: Optional[str] = None
 
     slot_data: Dict[str, Utils.Any] = {}
@@ -310,7 +313,6 @@ class MSMContext(CommonContext):
         self.command_processor.ctx = self
         self.items_received = []
         self.items_handled = []
-        self.locations_handled = []
         self.seed: Optional[str] = None
 
         # Consumables use AP's received-item index as their ID. Keep these as indices, not item names
@@ -318,6 +320,7 @@ class MSMContext(CommonContext):
         self.queued_consumable_indices: Set[int] = set()
         self.consumed_item_indices: Set[int] = set()
         self.consumed_item_storage_key: Optional[str] = None
+        self.location_storage_key: Optional[str] = None
 
         self.start_process = True
         self.handled_gecko_codes = False
@@ -371,6 +374,14 @@ class MSMContext(CommonContext):
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
+        if cmd == "Connected":
+            new_team = args["team"]
+            new_slot = args["slot"]
+            if self.team is not None and self.slot is not None and (self.team, self.slot) != (new_team, new_slot):
+                # Clear before CommonContext handles Connected so it cannot send stale local checks for the new slot.
+                self.reset_local_item_state(clear_received=True)
+                self.reset_location_state()
+
         super().on_package(cmd, args)
         if cmd == "Connected":
             self.slot_data = args["slot_data"]
@@ -392,7 +403,14 @@ class MSMContext(CommonContext):
             self.deathlink_consequence = self.slot_data["deathlink_consequence"]
             self.deathlink_o_points = self.slot_data["deathlink_opponent_points"]
 
+            Utils.async_start(self.update_death_link(self.deathlink_enabled))
+
             self.load_consumed_item_indices()
+            self.load_handled_locations()
+            if self.locations_checked:
+                Utils.async_start(
+                    self.send_msgs([{"cmd": "LocationChecks", "locations": sorted(self.locations_checked)}])
+                )
 
             generation_version = self.slot_data.get("version", "0.0.1")
 
@@ -409,12 +427,22 @@ class MSMContext(CommonContext):
                 logger.info(f"Version check passed! (v{CLIENT_VERSION})")
 
         elif cmd == "RoomInfo":
-            self.seed = args.get("seed_name", "unknown")
+            new_seed = args.get("seed_name", "unknown")
+            if self.seed != new_seed:
+                # A new room/seed must not inherit item or location state from the previous lobby.
+                self.reset_local_item_state(clear_received=True)
+                self.reset_location_state()
+            self.seed = new_seed
+
             self.load_consumed_item_indices()
 
         elif cmd == "ReceivedItems":
             self.load_consumed_item_indices()
             start_index = args["index"]
+            if start_index == 0:
+                # CommonContext has just replaced items_received with the full inventory snapshot.
+                # Keep that list and rebuild only the item-derived local state from it.
+                self.reset_local_item_state(clear_consumed=False, clear_received=False)
             self.debug_log(
                 f"ReceivedItems packet start={start_index}, count={len(args['items'])}, "
                 f"queued={len(self.queued_consumable_indices)}, consumed={len(self.consumed_item_indices)}"
@@ -467,8 +495,28 @@ class MSMContext(CommonContext):
         if self.seed is None or self.team is None or self.slot is None:
             return None
 
-        # Keep this scoped to the slot. Reusing a save/client on another seed should not inherit old traps.
+        # Scope one-shot item state to the AP room and slot so traps/filler do not leak between lobbies.
         return f"{self.seed}_{self.team}_{self.slot}_consumed_items"
+
+    def reset_local_item_state(self, clear_consumed: bool = True, clear_received: bool = False) -> None:
+        if clear_received:
+            self.items_received.clear()
+        self.items_handled.clear()
+        self.unlocked_sports.clear()
+        self.unlocked_cups.clear()
+        self.unlocked_sports_crystals.clear()
+        self.unlocked_stages.clear()
+        self.unlocked_characters.clear()
+        self.unlocked_costumes.clear()
+        self.unlocked_panel_items.clear()
+        self.unlocked_abilities.clear()
+        self.filler_to_give.clear()
+        self.traps_to_give.clear()
+        self.queued_consumable_indices.clear()
+
+        if clear_consumed:
+            self.consumed_item_indices.clear()
+            self.consumed_item_storage_key = None
 
     def load_consumed_item_indices(self) -> None:
         storage_key = self.get_consumed_item_storage_key()
@@ -517,6 +565,56 @@ class MSMContext(CommonContext):
             self.debug_log(f"Saved {len(self.consumed_item_indices)} consumed consumable indices")
         else:
             self.debug_log("Handled consumable in memory only; storage key is not ready")
+
+    def get_location_storage_key(self) -> Optional[str]:
+        if self.seed is None or self.team is None or self.slot is None:
+            return None
+
+        # Scope location checks the same way AP scopes player state: generation, team, and slot.
+        return f"{self.seed}_{self.team}_{self.slot}_checked_locations"
+
+    def reset_location_state(self) -> None:
+        self.locations_checked.clear()
+        self.location_storage_key = None
+        self.last_tournament_location_name = None
+
+    def load_handled_locations(self) -> None:
+        storage_key = self.get_location_storage_key()
+        if storage_key is None:
+            self.debug_log("Location storage key is not ready yet")
+            return
+        key: str = storage_key
+
+        if key != self.location_storage_key:
+            self.locations_checked.clear()
+
+        storage_category: Dict[str, list] = Utils.persistent_load().setdefault(LOCATION_STORAGE_CATEGORY, {})
+        saved_locations = set(map(int, storage_category.get(key, [])))
+        server_locations = set(self.checked_locations)
+        # Merge local checks with the server's known checks, then discard IDs this client no longer recognises.
+        valid_locations = {
+            location_id for location_id in saved_locations | server_locations
+            if location_id in LOCATION_ID_TO_NAME
+        }
+
+        self.locations_checked.update(valid_locations)
+        self.location_storage_key = key
+        self.save_handled_locations()
+        self.debug_log(f"Loaded {len(self.locations_checked)} handled locations from storage/server state")
+
+    def save_handled_locations(self) -> None:
+        storage_key = self.get_location_storage_key()
+        if storage_key is None:
+            self.debug_log("Handled locations in memory only; storage key is not ready")
+            return
+
+        self.location_storage_key = storage_key
+        # Persist IDs rather than names so display text can change without breaking saved progress.
+        Utils.persistent_store(
+            LOCATION_STORAGE_CATEGORY,
+            storage_key,
+            sorted(self.locations_checked),
+        )
 
     def current_item_func(self):
         current_item = self.game_interface.dolphin_client.read_byte(self.addresslib.p_item_held_addr)
@@ -1257,39 +1355,40 @@ class MSMContext(CommonContext):
         if self.boss_defeat_handled:
             return
 
-        address_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                                                 Offsets.Boss.behemoth_hp_offsets)
+        if self.game_interface.ready_to_handle():
+            address_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
+                                                                                     Offsets.Boss.behemoth_hp_offsets)
 
-        # Behemoth Handling
-        if self.is_behemoth:
+            # Behemoth Handling
+            if self.is_behemoth:
 
-            # Ensure pointer resolution didn't fail/return a bad address
-            if address_behemoth_hp:
-                behemoth_hp = self.game_interface.dolphin_client.read_float(address_behemoth_hp)
+                # Ensure pointer resolution didn't fail/return a bad address
+                if address_behemoth_hp:
+                    behemoth_hp = self.game_interface.dolphin_client.read_float(address_behemoth_hp)
 
-                if behemoth_hp is not None and behemoth_hp <= 0:
-                    self.boss_defeat_handled = True  # Lock execution immediately
+                    if behemoth_hp is not None and behemoth_hp <= 0:
+                        self.boss_defeat_handled = True  # Lock execution immediately
 
-                    if self.goal_condition == 0:
-                        await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                        self.debug_log("Goal Achieved: Defeated Behemoth!")
-                    else:
-                        await self.check_location("Defeated Behemoth!")
+                        if self.goal_condition == 0:
+                            await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                            self.debug_log("Goal Achieved: Defeated Behemoth!")
+                        else:
+                            await self.check_location("Defeated Behemoth!")
 
-        # Behemoth King Handling
-        if self.is_behemoth_king:
+            # Behemoth King Handling
+            if self.is_behemoth_king:
 
-            if address_behemoth_hp:
-                behemoth_hp = self.game_interface.dolphin_client.read_float(address_behemoth_hp)
+                if address_behemoth_hp:
+                    behemoth_hp = self.game_interface.dolphin_client.read_float(address_behemoth_hp)
 
-                if behemoth_hp is not None and behemoth_hp <= 0:
-                    self.boss_defeat_handled = True  # Lock execution immediately
-
-                    if self.goal_condition == 1:
-                        await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                        self.debug_log("Goal Achieved: Defeated Behemoth King!")
-                    else:
-                        await self.check_location("Defeated Behemoth King!")
+                    if behemoth_hp is not None and behemoth_hp <= 0:
+                        self.boss_defeat_handled = True  # Lock execution immediately
+    
+                        if self.goal_condition == 1:
+                            await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                            self.debug_log("Goal Achieved: Defeated Behemoth King!")
+                        else:
+                            await self.check_location("Defeated Behemoth King!")
 
     async def check_boss_type(self):
         is_sports_mix = self.game_interface.check_sports_mix()
@@ -1381,7 +1480,7 @@ class MSMContext(CommonContext):
             return
 
         self.locations_checked.add(location_id)
-        self.locations_handled.append(location_name)
+        self.save_handled_locations()
         self.debug_log(f"Checked location: {location_name}")
         await self.send_msgs([{"cmd": "LocationChecks", "locations": [location_id]}])
 
@@ -1624,9 +1723,9 @@ class MSMContext(CommonContext):
                     self.received_death = True
                     value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
                     addr = get_address(opponent_score_addresses[value]) # Get the address for current period
-                    points = self.game_interface.dolphin_client.read_byte(addr)
+                    points = self.game_interface.dolphin_client.read_word(addr)
                     new_points = points + self.deathlink_o_points
-                    self.game_interface.dolphin_client.write_byte(addr, new_points)
+                    self.game_interface.dolphin_client.write_word(addr, new_points)
                     self.received_death = False
 
 
@@ -1665,7 +1764,6 @@ class MSMContext(CommonContext):
                 if not self.slot:
                     await asyncio.sleep(1)
                     continue
-
 
                 # Reset error message once connected
                 self.last_error_message = None
@@ -1715,7 +1813,7 @@ class MSMContext(CommonContext):
             if value != 0:
                 self.game_interface.dolphin_client.write_word(address, 0)
 
-    def handle_gecko_codes(self):
+    async def handle_gecko_codes(self):
         current_module = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
                                                                             Offsets.Match.current_module_offsets)
         value = self.game_interface.dolphin_client.read_word(current_module)
@@ -1761,6 +1859,8 @@ class MSMContext(CommonContext):
         else:
             self.debug_log("Not ready to handle...")
 
+        self.handled_gecko_codes = False
+
         await asyncio.sleep(0.1)
 
 
@@ -1777,12 +1877,16 @@ class MSMContext(CommonContext):
         await self.handle_question_mark_panel_items()
         await self.handle_unlocked_abilities()
 
+        self.handled_gecko_codes = False
+
         await asyncio.sleep(0.1)
 
 
     async def handle_in_tournament_map(self):
         await self.check_current_cup()
         await self.check_pending_tournament_location()
+
+        self.handled_gecko_codes = False
         
         await asyncio.sleep(0.1)
 
@@ -1793,7 +1897,7 @@ class MSMContext(CommonContext):
         await self.stop_stupid_games_played_notifs()
         await unlock_tournament_tabs_option(self, self.hard_tournament_difficulty)
 
-        self.handle_gecko_codes()
+        await self.handle_gecko_codes()
 
         self.in_tournament_match = False
         self.boss_hp_handled = False
