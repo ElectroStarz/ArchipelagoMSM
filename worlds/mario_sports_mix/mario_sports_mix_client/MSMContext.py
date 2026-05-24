@@ -1134,7 +1134,7 @@ class MSMContext(CommonContext):
             self.last_match_score_total = score_total
             return
 
-        if score_total != self.last_match_score_total or timer == 0:
+        if score_total != self.last_match_score_total or timer == 0 or not self.game_interface.ready_to_handle():
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
@@ -1702,15 +1702,24 @@ class MSMContext(CommonContext):
                     self.has_sent_death = False
 
 
-            # Opponent Scores Points Action
+            # Every number of Points Action
             elif self.deathlink_action == 1:
-                if self.has_score_reached_threshold():
-                    if not self.has_sent_death and self.slot is not None:
-                        message = random.choice(possible_messages_1) # Pick a random message to send
-                        await self.send_death(f"{self.player_names[self.slot]} {message}")
-                        self.has_sent_death = True
-                        self.debug_log("Sent deathlink due to the opponent scoring")
-                        self.has_sent_death = False
+
+                # Dodgeball logic
+                if self.game_interface.check_sport() == "Dodgeball":
+                    if self.has_dodge_opponent_scored():
+                        if self.slot is not None:
+                            message = random.choice(possible_messages_1)
+                            await self.send_death(f"{self.player_names[self.slot]} {message}")
+                            self.debug_log("Sent deathlink due to the opponent scoring in dodgeball")
+
+                # All other sports logic
+                else:
+                    if self.has_score_reached_threshold():
+                        if self.slot is not None:
+                            message = random.choice(possible_messages_1)
+                            await self.send_death(f"{self.player_names[self.slot]} {message}")
+                            self.debug_log("Sent deathlink due to the opponent scoring a threshold")
 
 
     def has_score_reached_threshold(self) -> bool:
@@ -1737,6 +1746,32 @@ class MSMContext(CommonContext):
             return True
 
         # If the threshold isn't met yet, do nothing and return False
+        return False
+
+    def has_dodge_opponent_scored(self) -> bool:
+        current_opponent_score = sum(
+            self.game_interface.dolphin_client.read_word(get_address(addr))
+            for addr in opponent_score_addresses
+        )
+
+        if self.previous_opponent_score is None:
+            self.previous_opponent_score = current_opponent_score
+            return False
+
+        # If the score drops to 0, a new match started.
+        # Reset our tracker to the new lower score and return False.
+        if current_opponent_score < self.previous_opponent_score:
+            self.previous_opponent_score = current_opponent_score
+            return False
+
+        # Check for ANY point increase
+        if current_opponent_score > self.previous_opponent_score:
+            # The opponent scored 1 point!
+            # Update the tracker to this new score so it doesn't trigger again until the next point.
+            self.previous_opponent_score = current_opponent_score
+            return True
+
+        # If the score is exactly the same, do nothing
         return False
 
 

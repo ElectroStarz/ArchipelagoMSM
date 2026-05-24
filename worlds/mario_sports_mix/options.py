@@ -105,7 +105,10 @@ class DeathlinkEnabled(DeathLink):
     default = False
 
 class DeathlinkAction(Choice):
-    """What counts as sending a deathlink? Requires Deathlink on"""
+    """What counts as sending a deathlink? Requires Deathlink on
+
+NOTE: Every number of points works like normal for everything BUT dodgeball. In dodgeball,
+everytime the opponent wins the set a deathlink triggers"""
     display_name = "Deathlink Action"
     option_losing_or_tying_a_match = 0
     option_every_number_of_points = 1
