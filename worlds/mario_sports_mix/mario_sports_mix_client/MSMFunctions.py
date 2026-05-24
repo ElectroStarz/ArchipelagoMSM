@@ -19,12 +19,28 @@ sports_addresses = [
 ]
 
 
-def unlock_tabs():
-    # Tournament
-    for sport in sports_addresses:
-        new_addr = get_address(sport.Tournament.tabs)
-        dme.write_byte(new_addr, 3)
+async def unlock_tournament_tabs_option(self, hard_tournament_difficulty):
+    b_address = get_address(BasketballAddresses.Tournament.tabs)
+    d_address = get_address(DodgeballAddresses.Tournament.tabs)
+    v_address = get_address(VolleyballAddresses.Tournament.tabs)
+    h_address = get_address(HockeyAddresses.Tournament.tabs)
+    address_list = [b_address, d_address, v_address, h_address]
 
+    if hard_tournament_difficulty:
+        for address in address_list:
+            new_address = get_address(address)
+            value = self.game_interface.dolphin_client.read_byte(new_address)
+            if value != 3:
+                self.game_interface.dolphin_client.write_byte(new_address, 3)
+    else:
+        for address in address_list:
+            new_address = get_address(address)
+            value = self.game_interface.dolphin_client.read_byte(new_address)
+            if value != 2:
+                self.game_interface.dolphin_client.write_byte(new_address, 2)
+
+
+def unlock_ex_tabs():
     # Exhibition
     for sport in sports_addresses:
         new_addr = get_address(sport.Exhibition.tabs)
@@ -55,10 +71,14 @@ def lock_all_characters():
             dme.write_byte(new_addr, 0)
 
 
-
 def get_address(address, offset=0xF80):
+    """Get the correct address depending on what region the game is"""
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
+    exceptions = (BasketballAddresses.Characters, DodgeballAddresses.Characters, VolleyballAddresses.Characters,
+                HockeyAddresses.Characters, BasketballAddresses.Tournament, DodgeballAddresses.Tournament,
+                VolleyballAddresses.Tournament, HockeyAddresses.Tournament, BasketballAddresses.Exhibition,
+                DodgeballAddresses.Exhibition, VolleyballAddresses.Exhibition, HockeyAddresses.Exhibition)
 
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_stage:
@@ -66,9 +86,13 @@ def get_address(address, offset=0xF80):
             new_addr = 0x8047796E
             return new_addr
 
+        # Some addresses are the same in PAL and NTSC-U
+        if any(address in vars(classes).values() for classes in exceptions):
+            return address
+
         #print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         new_addr = address - offset
         return new_addr
 
-    new_addr = address
-    return new_addr
+
+    return address

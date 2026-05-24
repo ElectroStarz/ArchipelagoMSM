@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import random
+import time
 import traceback
 from collections import deque
 from random import randint
@@ -13,7 +14,7 @@ from NetUtils import ClientStatus
 from .MSMInterface import MSMInterface, ConnectionState
 from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
-from .MSMFunctions import get_address
+from .MSMFunctions import *
 from . import dolphin_connection as dc
 from .memory_addresses_pal import *
 from .common_address_library import AddressLib
@@ -128,6 +129,12 @@ class MSMCommandProcessor(ClientCommandProcessor):
         """Reapply unlocks if you don't have them!"""
         asyncio.create_task(self.ctx.handle_received_items())
         logger.info("Reapplied unlocks!")
+
+    def _cmd_reapply_codes(self):
+        """Reapply the patch codes if something isn't working, must be on main menu"""
+        self.ctx.handled_gecko_codes = False
+        self.ctx.handle_gecko_codes()
+        logger.info("Patches Reapplied!")
 
     def _cmd_reset_cached(self):
         """Manually reset the cached values if address errors are coming up when switching regions"""
@@ -287,6 +294,7 @@ class MSMContext(CommonContext):
     deathlink_enabled: bool = False
     deathlink_action = int
     deathlink_consequence = int
+    deathlink_o_points = int
 
     # Sanity stuff
     special_sanity = False
@@ -348,7 +356,7 @@ class MSMContext(CommonContext):
 
         # Debug Stuff
         self.DEBUGGING = False
-        self.last_debug_messages = deque(maxlen=5)  # Stores up to 3 messages at a time
+        self.last_debug_messages = deque(maxlen=5)  # Stores up to 5 messages at a time
 
     def debug_log(self, message: str) -> None:
         if self.DEBUGGING:
@@ -382,6 +390,7 @@ class MSMContext(CommonContext):
             self.deathlink_enabled = self.slot_data["deathlink_enabled"]
             self.deathlink_action = self.slot_data["deathlink_action"]
             self.deathlink_consequence = self.slot_data["deathlink_consequence"]
+            self.deathlink_o_points = self.slot_data["deathlink_opponent_points"]
 
             self.load_consumed_item_indices()
 
@@ -773,22 +782,22 @@ class MSMContext(CommonContext):
             sports_mix: ["Sports Mix: Mushroom Cup", "Sports Mix: Flower Cup", "Sports Mix: Star Cup"],
         }
 
-        for address, cups in cup_mapping.items():
+        for address, cup in cup_mapping.items():
             value = 0
 
             # Mushroom Cup
             # If the Mushroom Cup is in unlocked cups, add 1
-            if cups[0] in self.unlocked_cups:
+            if cup[0] in self.unlocked_cups:
                 value += 1
 
             # Flower Cup
             # If the Flower Cup is in unlocked cups, add 2
-            if cups[1] in self.unlocked_cups:
+            if cup[1] in self.unlocked_cups:
                 value += 2
 
             # Star Cup
             # If the Star Cup is in unlocked cups, add 4
-            if cups[2] in self.unlocked_cups:
+            if cup[2] in self.unlocked_cups:
                 value += 4
 
             # If no cups are unlocked (value is 0), set final_value to 8 which locks all cups, otherwise set
@@ -872,22 +881,22 @@ class MSMContext(CommonContext):
             h_block: ["Stage: Koopa Troopa Beach", "Stage: Ghoulish Galleon", "Stage: Bowser's Castle"],
         }
 
-        for address, stages in stage_mapping.items():
+        for address, stage in stage_mapping.items():
             value = 0
 
             # First Stage
             # If the first stage is in unlocked stages, add 1
-            if stages[0] in self.unlocked_stages:
+            if stage[0] in self.unlocked_stages:
                 value += 1
 
             # Second Stage
             # If the second stage is in unlocked stages, add 2
-            if stages[1] in self.unlocked_stages:
+            if stage[1] in self.unlocked_stages:
                 value += 2
 
             # Third Stage
             # If the third stage is in unlocked stages, add 4
-            if stages[2] in self.unlocked_stages:
+            if stage[2] in self.unlocked_stages:
                 value += 4
 
             # If no stages are unlocked (value is 0), set final_value to 8 which locks all stages, otherwise set
@@ -1018,13 +1027,13 @@ class MSMContext(CommonContext):
 
     def update_scoring_item_suppression(self):
         score_total = self.current_match_score_total()
-        time = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
 
         if self.last_match_score_total is None:
             self.last_match_score_total = score_total
             return
 
-        if score_total != self.last_match_score_total or time == 0:
+        if score_total != self.last_match_score_total or timer == 0:
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
@@ -1568,13 +1577,16 @@ class MSMContext(CommonContext):
 
     async def handle_send_deathlink(self):
         """Gets awaited during in match and sends a deathlink depending on what the deathlink_action is"""
+        possible_messages = ["lost the match!", "isn't good enough!", "has a MASSIVE skill issue!",
+                             "needs to take a break..."]
 
         if self.deathlink_enabled:
             if self.deathlink_action == 0:
                 match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
                 if (match_status == 2 or match_status == 3) and not self.received_death:
                     if not self.has_sent_death and self.slot is not None:
-                        await self.send_death(f"{self.player_names[self.slot]} lost the match!")
+                        message = random.choice(possible_messages)
+                        await self.send_death(f"{self.player_names[self.slot]} {message}")
                         self.has_sent_death = True
                         self.debug_log("Sent deathlink")
                 else:
@@ -1595,6 +1607,7 @@ class MSMContext(CommonContext):
                 current_stage_value = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
                 current_stage = current_stage_value[:3]
                 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
+                # Lose Match Consequence
                 if self.deathlink_consequence == 0:
                     # Force opponent to win
                     self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4 =5th Period
@@ -1606,6 +1619,15 @@ class MSMContext(CommonContext):
                     # If we're not in the state where we've died to deathlink, set received_death to false
                     if (match_status != 2 and match_status != 3) or current_stage in not_match_prefix:
                         self.received_death = False
+                # Opponent gains points
+                elif self.deathlink_consequence == 1:
+                    self.received_death = True
+                    value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
+                    addr = get_address(opponent_score_addresses[value]) # Get the address for current period
+                    points = self.game_interface.dolphin_client.read_byte(addr)
+                    new_points = points + self.deathlink_o_points
+                    self.game_interface.dolphin_client.write_byte(addr, new_points)
+                    self.received_death = False
 
 
     # === Misc stuff idk where to put ===
@@ -1636,13 +1658,14 @@ class MSMContext(CommonContext):
                     continue
 
                 if self.game_interface.dolphin_client.is_hooked_class() and self.start_process and self.slot:
-                    self.unlock_tournament_tabs_option()
+                    unlock_ex_tabs()
                     self.start_process = False
 
                 # Ensure we have received slot data
                 if not self.slot:
                     await asyncio.sleep(1)
                     continue
+
 
                 # Reset error message once connected
                 self.last_error_message = None
@@ -1692,32 +1715,24 @@ class MSMContext(CommonContext):
             if value != 0:
                 self.game_interface.dolphin_client.write_word(address, 0)
 
-    def unlock_tournament_tabs_option(self):
-        b_address = get_address(BasketballAddresses.Tournament.tabs)
-        d_address = get_address(DodgeballAddresses.Tournament.tabs)
-        v_address = get_address(VolleyballAddresses.Tournament.tabs)
-        h_address = get_address(HockeyAddresses.Tournament.tabs)
-        address_list = [b_address, d_address, v_address, h_address]
-
-        if self.hard_tournament_difficulty:
-            for address in address_list:
-                new_address = get_address(address)
-                self.game_interface.dolphin_client.write_byte(new_address, 3)
-        else:
-            for address in address_list:
-                new_address = get_address(address)
-                self.game_interface.dolphin_client.write_byte(new_address, 2)
-
     def handle_gecko_codes(self):
         current_module = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
                                                                             Offsets.Match.current_module_offsets)
         value = self.game_interface.dolphin_client.read_word(current_module)
 
         if value == 0x6D656E75 and not self.handled_gecko_codes:
+            # print(f"Game Version: {dc.GAME_VERSION}")
+            # print(f"Current Module Value (Hex): {hex(value)}")
+
             if dc.GAME_VERSION == "PAL":
                 for address, code in GeckoCodes.gecko_codes_pal.items():
                     self.game_interface.dolphin_client.write_bytes(address, code)
-                    self.handled_gecko_codes = True
+
+            elif dc.GAME_VERSION == "NTSC-U":
+                for address, code in GeckoCodes.gecko_codes_ntscu.items():
+                    self.game_interface.dolphin_client.write_bytes(address, code)
+
+            self.handled_gecko_codes = True
 
 
     # === Where to handle what ===
@@ -1776,6 +1791,7 @@ class MSMContext(CommonContext):
         await self.handle_received_items()
         await self.check_pending_tournament_location()
         await self.stop_stupid_games_played_notifs()
+        await unlock_tournament_tabs_option(self, self.hard_tournament_difficulty)
 
         self.handle_gecko_codes()
 

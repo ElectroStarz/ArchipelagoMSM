@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup, Visibility
+from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup, Visibility, \
+    DeathLink
 
 class StartWithSports(Choice):
     """Start with the sports? HEAVILY RECOMMENDED
@@ -98,7 +99,7 @@ class TrapChance(Range):
     range_end = 100
     default = 25
 
-class DeathlinkEnabled(Toggle):
+class DeathlinkEnabled(DeathLink):
     """When you die, everyone else does and vice versa"""
     display_name = "Deathlink"
     default = False
@@ -186,6 +187,7 @@ msm_option_groups = [
         DeathlinkEnabled,
         DeathlinkAction,
         DeathlinkConsequence,
+        DeathlinkOpponentPoints,
     ])
     # OptionGroup("Sanity Options (NOT WORKING)", [
     #     TeamSanity,
@@ -214,6 +216,7 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_enabled: DeathlinkEnabled
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
+    deathlink_opponent_points: DeathlinkOpponentPoints
     # team_sanity: TeamSanity
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints
