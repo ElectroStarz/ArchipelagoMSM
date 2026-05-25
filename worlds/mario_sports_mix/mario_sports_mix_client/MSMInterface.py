@@ -90,19 +90,31 @@ class MSMInterface:
 
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
-                if timer < basket_timer:
-                    ready_game = True
-                else:
-                    ready_game = False
-
-            elif self.check_sport() == "Dodgeball":
-                if dodge_timer == "Off":
-                    ready_game = True
-                else:
-                    if timer < dodge_timer:
+                if self.current_tournament is not None:
+                    if timer < 9000:
                         ready_game = True
                     else:
                         ready_game = False
+                else:
+                    if timer < basket_timer:
+                        ready_game = True
+                    else:
+                        ready_game = False
+
+            elif self.check_sport() == "Dodgeball":
+                if self.current_tournament is not None:
+                    if timer < 9000:
+                        ready_game = True
+                    else:
+                        ready_game = False
+                else:
+                    if dodge_timer == "Off":
+                        ready_game = True
+                    else:
+                        if timer < dodge_timer:
+                            ready_game = True
+                        else:
+                            ready_game = False
 
             elif self.check_sport() == "Volleyball":
                 if current_stage == "s20":
@@ -121,12 +133,19 @@ class MSMInterface:
                     except RuntimeError:
                         ready_game = False
             elif self.check_sport() == "Hockey":
-                if timer < hockey_timer:
-                    ready_game = True
+                if self.current_tournament is Any and self.current_tournament is not None:
+                    if timer < 9000:
+                        ready_game = True
+                    else:
+                        ready_game = False
                 else:
-                    ready_game = False
-        else:
-            ready_game = False
+
+                    if timer < hockey_timer:
+                        ready_game = True
+                    else:
+                        ready_game = False
+            else:
+                ready_game = False
 
         if paused == 1:
             is_paused = True
