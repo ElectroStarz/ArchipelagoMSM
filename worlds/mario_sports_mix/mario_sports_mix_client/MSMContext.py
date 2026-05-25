@@ -361,7 +361,7 @@ class MSMContext(CommonContext):
 
         # Debug Stuff
         self.DEBUGGING = False
-        self.last_debug_messages = deque(maxlen=5)  # Stores up to 5 messages at a time
+        self.last_debug_messages = deque(maxlen=4)  # Stores up to 5 messages at a time
 
     def debug_log(self, message: str) -> None:
         if self.DEBUGGING:
@@ -417,6 +417,7 @@ class MSMContext(CommonContext):
 
             generation_version = self.slot_data.get("version", "0.0.1")
 
+            # Client World mismatch handler
             if CLIENT_VERSION != generation_version:
                 logger.error(
                     f"\n=========================================\n"
@@ -1122,8 +1123,8 @@ class MSMContext(CommonContext):
             await asyncio.sleep(1)
 
     def current_match_score_total(self):
-        player_score = sum(self.game_interface.dolphin_client.read_word(address) for address in player_score_addresses)
-        opponent_score = sum(self.game_interface.dolphin_client.read_word(address) for address in opponent_score_addresses)
+        player_score = sum(self.game_interface.dolphin_client.read_word(get_address(address)) for address in player_score_addresses)
+        opponent_score = sum(self.game_interface.dolphin_client.read_word(get_address(address)) for address in opponent_score_addresses)
         return player_score + opponent_score
 
     def update_scoring_item_suppression(self):
@@ -1149,7 +1150,6 @@ class MSMContext(CommonContext):
 
         if asyncio.get_event_loop().time() < self.suppress_panel_until:
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.minus_one)
-            self.debug_log("Ignored item-slot change caused by scoring")
             return
 
         # If we are currently forcing an item from a scoring replacement
@@ -1169,6 +1169,23 @@ class MSMContext(CommonContext):
             logger.info("?-Panel Activated! No items available! Sucks to be you >;]")
             self.item_processed = True  # Mark processed so we don't spam the log
             return
+
+
+        # item_map_int_to_str = {
+        #     -1: "No Current Item",
+        #     0: "Green Shell",
+        #     1: "Red Shell",
+        #     2: "Mini Mushroom",
+        #     3: "Bob-omb",
+        #     4: "Super Star",
+        #     5: "Banana",
+        # }
+        #
+        # slot_to_name = item_map_int_to_str[item_data]
+        # name = f"?-Panel: {slot_to_name}"
+        # if name in self.unlocked_panel_items and slot_to_name is not "No Current Item" and self.forced_item_id is not None:
+        #     self.debug_log(f"Item {slot_to_name} is in ?-Panel list, not replacing")
+        #     return
 
         # Lookup Map
         item_map = {
@@ -1723,6 +1740,9 @@ class MSMContext(CommonContext):
 
 
     def has_score_reached_threshold(self) -> bool:
+        """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points) in
+        everything but dodgeball - Used for DL-C Opponent gains points. Returns True if yes, False if no"""
+
         current_opponent_score = sum(
             self.game_interface.dolphin_client.read_word(get_address(addr)) for addr in opponent_score_addresses)
 
@@ -1749,6 +1769,8 @@ class MSMContext(CommonContext):
         return False
 
     def has_dodge_opponent_scored(self) -> bool:
+        """Check when the opponent has got a point in Dodgeball - Used for DL-C Opponent gains points"""
+
         current_opponent_score = sum(
             self.game_interface.dolphin_client.read_word(get_address(addr))
             for addr in opponent_score_addresses
@@ -1900,6 +1922,8 @@ class MSMContext(CommonContext):
                 self.game_interface.dolphin_client.write_word(address, 0)
 
     async def handle_gecko_codes(self):
+        """Handle the gecko code patches for each region"""
+
         current_module = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
                                                                             Offsets.Match.current_module_offsets)
         value = self.game_interface.dolphin_client.read_word(current_module)
@@ -1923,6 +1947,8 @@ class MSMContext(CommonContext):
 
 
     async def handle_in_match(self):
+        """What functions should be handled during a match"""
+
         # Deathlink
         await self.handle_send_deathlink()
 
@@ -1951,6 +1977,8 @@ class MSMContext(CommonContext):
 
 
     async def handle_in_boss(self):
+        """What functions should be handled in the boss"""
+
         await self.handle_boss_hp()
         await self.check_boss_type()
         await self.handle_lock_behemoth_hp()
@@ -1969,6 +1997,8 @@ class MSMContext(CommonContext):
 
 
     async def handle_in_tournament_map(self):
+        """What functions should be handled in a tournament map"""
+
         await self.check_current_cup()
         await self.check_pending_tournament_location()
 
@@ -1978,6 +2008,8 @@ class MSMContext(CommonContext):
 
 
     async def handle_in_main_menu(self):
+        """What functions should be handled in the main menu"""
+
         await self.handle_received_items()
         await self.check_pending_tournament_location()
         await self.stop_stupid_games_played_notifs()
@@ -1986,6 +2018,8 @@ class MSMContext(CommonContext):
         await self.handle_gecko_codes()
 
         self.has_sent_death = False
+
+        self.forced_item_id = None
 
         self.in_tournament_match = False
         self.boss_hp_handled = False
