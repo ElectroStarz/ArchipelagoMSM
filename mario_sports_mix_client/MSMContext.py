@@ -218,8 +218,8 @@ class MSMCommandProcessor(ClientCommandProcessor):
             logger.info("No unlocked ?-Panel items")
 
     def _cmd_item(self):
-        """Show what item you currently have"""
-        current_item = self.ctx.current_item_func()
+        """BROKEN - Show what item you currently have"""
+        current_item = self.ctx.game_interface.dolphin_client.read_byte(self.ctx.addresslib.p_item_held_addr)
         item_map = {
             -1: "No Current Item",
             0: "Green Shell",
@@ -229,7 +229,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
             4: "Super Star",
             5: "Banana",
         }
-        logger.info(f"Current Item: {item_map[current_item]}")
+        logger.info(f"Current Item: {item_map[current_item]} - ID is {current_item}")
 
     def _cmd_filler(self):
         """Display the filler queue"""
@@ -1151,7 +1151,7 @@ class MSMContext(CommonContext):
     async def handle_replace_due_to_scoring(self):
         item_data = self.current_item_func()
 
-        if item_data == -1:
+        if item_data == -1 and self.game_interface.ready_to_handle() and not self.is_paused():
             # Slot is empty, stop forcing
             self.awaiting_use = False
             self.forced_item_id = None
@@ -1176,24 +1176,32 @@ class MSMContext(CommonContext):
             self.last_match_score_total = score_total
             return
 
-        if score_total != self.last_match_score_total or timer == 0 or not self.game_interface.ready_to_handle():
+        if score_total != self.last_match_score_total or timer == 0:
             self.last_match_score_total = score_total
-            self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
+            self.suppress_panel_until = asyncio.get_event_loop().time() + 2
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
+
+    def is_paused(self):
+        value = self.game_interface.dolphin_client.read_byte(self.addresslib.paused_addr)
+        if value == 1:
+            return True
+        else:
+            return False
 
     async def handle_question_mark_panel_items(self):
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
         self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)}, awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
-        # If we don't have an item, pause.
-        if item_data == -1:
-            self.item_processed = False
-            return
 
-        if asyncio.get_event_loop().time() < self.suppress_panel_until:
+        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.game_interface.ready_to_handle():
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.minus_one)
             verify_item = self.current_item_func()
             self.debug_log(f"Panel suppressed; cleared item at {self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
+            return
+
+        # If we don't have an item, pause.
+        if item_data == -1 and self.game_interface.ready_to_handle() and not self.is_paused():
+            self.item_processed = False
             return
 
         # If we are currently forcing an item from a scoring replacement
@@ -1203,7 +1211,7 @@ class MSMContext(CommonContext):
             return
 
         # Standard pauses
-        if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed:
+        if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed or self.is_paused():
             self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
             return
 
@@ -1216,22 +1224,6 @@ class MSMContext(CommonContext):
             self.item_processed = True  # Mark processed so we don't spam the log
             return
 
-
-        # item_map_int_to_str = {
-        #     -1: "No Current Item",
-        #     0: "Green Shell",
-        #     1: "Red Shell",
-        #     2: "Mini Mushroom",
-        #     3: "Bob-omb",
-        #     4: "Super Star",
-        #     5: "Banana",
-        # }
-        #
-        # slot_to_name = item_map_int_to_str[item_data]
-        # name = f"?-Panel: {slot_to_name}"
-        # if name in self.unlocked_panel_items and slot_to_name is not "No Current Item" and self.forced_item_id is not None:
-        #     self.debug_log(f"Item {slot_to_name} is in ?-Panel list, not replacing")
-        #     return
 
         # Lookup Map
         item_map = {
@@ -1987,10 +1979,10 @@ class MSMContext(CommonContext):
     async def stop_stupid_games_played_notifs(self):
         """Stop unlock messages from appearing constantly"""
 
-        basket_played = get_address(BasketballAddresses.games_played)
-        dodge_played = get_address(DodgeballAddresses.games_played)
-        volley_played = get_address(VolleyballAddresses.games_played)
-        hockey_played = get_address(HockeyAddresses.games_played)
+        basket_played = BasketballAddresses.games_played
+        dodge_played = DodgeballAddresses.games_played
+        volley_played = VolleyballAddresses.games_played
+        hockey_played = HockeyAddresses.games_played
         address_list = [basket_played, dodge_played, volley_played, hockey_played]
 
         for address in address_list:
