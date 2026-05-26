@@ -19,27 +19,31 @@ sports_addresses = [
 ]
 
 
-async def unlock_tournament_tabs_option(self, hard_tournament_difficulty):
-    """Unlocks the tournament tabs depending on if the player has checked Hard Tournament Difficulty in their YAML"""
+async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, unlocked_sports_mix: bool):
+    """Unlocks the tournament tabs depending on YAML settings."""
 
-    b_address = get_address(BasketballAddresses.Tournament.tabs)
-    d_address = get_address(DodgeballAddresses.Tournament.tabs)
-    v_address = get_address(VolleyballAddresses.Tournament.tabs)
-    h_address = get_address(HockeyAddresses.Tournament.tabs)
-    address_list = [b_address, d_address, v_address, h_address]
+    # If Sports Mix is unlocked, stop right here and do absolutely nothing.
+    if unlocked_sports_mix:
+        return
 
-    if hard_tournament_difficulty:
-        for address in address_list:
-            new_address = get_address(address)
-            value = self.game_interface.dolphin_client.read_byte(new_address)
-            if value != 3:
-                self.game_interface.dolphin_client.write_byte(new_address, 3)
-    else:
-        for address in address_list:
-            new_address = get_address(address)
-            value = self.game_interface.dolphin_client.read_byte(new_address)
-            if value != 2:
-                self.game_interface.dolphin_client.write_byte(new_address, 2)
+    # 1. Resolve the addresses exactly ONCE here
+    address_list = [
+        get_address(BasketballAddresses.Tournament.tabs),
+        get_address(DodgeballAddresses.Tournament.tabs),
+        get_address(VolleyballAddresses.Tournament.tabs),
+        get_address(HockeyAddresses.Tournament.tabs)
+    ]
+
+    # 2. Determine what value we want to write (3 for hard, 2 for normal)
+    target_value = 3 if hard_tournament_difficulty else 2
+
+    # 3. Run the memory check/write loop exactly once
+    for address in address_list:
+        current_value = self.game_interface.dolphin_client.read_byte(address)
+
+        # Only write if the value needs changing to avoid spamming the emulator
+        if current_value != target_value:
+            self.game_interface.dolphin_client.write_byte(address, target_value)
 
 
 def unlock_ex_tabs():
@@ -92,8 +96,8 @@ def get_address(address, offset=0xF80):
         if any(address in vars(classes).values() for classes in exceptions):
             return address
 
-        #print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         new_addr = address - offset
+        # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         return new_addr
 
 

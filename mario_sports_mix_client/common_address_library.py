@@ -100,7 +100,7 @@ class AddressLib:
         """Safely clears the cache for all memory addresses."""
 
         address_properties = [
-            "current_stage_addr", "match_status_addr", "game_layout_addr",
+            "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",
             "paused_addr", "timer_addr", "current_period", "cutscene_active_addr",
             "loading_screen_addr", "behemoth_hp_addr", "volley_last_held_addr",
             "basket_time_addr", "dodge_time_addr", "hockey_time_addr",

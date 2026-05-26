@@ -325,6 +325,9 @@ class MSMContext(CommonContext):
 
         self.start_process = True
         self.handled_gecko_codes = False
+        self.game_session_active = False
+        self.active_game_version = None
+        self.unlocked_sports_mix = False
 
         self.one_time_running = False
         self.item_processed = False
@@ -489,11 +492,35 @@ class MSMContext(CommonContext):
 
     async def disconnect(self, allow_auto_reconnect: bool = False):
         self.game_interface.dolphin_client.disconnect()
-        self.addresslib.reset_all_addresses()
+        self.reset_game_session_state()
         await super().disconnect(allow_auto_reconnect)
 
     def update_connection_status(self):
         self.connection_state = self.game_interface.get_connection_state()
+
+    def reset_game_session_state(self, game_active: bool = False) -> None:
+        """Reset runtime-only state when the game process/title exits or restarts."""
+        self.addresslib.reset_all_addresses()
+        self.game_interface.addresslib.reset_all_addresses()
+        self.start_process = True
+        self.handled_gecko_codes = False
+        self.one_time_running = False
+        self.item_processed = False
+        self.awaiting_use = False
+        self.forced_item_id = None
+        self.last_match_score_total = None
+        self.suppress_panel_until = 0.0
+        self.boss_hp_handled = False
+        self.boss_defeat_handled = False
+        self.in_tournament_match = False
+        self.last_tournament_location_name = None
+        self.current_item = None
+        self.has_sent_death = False
+        self.received_death = False
+        self.previous_opponent_score = None
+        self.game_interface.current_tournament = None
+        self.game_session_active = game_active
+        self.active_game_version = dc.GAME_VERSION if game_active else None
 
     def get_consumed_item_storage_key(self) -> Optional[str]:
         if self.seed is None or self.team is None or self.slot is None:
@@ -917,12 +944,14 @@ class MSMContext(CommonContext):
         sports_mix_unlocked = get_address(SportsMixAddresses.sports_mix_unlocked)
         if self.sports_mix_unlock == 0:
             if "Sport: Sports Mix" in self.unlocked_sports:
+                self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 self.debug_log("Sports Mix unlocked by Sports Mix item")
 
         elif self.sports_mix_unlock == 1:
             if ("Sports Crystal: Red" and "Sports Crystal: Green" and "Sports Crystal: Yellow" and
                     "Sports Crystal: Blue") in self.unlocked_sports_crystals:
+                self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 self.debug_log("Sports Mix unlocked by Sports Crystals")
 
@@ -1016,20 +1045,25 @@ class MSMContext(CommonContext):
         await self.handle_special_meter_unlock()
 
     async def handle_special_meter_unlock(self):
-        if self.game_interface.ready_to_handle():
-            try:
-                special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
-                                                                                Offsets.Player.special_meter_offsets)
-                # If you don't have the special meter, if the value isn't 0, set it to 0
-                if "Ability: Special Meter" not in self.unlocked_abilities:
-                    value = self.game_interface.dolphin_client.read_float(special_meter)
-                    if value != 0:
-                        self.game_interface.dolphin_client.write_byte(special_meter, 0)
-                        self.debug_log("Changed Special Meter to 0")
-                elif "Ability: Special Meter" in self.unlocked_abilities:
-                    pass
-            finally: pass
+        if not self.game_interface.ready_to_handle():
+            self.debug_log("Special meter lock waiting; game not ready")
+            return
 
+        try:
+            special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
+                                                                            Offsets.Player.special_meter_offsets)
+            self.debug_log(f"Special meter pointer resolved: base={self.addresslib.p_special_meter_addr:#x}, final={special_meter:#x}")
+            if "Ability: Special Meter" not in self.unlocked_abilities:
+                value = self.game_interface.dolphin_client.read_float(special_meter)
+                self.debug_log(f"Special meter current value: {value}")
+                if value != 0:
+                    self.game_interface.dolphin_client.write_float(special_meter, 0.0)
+                    verify_value = self.game_interface.dolphin_client.read_float(special_meter)
+                    self.debug_log(f"Changed Special Meter to 0; verify={verify_value}")
+            else:
+                self.debug_log("Special meter unlocked; not locking meter")
+        except Exception as e:
+            self.debug_log(f"Special meter handling failed: {e}")
 
     # === Filler + ?-Panel Handling ===
 
@@ -1038,6 +1072,8 @@ class MSMContext(CommonContext):
         # Queue empty? Nothing to do.
         if not self.filler_to_give:
             return
+
+        self.debug_log(f"Filler queue pending: size={len(self.filler_to_give)}, first={self.filler_to_give[0]}")
 
         # Game not in a valid state? Wait until later.
         if not self.game_interface.ready_to_handle():
@@ -1052,8 +1088,9 @@ class MSMContext(CommonContext):
             filler = queued_filler
 
         # Player already has an item? Don't overwrite it.
-        if filler != "1 Coin" and self.current_item_func() != -1:
-            self.debug_log(f"Waiting to give {filler}; player already has an item")
+        current_item = self.current_item_func()
+        if filler != "1 Coin" and current_item != -1:
+            self.debug_log(f"Waiting to give {filler}; player already has item={current_item}")
             return
 
         # Prevent question mark panel replacement while giving item
@@ -1100,9 +1137,10 @@ class MSMContext(CommonContext):
             # Give the item
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
 
+            verify_item = self.current_item_func()
             logger.info(f"Dolphin Write Success: {filler}")
             self.mark_consumable_handled(item_index)
-            self.debug_log(f"Wrote held item id {item_id} for {filler}")
+            self.debug_log(f"Wrote held item id {item_id} for {filler}; addr={self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
 
         finally:
             self.one_time_running = False
@@ -1119,7 +1157,8 @@ class MSMContext(CommonContext):
         elif self.awaiting_use and item_data != self.forced_item_id:
             # Game tried to overwrite our item, force it back
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
-            self.debug_log(f"Forced item back to {self.forced_item_id}")
+            verify_item = self.current_item_func()
+            self.debug_log(f"Forced item back to {self.forced_item_id}; previous={item_data}, verify={verify_item}")
             await asyncio.sleep(1)
 
     def current_match_score_total(self):
@@ -1143,6 +1182,7 @@ class MSMContext(CommonContext):
     async def handle_question_mark_panel_items(self):
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
+        self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)}, awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
         # If we don't have an item, pause.
         if item_data == -1:
             self.item_processed = False
@@ -1150,15 +1190,19 @@ class MSMContext(CommonContext):
 
         if asyncio.get_event_loop().time() < self.suppress_panel_until:
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.minus_one)
+            verify_item = self.current_item_func()
+            self.debug_log(f"Panel suppressed; cleared item at {self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
             return
 
         # If we are currently forcing an item from a scoring replacement
         # or a one-time item, DO NOT let the ?-panel code claim credit for it.
         if self.awaiting_use or item_data == self.forced_item_id or self.item_processed:
+            self.debug_log("Panel replacement skipped; forced/awaiting/processed state active")
             return
 
         # Standard pauses
         if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed:
+            self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
             return
 
         # Handle Empty List
@@ -1208,10 +1252,14 @@ class MSMContext(CommonContext):
         if item_id is not None:
             item_id_int = int(item_id)
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, item_id_int)
+            verify_item = self.current_item_func()
             logger.info(f"?-Panel activated! Item replaced with {random_item}!")
+            self.debug_log(f"Panel wrote item id {item_id_int}; addr={self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
             self.item_processed = True
             self.awaiting_use = True
             self.forced_item_id = item_id_int
+        else:
+            self.debug_log(f"Panel selected {random_item}, but no item id matched")
 
 
     # === Trap Handling ===
@@ -1847,12 +1895,19 @@ class MSMContext(CommonContext):
         while not self.exit_event.is_set():
             try:
                 if not self.game_interface.dolphin_client.is_hooked_class():
+                    if self.game_session_active:
+                        self.reset_game_session_state()
                     await self.game_interface.dolphin_client.attempt_to_hook()
 
                 if self.game_interface.dolphin_client.is_hooked_class():
                     if not self.game_interface.dolphin_client.check_region():
+                        if self.game_session_active:
+                            self.reset_game_session_state()
                         await asyncio.sleep(1)
                         continue
+
+                    if not self.game_session_active or self.active_game_version != dc.GAME_VERSION:
+                        self.reset_game_session_state(game_active=True)
 
                 # Ensure we are connected to the AP Server first
                 if not self.server or not self.server.socket or self.server.socket.closed:
@@ -2014,7 +2069,7 @@ class MSMContext(CommonContext):
         await self.handle_received_items()
         await self.check_pending_tournament_location()
         await self.stop_stupid_games_played_notifs()
-        await unlock_tournament_tabs_option(self, self.hard_tournament_difficulty)
+        await unlock_tournament_tabs_option(self, self.hard_tournament_difficulty, self.unlocked_sports_mix)
 
         await self.handle_gecko_codes()
 

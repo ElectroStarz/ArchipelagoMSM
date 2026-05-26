@@ -91,7 +91,7 @@ class MSMInterface:
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
                 if self.current_tournament is not None:
-                    if timer < 9000:
+                    if timer < 10800:
                         ready_game = True
                     else:
                         ready_game = False
@@ -103,7 +103,7 @@ class MSMInterface:
 
             elif self.check_sport() == "Dodgeball":
                 if self.current_tournament is not None:
-                    if timer < 9000:
+                    if timer < 10800:
                         ready_game = True
                     else:
                         ready_game = False
@@ -133,13 +133,12 @@ class MSMInterface:
                     except RuntimeError:
                         ready_game = False
             elif self.check_sport() == "Hockey":
-                if self.current_tournament is Any and self.current_tournament is not None:
-                    if timer < 9000:
+                if self.current_tournament is not None:
+                    if timer < 10800:
                         ready_game = True
                     else:
                         ready_game = False
                 else:
-
                     if timer < hockey_timer:
                         ready_game = True
                     else:

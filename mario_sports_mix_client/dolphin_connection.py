@@ -74,21 +74,22 @@ class DolphinClient:
         decoded = byte.decode("utf-8", errors="ignore")
 
         if decoded == "RMKP01":
-            GAME_VERSION = "PAL"
-            if not self.told_region:
-                self.logger.info("PAL Detected!")
-                self.told_region = True
-
+            detected_version = "PAL"
         elif decoded == "RMKE01":
-            GAME_VERSION = "NTSC-U"
-            if not self.told_region:
-                self.logger.info("NTSC-U Detected!")
-                self.told_region = True
-
+            detected_version = "NTSC-U"
         else:
             GAME_VERSION = None
+            self.told_region = False
             self.logger.info(f"Unsupported or unreadable game ID: {decoded!r}")
             return False
+
+        if GAME_VERSION != detected_version:
+            self.told_region = False
+
+        GAME_VERSION = detected_version
+        if not self.told_region:
+            self.logger.info(f"{detected_version} Detected!")
+            self.told_region = True
 
         return True
 
@@ -101,8 +102,12 @@ class DolphinClient:
             return False
 
     def disconnect(self):
+        global GAME_VERSION
+
         if self.dme.is_hooked():
             self.dme.un_hook()
+        GAME_VERSION = None
+        self.told_region = False
 
     def read_byte(self, address: Any) -> Any:
         self.dme.is_hooked()
