@@ -299,6 +299,7 @@ class MSMContext(CommonContext):
     deathlink_consequence = int
     deathlink_o_get_points = int
     deathlink_o_scores_points = int
+    deathlink_boss_recovered = int
 
     # Sanity stuff
     special_sanity = False
@@ -408,6 +409,7 @@ class MSMContext(CommonContext):
             self.deathlink_consequence = self.slot_data["deathlink_consequence"]
             self.deathlink_o_get_points = self.slot_data["deathlink_opponent_get_points"]
             self.deathlink_o_scores_points = self.slot_data["deathlink_opponent_scores_points"]
+            self.deathlink_boss_recovered = self.slot_data["deathlink_boss_health_recovered"]
 
             Utils.async_start(self.update_death_link(self.deathlink_enabled))
 
@@ -1862,27 +1864,47 @@ class MSMContext(CommonContext):
 
                 # Lose Match Consequence
                 if self.deathlink_consequence == 0:
-                    # Force opponent to win
-                    self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4 =5th Period
-                    for address in opponent_score_addresses:
-                        addr = get_address(address)
-                        self.game_interface.dolphin_client.write_byte(addr, 100) # Write 100 for all scores
-                    self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
-                    self.received_death = True
-                    # If we're not in the state where we've died to deathlink, set received_death to false
-                    if (match_status != 2 and match_status != 3) or current_stage in not_match_prefix:
-                        self.received_death = False
+                    if self.is_behemoth or self.is_behemoth_king:
+                        self.recover_boss_hp()
+                    else:
+                        # Force opponent to win
+                        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4=5th Period
+                        for address in opponent_score_addresses:
+                            addr = get_address(address)
+                            self.game_interface.dolphin_client.write_byte(addr, 100) # Write 100 for all scores
+                        self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
+                        self.received_death = True
+                        # If we're not in the state where we've died to deathlink, set received_death to false
+                        if (match_status != 2 and match_status != 3) or current_stage in not_match_prefix:
+                            self.received_death = False
 
                 # Opponent gains points
                 elif self.deathlink_consequence == 1:
-                    self.received_death = True
-                    value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
-                    addr = get_address(opponent_score_addresses[value]) # Get the address for current period
-                    points = self.game_interface.dolphin_client.read_word(addr)
-                    new_points = points + self.deathlink_o_get_points
-                    self.game_interface.dolphin_client.write_word(addr, new_points)
-                    logger.info(f"Opponent now has {new_points} points!")
-                    self.received_death = False
+                    if self.is_behemoth or self.is_behemoth_king:
+                        self.recover_boss_hp()
+                    else:
+                        self.received_death = True
+                        value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
+                        addr = get_address(opponent_score_addresses[value]) # Get the address for current period
+                        points = self.game_interface.dolphin_client.read_word(addr)
+                        new_points = points + self.deathlink_o_get_points
+                        self.game_interface.dolphin_client.write_word(addr, new_points)
+                        logger.info(f"Opponent now has {new_points} points!")
+                        self.received_death = False
+
+    def recover_boss_hp(self):
+        """Calculates the amount of HP recovered when sent a deathlink"""
+
+        if self.is_behemoth:
+            health_recovered = (self.deathlink_boss_recovered / 100) * self.behemoth_hp
+            current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)
+            new_health = current_health + health_recovered
+            self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
+        elif self.is_behemoth_king:
+            health_recovered = (self.deathlink_boss_recovered / 100) * self.behemoth_king_hp
+            current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)
+            new_health = current_health + health_recovered
+            self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
 
 
     # === Misc stuff idk where to put ===

@@ -139,6 +139,14 @@ Requires Deathlink on & Opponent Gains Point consequence"""
     range_end = 20
     default = 10
 
+class DeathlinkBossHealthRecovered(Range):
+    """What percentage of the boss' health should be recovered when sent a deathlink?
+(Behemoth & Behemoth King)"""
+    display_name = "Boss Health Recovered"
+    range_start = 0
+    range_end = 100
+    default = 20
+
 # class TeamSanity(Choice):
 #     """(NOT WORKING) Turn on or off team sanity
 #     (Playing with every team combination sends a check)"""
@@ -203,6 +211,7 @@ msm_option_groups = [
         DeathlinkOpponentScorePoints,
         DeathlinkConsequence,
         DeathlinkOpponentGetPoints,
+        DeathlinkBossHealthRecovered,
     ])
     # OptionGroup("Sanity Options (NOT WORKING)", [
     #     TeamSanity,
@@ -233,6 +242,7 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_consequence: DeathlinkConsequence
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
     deathlink_opponent_get_points: DeathlinkOpponentGetPoints
+    deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
     # team_sanity: TeamSanity
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints

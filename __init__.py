@@ -99,6 +99,7 @@ class MSMWorld(World):
         "deathlink_consequence": self.options.deathlink_consequence.value,
         "deathlink_opponent_get_points": self.options.deathlink_opponent_get_points.value,
         "deathlink_opponent_scores_points": self.options.deathlink_opponent_scores_points.value,
+        "deathlink_boss_health_recovered": self.options.deathlink_boss_health_recovered.value,
         }
 
         return slot_data
