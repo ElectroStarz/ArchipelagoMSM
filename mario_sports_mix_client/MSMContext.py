@@ -1940,6 +1940,7 @@ class MSMContext(CommonContext):
                 for address, code in GeckoCodes.gecko_codes_ntscu.items():
                     self.game_interface.dolphin_client.write_bytes(address, code)
 
+            self.debug_log("Gecko Codes Handled")
             self.handled_gecko_codes = True
 
 
