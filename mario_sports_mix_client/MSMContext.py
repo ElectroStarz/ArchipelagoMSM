@@ -20,7 +20,7 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.code: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.1.0"
+CLIENT_VERSION = "0.1.5"
 
 
 status_messages = {
