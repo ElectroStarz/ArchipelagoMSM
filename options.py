@@ -214,7 +214,7 @@ msm_option_groups = [
     # ])
 ]
 
-@dataclass()
+@dataclass
 class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
