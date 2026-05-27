@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Location
 from . import items
-from .options import GoalCondition, BeMean, HardTournamentDifficulty
+from .options import GoalCondition, BeMean, HardTournamentDifficulty, CharacterSanity
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -380,17 +380,42 @@ LOCATION_NAME_TO_ID = {
     "Use Slime's Special!": base_loc_id + 576,
     "Use Black Mage's Special!": base_loc_id + 577,
 
-    # === Party Mode: Feed Petey Locations ===
-    "FP: Get 10 Points!": base_loc_id + 600,
-    "FP: Get 20 Points!": base_loc_id + 601,
-    "FP: Get 30 Points!": base_loc_id + 602,
-    "FP: Get 40 Points!": base_loc_id + 603,
-    "FP: Get 50 Points!": base_loc_id + 604,
-    "FP: Get 60 Points!": base_loc_id + 605,
-    "FP: Get 70 Points!": base_loc_id + 606,
-    "FP: Get 80 Points!": base_loc_id + 607,
-    "FP: Get 90 Points!": base_loc_id + 608,
-    "FP: Get 100 Points!": base_loc_id + 609,
+    # === Character Sanity Locations ===
+    "Play as Mario": base_loc_id + 1001,
+    "Play as Luigi": base_loc_id + 1002,
+    "Play as Peach": base_loc_id + 1003,
+    "Play as Daisy": base_loc_id + 1004,
+    "Play as Yoshi": base_loc_id + 1005,
+    "Play as Wario": base_loc_id + 1006,
+    "Play as Waluigi": base_loc_id + 1007,
+    "Play as Donkey Kong": base_loc_id + 1008,
+    "Play as Diddy Kong": base_loc_id + 1009,
+    "Play as Toad": base_loc_id + 1010,
+    "Play as Bowser": base_loc_id + 1011,
+    "Play as Bowser Jr": base_loc_id + 1012,
+    "Play as Moogle": base_loc_id + 1013,
+    "Play as Cactuar": base_loc_id + 1014,
+    "Play as Ninja": base_loc_id + 1015,
+    "Play as White Mage": base_loc_id + 1016,
+    "Play as Slime": base_loc_id + 1017,
+    "Play as Black Mage": base_loc_id + 1018,
+    "Play as Mii (Male)": base_loc_id + 1019,
+    "Play as Mii (Female)": base_loc_id + 1020,
+
+    # --- Costumes ---
+    "Play as Pink Yoshi": base_loc_id + 1021,
+    "Play as Light Blue Yoshi": base_loc_id + 1022,
+    "Play as Yellow Yoshi": base_loc_id + 1023,
+    "Play as Blue Toad": base_loc_id + 1024,
+    "Play as Green Toad": base_loc_id + 1025,
+    "Play as Yellow Toad": base_loc_id + 1026,
+    "Play as She-Slime": base_loc_id + 1027,
+    "Play as Metal Slime": base_loc_id + 1028,
+    "Play as Tennis-wear Peach": base_loc_id + 1029,
+    "Play as Tennis-wear Daisy": base_loc_id + 1030,
+    "Play as Shadow White Ninja": base_loc_id + 1031,
+    "Play as Pure White - White Mage": base_loc_id + 1032,
+    "Play as Magic Red Black Mage": base_loc_id + 1033,
 
     # If goal condition is defeating Behemoth King create an item for defeating Behemoth
     "Defeat Behemoth!": base_loc_id + 2000,
@@ -401,6 +426,7 @@ def get_location_names_with_ids(location_names: list[str]) -> dict[str, int | No
     return {location_name: LOCATION_NAME_TO_ID[location_name] for location_name in location_names}
 
 def create_regular_locations(world: MSMWorld) -> None:
+    main_menu = world.get_region("Main Menu")
     # Basketball
     b_exhibition = world.get_region("Basketball: Exhibition")
     b_mushroom_cup_n = world.get_region("Basketball: Mushroom Cup (Normal)")
@@ -447,11 +473,6 @@ def create_regular_locations(world: MSMWorld) -> None:
     "Sports Mix: Beat Star Cup Round 2", "Sports Mix: Beat Star Cup Round 3"])
     sports_mix_star.add_locations(sm_star_locations, MSMLocation)
 
-    # feed_petey = world.get_region("Party Mode: Feed Petey")
-    # feed_petey_locations = get_location_names_with_ids(["FP: Get 10 Points!", "FP: Get 20 Points!", "FP: Get 30 Points!",
-    # "FP: Get 40 Points!", "FP: Get 50 Points!", "FP: Get 60 Points!", "FP: Get 70 Points!", "FP: Get 80 Points!",
-    # "FP: Get 90 Points!", "FP: Get 100 Points!"])
-    # feed_petey.add_locations(feed_petey_locations, MSMLocation)
 
     # === Exhibition Locations for each difficulty ===
 
@@ -795,6 +816,24 @@ def create_regular_locations(world: MSMWorld) -> None:
         d_exhibition.add_locations(d_exhibition_locations_ex)
         v_exhibition.add_locations(v_exhibition_locations_ex)
         h_exhibition.add_locations(h_exhibition_locations_ex)
+
+    # Character Sanity Locations
+    if (world.options.character_sanity == CharacterSanity.option_characters or
+        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+        character_locations = get_location_names_with_ids(["Play as Mario", "Play as Luigi", "Play as Peach",
+        "Play as Daisy", "Play as Yoshi", "Play as Wario", "Play as Waluigi", "Play as Donkey Kong",
+        "Play as Diddy Kong", "Play as Toad", "Play as Bowser", "Play as Bowser Jr", "Play as Moogle",
+        "Play as Cactuar", "Play as Ninja", "Play as White Mage", "Play as Slime", "Play as Black Mage",
+        "Play as Mii (Male)", "Play as Mii (Female)"])
+        main_menu.add_locations(character_locations)
+
+    if (world.options.character_sanity == CharacterSanity.option_costumes or
+        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+        costume_locations = get_location_names_with_ids(["Play as Pink Yoshi", "Play as Light Blue Yoshi",
+        "Play as Yellow Yoshi", "Play as Blue Toad", "Play as Green Toad", "Play as Yellow Toad", "Play as She-Slime",
+        "Play as Metal Slime", "Play as Tennis-wear Peach", "Play as Tennis-wear Daisy", "Play as Shadow White Ninja",
+        "Play as Pure White - White Mage", "Play as Magic Red Black Mage"])
+        main_menu.add_locations(costume_locations)
 
 
 def create_events(world: "MSMWorld") -> None:

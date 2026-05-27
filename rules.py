@@ -91,6 +91,42 @@ TOURNAMENT_DIFFICULTIES = {
     "Hard": "Hard"
 }
 
+CHARACTER_NAMES = {
+    "Mario": "Character: Mario",
+    "Luigi": "Character: Luigi",
+    "Peach": "Character: Peach",
+    "Daisy": "Character: Daisy",
+    "Yoshi": "Character: Yoshi",
+    "Wario": "Character: Wario",
+    "Waluigi": "Character: Waluigi",
+    "Donkey Kong": "Character: Donkey Kong",
+    "Diddy Kong": "Character: Diddy Kong",
+    "Toad": "Character: Toad",
+    "Bowser": "Character: Bowser",
+    "Bowser Jr": "Character: Bowser Jr",
+    "Moogle": "Character: Moogle",
+    "White Mage": "Character: White Mage",
+    "Black Mage": "Character: Black Mage",
+    "Ninja": "Character: Ninja",
+    "Cactuar": "Character: Cactuar",
+    "Slime": "Character: Slime"
+}
+
+COSTUME_NAMES = {
+    "Pink Yoshi": "Costume: Pink Yoshi",
+    "Light Blue Yoshi": "Costume: Light Blue Yoshi",
+    "Yellow Yoshi": "Costume: Yellow Yoshi",
+    "Blue Toad": "Costume: Blue Toad",
+    "Green Toad": "Costume: Green Toad",
+    "Yellow Toad": "Costume: Yellow Toad",
+    "She-Slime": "Costume: She-Slime",
+    "Metal Slime": "Costume: Metal Slime",
+    "Tennis-wear Peach": "Costume: Tennis-wear Peach",
+    "Tennis-wear Daisy": "Costume: Tennis-wear Daisy",
+    "Shadow White Ninja": "Costume: Shadow White Ninja",
+    "Pure White - White Mage": "Costume: Pure White - White Mage",
+    "Magic Red Black Mage": "Costume: Magic Red Black Mage"
+}
 
 # Main rule setup entry point
 # Calls all other rule generation functions
@@ -141,6 +177,18 @@ def set_all_location_rules(world: MSMWorld) -> None:
                     )
                     world.set_rule(location, rule)
 
+
+    if (world.options.character_sanity == CharacterSanity.option_characters or
+    world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+        for name, item in CHARACTER_NAMES.items():
+            location = world.get_location(f"Play as {name}")
+            world.set_rule(location, Has(item))
+
+    if (world.options.character_sanity == CharacterSanity.option_costumes or
+    world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+        for name, item in COSTUME_NAMES.items():
+            location = world.get_location(f"Play as {name}")
+            world.set_rule(location, Has(item))
 
 # Goal completion logic
 # Handles Behemoth and Behemoth King requirements

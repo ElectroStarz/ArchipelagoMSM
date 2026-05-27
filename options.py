@@ -147,15 +147,16 @@ class DeathlinkBossHealthRecovered(Range):
     range_end = 100
     default = 20
 
-# class TeamSanity(Choice):
-#     """(NOT WORKING) Turn on or off team sanity
-#     (Playing with every team combination sends a check)"""
-#     display_name = "Team Sanity"
-#     option_off = 0
-#     option_characters = 1
-#     option_characters_and_costumes = 2
-#     default = 0
-#
+class CharacterSanity(Choice):
+    """Turn on or off Character Sanity
+(Playing with a character sends a check)"""
+    display_name = "Character Sanity"
+    option_off = 0
+    option_characters = 1
+    option_costumes = 2
+    option_characters_and_costumes = 3
+    default = 0
+
 # class ScoreSanity(Toggle):
 #     """(NOT WORKING) Toggle on or off score sanity"""
 #     display_name = "Score Sanity"
@@ -212,15 +213,15 @@ msm_option_groups = [
         DeathlinkConsequence,
         DeathlinkOpponentGetPoints,
         DeathlinkBossHealthRecovered,
-    ])
-    # OptionGroup("Sanity Options (NOT WORKING)", [
-    #     TeamSanity,
-    #     ScoreSanity,
-    #     ScoreSanityPoints,
-    #     ScoreSanityMax,
-    #     SpecialSanity,
-    #     StageSanity,
-    # ])
+    ]),
+    OptionGroup("Sanity Options (NOT WORKING)", [
+        CharacterSanity,
+        # ScoreSanity,
+        # ScoreSanityPoints,
+        # ScoreSanityMax,
+        # SpecialSanity,
+        # StageSanity,
+    ]),
 ]
 
 @dataclass
@@ -243,7 +244,7 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
     deathlink_opponent_get_points: DeathlinkOpponentGetPoints
     deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
-    # team_sanity: TeamSanity
+    character_sanity: CharacterSanity
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints
     # score_sanity_max: ScoreSanityMax

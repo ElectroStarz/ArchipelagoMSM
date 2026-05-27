@@ -1,5 +1,5 @@
 from typing import Dict, NamedTuple, TYPE_CHECKING
-from BaseClasses import Item, ItemClassification
+from BaseClasses import Item, ItemClassification as IC
 from .options import *
 
 if TYPE_CHECKING:
@@ -10,191 +10,191 @@ class MSMItem(Item):
 
 class ItemData(NamedTuple):
     code: int
-    classification: ItemClassification
+    classification: IC
 
 base_id = 1
 
 sport_items = {
-    "Sport: Basketball": ItemData(base_id + 0, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Dodgeball": ItemData(base_id + 1, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Volleyball": ItemData(base_id + 2, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Hockey": ItemData(base_id + 3, ItemClassification.progression|ItemClassification.useful),
+    "Sport: Basketball": ItemData(base_id + 0, IC.progression|IC.useful),
+    "Sport: Dodgeball": ItemData(base_id + 1, IC.progression|IC.useful),
+    "Sport: Volleyball": ItemData(base_id + 2, IC.progression|IC.useful),
+    "Sport: Hockey": ItemData(base_id + 3, IC.progression|IC.useful),
 }
 
 sports_mix_item = {
-    "Sport: Sports Mix": ItemData(base_id + 4, ItemClassification.progression_skip_balancing|ItemClassification.useful)
+    "Sport: Sports Mix": ItemData(base_id + 4, IC.progression_skip_balancing|IC.useful)
 }
 
 basketball_items_n = {
-    "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 5, ItemClassification.progression),
-    "Basketball: Flower Cup (Normal)": ItemData(base_id + 6, ItemClassification.progression),
-    "Basketball: Star Cup (Normal)": ItemData(base_id + 7, ItemClassification.progression),
+    "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 5, IC.progression),
+    "Basketball: Flower Cup (Normal)": ItemData(base_id + 6, IC.progression),
+    "Basketball: Star Cup (Normal)": ItemData(base_id + 7, IC.progression),
 }
 
 basketball_items_h = {
-    "Basketball: Mushroom Cup (Hard)": ItemData(base_id + 8, ItemClassification.progression),
-    "Basketball: Flower Cup (Hard)": ItemData(base_id + 9, ItemClassification.progression),
-    "Basketball: Star Cup (Hard)": ItemData(base_id + 10, ItemClassification.progression)
+    "Basketball: Mushroom Cup (Hard)": ItemData(base_id + 8, IC.progression),
+    "Basketball: Flower Cup (Hard)": ItemData(base_id + 9, IC.progression),
+    "Basketball: Star Cup (Hard)": ItemData(base_id + 10, IC.progression)
 }
 
 dodgeball_items_n = {
-    "Dodgeball: Mushroom Cup (Normal)": ItemData(base_id + 11, ItemClassification.progression),
-    "Dodgeball: Flower Cup (Normal)": ItemData(base_id + 12, ItemClassification.progression),
-    "Dodgeball: Star Cup (Normal)": ItemData(base_id + 13, ItemClassification.progression)
+    "Dodgeball: Mushroom Cup (Normal)": ItemData(base_id + 11, IC.progression),
+    "Dodgeball: Flower Cup (Normal)": ItemData(base_id + 12, IC.progression),
+    "Dodgeball: Star Cup (Normal)": ItemData(base_id + 13, IC.progression)
 }
 
 dodgeball_items_h = {
-    "Dodgeball: Mushroom Cup (Hard)": ItemData(base_id + 14, ItemClassification.progression),
-    "Dodgeball: Flower Cup (Hard)": ItemData(base_id + 15, ItemClassification.progression),
-    "Dodgeball: Star Cup (Hard)": ItemData(base_id + 16, ItemClassification.progression)
+    "Dodgeball: Mushroom Cup (Hard)": ItemData(base_id + 14, IC.progression),
+    "Dodgeball: Flower Cup (Hard)": ItemData(base_id + 15, IC.progression),
+    "Dodgeball: Star Cup (Hard)": ItemData(base_id + 16, IC.progression)
 }
 
 volleyball_items_n = {
-    "Volleyball: Mushroom Cup (Normal)": ItemData(base_id + 17, ItemClassification.progression),
-    "Volleyball: Flower Cup (Normal)": ItemData(base_id + 18, ItemClassification.progression),
-    "Volleyball: Star Cup (Normal)": ItemData(base_id + 19, ItemClassification.progression)
+    "Volleyball: Mushroom Cup (Normal)": ItemData(base_id + 17, IC.progression),
+    "Volleyball: Flower Cup (Normal)": ItemData(base_id + 18, IC.progression),
+    "Volleyball: Star Cup (Normal)": ItemData(base_id + 19, IC.progression)
 }
 
 volleyball_items_h = {
-    "Volleyball: Mushroom Cup (Hard)": ItemData(base_id + 20, ItemClassification.progression),
-    "Volleyball: Flower Cup (Hard)": ItemData(base_id + 21, ItemClassification.progression),
-    "Volleyball: Star Cup (Hard)": ItemData(base_id + 22, ItemClassification.progression)
+    "Volleyball: Mushroom Cup (Hard)": ItemData(base_id + 20, IC.progression),
+    "Volleyball: Flower Cup (Hard)": ItemData(base_id + 21, IC.progression),
+    "Volleyball: Star Cup (Hard)": ItemData(base_id + 22, IC.progression)
 }
 
 hockey_items_n = {
-    "Hockey: Mushroom Cup (Normal)": ItemData(base_id + 23, ItemClassification.progression),
-    "Hockey: Flower Cup (Normal)": ItemData(base_id + 24, ItemClassification.progression),
-    "Hockey: Star Cup (Normal)": ItemData(base_id + 25, ItemClassification.progression)
+    "Hockey: Mushroom Cup (Normal)": ItemData(base_id + 23, IC.progression),
+    "Hockey: Flower Cup (Normal)": ItemData(base_id + 24, IC.progression),
+    "Hockey: Star Cup (Normal)": ItemData(base_id + 25, IC.progression)
 }
 
 hockey_items_h = {
-    "Hockey: Mushroom Cup (Hard)": ItemData(base_id + 26, ItemClassification.progression),
-    "Hockey: Flower Cup (Hard)": ItemData(base_id + 27, ItemClassification.progression),
-    "Hockey: Star Cup (Hard)": ItemData(base_id + 28, ItemClassification.progression)
+    "Hockey: Mushroom Cup (Hard)": ItemData(base_id + 26, IC.progression),
+    "Hockey: Flower Cup (Hard)": ItemData(base_id + 27, IC.progression),
+    "Hockey: Star Cup (Hard)": ItemData(base_id + 28, IC.progression)
 }
 
 sports_mix_cups = {
-    "Sports Mix: Mushroom Cup": ItemData(base_id + 29, ItemClassification.progression_skip_balancing),
-    "Sports Mix: Flower Cup": ItemData(base_id + 30, ItemClassification.progression_skip_balancing),
-    "Sports Mix: Star Cup": ItemData(base_id + 31, ItemClassification.progression_skip_balancing)
+    "Sports Mix: Mushroom Cup": ItemData(base_id + 29, IC.progression_skip_balancing),
+    "Sports Mix: Flower Cup": ItemData(base_id + 30, IC.progression_skip_balancing),
+    "Sports Mix: Star Cup": ItemData(base_id + 31, IC.progression_skip_balancing)
 }
 
 sports_crystals = {
-    "Sports Crystal: Red": ItemData(base_id + 32, ItemClassification.progression_skip_balancing|ItemClassification.useful),
-    "Sports Crystal: Green": ItemData(base_id + 33, ItemClassification.progression_skip_balancing|ItemClassification.useful),
-    "Sports Crystal: Yellow": ItemData(base_id + 34, ItemClassification.progression_skip_balancing|ItemClassification.useful),
-    "Sports Crystal: Blue": ItemData(base_id + 35, ItemClassification.progression_skip_balancing|ItemClassification.useful),
+    "Sports Crystal: Red": ItemData(base_id + 32, IC.progression_skip_balancing|IC.useful),
+    "Sports Crystal: Green": ItemData(base_id + 33, IC.progression_skip_balancing|IC.useful),
+    "Sports Crystal: Yellow": ItemData(base_id + 34, IC.progression_skip_balancing|IC.useful),
+    "Sports Crystal: Blue": ItemData(base_id + 35, IC.progression_skip_balancing|IC.useful),
 }
 
 individual_stages = {
-    "Stage: Mario Stadium": ItemData(base_id + 100, ItemClassification.progression),
-    "Stage: Koopa Troopa Beach": ItemData(base_id + 101, ItemClassification.progression),
-    "Stage: Peach's Castle": ItemData(base_id + 102, ItemClassification.progression),
-    "Stage: Toad Park": ItemData(base_id + 103, ItemClassification.progression),
-    "Stage: DK Dock": ItemData(base_id + 104, ItemClassification.progression),
-    "Stage: Luigi's Mansion": ItemData(base_id + 105, ItemClassification.progression),
-    "Stage: Daisy Garden": ItemData(base_id + 106, ItemClassification.progression),
-    "Stage: Wario Factory": ItemData(base_id + 107, ItemClassification.progression),
-    "Stage: Bowser Jr. Blvd.": ItemData(base_id + 108, ItemClassification.progression),
-    "Stage: Bowser's Castle": ItemData(base_id + 109, ItemClassification.progression),
-    "Stage: Waluigi Pinball": ItemData(base_id + 110, ItemClassification.progression),
-    "Stage: Ghoulish Galleon": ItemData(base_id + 111, ItemClassification.progression),
-    "Stage: Star Ship": ItemData(base_id + 112, ItemClassification.progression),
-    "Stage: Western Junction": ItemData(base_id + 113, ItemClassification.progression),
-    "Stage: Behemoth Stage": ItemData(base_id + 114, ItemClassification.progression_skip_balancing),
+    "Stage: Mario Stadium": ItemData(base_id + 100, IC.progression),
+    "Stage: Koopa Troopa Beach": ItemData(base_id + 101, IC.progression),
+    "Stage: Peach's Castle": ItemData(base_id + 102, IC.progression),
+    "Stage: Toad Park": ItemData(base_id + 103, IC.progression),
+    "Stage: DK Dock": ItemData(base_id + 104, IC.progression),
+    "Stage: Luigi's Mansion": ItemData(base_id + 105, IC.progression),
+    "Stage: Daisy Garden": ItemData(base_id + 106, IC.progression),
+    "Stage: Wario Factory": ItemData(base_id + 107, IC.progression),
+    "Stage: Bowser Jr. Blvd.": ItemData(base_id + 108, IC.progression),
+    "Stage: Bowser's Castle": ItemData(base_id + 109, IC.progression),
+    "Stage: Waluigi Pinball": ItemData(base_id + 110, IC.progression),
+    "Stage: Ghoulish Galleon": ItemData(base_id + 111, IC.progression),
+    "Stage: Star Ship": ItemData(base_id + 112, IC.progression),
+    "Stage: Western Junction": ItemData(base_id + 113, IC.progression),
+    "Stage: Behemoth Stage": ItemData(base_id + 114, IC.progression_skip_balancing),
 }
 
 progressive_stuff = {
-    # "Progressive: Team Size": ItemData(base_id + 120, ItemClassification.progression|ItemClassification.useful),
-    # "Progressive: Team Size": ItemData(base_id + 121, ItemClassification.progression|ItemClassification.useful),
+    # "Progressive: Team Size": ItemData(base_id + 120, IC.progression|IC.useful),
+    # "Progressive: Team Size": ItemData(base_id + 121, IC.progression|IC.useful),
 
 }
 
 characters = {
-    "Character: Mario": ItemData(base_id + 200, ItemClassification.useful),
-    "Character: Luigi": ItemData(base_id + 201, ItemClassification.useful),
-    "Character: Peach": ItemData(base_id + 202, ItemClassification.useful),
-    "Character: Daisy": ItemData(base_id + 203, ItemClassification.useful),
-    "Character: Yoshi": ItemData(base_id + 204, ItemClassification.useful),
-    "Character: Wario": ItemData(base_id + 205, ItemClassification.useful),
-    "Character: Waluigi": ItemData(base_id + 206, ItemClassification.useful),
-    "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.useful),
-    "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.useful),
-    "Character: Toad": ItemData(base_id + 209, ItemClassification.useful),
-    "Character: Bowser": ItemData(base_id + 210, ItemClassification.useful),
-    "Character: Bowser Jr": ItemData(base_id + 211, ItemClassification.useful),
-    "Character: Moogle": ItemData(base_id + 212, ItemClassification.useful),
-    "Character: Cactuar": ItemData(base_id + 213, ItemClassification.useful),
-    "Character: Ninja": ItemData(base_id + 214, ItemClassification.useful),
-    "Character: White Mage": ItemData(base_id + 215, ItemClassification.useful),
-    "Character: Slime": ItemData(base_id + 216, ItemClassification.useful),
-    "Character: Black Mage": ItemData(base_id + 217, ItemClassification.useful),
+    "Character: Mario": ItemData(base_id + 200, IC.useful),
+    "Character: Luigi": ItemData(base_id + 201, IC.useful),
+    "Character: Peach": ItemData(base_id + 202, IC.useful),
+    "Character: Daisy": ItemData(base_id + 203, IC.useful),
+    "Character: Yoshi": ItemData(base_id + 204, IC.useful),
+    "Character: Wario": ItemData(base_id + 205, IC.useful),
+    "Character: Waluigi": ItemData(base_id + 206, IC.useful),
+    "Character: Donkey Kong": ItemData(base_id + 207, IC.useful),
+    "Character: Diddy Kong": ItemData(base_id + 208, IC.useful),
+    "Character: Toad": ItemData(base_id + 209, IC.useful),
+    "Character: Bowser": ItemData(base_id + 210, IC.useful),
+    "Character: Bowser Jr": ItemData(base_id + 211, IC.useful),
+    "Character: Moogle": ItemData(base_id + 212, IC.useful),
+    "Character: Cactuar": ItemData(base_id + 213, IC.useful),
+    "Character: Ninja": ItemData(base_id + 214, IC.useful),
+    "Character: White Mage": ItemData(base_id + 215, IC.useful),
+    "Character: Slime": ItemData(base_id + 216, IC.useful),
+    "Character: Black Mage": ItemData(base_id + 217, IC.useful),
 }
 
 character_costumes = {
-    "Costume: Light Blue Yoshi": ItemData(base_id + 218, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Yellow Yoshi": ItemData(base_id + 219, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Pink Yoshi": ItemData(base_id + 220, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Tennis-wear Peach": ItemData(base_id + 221, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Tennis-wear Daisy": ItemData(base_id + 222, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Blue Toad": ItemData(base_id + 223, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Yellow Toad": ItemData(base_id + 224, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Green Toad": ItemData(base_id + 225, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Shadow White Ninja": ItemData(base_id + 226, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Pure White - White Mage": ItemData(base_id + 227,ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Magic Red Black Mage": ItemData(base_id + 228,ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: She-slime": ItemData(base_id + 229, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Metal Slime": ItemData(base_id + 230, ItemClassification.filler|ItemClassification.deprioritized),
+    "Costume: Light Blue Yoshi": ItemData(base_id + 218, IC.filler),
+    "Costume: Yellow Yoshi": ItemData(base_id + 219, IC.filler),
+    "Costume: Pink Yoshi": ItemData(base_id + 220, IC.filler),
+    "Costume: Tennis-wear Peach": ItemData(base_id + 221, IC.filler),
+    "Costume: Tennis-wear Daisy": ItemData(base_id + 222, IC.filler),
+    "Costume: Blue Toad": ItemData(base_id + 223, IC.filler),
+    "Costume: Yellow Toad": ItemData(base_id + 224, IC.filler),
+    "Costume: Green Toad": ItemData(base_id + 225, IC.filler),
+    "Costume: Shadow White Ninja": ItemData(base_id + 226, IC.filler),
+    "Costume: Pure White - White Mage": ItemData(base_id + 227,IC.filler),
+    "Costume: Magic Red Black Mage": ItemData(base_id + 228,IC.filler),
+    "Costume: She-Slime": ItemData(base_id + 229, IC.filler),
+    "Costume: Metal Slime": ItemData(base_id + 230, IC.filler),
 }
 
 # Able to use once unlocked
 unlockable_panel_items = {
-    "? Panel: Green Shell": ItemData(base_id + 300, ItemClassification.useful),
-    "? Panel: Red Shell": ItemData(base_id + 301, ItemClassification.useful),
-    "? Panel: Banana": ItemData(base_id + 302, ItemClassification.useful),
-    "? Panel: Bob-omb": ItemData(base_id + 303, ItemClassification.useful),
-    "? Panel: Mini Mushroom": ItemData(base_id + 304, ItemClassification.useful),
-    "? Panel: Super Star": ItemData(base_id + 305, ItemClassification.useful),
+    "? Panel: Green Shell": ItemData(base_id + 300, IC.useful),
+    "? Panel: Red Shell": ItemData(base_id + 301, IC.useful),
+    "? Panel: Banana": ItemData(base_id + 302, IC.useful),
+    "? Panel: Bob-omb": ItemData(base_id + 303, IC.useful),
+    "? Panel: Mini Mushroom": ItemData(base_id + 304, IC.useful),
+    "? Panel: Super Star": ItemData(base_id + 305, IC.useful),
 }
 
 unlockable_abilities = {
-    "Ability: Special Meter": ItemData(base_id + 307, ItemClassification.useful),
+    "Ability: Special Meter": ItemData(base_id + 307, IC.useful),
 }
 
 # One time use
 one_time_items = {
-    "1 Coin": ItemData(base_id + 400, ItemClassification.filler),
-    "1 Green Shell": ItemData(base_id + 401, ItemClassification.filler),
-    "1 Red Shell": ItemData(base_id + 402, ItemClassification.filler),
-    "1 Banana": ItemData(base_id + 403, ItemClassification.filler),
-    "1 Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
-    "1 Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
-    "1 Super Star": ItemData(base_id + 406, ItemClassification.filler),
+    "1 Coin": ItemData(base_id + 400, IC.filler),
+    "1 Green Shell": ItemData(base_id + 401, IC.filler),
+    "1 Red Shell": ItemData(base_id + 402, IC.filler),
+    "1 Banana": ItemData(base_id + 403, IC.filler),
+    "1 Bob-omb": ItemData(base_id + 404, IC.filler),
+    "1 Mini Mushroom": ItemData(base_id + 405, IC.filler),
+    "1 Super Star": ItemData(base_id + 406, IC.filler),
 }
 
 traps = {
-    "Trap: Opponent Coins": ItemData(base_id + 500, ItemClassification.trap),
-    #"Trap: Hit Stun": ItemData(base_id + 501, ItemClassification.trap),
-    "Trap: 1/2 Time": ItemData(base_id + 502, ItemClassification.trap),
-    "Trap: Freeze Character 1": ItemData(base_id + 503, ItemClassification.trap),
-    "Trap: Freeze Character 2": ItemData(base_id + 504, ItemClassification.trap),
-    "Trap: Freeze Character 3": ItemData(base_id + 505, ItemClassification.trap),
+    "Trap: Opponent Coins": ItemData(base_id + 500, IC.trap),
+    #"Trap: Hit Stun": ItemData(base_id + 501, IC.trap),
+    "Trap: 1/2 Time": ItemData(base_id + 502, IC.trap),
+    "Trap: Freeze Character 1": ItemData(base_id + 503, IC.trap),
+    "Trap: Freeze Character 2": ItemData(base_id + 504, IC.trap),
+    "Trap: Freeze Character 3": ItemData(base_id + 505, IC.trap),
 }
 
 
 # harmony_hustle_items = {
-#     "HH: Classic Ocean": ItemData(base_id + 800, ItemClassification.useful),
-#     "HH: Chocobo Rhythm": ItemData(base_id + 801, ItemClassification.useful),
-#     "HH: Mario Athletic": ItemData(base_id + 802, ItemClassification.useful),
-#     "HH: Mushroom Mix Melody": ItemData(base_id + 803, ItemClassification.useful),
-#     "HH: Bloocheep Ocean": ItemData(base_id + 804, ItemClassification.useful),
-#     "HH: Chocobo Pop": ItemData(base_id + 805, ItemClassification.useful),
-#     "HH: Punk Athletic": ItemData(base_id + 806, ItemClassification.useful),
-#     "HH: Blossom Mix Melody": ItemData(base_id + 807, ItemClassification.useful),
-#     "HH: Punk Ocean": ItemData(base_id + 808, ItemClassification.useful),
-#     "HH: Chocobo Beat": ItemData(base_id + 809, ItemClassification.useful),
-#     "HH: Island Athletic": ItemData(base_id + 810, ItemClassification.useful),
-#     "HH: Star Mix Melody": ItemData(base_id + 811, ItemClassification.useful),
+#     "HH: Classic Ocean": ItemData(base_id + 800, IC.useful),
+#     "HH: Chocobo Rhythm": ItemData(base_id + 801, IC.useful),
+#     "HH: Mario Athletic": ItemData(base_id + 802, IC.useful),
+#     "HH: Mushroom Mix Melody": ItemData(base_id + 803, IC.useful),
+#     "HH: Bloocheep Ocean": ItemData(base_id + 804, IC.useful),
+#     "HH: Chocobo Pop": ItemData(base_id + 805, IC.useful),
+#     "HH: Punk Athletic": ItemData(base_id + 806, IC.useful),
+#     "HH: Blossom Mix Melody": ItemData(base_id + 807, IC.useful),
+#     "HH: Punk Ocean": ItemData(base_id + 808, IC.useful),
+#     "HH: Chocobo Beat": ItemData(base_id + 809, IC.useful),
+#     "HH: Island Athletic": ItemData(base_id + 810, IC.useful),
+#     "HH: Star Mix Melody": ItemData(base_id + 811, IC.useful),
 # }
 
 # Put all into a table
@@ -615,8 +615,15 @@ def create_all_items(world: "MSMWorld") -> None:
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
 
-    # if name in character_costumes:
-    #     if world.options.team_sanity == TeamSanity.option_characters_and_costumes:
-    #         classification = ItemClassification.useful
+    # Character Sanity
+    if name in characters:
+        if (world.options.character_sanity == CharacterSanity.option_characters or
+        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+            classification = IC.progression
+
+    if name in character_costumes:
+        if (world.options.character_sanity == CharacterSanity.option_costumes or
+        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+            classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

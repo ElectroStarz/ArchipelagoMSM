@@ -311,12 +311,12 @@ class MSMContext(CommonContext):
     deathlink_boss_recovered = int
 
     # Sanity stuff
+    character_sanity = int
     special_sanity = False
     court_sanity = int
     score_sanity = False
     score_sanity_max = int
     score_sanity_points_req = int
-    team_sanity = int
 
     def __init__(self, server_address: str, password: str):
         super().__init__(server_address, password)
@@ -407,10 +407,8 @@ class MSMContext(CommonContext):
             self.behemoth_hp = self.slot_data["behemoth_hp"]
             self.behemoth_king_hp = self.slot_data["behemoth_king_hp"]
 
-            # Hard Difficulty Stuff
-            self.hard_tournament_difficulty = self.slot_data["hard_tournament_difficulty"]
-
             # Unlock Data
+            self.hard_tournament_difficulty = self.slot_data["hard_tournament_difficulty"]
             self.sports_mix_unlock = self.slot_data["sports_mix_unlock"]
 
             # Deathlink Data
@@ -420,6 +418,10 @@ class MSMContext(CommonContext):
             self.deathlink_o_get_points = self.slot_data["deathlink_opponent_get_points"]
             self.deathlink_o_scores_points = self.slot_data["deathlink_opponent_scores_points"]
             self.deathlink_boss_recovered = self.slot_data["deathlink_boss_health_recovered"]
+
+            # Sanity Data
+            self.character_sanity = self.slot_data["character_sanity"]
+            
 
             Utils.async_start(self.update_death_link(self.deathlink_enabled))
 
@@ -1742,6 +1744,80 @@ class MSMContext(CommonContext):
         if value != 0:
             self.game_interface.dolphin_client.write_float(special_meter, 0)
 
+    # --- Sanity Location Handling ---
+
+    async def send_character_sanity_checks(self):
+        if self.character_sanity == 0:
+            return
+
+        if not self.game_interface.ready_to_handle():
+            return
+
+        char_to_id = {
+            255: "None",
+            0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
+            5: "Waluigi", 6: "Donkey Kong", 7: "Diddy Kong", 8: "Toad",
+            10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
+            14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
+            18: "Shy Guy", 19: "Mii (Male)", 20: "Mii (Female)",
+        }
+
+        costume_database = {
+            "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
+            "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
+            "Slime": {1: "She-Slime", 2: "Metal Slime"},
+            "Peach": {1: "Tennis-wear Peach"},
+            "Daisy": {1: "Tennis-wear Daisy"},
+            "Ninja": {1: "Shadow White Ninja"},
+            "White Mage": {1: "Pure White - White Mage"},
+            "Black Mage": {1: "Magic Red Black Mage"},
+        }
+
+        # --- Character Checks ---
+
+        ch_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_1))
+        ch_byte_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_2))
+        ch_byte_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_3))
+
+        # SAFELY grab character names (If byte is missing, defaults to "None")
+        char_1 = char_to_id.get(ch_byte_1, "None")
+        char_2 = char_to_id.get(ch_byte_2, "None")
+        char_3 = char_to_id.get(ch_byte_3, "None")
+
+        # Cleaned up Location checks! Only checks if the slot actually has a player in it.
+        if self.character_sanity in (1, 3):
+            if char_1 != "None":
+                await self.check_location(f"Play as {char_1}")
+            if char_2 != "None":
+                await self.check_location(f"Play as {char_2}")
+            if char_3 != "None":
+                await self.check_location(f"Play as {char_3}")
+
+        # --- Costume Checks ---
+
+        co_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_1))
+        co_byte_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
+        co_byte_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
+
+        print(f"Character: 1: {ch_byte_1}, 2: {ch_byte_2}, 3: {ch_byte_3}")
+        print(f"Costume: 1: {co_byte_1}, 2: {co_byte_2}, 3: {co_byte_3}")
+
+        # I've added '0' to the ignore list, assuming 0 is the default costume.
+        if char_1 in costume_database and co_byte_1 not in (0, 255):
+            costume_db_1 = costume_database[char_1]
+            costume_1 = costume_db_1.get(co_byte_1, costume_db_1.get(1))
+            await self.check_location(f"Play as {costume_1}")
+
+        if char_2 in costume_database and co_byte_2 not in (0, 255):
+            costume_db_2 = costume_database[char_2]
+            costume_2 = costume_db_2.get(co_byte_2, costume_db_2.get(1))
+            await self.check_location(f"Play as {costume_2}")
+
+        if char_3 in costume_database and co_byte_3 not in (0, 255):
+            costume_db_3 = costume_database[char_3]
+            costume_3 = costume_db_3.get(co_byte_3, costume_db_3.get(1))
+            await self.check_location(f"Play as {costume_3}")
+
 
     # === Deathlink Stuff ===
 
@@ -2038,6 +2114,7 @@ class MSMContext(CommonContext):
         # Locations
         await self.handle_exhibition_win()
         await self.handle_cup_round_win()
+        await self.send_character_sanity_checks()
 
         # Items
         await self.handle_one_time_items()
