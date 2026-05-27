@@ -99,10 +99,10 @@ class TrapChance(Range):
     range_end = 100
     default = 25
 
-class DeathlinkEnabled(DeathLink):
-    """When you die, everyone else does and vice versa"""
-    display_name = "Deathlink"
-    default = False
+# class DeathlinkEnabled(DeathLink):
+#     """When you die, everyone else does and vice versa"""
+#     display_name = "Deathlink"
+#     default = False
 
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
@@ -206,7 +206,7 @@ msm_option_groups = [
         BehemothKingHP,
     ]),
     OptionGroup("Deathlink Options", [
-        DeathlinkEnabled,
+        DeathLink,
         DeathlinkAction,
         DeathlinkOpponentScorePoints,
         DeathlinkConsequence,
@@ -237,7 +237,7 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
-    deathlink_enabled: DeathlinkEnabled
+    deathlink_enabled: DeathLink
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
