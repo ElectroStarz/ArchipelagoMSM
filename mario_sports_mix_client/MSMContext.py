@@ -20,7 +20,7 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.code: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.1.5"
+CLIENT_VERSION = "0.1.6"
 
 
 status_messages = {
@@ -123,6 +123,15 @@ class MSMCommandProcessor(ClientCommandProcessor):
         else:
             self.ctx.DEBUGGING = False
             logger.info("Debugging off")
+
+    def _cmd_change_debug_amount(self, amount: str):
+        """Change the amount of debug messages that are stored so they don't repeat"""
+        try:
+            new_amount = int(amount)
+            from collections import deque
+            self.ctx.last_debug_messages = deque(self.ctx.last_debug_messages, maxlen=new_amount)
+        except ValueError:
+            logger.info(f"Error: '{amount} is not a valid number! Please enter an integer.")
 
     def _cmd_status(self):
         """Display the current dolphin connection status."""
@@ -365,7 +374,8 @@ class MSMContext(CommonContext):
 
         # Debug Stuff
         self.DEBUGGING = False
-        self.last_debug_messages = deque(maxlen=4)  # Stores up to 5 messages at a time
+        self.amount_debug: int = 5
+        self.last_debug_messages = deque(maxlen=self.amount_debug)  # Stores up to 5 messages at a time at default
 
     def debug_log(self, message: str) -> None:
         if self.DEBUGGING:
@@ -429,7 +439,7 @@ class MSMContext(CommonContext):
                     f"VERSION MISMATCH DETECTED!\n"
                     f"Your Client version: {CLIENT_VERSION}\n"
                     f"Seed was generated on version: {generation_version}\n"
-                    f"Please update your client, downgrade, or regenerate the seed as things may break!\n"
+                    f"Please update, downgrade your client, or regenerate the seed as things may break!\n"
                     f"========================================="
                 )
             else:
@@ -1176,7 +1186,7 @@ class MSMContext(CommonContext):
             self.last_match_score_total = score_total
             return
 
-        if score_total != self.last_match_score_total or timer == 0:
+        if score_total != self.last_match_score_total or (self.game_interface.check_sport() != "Volleyball" and timer == 0):
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 2
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")

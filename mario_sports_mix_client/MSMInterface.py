@@ -146,10 +146,10 @@ class MSMInterface:
             else:
                 ready_game = False
 
-        if paused == 1:
-            is_paused = True
-        else:
+        if paused == 0:
             is_paused = False
+        else:
+            is_paused = True
 
         if cutscene_active == 0:
             is_cutscene = False

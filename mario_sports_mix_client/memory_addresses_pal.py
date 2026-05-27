@@ -160,7 +160,9 @@ class DodgeballAddresses:
 
 class VolleyballAddresses:
     games_played = 0x902299F0 # Word
-    last_held = 0x804D0F98
+    last_held = 0x804D0F98 # Word
+
+    throw_timer = 0x805C1B50 # Word
 
     class Tournament:
         tabs = 0x90226DA4 # Byte
@@ -244,8 +246,8 @@ class Offsets:
         current_module_offsets = [0x1F5]
 
     class Player:
-        special_meter_offsets = [0x10, 0x10C]
-        special_active_offsets = [0xE0, 0x154]
+        special_meter_offsets = [0x10,0x10C]
+        special_active_offsets = [0xE0,0x154]
 
         class B1:
             class Position:
@@ -273,6 +275,9 @@ class Offsets:
 
     class Volleyball:
         last_held_offsets = [0x24, 0x214, 0x134]
+
+        class ThrowTimeOffsets:
+            b1 = [0x54,0x0,0x90,0x1B4]
 
     class Boss:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
