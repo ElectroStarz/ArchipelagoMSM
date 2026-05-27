@@ -1753,6 +1753,7 @@ class MSMContext(CommonContext):
         if not self.game_interface.ready_to_handle():
             return
 
+        # THESE ARE NOT CORRECT APART FROM NONE
         char_to_id = {
             255: "None",
             0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
@@ -1784,7 +1785,7 @@ class MSMContext(CommonContext):
         char_2 = char_to_id.get(ch_byte_2, "None")
         char_3 = char_to_id.get(ch_byte_3, "None")
 
-        # Cleaned up Location checks! Only checks if the slot actually has a player in it.
+
         if self.character_sanity in (1, 3):
             if char_1 != "None":
                 await self.check_location(f"Play as {char_1}")
@@ -1802,7 +1803,6 @@ class MSMContext(CommonContext):
         print(f"Character: 1: {ch_byte_1}, 2: {ch_byte_2}, 3: {ch_byte_3}")
         print(f"Costume: 1: {co_byte_1}, 2: {co_byte_2}, 3: {co_byte_3}")
 
-        # I've added '0' to the ignore list, assuming 0 is the default costume.
         if char_1 in costume_database and co_byte_1 not in (0, 255):
             costume_db_1 = costume_database[char_1]
             costume_1 = costume_db_1.get(co_byte_1, costume_db_1.get(1))
