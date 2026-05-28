@@ -85,19 +85,18 @@ def get_address(address, offset=0xF80):
                 VolleyballAddresses.Tournament, HockeyAddresses.Tournament, BasketballAddresses.Exhibition,
                 DodgeballAddresses.Exhibition, VolleyballAddresses.Exhibition, HockeyAddresses.Exhibition)
 
+    # Some addresses are the same in PAL and NTSC-U
+    if any(address in vars(classes).values() for classes in exceptions):
+        return address
+
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_stage:
             #print(f"[DEBUG] Current Stage detected! Returning NTSC-U Address {new_addr}")
             new_addr = 0x8047796E
             return new_addr
 
-        # Some addresses are the same in PAL and NTSC-U
-        if any(address in vars(classes).values() for classes in exceptions):
-            return address
-
         new_addr = address - offset
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         return new_addr
-
 
     return address
