@@ -93,6 +93,7 @@ class MSMWorld(World):
         slot_data = {
         "version": WORLD_VERSION,
         "goal_condition": self.options.goal_condition.value,
+        "win_cups_amount": self.options.win_cups_amount.value,
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
         "sports_mix_unlock": self.options.sports_mix_unlock.value,

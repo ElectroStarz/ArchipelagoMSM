@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from rule_builder.rules import Has, HasAll, HasAny, CanReachLocation, OptionFilter
+from rule_builder.rules import Has, HasAll, HasAny, CanReachLocation, OptionFilter, AtLeast
 from .options import *
 
 if TYPE_CHECKING:
@@ -200,6 +200,25 @@ def set_goal_rules(world: MSMWorld) -> None:
     if world.options.be_mean == BeMean.option_defeat_behemoth:
         if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
+
+    # Win Cups Rules
+    if world.options.goal_condition == GoalCondition.option_win_cups:
+        difficulties = ["Normal", "Hard"]
+        sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"]
+        cups = ["Mushroom", "Flower", "Star"]
+        win_cups_locations = []
+
+        for difficulty in difficulties:
+            for sport in sports:
+                for cup in cups:
+                    if sport != "Sports Mix":
+                        win_cups_locations.append(CanReachLocation(f"{sport}: Beat {difficulty} {cup} Cup Round 3"))
+                    else:
+                        win_cups_locations.append(CanReachLocation(f"{sport}: Beat {cup} Cup Round 3"))
+
+        win_cups_rule = AtLeast(world.options.win_cups_amount.value, *win_cups_locations)
+
+        world.set_rule(world.get_location(f"Win {world.options.win_cups_amount.value} Cups"), win_cups_rule)
 
 
 # Creates entrance access rules for menus and cups

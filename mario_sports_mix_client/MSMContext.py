@@ -299,6 +299,7 @@ class MSMContext(CommonContext):
     is_behemoth = False
     is_behemoth_king = False
     goal_condition = int
+    win_cups_amount = int
     hard_tournament_difficulty = bool
 
     # Deathlink Stuff
@@ -405,6 +406,7 @@ class MSMContext(CommonContext):
             self.goal_condition = self.slot_data["goal_condition"]
             self.behemoth_hp = self.slot_data["behemoth_hp"]
             self.behemoth_king_hp = self.slot_data["behemoth_king_hp"]
+            self.win_cups_amount = self.slot_data["win_cups_amount"]
 
             # Unlock Data
             self.hard_tournament_difficulty = self.slot_data["hard_tournament_difficulty"]
@@ -1436,6 +1438,18 @@ class MSMContext(CommonContext):
     # === Goal/Boss Stuff ===
 
 
+    async def has_cup_goaled(self):
+        cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball, CupsWonMultiple.Volleyball,
+                              CupsWonMultiple.Hockey]
+
+        cups_won_total = sum(self.game_interface.dolphin_client.read_word(address for address in cups_won_addresses))
+
+        if self.goal_condition == 3:
+            if cups_won_total == self.win_cups_amount:
+                await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                self.debug_log(f"Goal Achieved: Win {self.win_cups_amount} Cups!")
+
+
     async def has_boss_goaled(self):
         # If we already sent the goal or location check for the boss, stop running
         if self.boss_defeat_handled:
@@ -2113,6 +2127,8 @@ class MSMContext(CommonContext):
 
     async def handle_in_match(self):
         """What functions should be handled during a match"""
+        # Cup Goal
+        await self.has_cup_goaled()
 
         # Deathlink
         await self.handle_send_deathlink()
@@ -2175,6 +2191,7 @@ class MSMContext(CommonContext):
 
     async def handle_in_main_menu(self):
         """What functions should be handled in the main menu"""
+        await self.has_cup_goaled()
 
         await self.handle_received_items()
         await self.check_pending_tournament_location()

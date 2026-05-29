@@ -65,7 +65,15 @@ class GoalCondition(Choice):
     display_name = "Goal Condition"
     option_defeat_behemoth = 0
     option_defeat_behemoth_king = 1
+    option_win_cups = 2
     default = 1
+
+class WinCupsAmount(Range):
+    """How many cups are required to goal?"""
+    display_name = "Win Cups Amount"
+    range_start = 1
+    range_end = 26
+    default = 15
 
 class BeMean(Choice):
     """Have locations behind bosses even if your goal isn't that boss!
@@ -74,6 +82,7 @@ Cannot be the same as the goal condition!"""
     option_no = 0
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
+    option_both = 3
     default = 0
 
 class BehemothHP(Range):
@@ -99,16 +108,11 @@ class TrapChance(Range):
     range_end = 100
     default = 25
 
-# class DeathlinkEnabled(DeathLink):
-#     """When you die, everyone else does and vice versa"""
-#     display_name = "Deathlink"
-#     default = False
-
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
 
-NOTE: Every number of points works like normal for everything BUT dodgeball. In dodgeball,
-everytime the opponent wins the set a deathlink triggers"""
+NOTE: Every number of points works like normal for everything BUT dodgeball.
+In dodgeball, everytime the opponent wins the set a deathlink triggers"""
     display_name = "Deathlink Action"
     option_losing_or_tying_a_match = 0
     option_every_number_of_points = 1
@@ -202,6 +206,7 @@ msm_option_groups = [
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
+        WinCupsAmount,
         BeMean,
         BehemothHP,
         BehemothKingHP,
@@ -234,6 +239,7 @@ class MSMOptions(PerGameCommonOptions):
     party_mode: PartyMode
     sports_mix_unlock: SportsMixUnlock
     goal_condition: GoalCondition
+    win_cups_amount: WinCupsAmount
     be_mean: BeMean
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
