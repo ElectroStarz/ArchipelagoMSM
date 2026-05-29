@@ -4,7 +4,8 @@ from BaseClasses import Tutorial
 from worlds.AutoWorld import WebWorld, World
 from . import regions, rules, locations, components
 from .options import *
-from .items import ITEM_NAME_TO_ID
+from .items import ITEM_NAME_TO_ID, auto_item_groups
+from .locations import LOCATION_NAME_TO_ID, auto_location_groups
 import json
 import pkgutil
 
@@ -61,8 +62,11 @@ class MSMWorld(World):
     options: MSMOptions
 
 
-    location_name_to_id = locations.LOCATION_NAME_TO_ID
-    item_name_to_id = items.ITEM_NAME_TO_ID
+    location_name_to_id = LOCATION_NAME_TO_ID
+    item_name_to_id = ITEM_NAME_TO_ID
+
+    item_name_groups = auto_item_groups
+    location_name_groups = auto_location_groups
 
 
     origin_region_name = "Main Menu"

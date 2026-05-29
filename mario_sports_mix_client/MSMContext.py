@@ -19,8 +19,8 @@ from . import dolphin_connection as dc
 from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
-id_to_name = {data.code: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.1.6"
+id_to_name = {data.id: name for name, data in item_table.items()}
+CLIENT_VERSION = "0.3.0"
 
 
 status_messages = {
@@ -166,7 +166,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         final_items = []
         if unlocked_characters:
             for char in unlocked_characters:
-                final_items.append(char.replace("Character: ", ""))
+                final_items.append(char)
             logger.info(f"Unlocked Characters: {final_items}")
         else:
             logger.info("No unlocked characters")
@@ -177,7 +177,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         final_items = []
         if unlocked_costumes:
             for costume in unlocked_costumes:
-                final_items.append(costume.replace("Costume: ", ""))
+                final_items.append(costume)
             logger.info(f"Unlocked Costumes: {final_items}")
         else:
             logger.info("No unlocked costumes")
@@ -199,7 +199,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         final_items = []
         if unlocked_stages:
             for item in unlocked_stages:
-                final_items.append(item.replace("Stage: ", ""))
+                final_items.append(item)
             logger.info(f"Unlocked Stages: {final_items}")
         else:
             logger.info("No unlocked stages")
@@ -210,7 +210,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         final_items = []
         if unlocked_abilities:
             for ability in unlocked_abilities:
-                final_items.append(ability.replace("Ability: ", ""))
+                final_items.append(ability)
             logger.info(f"Unlocked Abilities: {final_items}")
         else:
             logger.info("No unlocked abilities")
@@ -227,8 +227,8 @@ class MSMCommandProcessor(ClientCommandProcessor):
             logger.info("No unlocked ?-Panel items")
 
     def _cmd_item(self):
-        """BROKEN - Show what item you currently have"""
-        current_item = self.ctx.game_interface.dolphin_client.read_byte(self.ctx.addresslib.p_item_held_addr)
+        """Show what item you currently have"""
+        current_item = self.ctx.current_item_func()
         item_map = {
             -1: "No Current Item",
             0: "Green Shell",
@@ -275,8 +275,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
                 else:
                     item_name = entry
 
-                # Now that we have the string, perform the replacement
-                final_items.append(item_name.replace("Trap: ", ""))
+                final_items.append(item_name)
 
             logger.info(f"Trap Queue: {final_items}")
         else:
@@ -349,7 +348,7 @@ class MSMContext(CommonContext):
         self.boss_defeat_handled = False
         self.in_tournament_match = False
         self.last_tournament_location_name: Optional[str] = None
-        self.current_item = None
+
         self.minus_one = 0xFFFFFFFF
 
         # Deathlink Stuff
@@ -528,7 +527,6 @@ class MSMContext(CommonContext):
         self.boss_defeat_handled = False
         self.in_tournament_match = False
         self.last_tournament_location_name = None
-        self.current_item = None
         self.has_sent_death = False
         self.received_death = False
         self.previous_opponent_score = None
@@ -662,7 +660,8 @@ class MSMContext(CommonContext):
         )
 
     def current_item_func(self):
-        current_item = self.game_interface.dolphin_client.read_byte(self.addresslib.p_item_held_addr)
+        current_item = self.game_interface.dolphin_client.read_word(self.addresslib.p_item_held_addr)
+        logger.info(current_item)
 
         if current_item == self.minus_one:
             result = -1 #"No Item"
@@ -688,7 +687,17 @@ class MSMContext(CommonContext):
 
 
     async def handle_received_items(self):
-        prefix = ("Basketball:", "Dodgeball:", "Volleyball:", "Hockey:", "Sports Mix:")
+        sport_tuple = ("Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix")
+        characters_tuple = ("Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong",
+        "Diddy Kong", "Toad", "Bowser", "Bowser Jr", "Moogle", "Cactuar", "Ninja", "White Mage", "Slime", "Black Mage")
+        costumes_tuple = ("Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad", "Yellow Toad",
+        "She-Slime", "Metal Slime",  "Tennis-wear Peach", "Tennis-wear Daisy", "Shadow White Ninja",
+        "Pure White - White Mage", "Magic Red Black Mage")
+        stages_tuple = ("Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
+        "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle", "Waluigi Pinball",
+        "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage")
+        ability_tuple = ("Special Meter", )
+
 
         for network_item in self.items_received:
             item_id = network_item.item
@@ -697,11 +706,12 @@ class MSMContext(CommonContext):
                 if item_name is None:
                     continue
 
-                if item_name.startswith("Sport:"):
+                if item_name in sport_tuple:
                     self.unlocked_sports.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports")
 
-                elif item_name.startswith(prefix):
+                # Format to Basketball:, Dodgeball:, etc
+                elif item_name.startswith(f"{sport_tuple}:"):
                     self.unlocked_cups.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_cups")
 
@@ -709,15 +719,15 @@ class MSMContext(CommonContext):
                     self.unlocked_sports_crystals.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
 
-                elif item_name.startswith("Stage:"):
+                elif item_name in stages_tuple:
                     self.unlocked_stages.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_stages")
 
-                elif item_name.startswith("Character:"):
+                elif item_name in characters_tuple:
                     self.unlocked_characters.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_characters")
 
-                elif item_name.startswith("Costume:"):
+                elif item_name in costumes_tuple:
                     self.unlocked_costumes.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_costumes")
 
@@ -725,7 +735,7 @@ class MSMContext(CommonContext):
                     self.unlocked_panel_items.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_panel_items")
 
-                elif item_name.startswith("Ability:"):
+                elif item_name in ability_tuple:
                     self.unlocked_abilities.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_abilities")
 
@@ -755,7 +765,7 @@ class MSMContext(CommonContext):
     async def handle_all_characters(self):
         for char in character_names:
             # Format character name for value
-            item_name = f"Character: {char.replace('_', ' ').title()}"
+            item_name = f"{char.replace('_', ' ').title()}"
 
             # Have separate values for characters with costumes, adding values can equal different combinations
             if char == "yoshi":
@@ -799,85 +809,85 @@ class MSMContext(CommonContext):
 
     def yoshi_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Yoshi" not in self.unlocked_characters:
+        if "Yoshi" not in self.unlocked_characters:
             value = 0
             return value
         else:
 
             value = 1
-            if "Costume: Pink Yoshi" in self.unlocked_costumes: value += 4
-            if "Costume: Light Blue Yoshi" in self.unlocked_costumes: value += 16
-            if "Costume: Yellow Yoshi" in self.unlocked_costumes: value += 64
+            if "Pink Yoshi" in self.unlocked_costumes: value += 4
+            if "Light Blue Yoshi" in self.unlocked_costumes: value += 16
+            if "Yellow Yoshi" in self.unlocked_costumes: value += 64
         return value
 
     def peach_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Peach" not in self.unlocked_characters:
+        if "Peach" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Tennis-wear Peach" in self.unlocked_costumes: value += 4
+        if "Tennis-wear Peach" in self.unlocked_costumes: value += 4
         return value
 
     def daisy_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Daisy" not in self.unlocked_characters:
+        if "Daisy" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Tennis-wear Daisy" in self.unlocked_costumes: value += 4
+        if "Tennis-wear Daisy" in self.unlocked_costumes: value += 4
         return value
 
     def toad_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Toad" not in self.unlocked_characters:
+        if "Toad" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Blue Toad" in self.unlocked_costumes: value += 4
-        if "Costume: Green Toad" in self.unlocked_costumes: value += 16
-        if "Costume: Yellow Toad" in self.unlocked_costumes: value += 64
+        if "Blue Toad" in self.unlocked_costumes: value += 4
+        if "Green Toad" in self.unlocked_costumes: value += 16
+        if "Yellow Toad" in self.unlocked_costumes: value += 64
         return value
 
     def ninja_unlocks_value(self):
-        if "Character: Ninja" not in self.unlocked_characters:
+        if "Ninja" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Shadow White Ninja" in self.unlocked_costumes: value += 4
+        if "Shadow White Ninja" in self.unlocked_costumes: value += 4
         return value
 
     def white_mage_unlocks_value(self):
-        if "Character: White Mage" not in self.unlocked_characters:
+        if "White Mage" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Pure White - White Mage" in self.unlocked_costumes: value += 4
+        if "Pure White - White Mage" in self.unlocked_costumes: value += 4
         return value
 
     def black_mage_unlocks_value(self):
-        if "Character: Black Mage" not in self.unlocked_characters:
+        if "Black Mage" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: Magic Red Black Mage" in self.unlocked_costumes: value += 4
+        if "Magic Red Black Mage" in self.unlocked_costumes: value += 4
         return value
 
     def slime_unlocks_value(self):
         # If they don't have the character item, character is locked
-        if "Character: Slime" not in self.unlocked_characters:
+        if "Slime" not in self.unlocked_characters:
             value = 0
             return value
 
         value = 1
-        if "Costume: She-slime" in self.unlocked_costumes: value += 4
-        if "Costume: Metal Slime" in self.unlocked_costumes: value += 16
+        if "She-slime" in self.unlocked_costumes: value += 4
+        if "Metal Slime" in self.unlocked_costumes: value += 16
         return value
 
 
@@ -957,7 +967,7 @@ class MSMContext(CommonContext):
     async def handle_sports_mix_unlock(self):
         sports_mix_unlocked = get_address(SportsMixAddresses.sports_mix_unlocked)
         if self.sports_mix_unlock == 0:
-            if "Sport: Sports Mix" in self.unlocked_sports:
+            if "Sports Mix" in self.unlocked_sports:
                 self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 self.debug_log("Sports Mix unlocked by Sports Mix item")
@@ -1002,28 +1012,28 @@ class MSMContext(CommonContext):
         # Link stages to variable
         stage_mapping = {
             # Basketball
-            b_mushroom: ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock"],
-            b_flower: ["Stage: Luigi's Mansion", "Stage: Western Junction", "Stage: Daisy Garden"],
-            b_star: ["Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Star Ship"],
-            b_block: ["Stage: Peach's Castle", "Stage: Wario Factory", "Stage: Ghoulish Galleon"],
+            b_mushroom: ["Mario Stadium", "Koopa Troopa Beach", "DK Dock"],
+            b_flower: ["Luigi's Mansion", "Western Junction", "Daisy Garden"],
+            b_star: ["Bowser Jr. Blvd.", "Bowser's Castle", "Star Ship"],
+            b_block: ["Peach's Castle", "Wario Factory", "Ghoulish Galleon"],
 
             # Volleyball
-            v_mushroom: ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: Peach's Castle"],
-            v_flower: ["Stage: DK Dock", "Stage: Luigi's Mansion", "Stage: Western Junction"],
-            v_star: ["Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Star Ship"],
-            v_block: ["Stage: Wario Factory", "Stage: Waluigi Pinball", "Stage: Ghoulish Galleon"],
+            v_mushroom: ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"],
+            v_flower: ["DK Dock", "Luigi's Mansion", "Western Junction"],
+            v_star: ["Bowser Jr. Blvd.", "Bowser's Castle", "Star Ship"],
+            v_block: ["Wario Factory", "Waluigi Pinball", "Ghoulish Galleon"],
 
             # Dodgeball
-            d_mushroom: ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: Peach's Castle"],
-            d_flower: ["Stage: DK Dock", "Stage: Toad Park", "Stage: Daisy Garden"],
-            d_star: ["Stage: Wario Factory", "Stage: Bowser's Castle", "Stage: Star Ship"],
-            d_block: ["Stage: Western Junction", "Stage: Waluigi Pinball", "Stage: Ghoulish Galleon"],
+            d_mushroom: ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"],
+            d_flower: ["DK Dock", "Toad Park", "Daisy Garden"],
+            d_star: ["Wario Factory", "Bowser's Castle", "Star Ship"],
+            d_block: ["Western Junction", "Waluigi Pinball", "Ghoulish Galleon"],
 
             # Hockey
-            h_mushroom: ["Stage: Mario Stadium", "Stage: Toad Park", "Stage: Peach's Castle"],
-            h_flower: ["Stage: Western Junction", "Stage: Wario Factory", "Stage: Daisy Garden"],
-            h_star: ["Stage: Bowser Jr. Blvd.", "Stage: Waluigi Pinball", "Stage: Star Ship"],
-            h_block: ["Stage: Koopa Troopa Beach", "Stage: Ghoulish Galleon", "Stage: Bowser's Castle"],
+            h_mushroom: ["Mario Stadium", "Toad Park", "Peach's Castle"],
+            h_flower: ["Western Junction", "Wario Factory", "Daisy Garden"],
+            h_star: ["Bowser Jr. Blvd.", "Waluigi Pinball", "Star Ship"],
+            h_block: ["Koopa Troopa Beach", "Ghoulish Galleon", "Bowser's Castle"],
         }
 
         for address, stage in stage_mapping.items():
@@ -1067,7 +1077,7 @@ class MSMContext(CommonContext):
             special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
                                                                             Offsets.Player.special_meter_offsets)
             self.debug_log(f"Special meter pointer resolved: base={self.addresslib.p_special_meter_addr:#x}, final={special_meter:#x}")
-            if "Ability: Special Meter" not in self.unlocked_abilities:
+            if "Special Meter" not in self.unlocked_abilities:
                 value = self.game_interface.dolphin_client.read_float(special_meter)
                 self.debug_log(f"Special meter current value: {value}")
                 if value != 0:
@@ -1164,7 +1174,7 @@ class MSMContext(CommonContext):
     async def handle_replace_due_to_scoring(self):
         item_data = self.current_item_func()
 
-        if item_data == -1 and self.game_interface.ready_to_handle() and not self.is_paused():
+        if item_data == -1 and self.game_interface.ready_to_handle():
             # Slot is empty, stop forcing
             self.awaiting_use = False
             self.forced_item_id = None
@@ -1191,7 +1201,7 @@ class MSMContext(CommonContext):
 
         if score_total != self.last_match_score_total or (self.game_interface.check_sport() != "Volleyball" and timer == 0):
             self.last_match_score_total = score_total
-            self.suppress_panel_until = asyncio.get_event_loop().time() + 2
+            self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
 
     def is_paused(self):
@@ -1204,7 +1214,8 @@ class MSMContext(CommonContext):
     async def handle_question_mark_panel_items(self):
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
-        self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)}, awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
+        self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)},"
+                       f"awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
 
         if asyncio.get_event_loop().time() < self.suppress_panel_until and self.game_interface.ready_to_handle():
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.minus_one)
@@ -1283,11 +1294,11 @@ class MSMContext(CommonContext):
 
         # Add new traps here. If the trap has an item in items.py but not in this map, it will be skipped once.
         trap_mapping = {
-            "Trap: Freeze Character 1": self.run_freeze_trap_1,
-            "Trap: Freeze Character 2": self.run_freeze_trap_2,
-            "Trap: Freeze Character 3": self.run_freeze_trap_3,
-            "Trap: Opponent Coins": self.opponent_coins,
-            "Trap: 1/2 Time": self.half_timer,
+            "Freeze Character 1": self.run_freeze_trap_1,
+            "Freeze Character 2": self.run_freeze_trap_2,
+            "Freeze Character 3": self.run_freeze_trap_3,
+            "Opponent Coins": self.opponent_coins,
+            "1/2 Timer": self.half_timer,
         }
 
         queued_trap = self.traps_to_give.popleft()
@@ -1303,10 +1314,10 @@ class MSMContext(CommonContext):
         # Handle Function-based traps
         if trap in trap_mapping:
             # If the trap is to freeze character 3, but we're only playing 2-on-2, send trap to either char 1 or 2
-            if trap == "Trap: Freeze Character 3" and self.game_interface.check_player_amount() == 2:
+            if trap == "Freeze Character 3" and self.game_interface.check_player_amount() == 2:
                 random_int = randint(1,2)
                 logger.info(f"2-on-2 detected! Sending trap to character {random_int}")
-                redirected_trap = f"Trap: Freeze Character {random_int}"
+                redirected_trap = f"Freeze Character {random_int}"
                 asyncio.create_task(trap_mapping[redirected_trap]())
                 self.debug_log(f"Redirected Freeze Character 3 to {redirected_trap}")
                 self.mark_consumable_handled(item_index)
@@ -1758,7 +1769,7 @@ class MSMContext(CommonContext):
         char_to_id = {
             255: "None",
             0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
-            5: "Waluigi", 6: "Donkey Kong", 7: "Diddy Kong", 8: "Toad",
+            5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
             10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
             14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
             18: "Shy Guy", 19: "Mii (Male)", 20: "Mii (Female)",
