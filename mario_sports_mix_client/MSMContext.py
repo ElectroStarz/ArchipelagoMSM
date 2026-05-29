@@ -1765,14 +1765,13 @@ class MSMContext(CommonContext):
         if not self.game_interface.ready_to_handle():
             return
 
-        # THESE ARE NOT CORRECT APART FROM NONE
         char_to_id = {
             255: "None",
             0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
             5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
             10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
             14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
-            18: "Shy Guy", 19: "Mii (Male)", 20: "Mii (Female)",
+            19: "Mii (Male)", 20: "Mii (Female)",
         }
 
         costume_database = {
@@ -1812,23 +1811,21 @@ class MSMContext(CommonContext):
         co_byte_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
         co_byte_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
 
-        print(f"Character: 1: {ch_byte_1}, 2: {ch_byte_2}, 3: {ch_byte_3}")
-        print(f"Costume: 1: {co_byte_1}, 2: {co_byte_2}, 3: {co_byte_3}")
+        if self.character_sanity in (2, 3):
+            if char_1 in costume_database and co_byte_1 not in (0, 255):
+                costume_db_1 = costume_database[char_1]
+                costume_1 = costume_db_1.get(co_byte_1, costume_db_1.get(1))
+                await self.check_location(f"Play as {costume_1}")
 
-        if char_1 in costume_database and co_byte_1 not in (0, 255):
-            costume_db_1 = costume_database[char_1]
-            costume_1 = costume_db_1.get(co_byte_1, costume_db_1.get(1))
-            await self.check_location(f"Play as {costume_1}")
+            if char_2 in costume_database and co_byte_2 not in (0, 255):
+                costume_db_2 = costume_database[char_2]
+                costume_2 = costume_db_2.get(co_byte_2, costume_db_2.get(1))
+                await self.check_location(f"Play as {costume_2}")
 
-        if char_2 in costume_database and co_byte_2 not in (0, 255):
-            costume_db_2 = costume_database[char_2]
-            costume_2 = costume_db_2.get(co_byte_2, costume_db_2.get(1))
-            await self.check_location(f"Play as {costume_2}")
-
-        if char_3 in costume_database and co_byte_3 not in (0, 255):
-            costume_db_3 = costume_database[char_3]
-            costume_3 = costume_db_3.get(co_byte_3, costume_db_3.get(1))
-            await self.check_location(f"Play as {costume_3}")
+            if char_3 in costume_database and co_byte_3 not in (0, 255):
+                costume_db_3 = costume_database[char_3]
+                costume_3 = costume_db_3.get(co_byte_3, costume_db_3.get(1))
+                await self.check_location(f"Play as {costume_3}")
 
 
     # === Deathlink Stuff ===
