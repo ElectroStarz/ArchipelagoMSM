@@ -104,7 +104,7 @@ class MSMWorld(World):
         "send_both_character_sanity": self.options.send_both_character_sanity.value,
 
 
-        "deathlink_enabled": self.options.deathlink_enabled.value,
+        "deathlink": self.options.deathlink.value,
         "deathlink_action": self.options.deathlink_action.value,
         "deathlink_consequence": self.options.deathlink_consequence.value,
         "deathlink_opponent_get_points": self.options.deathlink_opponent_get_points.value,

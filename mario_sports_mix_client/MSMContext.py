@@ -414,7 +414,7 @@ class MSMContext(CommonContext):
             self.sports_mix_unlock = self.slot_data["sports_mix_unlock"]
 
             # Deathlink Data
-            self.deathlink_enabled = self.slot_data["deathlink_enabled"]
+            self.deathlink_enabled = self.slot_data["deathlink"]
             self.deathlink_action = self.slot_data["deathlink_action"]
             self.deathlink_consequence = self.slot_data["deathlink_consequence"]
             self.deathlink_o_get_points = self.slot_data["deathlink_opponent_get_points"]

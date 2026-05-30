@@ -251,7 +251,7 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
-    deathlink_enabled: DeathLink
+    deathlink: DeathLink
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
