@@ -487,6 +487,9 @@ class MSMContext(CommonContext):
 
                 # Add new one-shot item types here if they should wait for an in-match state before firing.
                 # The queue stores (received index, name) so reconnects do not add the same item twice.
+                trap_list = ["Freeze Character 1", "Freeze Character 2", "Freeze Character 3", "Opponent Coins",
+                             "1/2 Timer"]
+
                 if item_name.startswith("1"):
                     self.filler_to_give.append((item_index, item_name))
                     self.queued_consumable_indices.add(item_index)
@@ -494,7 +497,7 @@ class MSMContext(CommonContext):
                     self.debug_log(f"Filler queue size is now {len(self.filler_to_give)}")
 
 
-                elif item_name.startswith("Trap"):
+                elif item_name in trap_list:
                     self.traps_to_give.append((item_index, item_name))
                     self.queued_consumable_indices.add(item_index)
                     logger.info(f"Queued trap: {item_name}")
@@ -1204,7 +1207,7 @@ class MSMContext(CommonContext):
 
         if score_total != self.last_match_score_total or (self.game_interface.check_sport() != "Volleyball" and timer == 0):
             self.last_match_score_total = score_total
-            self.suppress_panel_until = asyncio.get_event_loop().time() + 1.5
+            self.suppress_panel_until = asyncio.get_event_loop().time() + 3
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
 
     def is_paused(self):
@@ -1814,52 +1817,38 @@ class MSMContext(CommonContext):
         costume_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
         costume_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
 
-        if self.send_both_character_sanity:
-            await self.send_character_character_sanity(char_1, char_2, char_3,
-                                                       True, False, False, False)
+        char_list = [char_1, char_2, char_3]
+        costume_list = [costume_1, costume_2, costume_3]
 
-            await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
-                                                     True,False, False, False)
+        if self.send_both_character_sanity and self.character_sanity == 3:
+            await self.send_character_character_sanity(char_1, char_2, char_3,)
+            await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
+
         else:
-            if costume_1 == 0:
-                await self.send_character_character_sanity(char_1, char_2, char_3,
-                                                           False, True, False, False)
-            else:
-                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
-                                                         False,True, False, False)
+            if self.character_sanity == 1:
+                await self.send_character_character_sanity(char_1, char_2, char_3)
+            elif self.character_sanity == 2:
+                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
+            elif self.character_sanity == 3:
+                for char, costume in zip(char_list, costume_list):
+                    if (char in self.costume_database and costume != 0):
+                        await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
+                    else:
+                        await self.send_character_character_sanity(char_1, char_2, char_3)
 
-            if costume_2 == 0:
-                await self.send_character_character_sanity(char_1, char_2, char_3,
-                                                           False, False, True, False)
-            else:
-                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
-                                                         False, False, True, False)
 
-            if costume_3 == 0:
-                await self.send_character_character_sanity(char_1, char_2, char_3,
-                                                           False, False, False, True)
-            else:
-                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
-                                                         False, False, False, True)
-
-    async def send_character_character_sanity(self, char_1, char_2, char_3, all_true, t_1, t_2, t_3):
-        characters_l = [char_1, char_2, char_3]
-        triggers = [t_1, t_2, t_3]
-
-        for character, trigger in zip(characters_l, triggers):
-            if character != "None" and (all_true or trigger):
+    async def send_character_character_sanity(self, char_1, char_2, char_3):
+        for character in [char_1, char_2, char_3]:
+            if character != "None":
                 await self.check_location(f"Play as {character}")
 
-    async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3, all_true,
-                                            t_1, t_2, t_3):
-
+    async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
         characters_l = [char_1, char_2, char_3]
         costumes_l = [costume_1, costume_2, costume_3]
-        triggers_l = [t_1, t_2, t_3]
 
-        for character, costume_byte, trigger in zip(characters_l, costumes_l, triggers_l):
+        for character, costume_byte in zip(characters_l, costumes_l):
 
-            if character in self.costume_database and costume_byte not in (0, 255) and (all_true or trigger):
+            if character in self.costume_database and costume_byte not in (0, 255) and character != "None":
                 costume_db = self.costume_database[character]
 
                 # Fetch the string name
