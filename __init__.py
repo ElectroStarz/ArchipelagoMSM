@@ -93,13 +93,17 @@ class MSMWorld(World):
         slot_data = {
         "version": WORLD_VERSION,
         "goal_condition": self.options.goal_condition.value,
-        "win_cups_amount": self.options.win_cups_amount.value,
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
+
+
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
         "character_sanity": self.options.character_sanity.value,
+        "send_both_character_sanity": self.options.send_both_character_sanity.value,
+
+
         "deathlink_enabled": self.options.deathlink_enabled.value,
         "deathlink_action": self.options.deathlink_action.value,
         "deathlink_consequence": self.options.deathlink_consequence.value,

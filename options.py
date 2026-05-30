@@ -65,11 +65,12 @@ class GoalCondition(Choice):
     display_name = "Goal Condition"
     option_defeat_behemoth = 0
     option_defeat_behemoth_king = 1
-    option_win_cups = 2
+    #option_win_cups = 2
     default = 1
 
 class WinCupsAmount(Range):
-    """How many cups are required to goal?"""
+    """How many cups are required to goal? - Need to wait for 0.6.8 AP"""
+    visibility = Visibility.none
     display_name = "Win Cups Amount"
     range_start = 1
     range_end = 26
@@ -153,13 +154,19 @@ class DeathlinkBossHealthRecovered(Range):
 
 class CharacterSanity(Choice):
     """Turn on or off Character Sanity
-(Playing with a character sends a check)"""
+(Playing with a character and/or costume sends a check)"""
     display_name = "Character Sanity"
     option_off = 0
     option_characters = 1
     option_costumes = 2
     option_characters_and_costumes = 3
     default = 0
+
+class SendBothCharacterCostume(Toggle):
+    """When playing with a costume, sends the Character Sanity
+check for *both* the character and the costume"""
+    display_name = "Send both Character Sanity"
+    default = False
 
 # class ScoreSanity(Toggle):
 #     """(NOT WORKING) Toggle on or off score sanity"""
@@ -206,7 +213,6 @@ msm_option_groups = [
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
-        WinCupsAmount,
         BeMean,
         BehemothHP,
         BehemothKingHP,
@@ -219,8 +225,9 @@ msm_option_groups = [
         DeathlinkOpponentGetPoints,
         DeathlinkBossHealthRecovered,
     ]),
-    OptionGroup("Sanity Options (NOT WORKING)", [
+    OptionGroup("Sanity Options", [
         CharacterSanity,
+        SendBothCharacterCostume,
         # ScoreSanity,
         # ScoreSanityPoints,
         # ScoreSanityMax,
@@ -251,6 +258,7 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_opponent_get_points: DeathlinkOpponentGetPoints
     deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
     character_sanity: CharacterSanity
+    send_both_character_sanity: SendBothCharacterCostume
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints
     # score_sanity_max: ScoreSanityMax

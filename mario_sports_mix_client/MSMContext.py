@@ -114,7 +114,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
-    def _cmd_debug_mode(self, *args):
+    def _cmd_debug_mode(self):
         """Toggle debugging on and off (Default off)"""
         if not self.ctx.DEBUGGING:
             self.ctx.DEBUGGING = True
@@ -299,7 +299,7 @@ class MSMContext(CommonContext):
     is_behemoth = False
     is_behemoth_king = False
     goal_condition = int
-    win_cups_amount = int
+    #win_cups_amount = int
     hard_tournament_difficulty = bool
 
     # Deathlink Stuff
@@ -312,9 +312,10 @@ class MSMContext(CommonContext):
 
     # Sanity stuff
     character_sanity = int
-    special_sanity = False
-    court_sanity = int
-    score_sanity = False
+    send_both_character_sanity = bool
+    special_sanity = bool
+    court_sanity = bool
+    score_sanity = bool
     score_sanity_max = int
     score_sanity_points_req = int
 
@@ -406,7 +407,7 @@ class MSMContext(CommonContext):
             self.goal_condition = self.slot_data["goal_condition"]
             self.behemoth_hp = self.slot_data["behemoth_hp"]
             self.behemoth_king_hp = self.slot_data["behemoth_king_hp"]
-            self.win_cups_amount = self.slot_data["win_cups_amount"]
+            #self.win_cups_amount = self.slot_data["win_cups_amount"]
 
             # Unlock Data
             self.hard_tournament_difficulty = self.slot_data["hard_tournament_difficulty"]
@@ -422,6 +423,7 @@ class MSMContext(CommonContext):
 
             # Sanity Data
             self.character_sanity = self.slot_data["character_sanity"]
+            self.send_both_character_sanity = self.slot_data["send_both_character_sanity"]
             
 
             Utils.async_start(self.update_death_link(self.deathlink_enabled))
@@ -663,7 +665,6 @@ class MSMContext(CommonContext):
 
     def current_item_func(self):
         current_item = self.game_interface.dolphin_client.read_word(self.addresslib.p_item_held_addr)
-        logger.info(current_item)
 
         if current_item == self.minus_one:
             result = -1 #"No Item"
@@ -1438,16 +1439,17 @@ class MSMContext(CommonContext):
     # === Goal/Boss Stuff ===
 
 
-    async def has_cup_goaled(self):
-        cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball, CupsWonMultiple.Volleyball,
-                              CupsWonMultiple.Hockey]
-
-        cups_won_total = sum(self.game_interface.dolphin_client.read_word(address for address in cups_won_addresses))
-
-        if self.goal_condition == 3:
-            if cups_won_total == self.win_cups_amount:
-                await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                self.debug_log(f"Goal Achieved: Win {self.win_cups_amount} Cups!")
+    # Need to wait until AtLeast gets put into AP 0.6.8
+    # async def has_cup_goaled(self):
+    #     cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball, CupsWonMultiple.Volleyball,
+    #                           CupsWonMultiple.Hockey]
+    #
+    #     cups_won_total = sum(self.game_interface.dolphin_client.read_word(address for address in cups_won_addresses))
+    #
+    #     if self.goal_condition == 3:
+    #         if cups_won_total == self.win_cups_amount:
+    #             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+    #             self.debug_log(f"Goal Achieved: Win {self.win_cups_amount} Cups!")
 
 
     async def has_boss_goaled(self):
@@ -1771,6 +1773,25 @@ class MSMContext(CommonContext):
             self.game_interface.dolphin_client.write_float(special_meter, 0)
 
     # --- Sanity Location Handling ---
+    char_to_id = {
+        255: "None",
+        0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
+        5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
+        10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
+        14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
+        19: "Mii (Male)", 20: "Mii (Female)",
+    }
+
+    costume_database = {
+        "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
+        "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
+        "Slime": {1: "She-Slime", 2: "Metal Slime"},
+        "Peach": {1: "Tennis-wear Peach"},
+        "Daisy": {1: "Tennis-wear Daisy"},
+        "Ninja": {1: "Shadow White Ninja"},
+        "White Mage": {1: "Pure White - White Mage"},
+        "Black Mage": {1: "Magic Red Black Mage"},
+    }
 
     async def send_character_sanity_checks(self):
         if self.character_sanity == 0:
@@ -1779,68 +1800,73 @@ class MSMContext(CommonContext):
         if not self.game_interface.ready_to_handle():
             return
 
-        char_to_id = {
-            255: "None",
-            0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
-            5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
-            10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
-            14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
-            19: "Mii (Male)", 20: "Mii (Female)",
-        }
-
-        costume_database = {
-            "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
-            "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
-            "Slime": {1: "She-Slime", 2: "Metal Slime"},
-            "Peach": {1: "Tennis-wear Peach"},
-            "Daisy": {1: "Tennis-wear Daisy"},
-            "Ninja": {1: "Shadow White Ninja"},
-            "White Mage": {1: "Pure White - White Mage"},
-            "Black Mage": {1: "Magic Red Black Mage"},
-        }
-
-        # --- Character Checks ---
-
         ch_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_1))
         ch_byte_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_2))
         ch_byte_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_3))
 
-        # SAFELY grab character names (If byte is missing, defaults to "None")
-        char_1 = char_to_id.get(ch_byte_1, "None")
-        char_2 = char_to_id.get(ch_byte_2, "None")
-        char_3 = char_to_id.get(ch_byte_3, "None")
+        # Grab character names (If byte is missing, defaults to "None")
+        char_1 = self.char_to_id.get(ch_byte_1, "None")
+        char_2 = self.char_to_id.get(ch_byte_2, "None")
+        char_3 = self.char_to_id.get(ch_byte_3, "None")
 
+        # Read costumes ONCE here
+        costume_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_1))
+        costume_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
+        costume_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
 
-        if self.character_sanity in (1, 3):
-            if char_1 != "None":
-                await self.check_location(f"Play as {char_1}")
-            if char_2 != "None":
-                await self.check_location(f"Play as {char_2}")
-            if char_3 != "None":
-                await self.check_location(f"Play as {char_3}")
+        if self.send_both_character_sanity:
+            await self.send_character_character_sanity(char_1, char_2, char_3,
+                                                       True, False, False, False)
 
-        # --- Costume Checks ---
+            await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
+                                                     True,False, False, False)
+        else:
+            if costume_1 == 0:
+                await self.send_character_character_sanity(char_1, char_2, char_3,
+                                                           False, True, False, False)
+            else:
+                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
+                                                         False,True, False, False)
 
-        co_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_1))
-        co_byte_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
-        co_byte_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
+            if costume_2 == 0:
+                await self.send_character_character_sanity(char_1, char_2, char_3,
+                                                           False, False, True, False)
+            else:
+                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
+                                                         False, False, True, False)
 
-        if self.character_sanity in (2, 3):
-            if char_1 in costume_database and co_byte_1 not in (0, 255):
-                costume_db_1 = costume_database[char_1]
-                costume_1 = costume_db_1.get(co_byte_1, costume_db_1.get(1))
-                await self.check_location(f"Play as {costume_1}")
+            if costume_3 == 0:
+                await self.send_character_character_sanity(char_1, char_2, char_3,
+                                                           False, False, False, True)
+            else:
+                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3,
+                                                         False, False, False, True)
 
-            if char_2 in costume_database and co_byte_2 not in (0, 255):
-                costume_db_2 = costume_database[char_2]
-                costume_2 = costume_db_2.get(co_byte_2, costume_db_2.get(1))
-                await self.check_location(f"Play as {costume_2}")
+    async def send_character_character_sanity(self, char_1, char_2, char_3, all_true, t_1, t_2, t_3):
+        characters_l = [char_1, char_2, char_3]
+        triggers = [t_1, t_2, t_3]
 
-            if char_3 in costume_database and co_byte_3 not in (0, 255):
-                costume_db_3 = costume_database[char_3]
-                costume_3 = costume_db_3.get(co_byte_3, costume_db_3.get(1))
-                await self.check_location(f"Play as {costume_3}")
+        for character, trigger in zip(characters_l, triggers):
+            if character != "None" and (all_true or trigger):
+                await self.check_location(f"Play as {character}")
 
+    async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3, all_true,
+                                            t_1, t_2, t_3):
+
+        characters_l = [char_1, char_2, char_3]
+        costumes_l = [costume_1, costume_2, costume_3]
+        triggers_l = [t_1, t_2, t_3]
+
+        for character, costume_byte, trigger in zip(characters_l, costumes_l, triggers_l):
+
+            if character in self.costume_database and costume_byte not in (0, 255) and (all_true or trigger):
+                costume_db = self.costume_database[character]
+
+                # Fetch the string name
+                costume_name = costume_db.get(costume_byte, costume_db.get(1))
+
+                if costume_name:
+                    await self.check_location(f"Play as {costume_name}")
 
     # === Deathlink Stuff ===
 
@@ -2128,7 +2154,7 @@ class MSMContext(CommonContext):
     async def handle_in_match(self):
         """What functions should be handled during a match"""
         # Cup Goal
-        await self.has_cup_goaled()
+        #await self.has_cup_goaled()
 
         # Deathlink
         await self.handle_send_deathlink()
@@ -2191,7 +2217,7 @@ class MSMContext(CommonContext):
 
     async def handle_in_main_menu(self):
         """What functions should be handled in the main menu"""
-        await self.has_cup_goaled()
+        #await self.has_cup_goaled()
 
         await self.handle_received_items()
         await self.check_pending_tournament_location()
