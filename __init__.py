@@ -84,7 +84,7 @@ class MSMWorld(World):
         #
         # visualize_regions(
         #     self.get_region("Main Menu"),
-        #     "my_reachable_world.puml",
+        #     "mario_sports_mix_regions_status.puml",
         #     show_entrance_names=True,
         #     regions_to_highlight=set(state.reachable_regions[self.player])
         # )
