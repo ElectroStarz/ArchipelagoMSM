@@ -8,6 +8,7 @@ from .items import ITEM_NAME_TO_ID, auto_item_groups
 from .locations import LOCATION_NAME_TO_ID, auto_location_groups
 import json
 import pkgutil
+from Utils import visualize_regions
 
 # Find world version
 
@@ -72,9 +73,21 @@ class MSMWorld(World):
     origin_region_name = "Main Menu"
 
 
+
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
+
+        # state = self.multiworld.get_all_state(False)
+        #
+        # state.update_reachable_regions(self.player)
+        #
+        # visualize_regions(
+        #     self.get_region("Main Menu"),
+        #     "my_reachable_world.puml",
+        #     show_entrance_names=True,
+        #     regions_to_highlight=set(state.reachable_regions[self.player])
+        # )
 
     def set_rules(self) -> None:
         rules.set_all_rules(self)

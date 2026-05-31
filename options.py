@@ -153,7 +153,7 @@ class DeathlinkBossHealthRecovered(Range):
     default = 20
 
 class DeathlinkDodgeballHealthLost(Range):
-    """**ONlY FOR DODGEBALL**
+    """**ONLY FOR DODGEBALL**
 How much health will you lose when you get sent a deathlink if you're
 in dodgeball?"""
     display_name = "[DL-C] Dodgeball Health Lost"

@@ -153,9 +153,9 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
     if (world.options.character_sanity == CharacterSanity.option_characters or
     world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
-        for item in CHARACTER_NAMES:
-            location = world.get_location(f"Play as {item}")
-            world.set_rule(location, Has(item))
+        for character in CHARACTER_NAMES:
+            location = world.get_location(f"Play as {character}")
+            world.set_rule(location, Has(character))
 
     if (world.options.character_sanity == CharacterSanity.option_costumes or
     world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
