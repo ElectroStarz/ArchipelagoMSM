@@ -110,6 +110,7 @@ class MSMWorld(World):
         "deathlink_opponent_get_points": self.options.deathlink_opponent_get_points.value,
         "deathlink_opponent_scores_points": self.options.deathlink_opponent_scores_points.value,
         "deathlink_boss_health_recovered": self.options.deathlink_boss_health_recovered.value,
+        "deathlink_dodgeball_health_lost": self.options.deathlink_dodgeball_health_lost.value,
         }
 
         return slot_data

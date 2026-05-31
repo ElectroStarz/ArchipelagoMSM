@@ -147,7 +147,16 @@ Requires Deathlink on & Opponent Gains Point consequence"""
 class DeathlinkBossHealthRecovered(Range):
     """What percentage of the boss' health should be recovered when sent a deathlink?
 (Behemoth & Behemoth King)"""
-    display_name = "Boss Health Recovered"
+    display_name = "[DL-C] Boss % Health Recovered"
+    range_start = 0
+    range_end = 100
+    default = 20
+
+class DeathlinkDodgeballHealthLost(Range):
+    """**ONlY FOR DODGEBALL**
+How much health will you lose when you get sent a deathlink if you're
+in dodgeball?"""
+    display_name = "[DL-C] Dodgeball Health Lost"
     range_start = 0
     range_end = 100
     default = 20
@@ -224,6 +233,7 @@ msm_option_groups = [
         DeathlinkConsequence,
         DeathlinkOpponentGetPoints,
         DeathlinkBossHealthRecovered,
+        DeathlinkDodgeballHealthLost,
     ]),
     OptionGroup("Sanity Options", [
         CharacterSanity,
@@ -257,6 +267,7 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
     deathlink_opponent_get_points: DeathlinkOpponentGetPoints
     deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
+    deathlink_dodgeball_health_lost: DeathlinkDodgeballHealthLost
     character_sanity: CharacterSanity
     send_both_character_sanity: SendBothCharacterCostume
     # score_sanity: ScoreSanity

@@ -1,12 +1,10 @@
 import asyncio
 import logging
 import random
-import time
 import traceback
 from collections import deque
 from random import randint
-from typing import Dict, Set, Optional, Any
-
+from typing import Dict, Set, Optional, Any, List
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
@@ -85,6 +83,26 @@ tournament_map_cups = {
     "s33": "Star Cup",
 }
 
+char_to_id = {
+    255: "None",
+    0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
+    5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
+    10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
+    14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
+    19: "Mii (Male)", 20: "Mii (Female)",
+}
+
+costume_database = {
+    "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
+    "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
+    "Slime": {1: "She-Slime", 2: "Metal Slime"},
+    "Peach": {1: "Tennis-wear Peach"},
+    "Daisy": {1: "Tennis-wear Daisy"},
+    "Ninja": {1: "Shadow White Ninja"},
+    "White Mage": {1: "Pure White - White Mage"},
+    "Black Mage": {1: "Magic Red Black Mage"},
+}
+
 player_score_addresses = [
     PlayerAddresses.Score.score_period_1,
     PlayerAddresses.Score.score_period_2,
@@ -133,6 +151,63 @@ class MSMCommandProcessor(ClientCommandProcessor):
         except ValueError:
             logger.info(f"Error: '{amount} is not a valid number! Please enter an integer.")
 
+    def _cmd_read_address(self, address: str, addr_type: str = "Word", *pointers: str):
+        """Read the value of any address - Used for diagnostic purposes.
+        address should look like 0x80000000 (8 digits after 0x), pointers should look like 0x1F4, 0x8, addr_type defaults to Word"""
+
+        # ADDED , 16 HERE: This tells Python to parse the string as hexadecimal
+        try:
+            numeric_address = int(address, 16)
+        except ValueError:
+            return f"Error: '{address}' is not a valid hexadecimal address."
+
+        # Use the newly converted numeric_address instead of the raw string
+        if pointers:
+            new_pointers = []
+            for p in pointers:
+                # Strip out any brackets or commas
+                clean_p = p.replace("[", "").replace("]", "").replace(",", "")
+
+                # Skip any empty strings caused by extra spaces
+                if not clean_p:
+                    continue
+
+                try:
+                    new_pointers.append(int(clean_p, 16))
+                except ValueError:
+                    return f"Error: Pointer '{p}' is not valid hex."
+            final_address = self.ctx.game_interface.dolphin_client.follow_pointers(get_address(numeric_address),
+                                                                                   new_pointers)
+        else:
+            final_address = get_address(numeric_address)
+
+        client = self.ctx.game_interface.dolphin_client
+
+        match addr_type:
+            case "Byte":
+                result = client.read_byte(final_address)
+            case "Halfword":
+                result = client.read_bytes(final_address, 2)
+            case "Word":
+                result = client.read_word(final_address)
+            case "Float":
+                result = client.read_float(final_address)
+            case "String":
+                result = client.read_string(final_address)
+            case _:
+                error_msg = f"Error: Unsupported address type '{addr_type}'"
+                logger.error(error_msg)
+                return error_msg
+
+        # Format final_address with hex() makes it easier to read back.
+        log_message = f"[Memory Read] {addr_type} at {hex(final_address)}. Result: {result}"
+
+        logger.info(log_message)
+        return log_message
+
+
+
+
     def _cmd_status(self):
         """Display the current dolphin connection status."""
         logger.info(f"Connection Status: {status_messages[self.ctx.connection_state]}")
@@ -141,13 +216,6 @@ class MSMCommandProcessor(ClientCommandProcessor):
         """Reapply unlocks if you don't have them!"""
         asyncio.create_task(self.ctx.handle_received_items())
         logger.info("Reapplied unlocks!")
-
-    # def _cmd_reapply_codes(self):
-    #     """Reapply the patch codes if something isn't working, must be on main menu"""
-    #     self.ctx.handled_gecko_codes = False
-    #     print(self.ctx.handled_gecko_codes)
-    #     self.ctx.handle_gecko_codes()
-    #     logger.info("Patches Reapplied!")
 
     def _cmd_reset_cached(self):
         """Manually reset the cached values if address errors are coming up when switching regions"""
@@ -309,6 +377,7 @@ class MSMContext(CommonContext):
     deathlink_o_get_points = int
     deathlink_o_scores_points = int
     deathlink_boss_recovered = int
+    deathlink_dodge_health_lost = int
 
     # Sanity stuff
     character_sanity = int
@@ -420,6 +489,7 @@ class MSMContext(CommonContext):
             self.deathlink_o_get_points = self.slot_data["deathlink_opponent_get_points"]
             self.deathlink_o_scores_points = self.slot_data["deathlink_opponent_scores_points"]
             self.deathlink_boss_recovered = self.slot_data["deathlink_boss_health_recovered"]
+            self.deathlink_dodge_health_lost = self.slot_data["deathlink_dodgeball_health_lost"]
 
             # Sanity Data
             self.character_sanity = self.slot_data["character_sanity"]
@@ -699,9 +769,9 @@ class MSMContext(CommonContext):
         costumes_tuple = ("Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad", "Yellow Toad",
         "She-Slime", "Metal Slime",  "Tennis-wear Peach", "Tennis-wear Daisy", "Shadow White Ninja",
         "Pure White - White Mage", "Magic Red Black Mage")
-        stages_tuple = ("Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
+        stages_tuple = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
         "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle", "Waluigi Pinball",
-        "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage")
+        "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
         ability_tuple = ("Special Meter", )
 
 
@@ -717,11 +787,12 @@ class MSMContext(CommonContext):
                     self.debug_log(f"Added {item_name} to unlocked_sports")
 
                 # Format to Basketball:, Dodgeball:, etc
-                elif item_name.startswith(f"{sport_tuple}:"):
-                    self.unlocked_cups.append(item_name)
-                    self.debug_log(f"Added {item_name} to unlocked_cups")
+                for sport in sport_tuple:
+                    if item_name.startswith(f"{sport}: "):
+                        self.unlocked_cups.append(item_name)
+                        self.debug_log(f"Added {item_name} to unlocked_cups")
 
-                elif item_name.startswith("Sports Crystal:"):
+                if item_name.startswith("Sports Crystal:"):
                     self.unlocked_sports_crystals.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
 
@@ -1185,7 +1256,7 @@ class MSMContext(CommonContext):
             self.awaiting_use = False
             self.forced_item_id = None
 
-        elif self.awaiting_use and item_data != self.forced_item_id:
+        elif self.awaiting_use and self.forced_item_id is not None and item_data != self.forced_item_id:
             # Game tried to overwrite our item, force it back
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
             verify_item = self.current_item_func()
@@ -1535,7 +1606,7 @@ class MSMContext(CommonContext):
         if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.game_interface.ready_to_handle():
             return
 
-        required_stage = "Stage: Behemoth Stage"
+        required_stage = "Behemoth Stage"
         if self.is_behemoth:
             boss = "Behemoth"
         elif self.is_behemoth_king:
@@ -1582,6 +1653,7 @@ class MSMContext(CommonContext):
             return
 
         if location_id in self.locations_checked:
+            self.debug_log(f"Location in locations checked!")
             return
 
         self.locations_checked.add(location_id)
@@ -1740,7 +1812,7 @@ class MSMContext(CommonContext):
             return
 
         difficulty = self.game_interface.get_tournament_difficulty(cup)
-        required_stage = f"Stage: {stage}"
+        required_stage = f"{stage}"
         if sports_mix_activated:
             required_cup = f"Sports Mix: {cup}"
         else:
@@ -1776,25 +1848,7 @@ class MSMContext(CommonContext):
             self.game_interface.dolphin_client.write_float(special_meter, 0)
 
     # --- Sanity Location Handling ---
-    char_to_id = {
-        255: "None",
-        0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
-        5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
-        10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
-        14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
-        19: "Mii (Male)", 20: "Mii (Female)",
-    }
 
-    costume_database = {
-        "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
-        "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
-        "Slime": {1: "She-Slime", 2: "Metal Slime"},
-        "Peach": {1: "Tennis-wear Peach"},
-        "Daisy": {1: "Tennis-wear Daisy"},
-        "Ninja": {1: "Shadow White Ninja"},
-        "White Mage": {1: "Pure White - White Mage"},
-        "Black Mage": {1: "Magic Red Black Mage"},
-    }
 
     async def send_character_sanity_checks(self):
         if self.character_sanity == 0:
@@ -1808,9 +1862,9 @@ class MSMContext(CommonContext):
         ch_byte_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_3))
 
         # Grab character names (If byte is missing, defaults to "None")
-        char_1 = self.char_to_id.get(ch_byte_1, "None")
-        char_2 = self.char_to_id.get(ch_byte_2, "None")
-        char_3 = self.char_to_id.get(ch_byte_3, "None")
+        char_1 = char_to_id.get(ch_byte_1, "None")
+        char_2 = char_to_id.get(ch_byte_2, "None")
+        char_3 = char_to_id.get(ch_byte_3, "None")
 
         # Read costumes ONCE here
         costume_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_1))
@@ -1831,7 +1885,7 @@ class MSMContext(CommonContext):
                 await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
             elif self.character_sanity == 3:
                 for char, costume in zip(char_list, costume_list):
-                    if (char in self.costume_database and costume != 0):
+                    if char in costume_database and costume != 0:
                         await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
                     else:
                         await self.send_character_character_sanity(char_1, char_2, char_3)
@@ -1848,8 +1902,8 @@ class MSMContext(CommonContext):
 
         for character, costume_byte in zip(characters_l, costumes_l):
 
-            if character in self.costume_database and costume_byte not in (0, 255) and character != "None":
-                costume_db = self.costume_database[character]
+            if character in costume_database and costume_byte not in (0, 255) and character != "None":
+                costume_db = costume_database[character]
 
                 # Fetch the string name
                 costume_name = costume_db.get(costume_byte, costume_db.get(1))
@@ -1964,12 +2018,13 @@ class MSMContext(CommonContext):
 
 
     def on_deathlink(self, data: dict[str, Any]):
-        self.debug_log("Deathlink Received")
         super().on_deathlink(data)
+        self.debug_log("Deathlink Received")
         self.handle_received_deathlink()
 
     def handle_received_deathlink(self):
-        """Gets called when on_deathlink goes off and acts depending on deathlink_consequence"""
+        """Gets called when on_deathlink goes off and acts depending on deathlink_consequence
+        NOTE: Dodgeball deathlinks get handled differently to everything else since it doesn't have a normal scoring system"""
 
         if self.deathlink_enabled:
             if self.game_interface.ready_to_handle():
@@ -1984,13 +2039,14 @@ class MSMContext(CommonContext):
                         self.recover_boss_hp()
                     else:
                         # Force opponent to win
-                        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4=5th Period
+                        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4 = 5th Period
                         for address in opponent_score_addresses:
                             addr = get_address(address)
                             self.game_interface.dolphin_client.write_byte(addr, 100) # Write 100 for all scores
                         self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
-                        self.received_death = True
-                        # If we're not in the state where we've died to deathlink, set received_death to false
+                        self.received_death = True # Required so we don't send a deathlink when we get sent one
+                        # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
+                        # set received_death to false
                         if (match_status != 2 and match_status != 3) or current_stage in not_match_prefix:
                             self.received_death = False
 
@@ -1999,14 +2055,39 @@ class MSMContext(CommonContext):
                     if self.is_behemoth or self.is_behemoth_king:
                         self.recover_boss_hp()
                     else:
-                        self.received_death = True
-                        value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
-                        addr = get_address(opponent_score_addresses[value]) # Get the address for current period
-                        points = self.game_interface.dolphin_client.read_word(addr)
-                        new_points = points + self.deathlink_o_get_points
-                        self.game_interface.dolphin_client.write_word(addr, new_points)
-                        logger.info(f"Opponent now has {new_points} points!")
-                        self.received_death = False
+                        if self.game_interface.check_sport() != "Dodgeball":
+                            value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
+                            addr = get_address(opponent_score_addresses[value]) # Get the address for current period
+                            points = self.game_interface.dolphin_client.read_word(addr)
+                            new_points = points + self.deathlink_o_get_points
+                            self.game_interface.dolphin_client.write_word(addr, new_points)
+                            total_points = sum(self.game_interface.dolphin_client.read_word(get_address(addr for addr in opponent_score_addresses)))
+                            logger.info(f"Opponent now has {total_points} points!")
+                        else:
+                            # Lists start at 0, we need to take away one from the value
+                            random_char = randint(0, self.game_interface.check_player_amount() - 1)
+
+                            offsets = [Offsets.Player.B1.dodge_damage,
+                                       Offsets.Player.B2.dodge_damage,
+                                       Offsets.Player.B3.dodge_damage,]
+
+                            addr = get_address(PlayerAddresses.dodge_damage)
+                            final_addr = self.game_interface.dolphin_client.follow_pointers(addr, offsets[random_char])
+                            curr_damage = self.game_interface.dolphin_client.read_word(final_addr)
+                            new_damage = curr_damage + self.deathlink_dodge_health_lost
+                            self.game_interface.dolphin_client.write_word(final_addr, new_damage)
+                            health = 100 - new_damage
+                            # Find current the character selected by randint
+                            chars = [PlayerAddresses.character_1,
+                                     PlayerAddresses.character_2,
+                                     PlayerAddresses.character_3,]
+
+                            value = self.game_interface.dolphin_client.read_byte(chars[random_char])
+                            character = char_to_id.get(value)
+
+                            logger.info(f"Watch out! Next time character {character} gets hit, they'll be on {health} HP!")
+
+
 
     def recover_boss_hp(self):
         """Calculates the amount of HP recovered when sent a deathlink"""
@@ -2101,7 +2182,7 @@ class MSMContext(CommonContext):
                 await asyncio.sleep(3)
 
     async def stop_stupid_games_played_notifs(self):
-        """Stop unlock messages from appearing constantly"""
+        """Stop SOME of the unlock messages from appearing constantly"""
 
         basket_played = BasketballAddresses.games_played
         dodge_played = DodgeballAddresses.games_played
