@@ -201,29 +201,14 @@ one_time_items = {
 }
 
 traps = {
-    "Opponent Coins": ItemData(base_id + 500, IC.trap, ItemGroup.TRAPS),
+    "Coins Trap": ItemData(base_id + 500, IC.trap, ItemGroup.TRAPS),
     #"Hit Stun": ItemData(base_id + 501, IC.trap, ItemGroup.TRAPS),
-    "1/2 Timer": ItemData(base_id + 502, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 1": ItemData(base_id + 503, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 2": ItemData(base_id + 504, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 3": ItemData(base_id + 505, IC.trap, ItemGroup.TRAPS),
+    "Timer Trap": ItemData(base_id + 502, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 1 Trap": ItemData(base_id + 503, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 2 Trap": ItemData(base_id + 504, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 3 Trap": ItemData(base_id + 505, IC.trap, ItemGroup.TRAPS),
 }
 
-
-# harmony_hustle_items = {
-#     "HH: Classic Ocean": ItemData(base_id + 800, IC.useful),
-#     "HH: Chocobo Rhythm": ItemData(base_id + 801, IC.useful),
-#     "HH: Mario Athletic": ItemData(base_id + 802, IC.useful),
-#     "HH: Mushroom Mix Melody": ItemData(base_id + 803, IC.useful),
-#     "HH: Bloocheep Ocean": ItemData(base_id + 804, IC.useful),
-#     "HH: Chocobo Pop": ItemData(base_id + 805, IC.useful),
-#     "HH: Punk Athletic": ItemData(base_id + 806, IC.useful),
-#     "HH: Blossom Mix Melody": ItemData(base_id + 807, IC.useful),
-#     "HH: Punk Ocean": ItemData(base_id + 808, IC.useful),
-#     "HH: Chocobo Beat": ItemData(base_id + 809, IC.useful),
-#     "HH: Island Athletic": ItemData(base_id + 810, IC.useful),
-#     "HH: Star Mix Melody": ItemData(base_id + 811, IC.useful),
-# }
 
 # Put all into a table
 item_table: Dict[str, ItemData] = {
@@ -247,7 +232,6 @@ item_table: Dict[str, ItemData] = {
     **unlockable_abilities,
     **one_time_items,
     **traps,
-    #**harmony_hustle_items
 }
 
 ITEM_NAME_TO_ID: Dict[str, int] = {item_name: data.id for item_name, data in item_table.items()}
@@ -640,13 +624,6 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(new_item)
 
 
-    # Party Mode Items
-    # Harmony Hustle
-    # if "Harmony Hustle" in world.options.party_mode:
-    #     for name, icon in harmony_hustle_items.items():
-    #         new_item = world.create_item(name)
-    #         itempool.append(new_item)
-
     # Calculate number of filler items needed, exclude costumes
 
     number_of_items = len(itempool)
@@ -662,15 +639,10 @@ def create_all_items(world: "MSMWorld") -> None:
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
 
-    # Character Sanity
-    if name in characters:
-        if (world.options.character_sanity == CharacterSanity.option_characters or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
-            classification = IC.progression
-
+    # Character Sanity (Costumes)
     if name in character_costumes:
         if (world.options.character_sanity == CharacterSanity.option_costumes or
         world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
-            classification = IC.progression
+            classification = IC.useful
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
