@@ -63,10 +63,10 @@ or get Sports Mix as an item"""
 class GoalCondition(Choice):
     """What is your goal?"""
     display_name = "Goal Condition"
-    option_defeat_behemoth = 0
-    option_defeat_behemoth_king = 1
+    option_defeat_behemoth = 1
+    option_defeat_behemoth_king = 2
     #option_win_cups = 2
-    default = 1
+    default = 2
 
 class WinCupsAmount(Range):
     """How many cups are required to goal? - Need to wait for 0.6.8 AP"""
@@ -83,7 +83,6 @@ Cannot be the same as the goal condition!"""
     option_no = 0
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
-    option_both = 3
     default = 0
 
 class BehemothHP(Range):
@@ -167,8 +166,7 @@ class CharacterSanity(Choice):
     display_name = "Character Sanity"
     option_off = 0
     option_characters = 1
-    option_costumes = 2
-    option_characters_and_costumes = 3
+    option_characters_and_costumes = 2
     default = 0
 
 class SendBothCharacterCostume(Toggle):

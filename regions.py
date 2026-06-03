@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from BaseClasses import Region
 
 if TYPE_CHECKING:
-    from . import MSMWorld, HardTournamentDifficulty
+    from . import MSMWorld
 
 
 def create_and_connect_regions(world: "MSMWorld") -> None:

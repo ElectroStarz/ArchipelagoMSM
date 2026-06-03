@@ -515,6 +515,7 @@ class MSMContext(CommonContext):
                     f"Your Client version: {CLIENT_VERSION}\n"
                     f"Seed was generated on version: {generation_version}\n"
                     f"Please update, downgrade your client, or regenerate the seed as things may break!\n"
+                    f"If ElectroStarz says things should be okay, feel free to continue!\n"
                     f"========================================="
                 )
             else:
@@ -767,9 +768,9 @@ class MSMContext(CommonContext):
         costumes_tuple = ("Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad", "Yellow Toad",
         "She-Slime", "Metal Slime",  "Tennis-wear Peach", "Tennis-wear Daisy", "Shadow White Ninja",
         "Pure White - White Mage", "Magic Red Black Mage")
-        stages_tuple = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
+        stages_tuple = ("Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
         "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle", "Waluigi Pinball",
-        "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
+        "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage")
         ability_tuple = ("Special Meter", )
 
 
@@ -786,7 +787,7 @@ class MSMContext(CommonContext):
 
                 # Format to Basketball:, Dodgeball:, etc
                 for sport in sport_tuple:
-                    if item_name.startswith(f"{sport}: "):
+                    if item_name.startswith(f"{sport}:"):
                         self.unlocked_cups.append(item_name)
                         self.debug_log(f"Added {item_name} to unlocked_cups")
 
@@ -1903,7 +1904,7 @@ class MSMContext(CommonContext):
         char_list = [char_1, char_2, char_3]
         costume_list = [costume_1, costume_2, costume_3]
 
-        if self.send_both_character_sanity and self.character_sanity == 3:
+        if self.send_both_character_sanity and self.character_sanity == 2:
             await self.send_character_character_sanity(char_1, char_2, char_3,)
             await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
 
@@ -1911,8 +1912,6 @@ class MSMContext(CommonContext):
             if self.character_sanity == 1:
                 await self.send_character_character_sanity(char_1, char_2, char_3)
             elif self.character_sanity == 2:
-                await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
-            elif self.character_sanity == 3:
                 for char, costume in zip(char_list, costume_list):
                     if char in costume_database and costume != 0:
                         await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)

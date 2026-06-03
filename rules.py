@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 from rule_builder.rules import Has, HasAll, CanReachLocation, OptionFilter#, AtLeast
 from .options import *
 
@@ -157,8 +158,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
             location = world.get_location(f"Play as {character}")
             world.set_rule(location, Has(character))
 
-    if (world.options.character_sanity == CharacterSanity.option_costumes or
-    world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
         for costume, char in COSTUME_NAMES.items():
             location = world.get_location(f"Play as {costume}")
             world.set_rule(location, HasAll(char, costume))
@@ -176,30 +176,28 @@ def set_goal_rules(world: MSMWorld) -> None:
     )
 
     behemoth_king_rule = (
-        (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, 0)]) |
+        (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_mix_item)]) |
         HasAll(
             "Sports Crystal: Red", "Sports Crystal: Green",
             "Sports Crystal: Yellow", "Sports Crystal: Blue",
-            options=[OptionFilter(SportsMixUnlock, 1)]
+            options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_crystals)]
         )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3") & Has("Behemoth Stage")
     )
 
-    # Behemoth Rules
+    # Behemoth Rule
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
         world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
-    if world.options.be_mean == BeMean.option_defeat_behemoth_king:
-        if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+        if world.options.be_mean == BeMean.option_defeat_behemoth_king:
+            world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
 
-    # Behemoth King Rules
+    # Behemoth King Rule
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
         world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
-    if world.options.be_mean == BeMean.option_defeat_behemoth:
-        if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-            world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
+        if world.options.be_mean == BeMean.option_defeat_behemoth:
+            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
     # # Win Cups Rules - Need to wait for 0.6.8
     # if world.options.goal_condition == GoalCondition.option_win_cups:

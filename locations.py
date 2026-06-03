@@ -914,8 +914,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Play as Mii (Male)", "Play as Mii (Female)"])
         main_menu.add_locations(character_locations)
 
-    if (world.options.character_sanity == CharacterSanity.option_costumes or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
         costume_locations = get_location_names_with_ids(["Play as Pink Yoshi", "Play as Light Blue Yoshi",
         "Play as Yellow Yoshi", "Play as Blue Toad", "Play as Green Toad", "Play as Yellow Toad", "Play as She-Slime",
         "Play as Metal Slime", "Play as Tennis-wear Peach", "Play as Tennis-wear Daisy", "Play as Shadow White Ninja",

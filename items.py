@@ -640,15 +640,14 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     classification = item_table[name].classification
 
     # Character Sanity (Characters)
-    if name in characters:
-        if (world.options.character_sanity == CharacterSanity.option_characters or
+    if (world.options.character_sanity == CharacterSanity.option_characters or
         world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+        if name in characters:
             classification = IC.progression
 
     # Character Sanity (Costumes)
-    if name in character_costumes:
-        if (world.options.character_sanity == CharacterSanity.option_costumes or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+        if name in character_costumes:
             classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

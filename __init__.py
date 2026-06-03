@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import Any
 from BaseClasses import Tutorial
+from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from . import regions, rules, locations, components
 from .options import *
@@ -72,7 +73,23 @@ class MSMWorld(World):
 
     origin_region_name = "Main Menu"
 
+    def generate_early(self) -> None:
+        if self.options.goal_condition.value == self.options.be_mean.value:
+            raise OptionError(
+                f"[Mario Sports Mix] Player {self.player_name}'s Be Mean option is the same as their win condition!"
+            )
 
+        if self.options.behemoth_hp < 2400 or self.options.behemoth_hp > 4000:
+            raise OptionError(
+                f"[Mario Sports Mix] Player {self.player_name}'s Behemoth HP is smaller or larger than the allowed value!\n"
+                f"[Mario Sports Mix] Value set: {self.options.behemoth_hp}"
+            )
+
+        if self.options.behemoth_king_hp < 3000 or self.options.behemoth_king_hp > 7000:
+            raise OptionError(
+                f"[Mario Sports Mix] Player {self.player_name}'s Behemoth King HP is smaller or larger than the allowed value!\n"
+                f"[Mario Sports Mix] Value set: {self.options.behemoth_king_hp}"
+            )
 
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
