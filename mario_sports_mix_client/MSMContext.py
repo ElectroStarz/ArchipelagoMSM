@@ -1905,7 +1905,7 @@ class MSMContext(CommonContext):
         costume_list = [costume_1, costume_2, costume_3]
 
         if self.send_both_character_sanity and self.character_sanity == 2:
-            await self.send_character_character_sanity(char_1, char_2, char_3,)
+            await self.send_character_character_sanity(char_1, char_2, char_3)
             await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
 
         else:
@@ -1922,26 +1922,46 @@ class MSMContext(CommonContext):
     async def send_character_character_sanity(self, char_1, char_2, char_3):
         """Sends the location for the character if Character Sanity is enabled"""
 
-        for character in [char_1, char_2, char_3]:
-            if character != "None":
-                await self.check_location(f"Play as {character}")
+        if self.game_interface.check_player_amount() == 2:
+            for character in [char_1, char_2]:
+                if character != "None":
+                    await self.check_location(f"Play as {character}")
+        elif self.game_interface.check_player_amount() == 3:
+            for character in [char_1, char_2, char_3]:
+                if character != "None":
+                    await self.check_location(f"Play as {character}")
 
     async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
         """Sends the location for the costume if Character Sanity is enabled"""
 
-        characters_l = [char_1, char_2, char_3]
-        costumes_l = [costume_1, costume_2, costume_3]
+        characters_2 = [char_1, char_2]
+        costumes_2 = [costume_1, costume_2]
+        characters_3 = [char_1, char_2, char_3]
+        costumes_3 = [costume_1, costume_2, costume_3]
 
-        for character, costume_byte in zip(characters_l, costumes_l):
+        if self.game_interface.check_player_amount() == 2:
+            for character, costume_byte in zip(characters_2, costumes_2):
 
-            if character in costume_database and costume_byte not in (0, 255) and character != "None":
-                costume_db = costume_database[character]
+                if character in costume_database and costume_byte not in (0, 255) and character != "None":
+                    costume_db = costume_database[character]
 
-                # Fetch the string name
-                costume_name = costume_db.get(costume_byte, costume_db.get(1))
+                    # Fetch the string name
+                    costume_name = costume_db.get(costume_byte, costume_db.get(1))
 
-                if costume_name:
-                    await self.check_location(f"Play as {costume_name}")
+                    if costume_name:
+                        await self.check_location(f"Play as {costume_name}")
+
+        elif self.game_interface.check_player_amount() == 3:
+            for character, costume_byte in zip(characters_3, costumes_3):
+
+                if character in costume_database and costume_byte not in (0, 255) and character != "None":
+                    costume_db = costume_database[character]
+
+                    # Fetch the string name
+                    costume_name = costume_db.get(costume_byte, costume_db.get(1))
+
+                    if costume_name:
+                        await self.check_location(f"Play as {costume_name}")
 
     # === Deathlink Stuff ===
 
