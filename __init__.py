@@ -1,12 +1,15 @@
 from collections.abc import Mapping
 from typing import Any
 from BaseClasses import Tutorial
+from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from . import regions, rules, locations, components
 from .options import *
-from .items import ITEM_NAME_TO_ID
+from .items import ITEM_NAME_TO_ID, auto_item_groups
+from .locations import LOCATION_NAME_TO_ID, auto_location_groups
 import json
 import pkgutil
+from Utils import visualize_regions
 
 # Find world version
 
@@ -61,16 +64,47 @@ class MSMWorld(World):
     options: MSMOptions
 
 
-    location_name_to_id = locations.LOCATION_NAME_TO_ID
-    item_name_to_id = items.ITEM_NAME_TO_ID
+    location_name_to_id = LOCATION_NAME_TO_ID
+    item_name_to_id = ITEM_NAME_TO_ID
+
+    item_name_groups = auto_item_groups
+    location_name_groups = auto_location_groups
 
 
     origin_region_name = "Main Menu"
 
+    def generate_early(self) -> None:
+        if self.options.goal_condition.value == self.options.be_mean.value:
+            raise OptionError(
+                f"[Mario Sports Mix] Player {self.player_name}'s Be Mean option is the same as their win condition!"
+            )
+
+        if self.options.behemoth_hp < 2400 or self.options.behemoth_hp > 4000:
+            raise OptionError(
+                f"[Mario Sports Mix] Player {self.player_name}'s Behemoth HP is smaller or larger than the allowed value!\n"
+                f"[Mario Sports Mix] Value set: {self.options.behemoth_hp}"
+            )
+
+        if self.options.behemoth_king_hp < 3000 or self.options.behemoth_king_hp > 7000:
+            raise OptionError(
+                f"[Mario Sports Mix] Player {self.player_name}'s Behemoth King HP is smaller or larger than the allowed value!\n"
+                f"[Mario Sports Mix] Value set: {self.options.behemoth_king_hp}"
+            )
 
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
+
+        # state = self.multiworld.get_all_state(False)
+        #
+        # state.update_reachable_regions(self.player)
+        #
+        # visualize_regions(
+        #     self.get_region("Main Menu"),
+        #     "mario_sports_mix_regions_status.puml",
+        #     show_entrance_names=True,
+        #     regions_to_highlight=set(state.reachable_regions[self.player])
+        # )
 
     def set_rules(self) -> None:
         rules.set_all_rules(self)
@@ -91,15 +125,22 @@ class MSMWorld(World):
         "goal_condition": self.options.goal_condition.value,
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
+
+
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
-        "deathlink_enabled": self.options.deathlink_enabled.value,
+        "character_sanity": self.options.character_sanity.value,
+        "send_both_character_sanity": self.options.send_both_character_sanity.value,
+
+
+        "deathlink": self.options.deathlink.value,
         "deathlink_action": self.options.deathlink_action.value,
         "deathlink_consequence": self.options.deathlink_consequence.value,
         "deathlink_opponent_get_points": self.options.deathlink_opponent_get_points.value,
         "deathlink_opponent_scores_points": self.options.deathlink_opponent_scores_points.value,
         "deathlink_boss_health_recovered": self.options.deathlink_boss_health_recovered.value,
+        "deathlink_dodgeball_health_lost": self.options.deathlink_dodgeball_health_lost.value,
         }
 
         return slot_data

@@ -50,13 +50,15 @@ class PlayerAddresses:
     character_2 = 0x804D780A  # Byte
     character_3 = 0x804D780C  # Byte
 
-    # Following 3 are bytes | 1 = True, 0 = False
-    is_cpu = 0x805C1B50
-
-
     costume_1 = 0x804D7810  # Byte
     costume_2 = 0x804D7812  # Byte
     costume_3 = 0x804D7814  # Byte
+
+    dodge_damage = 0x805C1C70 # Word
+
+    # Following 3 are bytes | 1 = True, 0 = False
+    is_cpu = 0x805C1B50
+
 
     # Score and coins
     class Score:
@@ -250,6 +252,7 @@ class Offsets:
         special_active_offsets = [0xE0,0x154]
 
         class B1:
+            dodge_damage = [0x1F4]
             class Position:
                 x_offsets = [0x54,0x0,0x90,0x98]
                 y_offsets = [0x54,0x0,0x90,0x9C]
@@ -257,7 +260,9 @@ class Offsets:
                 rotation_offsets = [0x54,0x0,0x90,0xB4]
                 is_cpu = [0x54, 0x0, 0x6F]
 
+
         class B2:
+            dodge_damage = [0x1FC]
             class Position:
                 x_offsets = [0x54,0x8,0x90,0x98]
                 y_offsets = [0x54,0x8,0x90,0x9C]
@@ -265,13 +270,16 @@ class Offsets:
                 rotation_offsets = [0x54,0x8,0x90,0xB4]
                 is_cpu = [0x54, 0x8, 0x6F]
 
+
         class B3:
+            dodge_damage = [0x204]
             class Position:
                 x_offsets = [0x54,0x10,0x90,0x98]
                 y_offsets = [0x54,0x10, 0x90,0x9C]
                 z_offsets = [0x54,0x10,0x90,0xA0]
                 rotation_offsets = [0x54,0x10,0x90,0xB4]
                 is_cpu = [0x54, 0x10, 0x6F]
+
 
     class Volleyball:
         last_held_offsets = [0x24, 0x214, 0x134]

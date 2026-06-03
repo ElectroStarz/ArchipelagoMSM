@@ -63,9 +63,18 @@ or get Sports Mix as an item"""
 class GoalCondition(Choice):
     """What is your goal?"""
     display_name = "Goal Condition"
-    option_defeat_behemoth = 0
-    option_defeat_behemoth_king = 1
-    default = 1
+    option_defeat_behemoth = 1
+    option_defeat_behemoth_king = 2
+    #option_win_cups = 2
+    default = 2
+
+class WinCupsAmount(Range):
+    """How many cups are required to goal? - Need to wait for 0.6.8 AP"""
+    visibility = Visibility.none
+    display_name = "Win Cups Amount"
+    range_start = 1
+    range_end = 26
+    default = 15
 
 class BeMean(Choice):
     """Have locations behind bosses even if your goal isn't that boss!
@@ -99,16 +108,11 @@ class TrapChance(Range):
     range_end = 100
     default = 25
 
-# class DeathlinkEnabled(DeathLink):
-#     """When you die, everyone else does and vice versa"""
-#     display_name = "Deathlink"
-#     default = False
-
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
 
-NOTE: Every number of points works like normal for everything BUT dodgeball. In dodgeball,
-everytime the opponent wins the set a deathlink triggers"""
+NOTE: Every number of points works like normal for everything BUT dodgeball.
+In dodgeball, everytime the opponent wins the set a deathlink triggers"""
     display_name = "Deathlink Action"
     option_losing_or_tying_a_match = 0
     option_every_number_of_points = 1
@@ -142,20 +146,35 @@ Requires Deathlink on & Opponent Gains Point consequence"""
 class DeathlinkBossHealthRecovered(Range):
     """What percentage of the boss' health should be recovered when sent a deathlink?
 (Behemoth & Behemoth King)"""
-    display_name = "Boss Health Recovered"
+    display_name = "[DL-C] Boss % Health Recovered"
     range_start = 0
     range_end = 100
     default = 20
 
-# class TeamSanity(Choice):
-#     """(NOT WORKING) Turn on or off team sanity
-#     (Playing with every team combination sends a check)"""
-#     display_name = "Team Sanity"
-#     option_off = 0
-#     option_characters = 1
-#     option_characters_and_costumes = 2
-#     default = 0
-#
+class DeathlinkDodgeballHealthLost(Range):
+    """**ONLY FOR DODGEBALL**
+How much health will you lose when you get sent a deathlink if you're
+in dodgeball?"""
+    display_name = "[DL-C] Dodgeball Health Lost"
+    range_start = 0
+    range_end = 100
+    default = 20
+
+class CharacterSanity(Choice):
+    """Turn on or off Character Sanity
+(Playing with a character and/or costume sends a check)"""
+    display_name = "Character Sanity"
+    option_off = 0
+    option_characters = 1
+    option_characters_and_costumes = 2
+    default = 0
+
+class SendBothCharacterCostume(Toggle):
+    """When playing with a costume, sends the Character Sanity
+check for *both* the character and the costume"""
+    display_name = "Send both Character Sanity"
+    default = False
+
 # class ScoreSanity(Toggle):
 #     """(NOT WORKING) Toggle on or off score sanity"""
 #     display_name = "Score Sanity"
@@ -212,15 +231,17 @@ msm_option_groups = [
         DeathlinkConsequence,
         DeathlinkOpponentGetPoints,
         DeathlinkBossHealthRecovered,
-    ])
-    # OptionGroup("Sanity Options (NOT WORKING)", [
-    #     TeamSanity,
-    #     ScoreSanity,
-    #     ScoreSanityPoints,
-    #     ScoreSanityMax,
-    #     SpecialSanity,
-    #     StageSanity,
-    # ])
+        DeathlinkDodgeballHealthLost,
+    ]),
+    OptionGroup("Sanity Options", [
+        CharacterSanity,
+        SendBothCharacterCostume,
+        # ScoreSanity,
+        # ScoreSanityPoints,
+        # ScoreSanityMax,
+        # SpecialSanity,
+        # StageSanity,
+    ]),
 ]
 
 @dataclass
@@ -233,17 +254,20 @@ class MSMOptions(PerGameCommonOptions):
     party_mode: PartyMode
     sports_mix_unlock: SportsMixUnlock
     goal_condition: GoalCondition
+    win_cups_amount: WinCupsAmount
     be_mean: BeMean
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
-    deathlink_enabled: DeathLink
+    deathlink: DeathLink
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
     deathlink_opponent_get_points: DeathlinkOpponentGetPoints
     deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
-    # team_sanity: TeamSanity
+    deathlink_dodgeball_health_lost: DeathlinkDodgeballHealthLost
+    character_sanity: CharacterSanity
+    send_both_character_sanity: SendBothCharacterCostume
     # score_sanity: ScoreSanity
     # score_sanity_points: ScoreSanityPoints
     # score_sanity_max: ScoreSanityMax

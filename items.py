@@ -1,5 +1,6 @@
+from enum import Enum
 from typing import Dict, NamedTuple, TYPE_CHECKING
-from BaseClasses import Item, ItemClassification
+from BaseClasses import Item, ItemClassification as IC
 from .options import *
 
 if TYPE_CHECKING:
@@ -8,194 +9,206 @@ if TYPE_CHECKING:
 class MSMItem(Item):
     game: str = "Mario Sports Mix"
 
+class ItemGroup(str, Enum):
+    BASKETBALL_NORMAL_CUPS = "Basketball Normal Cups"
+    BASKETBALL_HARD_CUPS = "Basketball Hard Cups"
+
+    DODGEBALL_NORMAL_CUPS = "Dodgeball Normal Cups"
+    DODGEBALL_HARD_CUPS = "Dodgeball Hard Cups"
+
+    VOLLEYBALL_NORMAL_CUPS = "Volleyball Normal Cups"
+    VOLLEYBALL_HARD_CUPS = "Volleyball Hard Cups"
+
+    HOCKEY_NORMAL_CUPS = "Hockey Normal Cups"
+    HOCKEY_HARD_CUPS = "Hockey Hard Cups"
+
+    SPORTS_MIX_CUPS = "Sports Mix Cups"
+
+    SPORTS = "Sports"
+    SPORTS_CRYSTALS = "Sports Crystals"
+    CHARACTERS = "Characters"
+    COSTUMES = "Costumes"
+    COURTS = "Courts"
+    PANEL_ITEMS = "?-Panel Items"
+    ABILITIES = "Abilities"
+    FILLER = "Filler"
+    TRAPS = "Traps"
+
 class ItemData(NamedTuple):
-    code: int
-    classification: ItemClassification
+    id: int
+    classification: IC
+    group: ItemGroup
+
 
 base_id = 1
 
 sport_items = {
-    "Sport: Basketball": ItemData(base_id + 0, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Dodgeball": ItemData(base_id + 1, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Volleyball": ItemData(base_id + 2, ItemClassification.progression|ItemClassification.useful),
-    "Sport: Hockey": ItemData(base_id + 3, ItemClassification.progression|ItemClassification.useful),
+    "Basketball": ItemData(base_id + 0, IC.progression|IC.useful, ItemGroup.SPORTS),
+    "Dodgeball": ItemData(base_id + 1, IC.progression|IC.useful, ItemGroup.SPORTS),
+    "Volleyball": ItemData(base_id + 2, IC.progression|IC.useful, ItemGroup.SPORTS),
+    "Hockey": ItemData(base_id + 3, IC.progression|IC.useful, ItemGroup.SPORTS),
 }
 
 sports_mix_item = {
-    "Sport: Sports Mix": ItemData(base_id + 4, ItemClassification.progression_skip_balancing|ItemClassification.useful)
+    "Sports Mix": ItemData(base_id + 4, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS)
 }
 
 basketball_items_n = {
-    "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 5, ItemClassification.progression),
-    "Basketball: Flower Cup (Normal)": ItemData(base_id + 6, ItemClassification.progression),
-    "Basketball: Star Cup (Normal)": ItemData(base_id + 7, ItemClassification.progression),
+    "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 5, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Flower Cup (Normal)": ItemData(base_id + 6, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Star Cup (Normal)": ItemData(base_id + 7, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
 }
 
 basketball_items_h = {
-    "Basketball: Mushroom Cup (Hard)": ItemData(base_id + 8, ItemClassification.progression),
-    "Basketball: Flower Cup (Hard)": ItemData(base_id + 9, ItemClassification.progression),
-    "Basketball: Star Cup (Hard)": ItemData(base_id + 10, ItemClassification.progression)
+    "Basketball: Mushroom Cup (Hard)": ItemData(base_id + 8, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Flower Cup (Hard)": ItemData(base_id + 9, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Star Cup (Hard)": ItemData(base_id + 10, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS)
 }
 
 dodgeball_items_n = {
-    "Dodgeball: Mushroom Cup (Normal)": ItemData(base_id + 11, ItemClassification.progression),
-    "Dodgeball: Flower Cup (Normal)": ItemData(base_id + 12, ItemClassification.progression),
-    "Dodgeball: Star Cup (Normal)": ItemData(base_id + 13, ItemClassification.progression)
+    "Dodgeball: Mushroom Cup (Normal)": ItemData(base_id + 11, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Flower Cup (Normal)": ItemData(base_id + 12, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Star Cup (Normal)": ItemData(base_id + 13, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS)
 }
 
 dodgeball_items_h = {
-    "Dodgeball: Mushroom Cup (Hard)": ItemData(base_id + 14, ItemClassification.progression),
-    "Dodgeball: Flower Cup (Hard)": ItemData(base_id + 15, ItemClassification.progression),
-    "Dodgeball: Star Cup (Hard)": ItemData(base_id + 16, ItemClassification.progression)
+    "Dodgeball: Mushroom Cup (Hard)": ItemData(base_id + 14, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Flower Cup (Hard)": ItemData(base_id + 15, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Star Cup (Hard)": ItemData(base_id + 16, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS)
 }
 
 volleyball_items_n = {
-    "Volleyball: Mushroom Cup (Normal)": ItemData(base_id + 17, ItemClassification.progression),
-    "Volleyball: Flower Cup (Normal)": ItemData(base_id + 18, ItemClassification.progression),
-    "Volleyball: Star Cup (Normal)": ItemData(base_id + 19, ItemClassification.progression)
+    "Volleyball: Mushroom Cup (Normal)": ItemData(base_id + 17, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Flower Cup (Normal)": ItemData(base_id + 18, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Star Cup (Normal)": ItemData(base_id + 19, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS)
 }
 
 volleyball_items_h = {
-    "Volleyball: Mushroom Cup (Hard)": ItemData(base_id + 20, ItemClassification.progression),
-    "Volleyball: Flower Cup (Hard)": ItemData(base_id + 21, ItemClassification.progression),
-    "Volleyball: Star Cup (Hard)": ItemData(base_id + 22, ItemClassification.progression)
+    "Volleyball: Mushroom Cup (Hard)": ItemData(base_id + 20, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Flower Cup (Hard)": ItemData(base_id + 21, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Star Cup (Hard)": ItemData(base_id + 22, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS)
 }
 
 hockey_items_n = {
-    "Hockey: Mushroom Cup (Normal)": ItemData(base_id + 23, ItemClassification.progression),
-    "Hockey: Flower Cup (Normal)": ItemData(base_id + 24, ItemClassification.progression),
-    "Hockey: Star Cup (Normal)": ItemData(base_id + 25, ItemClassification.progression)
+    "Hockey: Mushroom Cup (Normal)": ItemData(base_id + 23, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Flower Cup (Normal)": ItemData(base_id + 24, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Star Cup (Normal)": ItemData(base_id + 25, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS)
 }
 
 hockey_items_h = {
-    "Hockey: Mushroom Cup (Hard)": ItemData(base_id + 26, ItemClassification.progression),
-    "Hockey: Flower Cup (Hard)": ItemData(base_id + 27, ItemClassification.progression),
-    "Hockey: Star Cup (Hard)": ItemData(base_id + 28, ItemClassification.progression)
+    "Hockey: Mushroom Cup (Hard)": ItemData(base_id + 26, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Flower Cup (Hard)": ItemData(base_id + 27, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Star Cup (Hard)": ItemData(base_id + 28, IC.progression, ItemGroup.HOCKEY_HARD_CUPS)
 }
 
 sports_mix_cups = {
-    "Sports Mix: Mushroom Cup": ItemData(base_id + 29, ItemClassification.progression_skip_balancing),
-    "Sports Mix: Flower Cup": ItemData(base_id + 30, ItemClassification.progression_skip_balancing),
-    "Sports Mix: Star Cup": ItemData(base_id + 31, ItemClassification.progression_skip_balancing)
+    "Sports Mix: Mushroom Cup": ItemData(base_id + 29, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Flower Cup": ItemData(base_id + 30, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Star Cup": ItemData(base_id + 31, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS)
 }
 
 sports_crystals = {
-    "Sports Crystal: Red": ItemData(base_id + 32, ItemClassification.progression_skip_balancing|ItemClassification.useful),
-    "Sports Crystal: Green": ItemData(base_id + 33, ItemClassification.progression_skip_balancing|ItemClassification.useful),
-    "Sports Crystal: Yellow": ItemData(base_id + 34, ItemClassification.progression_skip_balancing|ItemClassification.useful),
-    "Sports Crystal: Blue": ItemData(base_id + 35, ItemClassification.progression_skip_balancing|ItemClassification.useful),
+    "Sports Crystal: Red": ItemData(base_id + 32, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Green": ItemData(base_id + 33, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Yellow": ItemData(base_id + 34, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Blue": ItemData(base_id + 35, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
 }
 
 individual_stages = {
-    "Stage: Mario Stadium": ItemData(base_id + 100, ItemClassification.progression),
-    "Stage: Koopa Troopa Beach": ItemData(base_id + 101, ItemClassification.progression),
-    "Stage: Peach's Castle": ItemData(base_id + 102, ItemClassification.progression),
-    "Stage: Toad Park": ItemData(base_id + 103, ItemClassification.progression),
-    "Stage: DK Dock": ItemData(base_id + 104, ItemClassification.progression),
-    "Stage: Luigi's Mansion": ItemData(base_id + 105, ItemClassification.progression),
-    "Stage: Daisy Garden": ItemData(base_id + 106, ItemClassification.progression),
-    "Stage: Wario Factory": ItemData(base_id + 107, ItemClassification.progression),
-    "Stage: Bowser Jr. Blvd.": ItemData(base_id + 108, ItemClassification.progression),
-    "Stage: Bowser's Castle": ItemData(base_id + 109, ItemClassification.progression),
-    "Stage: Waluigi Pinball": ItemData(base_id + 110, ItemClassification.progression),
-    "Stage: Ghoulish Galleon": ItemData(base_id + 111, ItemClassification.progression),
-    "Stage: Star Ship": ItemData(base_id + 112, ItemClassification.progression),
-    "Stage: Western Junction": ItemData(base_id + 113, ItemClassification.progression),
-    "Stage: Behemoth Stage": ItemData(base_id + 114, ItemClassification.progression_skip_balancing),
+    "Mario Stadium": ItemData(base_id + 100, IC.progression, ItemGroup.COURTS),
+    "Koopa Troopa Beach": ItemData(base_id + 101, IC.progression, ItemGroup.COURTS),
+    "Peach's Castle": ItemData(base_id + 102, IC.progression, ItemGroup.COURTS),
+    "Toad Park": ItemData(base_id + 103, IC.progression, ItemGroup.COURTS),
+    "DK Dock": ItemData(base_id + 104, IC.progression, ItemGroup.COURTS),
+    "Luigi's Mansion": ItemData(base_id + 105, IC.progression, ItemGroup.COURTS),
+    "Daisy Garden": ItemData(base_id + 106, IC.progression, ItemGroup.COURTS),
+    "Wario Factory": ItemData(base_id + 107, IC.progression, ItemGroup.COURTS),
+    "Bowser Jr. Blvd.": ItemData(base_id + 108, IC.progression, ItemGroup.COURTS),
+    "Bowser's Castle": ItemData(base_id + 109, IC.progression, ItemGroup.COURTS),
+    "Waluigi Pinball": ItemData(base_id + 110, IC.progression, ItemGroup.COURTS),
+    "Ghoulish Galleon": ItemData(base_id + 111, IC.progression, ItemGroup.COURTS),
+    "Star Ship": ItemData(base_id + 112, IC.progression, ItemGroup.COURTS),
+    "Western Junction": ItemData(base_id + 113, IC.progression, ItemGroup.COURTS),
+    "Behemoth Stage": ItemData(base_id + 114, IC.progression_skip_balancing, ItemGroup.COURTS),
 }
 
 progressive_stuff = {
-    # "Progressive: Team Size": ItemData(base_id + 120, ItemClassification.progression|ItemClassification.useful),
-    # "Progressive: Team Size": ItemData(base_id + 121, ItemClassification.progression|ItemClassification.useful),
+    # "Progressive: Team Size": ItemData(base_id + 120, IC.progression|IC.useful),
+    # "Progressive: Team Size": ItemData(base_id + 121, IC.progression|IC.useful),
 
 }
 
 characters = {
-    "Character: Mario": ItemData(base_id + 200, ItemClassification.useful),
-    "Character: Luigi": ItemData(base_id + 201, ItemClassification.useful),
-    "Character: Peach": ItemData(base_id + 202, ItemClassification.useful),
-    "Character: Daisy": ItemData(base_id + 203, ItemClassification.useful),
-    "Character: Yoshi": ItemData(base_id + 204, ItemClassification.useful),
-    "Character: Wario": ItemData(base_id + 205, ItemClassification.useful),
-    "Character: Waluigi": ItemData(base_id + 206, ItemClassification.useful),
-    "Character: Donkey Kong": ItemData(base_id + 207, ItemClassification.useful),
-    "Character: Diddy Kong": ItemData(base_id + 208, ItemClassification.useful),
-    "Character: Toad": ItemData(base_id + 209, ItemClassification.useful),
-    "Character: Bowser": ItemData(base_id + 210, ItemClassification.useful),
-    "Character: Bowser Jr": ItemData(base_id + 211, ItemClassification.useful),
-    "Character: Moogle": ItemData(base_id + 212, ItemClassification.useful),
-    "Character: Cactuar": ItemData(base_id + 213, ItemClassification.useful),
-    "Character: Ninja": ItemData(base_id + 214, ItemClassification.useful),
-    "Character: White Mage": ItemData(base_id + 215, ItemClassification.useful),
-    "Character: Slime": ItemData(base_id + 216, ItemClassification.useful),
-    "Character: Black Mage": ItemData(base_id + 217, ItemClassification.useful),
+    "Mario": ItemData(base_id + 200, IC.useful, ItemGroup.CHARACTERS),
+    "Luigi": ItemData(base_id + 201, IC.useful, ItemGroup.CHARACTERS),
+    "Peach": ItemData(base_id + 202, IC.useful, ItemGroup.CHARACTERS),
+    "Daisy": ItemData(base_id + 203, IC.useful, ItemGroup.CHARACTERS),
+    "Yoshi": ItemData(base_id + 204, IC.useful, ItemGroup.CHARACTERS),
+    "Wario": ItemData(base_id + 205, IC.useful, ItemGroup.CHARACTERS),
+    "Waluigi": ItemData(base_id + 206, IC.useful, ItemGroup.CHARACTERS),
+    "Donkey Kong": ItemData(base_id + 207, IC.useful, ItemGroup.CHARACTERS),
+    "Diddy Kong": ItemData(base_id + 208, IC.useful, ItemGroup.CHARACTERS),
+    "Toad": ItemData(base_id + 209, IC.useful, ItemGroup.CHARACTERS),
+    "Bowser": ItemData(base_id + 210, IC.useful, ItemGroup.CHARACTERS),
+    "Bowser Jr": ItemData(base_id + 211, IC.useful, ItemGroup.CHARACTERS),
+    "Moogle": ItemData(base_id + 212, IC.useful, ItemGroup.CHARACTERS),
+    "Cactuar": ItemData(base_id + 213, IC.useful, ItemGroup.CHARACTERS),
+    "Ninja": ItemData(base_id + 214, IC.useful, ItemGroup.CHARACTERS),
+    "White Mage": ItemData(base_id + 215, IC.useful, ItemGroup.CHARACTERS),
+    "Slime": ItemData(base_id + 216, IC.useful, ItemGroup.CHARACTERS),
+    "Black Mage": ItemData(base_id + 217, IC.useful, ItemGroup.CHARACTERS),
 }
 
 character_costumes = {
-    "Costume: Light Blue Yoshi": ItemData(base_id + 218, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Yellow Yoshi": ItemData(base_id + 219, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Pink Yoshi": ItemData(base_id + 220, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Tennis-wear Peach": ItemData(base_id + 221, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Tennis-wear Daisy": ItemData(base_id + 222, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Blue Toad": ItemData(base_id + 223, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Yellow Toad": ItemData(base_id + 224, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Green Toad": ItemData(base_id + 225, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Shadow White Ninja": ItemData(base_id + 226, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Pure White - White Mage": ItemData(base_id + 227,ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Magic Red Black Mage": ItemData(base_id + 228,ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: She-slime": ItemData(base_id + 229, ItemClassification.filler|ItemClassification.deprioritized),
-    "Costume: Metal Slime": ItemData(base_id + 230, ItemClassification.filler|ItemClassification.deprioritized),
+    "Light Blue Yoshi": ItemData(base_id + 218, IC.filler, ItemGroup.COSTUMES),
+    "Yellow Yoshi": ItemData(base_id + 219, IC.filler, ItemGroup.COSTUMES),
+    "Pink Yoshi": ItemData(base_id + 220, IC.filler, ItemGroup.COSTUMES),
+    "Tennis-wear Peach": ItemData(base_id + 221, IC.filler, ItemGroup.COSTUMES),
+    "Tennis-wear Daisy": ItemData(base_id + 222, IC.filler, ItemGroup.COSTUMES),
+    "Blue Toad": ItemData(base_id + 223, IC.filler, ItemGroup.COSTUMES),
+    "Yellow Toad": ItemData(base_id + 224, IC.filler, ItemGroup.COSTUMES),
+    "Green Toad": ItemData(base_id + 225, IC.filler, ItemGroup.COSTUMES),
+    "Shadow White Ninja": ItemData(base_id + 226, IC.filler, ItemGroup.COSTUMES),
+    "Pure White - White Mage": ItemData(base_id + 227,IC.filler, ItemGroup.COSTUMES),
+    "Magic Red Black Mage": ItemData(base_id + 228,IC.filler, ItemGroup.COSTUMES),
+    "She-Slime": ItemData(base_id + 229, IC.filler, ItemGroup.COSTUMES),
+    "Metal Slime": ItemData(base_id + 230, IC.filler, ItemGroup.COSTUMES),
 }
 
 # Able to use once unlocked
 unlockable_panel_items = {
-    "? Panel: Green Shell": ItemData(base_id + 300, ItemClassification.useful),
-    "? Panel: Red Shell": ItemData(base_id + 301, ItemClassification.useful),
-    "? Panel: Banana": ItemData(base_id + 302, ItemClassification.useful),
-    "? Panel: Bob-omb": ItemData(base_id + 303, ItemClassification.useful),
-    "? Panel: Mini Mushroom": ItemData(base_id + 304, ItemClassification.useful),
-    "? Panel: Super Star": ItemData(base_id + 305, ItemClassification.useful),
+    "? Panel: Green Shell": ItemData(base_id + 300, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Red Shell": ItemData(base_id + 301, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Banana": ItemData(base_id + 302, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Bob-omb": ItemData(base_id + 303, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Mini Mushroom": ItemData(base_id + 304, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Super Star": ItemData(base_id + 305, IC.useful, ItemGroup.PANEL_ITEMS),
 }
 
 unlockable_abilities = {
-    "Ability: Special Meter": ItemData(base_id + 307, ItemClassification.useful),
+    "Special Meter": ItemData(base_id + 307, IC.useful, ItemGroup.ABILITIES),
 }
 
 # One time use
 one_time_items = {
-    "1 Coin": ItemData(base_id + 400, ItemClassification.filler),
-    "1 Green Shell": ItemData(base_id + 401, ItemClassification.filler),
-    "1 Red Shell": ItemData(base_id + 402, ItemClassification.filler),
-    "1 Banana": ItemData(base_id + 403, ItemClassification.filler),
-    "1 Bob-omb": ItemData(base_id + 404, ItemClassification.filler),
-    "1 Mini Mushroom": ItemData(base_id + 405, ItemClassification.filler),
-    "1 Super Star": ItemData(base_id + 406, ItemClassification.filler),
+    "1 Coin": ItemData(base_id + 400, IC.filler, ItemGroup.FILLER),
+    "1 Green Shell": ItemData(base_id + 401, IC.filler, ItemGroup.FILLER),
+    "1 Red Shell": ItemData(base_id + 402, IC.filler, ItemGroup.FILLER),
+    "1 Banana": ItemData(base_id + 403, IC.filler, ItemGroup.FILLER),
+    "1 Bob-omb": ItemData(base_id + 404, IC.filler, ItemGroup.FILLER),
+    "1 Mini Mushroom": ItemData(base_id + 405, IC.filler, ItemGroup.FILLER),
+    "1 Super Star": ItemData(base_id + 406, IC.filler, ItemGroup.FILLER),
 }
 
 traps = {
-    "Trap: Opponent Coins": ItemData(base_id + 500, ItemClassification.trap),
-    #"Trap: Hit Stun": ItemData(base_id + 501, ItemClassification.trap),
-    "Trap: 1/2 Time": ItemData(base_id + 502, ItemClassification.trap),
-    "Trap: Freeze Character 1": ItemData(base_id + 503, ItemClassification.trap),
-    "Trap: Freeze Character 2": ItemData(base_id + 504, ItemClassification.trap),
-    "Trap: Freeze Character 3": ItemData(base_id + 505, ItemClassification.trap),
+    "Coins Trap": ItemData(base_id + 500, IC.trap, ItemGroup.TRAPS),
+    #"Hit Stun": ItemData(base_id + 501, IC.trap, ItemGroup.TRAPS),
+    "Timer Trap": ItemData(base_id + 502, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 1 Trap": ItemData(base_id + 503, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 2 Trap": ItemData(base_id + 504, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 3 Trap": ItemData(base_id + 505, IC.trap, ItemGroup.TRAPS),
 }
 
-
-# harmony_hustle_items = {
-#     "HH: Classic Ocean": ItemData(base_id + 800, ItemClassification.useful),
-#     "HH: Chocobo Rhythm": ItemData(base_id + 801, ItemClassification.useful),
-#     "HH: Mario Athletic": ItemData(base_id + 802, ItemClassification.useful),
-#     "HH: Mushroom Mix Melody": ItemData(base_id + 803, ItemClassification.useful),
-#     "HH: Bloocheep Ocean": ItemData(base_id + 804, ItemClassification.useful),
-#     "HH: Chocobo Pop": ItemData(base_id + 805, ItemClassification.useful),
-#     "HH: Punk Athletic": ItemData(base_id + 806, ItemClassification.useful),
-#     "HH: Blossom Mix Melody": ItemData(base_id + 807, ItemClassification.useful),
-#     "HH: Punk Ocean": ItemData(base_id + 808, ItemClassification.useful),
-#     "HH: Chocobo Beat": ItemData(base_id + 809, ItemClassification.useful),
-#     "HH: Island Athletic": ItemData(base_id + 810, ItemClassification.useful),
-#     "HH: Star Mix Melody": ItemData(base_id + 811, ItemClassification.useful),
-# }
 
 # Put all into a table
 item_table: Dict[str, ItemData] = {
@@ -219,10 +232,24 @@ item_table: Dict[str, ItemData] = {
     **unlockable_abilities,
     **one_time_items,
     **traps,
-    #**harmony_hustle_items
 }
 
-ITEM_NAME_TO_ID: Dict[str, int] = {item_name: data.code for item_name, data in item_table.items()}
+ITEM_NAME_TO_ID: Dict[str, int] = {item_name: data.id for item_name, data in item_table.items()}
+
+auto_item_groups = {}
+
+# Loop through every single location
+for item_name, item_data in item_table.items():
+
+    # Grab the string name of the group from the Enum
+    # (e.g., "Basketball Exhibition Easy")
+    group_name = item_data.group.value
+    # If this group isn't in our dictionary yet, create an empty set for it
+    if group_name not in auto_item_groups:
+        auto_item_groups[group_name] = set()
+
+    # Add the location's name into that group's set
+    auto_item_groups[group_name].add(item_name)
 
 
 def get_random_filler_item_name(world: "MSMWorld") -> str:
@@ -258,8 +285,15 @@ def create_all_items(world: "MSMWorld") -> None:
         itempool.append(new_item)
 
     # Start with random characters option
+    row_1 = ["Mario", "Peach", "Wario", "Diddy Kong"]
+    row_2 = ["Luigi", "Daisy", "Donkey Kong", "Bowser Jr"]
+    row_3 = ["Yoshi", "Waluigi", "Bowser", "Toad"]
+    all_rows = [row_1, row_2, row_3]
+
     if world.options.start_with_characters == StartWithCharacters.option_2_characters:
-        character_1, character_2 = world.random.sample(list(characters), 2)
+        selected_1, selected_2 = world.random.sample(all_rows, 2)
+        character_1 = world.random.choice(selected_1)
+        character_2 = world.random.choice(selected_2)
         item_1 = world.create_item(character_1)
         item_2 = world.create_item(character_2)
         world.push_precollected(item_1)
@@ -271,7 +305,9 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(new_item)
 
     elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
-        character_1, character_2, character_3 = world.random.sample(list(characters), 3)
+        character_1 = world.random.choice(row_1)
+        character_2 = world.random.choice(row_2)
+        character_3 = world.random.choice(row_3)
         item_1 = world.create_item(character_1)
         item_2 = world.create_item(character_2)
         item_3 = world.create_item(character_3)
@@ -283,6 +319,7 @@ def create_all_items(world: "MSMWorld") -> None:
             if name not in (character_1, character_2, character_3):
                 new_item = world.create_item(name)
                 itempool.append(new_item)
+
     else:
         for name, data in characters.items():
             new_item = world.create_item(name)
@@ -291,16 +328,16 @@ def create_all_items(world: "MSMWorld") -> None:
 
     # Start with sports option
     if world.options.start_with_sports == StartWithSports.option_excluding_sports_mix:
-        basketball = world.create_item("Sport: Basketball")
+        basketball = world.create_item("Basketball")
         world.push_precollected(basketball)
-        dodgeball = world.create_item("Sport: Dodgeball")
+        dodgeball = world.create_item("Dodgeball")
         world.push_precollected(dodgeball)
-        volleyball = world.create_item("Sport: Volleyball")
+        volleyball = world.create_item("Volleyball")
         world.push_precollected(volleyball)
-        hockey = world.create_item("Sport: Hockey")
+        hockey = world.create_item("Hockey")
         world.push_precollected(hockey)
         if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-            sports_mix = world.create_item("Sport: Sports Mix")
+            sports_mix = world.create_item("Sports Mix")
             itempool.append(sports_mix)
         elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
             for name, data in sports_crystals.items():
@@ -308,16 +345,16 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(new_item)
 
     elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
-        basketball = world.create_item("Sport: Basketball")
+        basketball = world.create_item("Basketball")
         world.push_precollected(basketball)
-        dodgeball = world.create_item("Sport: Dodgeball")
+        dodgeball = world.create_item("Dodgeball")
         world.push_precollected(dodgeball)
-        volleyball = world.create_item("Sport: Volleyball")
+        volleyball = world.create_item("Volleyball")
         world.push_precollected(volleyball)
-        hockey = world.create_item("Sport: Hockey")
+        hockey = world.create_item("Hockey")
         world.push_precollected(hockey)
         if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-            sports_mix = world.create_item("Sport: Sports Mix")
+            sports_mix = world.create_item("Sports Mix")
             world.push_precollected(sports_mix)
         elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
             for crystal_name, crystal_data in sports_crystals.items():
@@ -329,7 +366,7 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             itempool.append(new_item)
             if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-                sports_mix = world.create_item("Sport: Sports Mix")
+                sports_mix = world.create_item("Sports Mix")
                 itempool.append(sports_mix)
             elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
                 for crystal_name, crystal_data in sports_crystals.items():
@@ -345,8 +382,7 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             world.push_precollected(new_item)
 
-        mush_stages = ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock", "Stage: Peach's Castle",
-                       "Stage: Toad Park"]
+        mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
         for name in mush_stages:
             new_item = world.create_item(name)
             world.push_precollected(new_item)
@@ -400,9 +436,8 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
         # Create items for actual stages
-        other_stages = ["Stage: Luigi's Mansion", "Stage: Daisy Garden", "Stage: Wario Factory",
-                        "Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Waluigi Pinball",
-                        "Stage: Ghoulish Galleon", "Stage: Star Ship", "Stage: Western Junction", "Stage: Behemoth Stage"]
+        other_stages = ["Luigi's Mansion","Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
 
         for name in other_stages:
             new_item = world.create_item(name)
@@ -415,8 +450,7 @@ def create_all_items(world: "MSMWorld") -> None:
             new_item = world.create_item(name)
             world.push_precollected(new_item)
 
-        mush_stages = ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock", "Stage: Peach's Castle",
-                       "Stage: Toad Park"]
+        mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
         for name in mush_stages:
             new_item = world.create_item(name)
             world.push_precollected(new_item)
@@ -465,9 +499,8 @@ def create_all_items(world: "MSMWorld") -> None:
                     itempool.append(new_item)
 
         # Create items for actual stages
-        other_stages = ["Stage: Luigi's Mansion", "Stage: Daisy Garden", "Stage: Wario Factory",
-                        "Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Waluigi Pinball",
-                        "Stage: Ghoulish Galleon", "Stage: Star Ship", "Stage: Western Junction", "Stage: Behemoth Stage"]
+        other_stages = ["Luigi's Mansion","Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
 
         for name in other_stages:
             new_item = world.create_item(name)
@@ -488,16 +521,14 @@ def create_all_items(world: "MSMWorld") -> None:
             world.push_precollected(new_item)
 
         # Push stages to do with mushroom cup to precollected
-        mush_stages = ["Stage: Mario Stadium", "Stage: Koopa Troopa Beach", "Stage: DK Dock", "Stage: Peach's Castle",
-                       "Stage: Toad Park"]
+        mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
         for name in mush_stages:
             new_item = world.create_item(name)
             world.push_precollected(new_item)
 
         # Create items for actual stages
-        other_stages = ["Stage: Luigi's Mansion","Stage: Daisy Garden", "Stage: Wario Factory",
-                        "Stage: Bowser Jr. Blvd.", "Stage: Bowser's Castle", "Stage: Waluigi Pinball",
-                        "Stage: Ghoulish Galleon", "Stage: Star Ship", "Stage: Western Junction", "Stage: Behemoth Stage"]
+        other_stages = ["Luigi's Mansion","Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
 
         for name in other_stages:
             new_item = world.create_item(name)
@@ -593,13 +624,6 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(new_item)
 
 
-    # Party Mode Items
-    # Harmony Hustle
-    # if "Harmony Hustle" in world.options.party_mode:
-    #     for name, icon in harmony_hustle_items.items():
-    #         new_item = world.create_item(name)
-    #         itempool.append(new_item)
-
     # Calculate number of filler items needed, exclude costumes
 
     number_of_items = len(itempool)
@@ -615,8 +639,15 @@ def create_all_items(world: "MSMWorld") -> None:
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
 
-    # if name in character_costumes:
-    #     if world.options.team_sanity == TeamSanity.option_characters_and_costumes:
-    #         classification = ItemClassification.useful
+    # Character Sanity (Characters)
+    if (world.options.character_sanity == CharacterSanity.option_characters or
+        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+        if name in characters:
+            classification = IC.progression
+
+    # Character Sanity (Costumes)
+    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+        if name in character_costumes:
+            classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

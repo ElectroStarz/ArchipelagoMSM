@@ -26,7 +26,6 @@ async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, 
     if unlocked_sports_mix:
         return
 
-    # 1. Resolve the addresses exactly ONCE here
     address_list = [
         get_address(BasketballAddresses.Tournament.tabs),
         get_address(DodgeballAddresses.Tournament.tabs),
@@ -34,10 +33,10 @@ async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, 
         get_address(HockeyAddresses.Tournament.tabs)
     ]
 
-    # 2. Determine what value we want to write (3 for hard, 2 for normal)
+    # Determine what value we want to write (3 for hard, 2 for normal)
     target_value = 3 if hard_tournament_difficulty else 2
 
-    # 3. Run the memory check/write loop exactly once
+    # Run the memory check/write loop exactly once
     for address in address_list:
         current_value = self.game_interface.dolphin_client.read_byte(address)
 
@@ -95,7 +94,6 @@ def get_address(address, offset=0xF80):
             #print(f"[DEBUG] Current Stage detected! Returning NTSC-U Address {new_addr}")
             new_addr = 0x8047796E
             return new_addr
-
 
         new_addr = address - offset
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")

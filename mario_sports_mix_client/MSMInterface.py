@@ -91,7 +91,7 @@ class MSMInterface:
         if match_status == 0 and current_stage not in not_match_prefix:
             if self.check_sport() == "Basketball":
                 if self.current_tournament is not None:
-                    if timer < 10800:
+                    if timer < 9000:
                         ready_game = True
                     else:
                         ready_game = False
@@ -160,6 +160,9 @@ class MSMInterface:
             is_loading = True
         else:
             is_loading = False
+
+        if timer == 0:
+            ready_game = False
 
         if ready_game and not is_cutscene and not is_paused and not is_loading:
             return True
