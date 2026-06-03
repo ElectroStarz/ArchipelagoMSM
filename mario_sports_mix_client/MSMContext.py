@@ -18,7 +18,8 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.3.0"
+CLIENT_VERSION = "0.3.1"
+COMPATIBLE_VERSIONS = ["0.3.0"]
 
 
 status_messages = {
@@ -508,14 +509,17 @@ class MSMContext(CommonContext):
             generation_version = self.slot_data.get("version", "0.0.1")
 
             # Client World mismatch handler
-            if CLIENT_VERSION != generation_version:
+            if CLIENT_VERSION in COMPATIBLE_VERSIONS:
+                logger.info(
+                    f"This seed was generated on {generation_version}, however client version {CLIENT_VERSION} is compatible!"
+                )
+            elif CLIENT_VERSION != generation_version:
                 logger.error(
                     f"\n=========================================\n"
                     f"VERSION MISMATCH DETECTED!\n"
-                    f"Your Client version: {CLIENT_VERSION}\n"
                     f"Seed was generated on version: {generation_version}\n"
+                    f"Your Client version: {CLIENT_VERSION}. This version is not compatible with version generated on!\n"
                     f"Please update, downgrade your client, or regenerate the seed as things may break!\n"
-                    f"If ElectroStarz says things should be okay, feel free to continue!\n"
                     f"========================================="
                 )
             else:
