@@ -161,7 +161,7 @@ class MSMInterface:
         else:
             is_loading = False
 
-        if timer == 0:
+        if timer == 0 and self.check_sport() != "Volleyball":
             ready_game = False
 
         if ready_game and not is_cutscene and not is_paused and not is_loading:

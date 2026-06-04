@@ -95,21 +95,26 @@ class AddressLib:
     def p_special_meter_addr(self):
         return get_address(PlayerAddresses.special_meter)
 
+    address_properties = [
+        "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",
+        "paused_addr", "timer_addr", "current_period", "cutscene_active_addr",
+        "loading_screen_addr", "behemoth_hp_addr", "volley_last_held_addr",
+        "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
+        "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
+        "p_pos_addr", "p_item_held_addr", "p_coins_addr",
+        "o_coins_addr", "p_special_meter_addr"
+    ]
 
-    def reset_all_addresses(self):
-        """Safely clears the cache for all memory addresses."""
+    def reset_all_addresses(self, logger):
+        """Forces the client to re-read memory by clearing all cached addresses."""
 
-        address_properties = [
-            "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",
-            "paused_addr", "timer_addr", "current_period", "cutscene_active_addr",
-            "loading_screen_addr", "behemoth_hp_addr", "volley_last_held_addr",
-            "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
-            "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
-            "p_pos_addr", "p_item_held_addr", "p_coins_addr",
-            "o_coins_addr", "p_special_meter_addr"
-        ]
+        cleared_count = 0
 
-        # Loop through the list and delete the cached variables if they exist
-        for prop in address_properties:
+        for prop in self.address_properties:
+            # We must check if it actually exists in the cache first.
+            # If we try to delete something that isn't cached yet, Python will crash with an AttributeError!
             if prop in self.__dict__:
                 delattr(self, prop)
+                cleared_count += 1
+
+        logger.info(f"Successfully cleared {cleared_count} cached addresses. They will be re-read on next access.")

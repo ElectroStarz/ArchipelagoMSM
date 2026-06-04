@@ -4,7 +4,7 @@ import random
 import traceback
 from collections import deque
 from random import randint
-from typing import Dict, Set, Optional, Any, List
+from typing import Dict, Set, Optional, Any
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
@@ -18,8 +18,8 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.3.1"
-COMPATIBLE_VERSIONS = ["0.3.0"]
+CLIENT_VERSION = "0.3.2"
+COMPATIBLE_VERSIONS = ["0.3.0", "0.3.1"]
 
 
 status_messages = {
@@ -30,7 +30,6 @@ status_messages = {
     ConnectionState.CONNECTED: "Connected to Dolphin!",
     ConnectionState.IN_TOURNAMENT_MAP: "In Tournament Map",
 }
-
 
 character_names = [
     "mario", "luigi", "peach", "daisy", "yoshi", "wario", "waluigi",
@@ -138,7 +137,15 @@ class MSMCommandProcessor(ClientCommandProcessor):
         if not self.ctx.DEBUGGING:
             self.ctx.DEBUGGING = True
             logger.info("Debugging on")
-            self.ctx.debug_log("This is what a debug message will look like!")
+            self.ctx.debug_log(
+                f"\n=========================================\n"
+                f"Welcome to debug mode! This is what a debug message will look like!\n"
+                f"Debug mode will tell you about things such as: Is the game ready_to_handle?\n"
+                f"Has my item been stopped from swapping? What's the current forced_item_id?\n"
+                f"You can use /change_debug_amount to change the amount of debug messages stored "
+                f"at once so the client doesn't spam messages!"
+                f"\n=========================================\n"
+            )
         else:
             self.ctx.DEBUGGING = False
             logger.info("Debugging off")
@@ -152,9 +159,10 @@ class MSMCommandProcessor(ClientCommandProcessor):
         except ValueError:
             logger.info(f"Error: '{amount} is not a valid number! Please enter an integer.")
 
-    def _cmd_read_address(self, address: str, addr_type: str = "Word", *pointers: str):
+    def _cmd_read_address(self, address: str, addr_type: str, *pointers: str):
         """Read the value of any address - Used for diagnostic purposes.
-        address should look like 0x80000000 (8 digits after 0x), pointers should look like 0x1F4, 0x8, addr_type defaults to Word"""
+        address should look like 0x80000000 (8 digits after 0x), pointers should look like 0x1F4, 0x8, addr_type can be
+        any from Byte, Halfword, Word, Float or String."""
 
         # ADDED , 16 HERE: This tells Python to parse the string as hexadecimal
         try:
@@ -206,9 +214,6 @@ class MSMCommandProcessor(ClientCommandProcessor):
         logger.info(log_message)
         return log_message
 
-
-
-
     def _cmd_status(self):
         """Display the current dolphin connection status."""
         logger.info(f"Connection Status: {status_messages[self.ctx.connection_state]}")
@@ -218,10 +223,49 @@ class MSMCommandProcessor(ClientCommandProcessor):
         asyncio.create_task(self.ctx.handle_received_items())
         logger.info("Reapplied unlocks!")
 
+    def _cmd_print_cached(self):
+        """Print out the cached values"""
+        for prop in AddressLib.address_properties:
+            if prop in self.ctx.addresslib.__dict__:
+                value = self.ctx.addresslib.__dict__[prop]
+
+                # Format it nicely based on what type of data it is
+                if isinstance(value, int):
+                    logger.info(f"{prop}: {hex(value)}")
+                elif isinstance(value, (bytes, bytearray)):
+                    logger.info(f"{prop}: 0x{value.hex().upper()}")
+                else:
+                    logger.info(f"{prop}: {value}")
+
+            else:
+                # If it's not in the dictionary, it's empty!
+                logger.info(f"{prop}: None (Currently Empty/Cleared)")
+
     def _cmd_reset_cached(self):
         """Manually reset the cached values if address errors are coming up when switching regions"""
-        self.ctx.addresslib.reset_all_addresses()
-        logger.info("Reset cached values!")
+        self.ctx.addresslib.reset_all_addresses(logger)
+
+    def _cmd_debug_memory(self):
+        """Forces the client to read Dolphin memory and print the live values."""
+
+        logger.info("Fetching live memory from Dolphin...")
+
+        for prop in AddressLib.address_properties:
+            # We intentionally use getattr here!
+            # If it's not cached, this forces it to read from Dolphin right now.
+            value = getattr(self.ctx.addresslib, prop)
+
+            if value is None:
+                logger.info(f"{prop}: Read Failed (None)")
+
+            elif isinstance(value, int):
+                logger.info(f"{prop}: {hex(value)}")
+
+            elif isinstance(value, (bytes, bytearray)):
+                logger.info(f"{prop}: 0x{value.hex().upper()}")
+
+            else:
+                logger.info(f"{prop}: {value}")
 
     def _cmd_deathlink(self):
         """Toggle deathlink from client. Overrides default setting."""
@@ -509,7 +553,7 @@ class MSMContext(CommonContext):
             generation_version = self.slot_data.get("version", "0.0.1")
 
             # Client World mismatch handler
-            if CLIENT_VERSION in COMPATIBLE_VERSIONS:
+            if generation_version in COMPATIBLE_VERSIONS:
                 logger.info(
                     f"This seed was generated on {generation_version}, however client version {CLIENT_VERSION} is compatible!"
                 )
@@ -585,7 +629,7 @@ class MSMContext(CommonContext):
 
     async def disconnect(self, allow_auto_reconnect: bool = False):
         self.game_interface.dolphin_client.disconnect()
-        self.reset_game_session_state()
+        self.reset_game_session_state(game_active= True if dc.GAME_VERSION is not None else False)
         await super().disconnect(allow_auto_reconnect)
 
     def update_connection_status(self):
@@ -593,8 +637,6 @@ class MSMContext(CommonContext):
 
     def reset_game_session_state(self, game_active: bool = False) -> None:
         """Reset runtime-only state when the game process/title exits or restarts."""
-        self.addresslib.reset_all_addresses()
-        self.game_interface.addresslib.reset_all_addresses()
         self.start_process = True
         self.handled_gecko_codes = False
         self.one_time_running = False
@@ -757,7 +799,7 @@ class MSMContext(CommonContext):
         elif current_item == 5:
             result = 5 #"Banana"
         else:
-            result = -1
+            result = -1 #"No Item"
 
         return result
 
@@ -1907,7 +1949,8 @@ class MSMContext(CommonContext):
 
         char_list = [char_1, char_2, char_3]
         costume_list = [costume_1, costume_2, costume_3]
-
+                                                # This is changed because of my async, it uses some different values,
+                                                # change it back to 2 when releasing!
         if self.send_both_character_sanity and self.character_sanity == 2:
             await self.send_character_character_sanity(char_1, char_2, char_3)
             await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
@@ -2173,13 +2216,14 @@ class MSMContext(CommonContext):
 
                 if self.game_interface.dolphin_client.is_hooked_class():
                     if not self.game_interface.dolphin_client.check_region():
-                        if self.game_session_active:
-                            self.reset_game_session_state()
+                        self.game_interface.dolphin_client.check_region()
+                        #if self.game_session_active:
+                            #self.reset_game_session_state()
                         await asyncio.sleep(1)
-                        continue
+                        #continue
 
-                    if not self.game_session_active or self.active_game_version != dc.GAME_VERSION:
-                        self.reset_game_session_state(game_active=True)
+                    # if not self.game_session_active or self.active_game_version != dc.GAME_VERSION:
+                    #     self.reset_game_session_state(game_active=True)
 
                 # Ensure we are connected to the AP Server first
                 if not self.server or not self.server.socket or self.server.socket.closed:
