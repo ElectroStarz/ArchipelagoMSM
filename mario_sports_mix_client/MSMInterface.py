@@ -12,8 +12,6 @@ class ConnectionState(Enum):
     IN_MATCH = 5
     IN_BOSS = 6
 
-_supported_versions = ["RMKP01", "RMKE01"]
-
 stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
 
 class MSMInterface:
@@ -58,8 +56,9 @@ class MSMInterface:
     def is_in_tournament_map(self):
         current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         current_stage_prefix = current_stage[:3]
+        maps = ["s31", "s32", "s33"]
 
-        if any(prefix in current_stage_prefix for prefix in ["s31", "s32", "s33"]):
+        if current_stage_prefix in maps:
             return True
         else:
             return False

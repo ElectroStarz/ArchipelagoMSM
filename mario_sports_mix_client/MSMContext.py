@@ -1938,6 +1938,7 @@ class MSMContext(CommonContext):
         if value != 0:
             self.game_interface.dolphin_client.write_float(special_meter, 0)
 
+
     # --- Sanity Location Handling ---
 
 
@@ -2027,7 +2028,9 @@ class MSMContext(CommonContext):
                     if costume_name:
                         await self.check_location(f"Play as {costume_name}")
 
+
     # === Deathlink Stuff ===
+
 
     # Sending Deathlink
     async def handle_send_deathlink(self):

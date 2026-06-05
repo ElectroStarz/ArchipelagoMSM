@@ -35,12 +35,6 @@ def create_all_regions(world: "MSMWorld") -> None:
                volleyball, v_exhibition, hockey, h_exhibition,
                sports_mix, sm_mushroom_cup, sm_flower_cup, sm_star_cup]
 
-    # # Check for party mode, if exists create region
-    # if "Feed Petey" or "Harmony Hustle" or "Bob-omb Dodge" or "Smash Skate" in world.options.party_mode:
-    #     party_mode = Region("Party Mode", world.player, world.multiworld)
-    #     regions.append(party_mode)
-
-    # Regions based on options
     # Basketball
     b_mushroom_cup_n = Region("Basketball: Mushroom Cup (Normal)", world.player, world.multiworld)
     b_flower_cup_n = Region("Basketball: Flower Cup (Normal)", world.player, world.multiworld)
@@ -110,19 +104,6 @@ def create_all_regions(world: "MSMWorld") -> None:
     regions.append(h_flower_cup_h)
     regions.append(h_star_cup_h)
 
-    # if "Feed Petey" in world.options.party_mode:
-    #     feed_petey = Region("Party Mode: Feed Petey", world.player, world.multiworld)
-    #     regions.append(feed_petey)
-    # if "Harmony Hustle" in world.options.party_mode:
-    #     harmony_hustle = Region("Party Mode: Harmony Hustle", world.player, world.multiworld)
-    #     regions.append(harmony_hustle)
-    # if  "Bob-omb Dodge" in world.options.party_mode:
-    #     bobomb_dodge = Region("Party Mode: Bob-omb Dodge", world.player, world.multiworld)
-    #     regions.append(bobomb_dodge)
-    # if "Smash Skate" in world.options.party_mode:
-    #     smash_skate = Region("Party Mode: Smash Skate", world.player, world.multiworld)
-    #     regions.append(smash_skate)
-
 
     # Boss stuff
     behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
@@ -185,32 +166,6 @@ def connect_regions(world: MSMWorld) -> None:
     # Boss
     behemoth_boss = world.get_region("Behemoth Boss Battle")
     behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
-
-    # # Party Mode
-    # if "Feed Petey" or "Harmony Hustle" or "Bob-omb Dodge" or "Smash Skate" in world.options.party_mode:
-    #     party_mode = world.get_region("Party Mode")
-    #     main_menu.connect(party_mode, "Main Menu -> Party Mode")
-    #
-    # if "Feed Petey" in world.options.party_mode:
-    #     party_mode = world.get_region("Party Mode")
-    #     feed_petey = world.get_region("Party Mode: Feed Petey")
-    #     party_mode.connect(feed_petey, "Party Mode -> Feed Petey")
-    #
-    # if "Harmony Hustle" in world.options.party_mode:
-    #     party_mode = world.get_region("Party Mode")
-    #     harmony_hustle = world.get_region("Party Mode: Harmony Hustle")
-    #     party_mode.connect(harmony_hustle, "Party Mode -> Harmony Hustle")
-    #
-    # if "Bob-omb Dodge" in world.options.party_mode:
-    #     party_mode = world.get_region("Party Mode")
-    #     bob_omb_dodge = world.get_region("Party Mode: Bob-omb Dodge")
-    #     party_mode.connect(bob_omb_dodge, "Party Mode -> Bob Omb Dodge")
-    #
-    # if "Smash Skate" in world.options.party_mode:
-    #     party_mode = world.get_region("Party Mode")
-    #     smash_strike = world.get_region("Party Mode: Smash Skate")
-    #     party_mode.connect(smash_strike, "Party Mode -> Smash Strike")
-
 
     # Connect menu to sports
     main_menu.connect(basketball, "Main Menu -> Basketball")
