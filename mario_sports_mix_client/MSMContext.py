@@ -18,17 +18,17 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.3.2"
-COMPATIBLE_VERSIONS = ["0.3.0", "0.3.1"]
+CLIENT_VERSION = "0.3.3"
+COMPATIBLE_VERSIONS = ["0.3.0", "0.3.1", "0.3.2"]
 
 
 status_messages = {
     ConnectionState.IN_MATCH: "In Match",
     ConnectionState.IN_BOSS: "In Boss",
     ConnectionState.IN_MENU: "In Main Menu",
+    ConnectionState.IN_TOURNAMENT_MAP: "In Tournament Map",
     ConnectionState.DISCONNECTED: "Unable to connect to the Dolphin instance, attempting to reconnect...",
     ConnectionState.CONNECTED: "Connected to Dolphin!",
-    ConnectionState.IN_TOURNAMENT_MAP: "In Tournament Map",
 }
 
 character_names = [
@@ -156,8 +156,9 @@ class MSMCommandProcessor(ClientCommandProcessor):
             new_amount = int(amount)
             from collections import deque
             self.ctx.last_debug_messages = deque(self.ctx.last_debug_messages, maxlen=new_amount)
+            logger.info(f"Changed debug amount to {new_amount}")
         except ValueError:
-            logger.info(f"Error: '{amount} is not a valid number! Please enter an integer.")
+            logger.info(f"Error: '{amount}' is not a valid number! Please enter an integer.")
 
     def _cmd_read_address(self, address: str, addr_type: str, *pointers: str):
         """Read the value of any address - Used for diagnostic purposes.
@@ -209,7 +210,12 @@ class MSMCommandProcessor(ClientCommandProcessor):
                 return error_msg
 
         # Format final_address with hex() makes it easier to read back.
-        log_message = f"[Memory Read] {addr_type} at {hex(final_address)}. Result: {result}"
+        if dc.GAME_VERSION == "PAL":
+            log_message = f"[Memory Read - PAL] {addr_type} at {hex(final_address)}. Result: {result}"
+        elif dc.GAME_VERSION == "NTSC-U":
+            log_message = f"[Memory Read - NTSC-U] {addr_type} at {hex(final_address)} (Original Address: {address}). Result: {result}"
+        else:
+            log_message = None
 
         logger.info(log_message)
         return log_message
@@ -1323,12 +1329,20 @@ class MSMContext(CommonContext):
 
         if score_total != self.last_match_score_total or (self.game_interface.check_sport() != "Volleyball" and timer == 0):
             self.last_match_score_total = score_total
-            self.suppress_panel_until = asyncio.get_event_loop().time() + 3
+            self.suppress_panel_until = asyncio.get_event_loop().time() + 3.0
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
+
 
     def is_paused(self):
         value = self.game_interface.dolphin_client.read_byte(self.addresslib.paused_addr)
         if value == 1:
+            return True
+        else:
+            return False
+
+    def has_ended(self):
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+        if timer == 0:
             return True
         else:
             return False
@@ -1339,8 +1353,8 @@ class MSMContext(CommonContext):
         self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)},"
                        f"awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
 
-        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.game_interface.ready_to_handle():
-            self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.minus_one)
+        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.game_interface.ready_to_handle() and self.forced_item_id is not None:
+            self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
             verify_item = self.current_item_func()
             self.debug_log(f"Panel suppressed; cleared item at {self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
             return
@@ -1357,8 +1371,11 @@ class MSMContext(CommonContext):
             return
 
         # Standard pauses
-        if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed or self.is_paused():
+        if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed or self.is_paused() or self.has_ended():
             self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
+            return
+
+        if asyncio.get_event_loop().time() < self.suppress_panel_until:
             return
 
         # Handle Empty List
@@ -1951,7 +1968,7 @@ class MSMContext(CommonContext):
         costume_list = [costume_1, costume_2, costume_3]
                                                 # This is changed because of my async, it uses some different values,
                                                 # change it back to 2 when releasing!
-        if self.send_both_character_sanity and self.character_sanity == 2:
+        if self.send_both_character_sanity and (self.character_sanity == 2 or self.character_sanity == 3):
             await self.send_character_character_sanity(char_1, char_2, char_3)
             await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
 
