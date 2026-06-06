@@ -8,6 +8,7 @@ from typing import Dict, Set, Optional, Any
 
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
+from MultiServer import mark_raw
 from NetUtils import ClientStatus
 from .MSMInterface import MSMInterface, ConnectionState
 from ..items import item_table
@@ -192,17 +193,18 @@ class MSMCommandProcessor(ClientCommandProcessor):
             final_address = get_address(numeric_address)
 
         client = self.ctx.game_interface.dolphin_client
+        result = ""
 
-        match addr_type:
-            case "Byte":
+        match addr_type.lower():
+            case "byte":
                 result = client.read_byte(final_address)
-            case "Halfword":
+            case "halfword":
                 result = client.read_bytes(final_address, 2)
-            case "Word":
+            case "word":
                 result = client.read_word(final_address)
-            case "Float":
+            case "float":
                 result = client.read_float(final_address)
-            case "String":
+            case "string":
                 result = client.read_string(final_address)
             case _:
                 error_msg = f"Error: Unsupported address type '{addr_type}'"
@@ -279,7 +281,43 @@ class MSMCommandProcessor(ClientCommandProcessor):
         Utils.async_start(self.ctx.update_death_link(self.ctx.deathlink_enabled))
         logger.info(f"Deathlink {'enabled' if self.ctx.deathlink_enabled else 'disabled'}!")
 
-    def _cmd_unlocked_characters(self):
+    @mark_raw
+    def _cmd_unlocked(self, type: str):
+        """See what type of item you have unlocked. Param type can be any from Sports, Stages, Cups, Characters/Chars,
+        Costumes/Costs, Abilities, Panel, Crystals"""
+
+        type_to_cmd = {
+            "sports": self.unlocked_sports,
+            "stages": self.unlocked_stages,
+            "cups": self.unlocked_cups,
+            "characters": self.unlocked_characters,
+            "chars": self.unlocked_characters,
+            "costumes": self.unlocked_costumes,
+            "costs": self.unlocked_costumes,
+            "abilities": self.unlocked_abilities,
+            "panel": self.unlocked_panel,
+            "crystals": self.unlocked_crystals
+        }
+        type = type.strip().lower()
+
+        if type in type_to_cmd:
+            function = type_to_cmd[type]
+            function()
+        else:
+            logger.error(f"Invalid type: {type}. Check the command description for valid types.")
+
+    def unlocked_sports(self):
+        """Display what sports you have unlocked."""
+        unlocked_sports = self.ctx.unlocked_sports
+        final_items = []
+        if unlocked_sports:
+            for sport in unlocked_sports:
+                final_items.append(sport)
+            logger.info(f"Unlocked Sports: {final_items}")
+        else:
+            logger.info("No unlocked sports")
+
+    def unlocked_characters(self):
         """Display what characters you have unlocked."""
         unlocked_characters = self.ctx.unlocked_characters
         final_items = []
@@ -290,7 +328,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         else:
             logger.info("No unlocked characters")
 
-    def _cmd_unlocked_costumes(self):
+    def unlocked_costumes(self):
         """Display what costumes you have unlocked"""
         unlocked_costumes = self.ctx.unlocked_costumes
         final_items = []
@@ -301,7 +339,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         else:
             logger.info("No unlocked costumes")
 
-    def _cmd_unlocked_cups(self):
+    def unlocked_cups(self):
         """Display what cups you have unlocked."""
         unlocked_cups = self.ctx.unlocked_cups
         final_items = []
@@ -312,7 +350,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         else:
             logger.info("No unlocked cups")
 
-    def _cmd_unlocked_stages(self):
+    def unlocked_stages(self):
         """Display what stages you have unlocked."""
         unlocked_stages = self.ctx.unlocked_stages
         final_items = []
@@ -323,7 +361,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         else:
             logger.info("No unlocked stages")
 
-    def _cmd_unlocked_abilities(self):
+    def unlocked_abilities(self):
         """Display what abilities you have unlocked."""
         unlocked_abilities = self.ctx.unlocked_abilities
         final_items = []
@@ -334,7 +372,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         else:
             logger.info("No unlocked abilities")
 
-    def _cmd_unlocked_panel(self):
+    def unlocked_panel(self):
         """Display what ?-Panel items you have unlocked."""
         unlocked_panel = self.ctx.unlocked_panel_items
         final_items = []
@@ -344,6 +382,17 @@ class MSMCommandProcessor(ClientCommandProcessor):
             logger.info(f"Unlocked Panel Items: {final_items}")
         else:
             logger.info("No unlocked ?-Panel items")
+
+    def unlocked_crystals(self):
+        """Display what Sports Crystals you have unlocked."""
+        unlocked_crystals = self.ctx.unlocked_sports_crystals
+        final_items = []
+        if unlocked_crystals:
+            for item in unlocked_crystals:
+                final_items.append(item.replace("Sports Crystal:", ""))
+            logger.info(f"Unlocked Sports Crystals: {final_items}")
+        else:
+            logger.info("No unlocked Sports Crystals")
 
     def _cmd_item(self):
         """Show what item you currently have"""
@@ -357,7 +406,10 @@ class MSMCommandProcessor(ClientCommandProcessor):
             4: "Super Star",
             5: "Banana",
         }
-        logger.info(f"Current Item: {item_map[current_item]} - ID is {current_item}")
+        if self.ctx.DEBUGGING:
+            logger.info(f"Current Item: {item_map[current_item]} - ID is {current_item}")
+        else:
+            logger.info(f"Current Item: {item_map[current_item]}")
 
     def _cmd_filler(self):
         """Display the filler queue"""
@@ -412,32 +464,32 @@ class MSMContext(CommonContext):
     last_error_message: Optional[str] = None
 
     slot_data: Dict[str, Utils.Any] = {}
-    sports_mix_unlock = int
-    behemoth_hp = float
-    behemoth_king_hp = float
+    sports_mix_unlock: Any = int
+    behemoth_hp: Any = float
+    behemoth_king_hp: Any = float
     is_behemoth = False
     is_behemoth_king = False
-    goal_condition = int
-    #win_cups_amount = int
-    hard_tournament_difficulty = bool
+    goal_condition: Any = int
+    #win_cups_amount: Any = int
+    hard_tournament_difficulty: Any = bool
 
     # Deathlink Stuff
-    deathlink_enabled: bool = False
-    deathlink_action = int
-    deathlink_consequence = int
-    deathlink_o_get_points = int
-    deathlink_o_scores_points = int
-    deathlink_boss_recovered = int
-    deathlink_dodge_health_lost = int
+    deathlink_enabled: Any = False
+    deathlink_action: Any
+    deathlink_consequence: Any
+    deathlink_o_get_points: Any
+    deathlink_o_scores_points: Any
+    deathlink_boss_recovered: Any
+    deathlink_dodge_health_lost: Any
 
     # Sanity stuff
-    character_sanity = int
-    send_both_character_sanity = bool
-    special_sanity = bool
-    court_sanity = bool
-    score_sanity = bool
-    score_sanity_max = int
-    score_sanity_points_req = int
+    character_sanity: Any
+    send_both_character_sanity: Any = False
+    special_sanity: Any
+    court_sanity: Any
+    score_sanity: Any
+    score_sanity_max: Any
+    score_sanity_points_req: Any
 
     def __init__(self, server_address: str, password: str):
         super().__init__(server_address, password)
@@ -495,8 +547,7 @@ class MSMContext(CommonContext):
 
         # Debug Stuff
         self.DEBUGGING = False
-        self.amount_debug: int = 5
-        self.last_debug_messages = deque(maxlen=self.amount_debug)  # Stores up to 5 messages at a time at default
+        self.last_debug_messages = deque(maxlen=5)  # Stores up to 5 messages at a time at default
 
     def debug_log(self, message: str) -> None:
         if self.DEBUGGING:
@@ -521,30 +572,30 @@ class MSMContext(CommonContext):
 
         super().on_package(cmd, args)
         if cmd == "Connected":
-            self.slot_data = args["slot_data"]
+            self.slot_data = args.get("slot_data", {})
 
             # Goal Data
-            self.goal_condition = self.slot_data["goal_condition"]
-            self.behemoth_hp = self.slot_data["behemoth_hp"]
-            self.behemoth_king_hp = self.slot_data["behemoth_king_hp"]
-            #self.win_cups_amount = self.slot_data["win_cups_amount"]
+            self.goal_condition = self.slot_data.get("goal_condition")
+            self.behemoth_hp = self.slot_data.get("behemoth_hp")
+            self.behemoth_king_hp = self.slot_data.get("behemoth_king_hp")
+            # self.win_cups_amount = self.slot_data.get("win_cups_amount")
 
             # Unlock Data
-            self.hard_tournament_difficulty = self.slot_data["hard_tournament_difficulty"]
-            self.sports_mix_unlock = self.slot_data["sports_mix_unlock"]
+            self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty")
+            self.sports_mix_unlock = self.slot_data.get("sports_mix_unlock")
 
             # Deathlink Data
-            self.deathlink_enabled = self.slot_data["deathlink"]
-            self.deathlink_action = self.slot_data["deathlink_action"]
-            self.deathlink_consequence = self.slot_data["deathlink_consequence"]
-            self.deathlink_o_get_points = self.slot_data["deathlink_opponent_get_points"]
-            self.deathlink_o_scores_points = self.slot_data["deathlink_opponent_scores_points"]
-            self.deathlink_boss_recovered = self.slot_data["deathlink_boss_health_recovered"]
-            self.deathlink_dodge_health_lost = self.slot_data["deathlink_dodgeball_health_lost"]
+            self.deathlink_enabled = self.slot_data.get("deathlink")
+            self.deathlink_action = self.slot_data.get("deathlink_action")
+            self.deathlink_consequence = self.slot_data.get("deathlink_consequence")
+            self.deathlink_o_get_points = self.slot_data.get("deathlink_opponent_get_points")
+            self.deathlink_o_scores_points = self.slot_data.get("deathlink_opponent_scores_points")
+            self.deathlink_boss_recovered = self.slot_data.get("deathlink_boss_health_recovered")
+            self.deathlink_dodge_health_lost = self.slot_data.get("deathlink_dodgeball_health_lost")
 
             # Sanity Data
-            self.character_sanity = self.slot_data["character_sanity"]
-            self.send_both_character_sanity = self.slot_data["send_both_character_sanity"]
+            self.character_sanity = self.slot_data.get("character_sanity")
+            self.send_both_character_sanity = self.slot_data.get("send_both_character_sanity")
             
 
             Utils.async_start(self.update_death_link(self.deathlink_enabled))
@@ -949,7 +1000,6 @@ class MSMContext(CommonContext):
         return value
 
     def peach_unlocks_value(self):
-        # If they don't have the character item, character is locked
         if "Peach" not in self.unlocked_characters:
             value = 0
             return value
@@ -959,7 +1009,6 @@ class MSMContext(CommonContext):
         return value
 
     def daisy_unlocks_value(self):
-        # If they don't have the character item, character is locked
         if "Daisy" not in self.unlocked_characters:
             value = 0
             return value
@@ -969,7 +1018,6 @@ class MSMContext(CommonContext):
         return value
 
     def toad_unlocks_value(self):
-        # If they don't have the character item, character is locked
         if "Toad" not in self.unlocked_characters:
             value = 0
             return value
@@ -1008,7 +1056,6 @@ class MSMContext(CommonContext):
         return value
 
     def slime_unlocks_value(self):
-        # If they don't have the character item, character is locked
         if "Slime" not in self.unlocked_characters:
             value = 0
             return value
@@ -1329,16 +1376,8 @@ class MSMContext(CommonContext):
 
         if score_total != self.last_match_score_total or (self.game_interface.check_sport() != "Volleyball" and timer == 0):
             self.last_match_score_total = score_total
-            self.suppress_panel_until = asyncio.get_event_loop().time() + 3.0
+            self.suppress_panel_until = asyncio.get_event_loop().time() + 2.0
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
-
-
-    def is_paused(self):
-        value = self.game_interface.dolphin_client.read_byte(self.addresslib.paused_addr)
-        if value == 1:
-            return True
-        else:
-            return False
 
     def has_ended(self):
         timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
@@ -1360,7 +1399,7 @@ class MSMContext(CommonContext):
             return
 
         # If we don't have an item, pause.
-        if item_data == -1 and self.game_interface.ready_to_handle() and not self.is_paused():
+        if item_data == -1 and self.game_interface.ready_to_handle():
             self.item_processed = False
             return
 
@@ -1371,7 +1410,8 @@ class MSMContext(CommonContext):
             return
 
         # Standard pauses
-        if self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed or self.is_paused() or self.has_ended():
+        if (self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed
+                or self.has_ended() or self.game_interface.special_active()):
             self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
             return
 
@@ -2213,6 +2253,7 @@ class MSMContext(CommonContext):
             current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)
             new_health = current_health + health_recovered
             self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
+
         elif self.is_behemoth_king:
             health_recovered = (self.deathlink_boss_recovered / 100) * self.behemoth_king_hp
             current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)

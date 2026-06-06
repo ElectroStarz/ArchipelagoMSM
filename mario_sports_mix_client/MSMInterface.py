@@ -3,6 +3,7 @@ from .dolphin_connection import *
 from typing import Optional
 from .memory_addresses_pal import *
 from .common_address_library import AddressLib
+from .MSMFunctions import get_address
 
 class ConnectionState(Enum):
     DISCONNECTED = 0
@@ -262,6 +263,16 @@ class MSMInterface:
             return {0: "Normal", 1: "Hard"}.get(difficulty)
 
         return {1: "Normal", 2: "Hard"}.get(difficulty)
+
+    def special_active(self):
+        addr = self.dolphin_client.follow_pointers(get_address(MatchAddresses.special_active),
+                                                                  Offsets.Player.special_active_offsets)
+        value = self.dolphin_client.read_word(addr)
+
+        if value == 1:
+            return True
+        else:
+            return False
 
     def get_connection_state(self):
         try:
