@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from rule_builder.rules import Has, HasAll, CanReachLocation, OptionFilter#, AtLeast
+from rule_builder.rules import *
 from .options import *
 
 if TYPE_CHECKING:
@@ -150,6 +150,12 @@ def set_all_location_rules(world: MSMWorld) -> None:
                         f"{sport}: Beat {difficulty} {cup} Cup Round {i}"
                     )
                     world.set_rule(location, rule)
+
+    for cup in ["Mushroom", "Flower", "Star"]:
+        for i in range(1, 4):
+            location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
+            rule = HasAny(*STAGES)
+            world.set_rule(location, rule)
 
 
     if (world.options.character_sanity == CharacterSanity.option_characters or

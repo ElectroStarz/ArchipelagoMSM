@@ -76,18 +76,26 @@ def lock_all_characters():
             dme.write_byte(new_addr, 0)
 
 
+def is_exception(address):
+    exceptions = (BasketballAddresses.Characters, DodgeballAddresses.Characters, VolleyballAddresses.Characters,
+                  HockeyAddresses.Characters, BasketballAddresses.Tournament, DodgeballAddresses.Tournament,
+                  VolleyballAddresses.Tournament, HockeyAddresses.Tournament, BasketballAddresses.Exhibition,
+                  DodgeballAddresses.Exhibition, VolleyballAddresses.Exhibition, HockeyAddresses.Exhibition,
+                  SportsMixAddresses.Tournament)
+
+    if any(address in vars(classes).values() for classes in exceptions):
+        return True
+    else:
+        return False
+
 def get_address(address, offset=0xF80):
     """Get the correct address depending on what region the game is"""
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
-    exceptions = (BasketballAddresses.Characters, DodgeballAddresses.Characters, VolleyballAddresses.Characters,
-                HockeyAddresses.Characters, BasketballAddresses.Tournament, DodgeballAddresses.Tournament,
-                VolleyballAddresses.Tournament, HockeyAddresses.Tournament, BasketballAddresses.Exhibition,
-                DodgeballAddresses.Exhibition, VolleyballAddresses.Exhibition, HockeyAddresses.Exhibition)
+    if is_exception(address):
+        return address
 
     # Some addresses are the same in PAL and NTSC-U
-    if any(address in vars(classes).values() for classes in exceptions):
-        return address
 
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_stage:

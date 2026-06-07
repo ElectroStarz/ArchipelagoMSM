@@ -214,6 +214,8 @@ class MSMCommandProcessor(ClientCommandProcessor):
         # Format final_address with hex() makes it easier to read back.
         if dc.GAME_VERSION == "PAL":
             log_message = f"[Memory Read - PAL] {addr_type} at {hex(final_address)}. Result: {result}"
+        elif dc.GAME_VERSION == "NTSC-U" and is_exception(address):
+            log_message = f"[Memory Read - NTSC-U] {addr_type} at {hex(final_address)} (In Exceptions). Result: {result}"
         elif dc.GAME_VERSION == "NTSC-U":
             log_message = f"[Memory Read - NTSC-U] {addr_type} at {hex(final_address)} (Original Address: {address}). Result: {result}"
         else:
@@ -1344,7 +1346,8 @@ class MSMContext(CommonContext):
 
         finally:
             self.one_time_running = False
-            await asyncio.sleep(1)
+
+        await asyncio.sleep(0.1)
 
     async def handle_replace_due_to_scoring(self):
         item_data = self.current_item_func()
@@ -1359,7 +1362,8 @@ class MSMContext(CommonContext):
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
             verify_item = self.current_item_func()
             self.debug_log(f"Forced item back to {self.forced_item_id}; previous={item_data}, verify={verify_item}")
-            await asyncio.sleep(1)
+
+        await asyncio.sleep(0.1)
 
     def current_match_score_total(self):
         player_score = sum(self.game_interface.dolphin_client.read_word(get_address(address)) for address in player_score_addresses)
@@ -1381,7 +1385,10 @@ class MSMContext(CommonContext):
 
     def has_ended(self):
         timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
-        if timer == 0:
+        if self.game_interface.check_sport() == "Volleyball":
+            return False
+
+        elif timer == 0 and self.game_interface.check_sport() != "Volleyball":
             return True
         else:
             return False
@@ -1458,6 +1465,8 @@ class MSMContext(CommonContext):
         else:
             self.debug_log(f"Panel selected {random_item}, but no item id matched")
 
+        await asyncio.sleep(0.1)
+
 
     # === Trap Handling ===
 
@@ -1510,7 +1519,7 @@ class MSMContext(CommonContext):
             self.mark_consumable_handled(item_index)
 
         # Prevents multiple traps from firing at the exact same millisecond
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
 
     async def run_freeze_trap_1(self):
         if not self.game_interface.ready_to_handle():
