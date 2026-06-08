@@ -487,6 +487,10 @@ class MSMContext(CommonContext):
 
     # Custom Tournament Settings
     custom_basket_time: Any
+    enable_b_points: Any
+    b_points_win: Any
+    custom_dodge_time: Any
+    custom_hockey_time: Any
 
     # Sanity stuff
     character_sanity: Any
@@ -577,6 +581,7 @@ class MSMContext(CommonContext):
         elif not condition and message_2 not in last_message:
             logger.info(message_2)
             last_message.append(message_2)
+
     async def server_auth(self, password_requested: bool = False):
         if password_requested and not self.password:
             await super(MSMContext, self).server_auth(password_requested)
@@ -618,6 +623,11 @@ class MSMContext(CommonContext):
 
             # Custom Tournament Settings Data
             self.custom_basket_time = self.slot_data.get("basket_time")
+            self.enable_b_points = self.slot_data.get("enable_b_points_win")
+            self.b_points_win = self.slot_data.get("b_points_win")
+
+            self.custom_dodge_time = self.slot_data.get("dodge_time")
+            self.custom_hockey_time = self.slot_data.get("hockey_time")
 
 
             # Sanity Data
@@ -889,6 +899,102 @@ class MSMContext(CommonContext):
             result = -1 #"No Item"
 
         return result
+
+    def ready_to_handle(self):
+        match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
+        string_stage = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = string_stage[0:3]
+        paused = self.game_interface.dolphin_client.read_byte(self.addresslib.paused_addr)
+        timer = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
+        cutscene_active = self.game_interface.dolphin_client.read_byte(self.addresslib.cutscene_active_addr)
+        loading_screen_active = self.game_interface.dolphin_client.read_word(self.addresslib.loading_screen_addr)
+        basket_ex_timer = self.game_interface.get_basketball_time()
+        dodge_ex_timer = self.game_interface.get_dodgeball_time()
+        hockey_ex_timer = self.game_interface.get_hockey_time()
+        not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
+        ready_game = bool
+        custom_time = self.get_custom_time()
+
+        if match_status == 0 and current_stage not in not_match_prefix and custom_time is not None:
+            if self.game_interface.check_sport() == "Basketball":
+                if self.game_interface.current_tournament is not None:
+                    if timer < custom_time:
+                        ready_game = True
+                    else:
+                        ready_game = False
+                else:
+                    if timer < basket_ex_timer:
+                        ready_game = True
+                    else:
+                        ready_game = False
+
+            elif self.game_interface.check_sport() == "Dodgeball":
+                if self.game_interface.current_tournament is not None:
+                    if timer < custom_time:
+                        ready_game = True
+                    else:
+                        ready_game = False
+                else:
+                    if dodge_ex_timer == "Off":
+                        ready_game = True
+                    else:
+                        if timer < dodge_ex_timer:
+                            ready_game = True
+                        else:
+                            ready_game = False
+
+            elif self.game_interface.check_sport() == "Volleyball":
+                if current_stage == "s20":
+                    try:
+                        self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
+                                                            Offsets.Boss.behemoth_hp_offsets)
+                        ready_game = True
+                    except RuntimeError:
+                        ready_game = False
+                else:
+                    try:
+                        # Check if you can follow pointers to the address, if so, then ready
+                        self.game_interface.dolphin_client.follow_pointers(self.addresslib.volley_last_held_addr,
+                                                            Offsets.Volleyball.last_held_offsets)
+                        ready_game = True
+                    except RuntimeError:
+                        ready_game = False
+            elif self.game_interface.check_sport() == "Hockey":
+                if self.game_interface.current_tournament is not None:
+                    if timer < custom_time:
+                        ready_game = True
+                    else:
+                        ready_game = False
+                else:
+                    if timer < hockey_ex_timer:
+                        ready_game = True
+                    else:
+                        ready_game = False
+            else:
+                ready_game = False
+
+        if paused == 0:
+            is_paused = False
+        else:
+            is_paused = True
+
+        if cutscene_active == 0:
+            is_cutscene = False
+        else:
+            is_cutscene = True
+
+        if loading_screen_active == 0:
+            is_loading = True
+        else:
+            is_loading = False
+
+        if timer == 0 and self.game_interface.check_sport() != "Volleyball":
+            ready_game = False
+
+        if ready_game and not is_cutscene and not is_paused and not is_loading:
+            return True
+        else:
+            return False
 
 
     # === Item Receiving ===
@@ -1274,7 +1380,7 @@ class MSMContext(CommonContext):
         await self.handle_special_meter_unlock()
 
     async def handle_special_meter_unlock(self):
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             self.debug_log("Special meter lock waiting; game not ready")
             return
 
@@ -1306,7 +1412,7 @@ class MSMContext(CommonContext):
         self.debug_log(f"Filler queue pending: size={len(self.filler_to_give)}, first={self.filler_to_give[0]}")
 
         # Game not in a valid state? Wait until later.
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             self.debug_log(f"Waiting to give filler; game not ready. Queue size: {len(self.filler_to_give)}")
             return
 
@@ -1383,7 +1489,7 @@ class MSMContext(CommonContext):
     async def handle_replace_due_to_scoring(self):
         item_data = self.current_item_func()
 
-        if item_data == -1 and self.game_interface.ready_to_handle():
+        if item_data == -1 and self.ready_to_handle():
             # Slot is empty, stop forcing
             self.awaiting_use = False
             self.forced_item_id = None
@@ -1430,14 +1536,14 @@ class MSMContext(CommonContext):
         self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)},"
                        f"awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
 
-        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.game_interface.ready_to_handle() and self.forced_item_id is not None:
+        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.ready_to_handle() and self.forced_item_id is not None:
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
             verify_item = self.current_item_func()
             self.debug_log(f"Panel suppressed; cleared item at {self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
             return
 
         # If we don't have an item, pause.
-        if item_data == -1 and self.game_interface.ready_to_handle():
+        if item_data == -1 and self.ready_to_handle():
             self.item_processed = False
             return
 
@@ -1448,7 +1554,7 @@ class MSMContext(CommonContext):
             return
 
         # Standard pauses
-        if (self.one_time_running or not self.game_interface.ready_to_handle() or self.item_processed
+        if (self.one_time_running or not self.ready_to_handle() or self.item_processed
                 or self.game_interface.special_active()):
             self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
             return
@@ -1507,7 +1613,7 @@ class MSMContext(CommonContext):
         if not self.traps_to_give:
             return
 
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             self.debug_log(f"Waiting to trigger trap; game not ready. Queue size: {len(self.traps_to_give)}")
             return
 
@@ -1556,7 +1662,7 @@ class MSMContext(CommonContext):
         await asyncio.sleep(0.1)
 
     async def run_freeze_trap_1(self):
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             return
 
         # 1. Get the actual memory addresses for X, Y, and Z
@@ -1585,7 +1691,7 @@ class MSMContext(CommonContext):
         self.debug_log("Freeze Trap 1 finished.")
 
     async def run_freeze_trap_2(self):
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             return
 
         addr_x = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_pos_addr, Offsets.Player.B2.Position.x_offsets)
@@ -1612,7 +1718,7 @@ class MSMContext(CommonContext):
         self.debug_log("Freeze Trap 2 finished.")
 
     async def run_freeze_trap_3(self):
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             return
 
         addr_x = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_pos_addr, Offsets.Player.B3.Position.x_offsets)
@@ -1639,7 +1745,7 @@ class MSMContext(CommonContext):
         self.debug_log("Freeze Trap 3 finished.")
 
     async def opponent_coins(self):
-        if self.game_interface.ready_to_handle():
+        if self.ready_to_handle():
             current_coins = self.game_interface.dolphin_client.read_word(self.addresslib.o_coins_addr)
             random_int = randint(1,5)
             new_coins = current_coins + random_int
@@ -1649,7 +1755,7 @@ class MSMContext(CommonContext):
             self.debug_log(f"Opponent coins set to {final_coins}")
 
     async def half_timer(self):
-        if self.game_interface.ready_to_handle():
+        if self.ready_to_handle():
             current_time = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
             new_time = current_time / 2
             self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, new_time)
@@ -1672,9 +1778,8 @@ class MSMContext(CommonContext):
         else:
             return None
 
-    async def set_custom_timer(self):
-        """Sets the custom timer depending on the sport and player's option. Electro for the love of god volleyball doesn't have a timer."""
-
+    def get_custom_time(self):
+        """Retrieves the custom timer amount from the option value"""
         b_option_to_timer = {
             0: 5400,
             1: 7200,
@@ -1690,17 +1795,53 @@ class MSMContext(CommonContext):
             3: 12600,
             4: 14400
         }
+        sport = self.game_interface.check_sport()
 
-        if self.in_tournament_match:
-            if self.game_interface.check_sport() != "Volleyball": # VOLLEYBALL DOESN'T HAVE A TIMER ELECTRO
-                if self.game_interface.ready_to_handle() and not self.handled_custom_timer:
-                    if self.game_interface.check_sport() == "Basketball":
-                        if self.custom_basket_time != self.get_default_time(): # If the value set is the default value, don't do anything because we don't need to.
-                            new_time = b_option_to_timer.get(self.custom_basket_time)
-                            self.game_interface.dolphin_client.write_float(self.addresslib.max_time_addr, new_time)
-                            self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, new_time)
-                            self.handled_custom_timer = True
+        if sport == "Basketball":
+            return b_option_to_timer.get(self.custom_basket_time)
+        elif sport == "Dodgeball":
+            return h_d_option_to_timer.get(self.custom_dodge_time)
+        elif sport == "Hockey":
+            return h_d_option_to_timer.get(self.custom_hockey_time)
+        else:
+            return 99999
 
+    async def set_custom_timer(self):
+        """Sets the custom timer depending on the sport and player's option. Electro for the love of god volleyball doesn't have a timer."""
+        new_time = None
+        status = self.game_interface.match_status()
+
+        if status in (2,3):
+            self.handled_custom_timer = False
+
+        if not self.in_tournament_match or self.handled_custom_timer:
+            return
+
+        sport = self.game_interface.check_sport()
+
+        if sport == "Volleyball": # Volleyball doesn't have a timer
+            return
+
+
+        if sport == "Basketball":
+            if self.custom_basket_time != self.get_default_time(): # If the value set is the default value, don't do anything because we don't need to.
+                new_time = self.get_custom_time()
+
+        elif sport == "Dodgeball":
+            if self.custom_dodge_time != self.get_default_time():
+                new_time = self.get_custom_time()
+
+        elif sport == "Hockey":
+            if self.custom_hockey_time != self.get_default_time():
+                new_time = self.get_custom_time()
+
+        if new_time is not None:
+            self.game_interface.dolphin_client.write_float(self.addresslib.max_time_addr, new_time)
+            self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, new_time)
+            self.handled_custom_timer = True
+            self.debug_log(f"Custom timer set to {new_time}")
+
+    #async def has_points_win(self):
 
 
 
@@ -1727,7 +1868,7 @@ class MSMContext(CommonContext):
         if self.boss_defeat_handled:
             return
 
-        if self.game_interface.ready_to_handle():
+        if self.ready_to_handle():
             address_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
                                                                                      Offsets.Boss.behemoth_hp_offsets)
 
@@ -1779,14 +1920,13 @@ class MSMContext(CommonContext):
                 self.is_behemoth = True
                 self.debug_log("Behemoth Found")
 
-        if current_stage == "s20VO":
             if match_status == 2:
                 self.boss_hp_handled = False
 
     async def handle_boss_hp(self):
         """Change the boss' HP depending on what boss it is and their custom health set"""
 
-        if not self.boss_hp_handled and self.game_interface.ready_to_handle():
+        if not self.boss_hp_handled and self.ready_to_handle():
             max_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
                                                                                  Offsets.Boss.max_hp_offsets)
             behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
@@ -1806,7 +1946,7 @@ class MSMContext(CommonContext):
     async def handle_lock_behemoth_hp(self):
         """Locks the Behemoth health and Special Meter charge if in a behemoth fight without Behemoth Stage"""
 
-        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.game_interface.ready_to_handle():
+        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.ready_to_handle():
             return
 
         required_stage = "Behemoth Stage"
@@ -2010,7 +2150,7 @@ class MSMContext(CommonContext):
     async def handle_locked_tournament_stage_points(self):
         """Locks the points in a tournament match if you don't have the required cup or stage"""
 
-        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.game_interface.ready_to_handle():
+        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.ready_to_handle():
             return
 
         current_stage = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
@@ -2080,7 +2220,7 @@ class MSMContext(CommonContext):
         if self.character_sanity == 0:
             return
 
-        if not self.game_interface.ready_to_handle():
+        if not self.ready_to_handle():
             return
 
         ch_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_1))
@@ -2276,7 +2416,7 @@ class MSMContext(CommonContext):
         NOTE: Dodgeball deathlinks get handled differently to everything else since it doesn't have a normal scoring system"""
 
         if self.deathlink_enabled:
-            if self.game_interface.ready_to_handle():
+            if self.ready_to_handle():
                 match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
                 current_stage_value = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
                 current_stage = current_stage_value[:3]

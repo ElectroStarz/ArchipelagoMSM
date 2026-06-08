@@ -3,7 +3,7 @@ from typing import Any
 from BaseClasses import Tutorial
 from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
-from . import regions, rules, locations, components
+from . import regions, rules, locations
 from .options import *
 from .items import ITEM_NAME_TO_ID, auto_item_groups
 from .locations import LOCATION_NAME_TO_ID, auto_location_groups
@@ -148,6 +148,11 @@ class MSMWorld(World):
 
         # Custom Tournament Rule Stuff
         "basket_time": self.options.basket_time.value,
+        "enable_b_points_win": self.options.enable_b_points_win.value,
+        "b_points_win": self.options.b_points_win.value,
+
+        "dodge_time": self.options.dodge_time.value,
+        "hockey_time": self.options.hockey_time.value,
         }
 
         return slot_data

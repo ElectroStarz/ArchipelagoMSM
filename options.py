@@ -242,7 +242,6 @@ class BasketTime(Choice):
 
         return None
 
-
 class EnableBPointsWin(Toggle):
     """Getting a certain amount of points wins you or the opponent the set"""
     display_name = "Enable Points Win"
@@ -254,6 +253,50 @@ class BPointsToWin(Range):
     range_start = 10
     range_end = 100
     default = 30
+
+# --- Dodgeball ---
+class DodgeTime(Choice):
+    """Select the custom amount of time for a Dodgeball tournament"""
+    display_name = "Dodgeball Tournament Time"
+    option_2_mins = 0
+    option_2_mins_30_secs = 1
+    option_3_mins = 2
+    option_3_mins_30_secs = 3
+    option_4_mins = 4
+    default = 2
+
+    @classmethod
+    def get_option_name(cls, id_):
+        match id_:
+            case 0: return "2:00"
+            case 1: return "2:30"
+            case 2: return "3:00"
+            case 3: return "3:30"
+            case 4: return "4:00"
+
+        return None
+
+# --- Hockey ---
+class HockeyTime(Choice):
+    """Select the custom amount of time for a Hockey tournament"""
+    display_name = "Hockey Tournament Time"
+    option_2_mins = 0
+    option_2_mins_30_secs = 1
+    option_3_mins = 2
+    option_3_mins_30_secs = 3
+    option_4_mins = 4
+    default = 2
+
+    @classmethod
+    def get_option_name(cls, id_):
+        match id_:
+            case 0: return "2:00"
+            case 1: return "2:30"
+            case 2: return "3:00"
+            case 3: return "3:30"
+            case 4: return "4:00"
+
+        return None
 
 msm_option_groups = [
     OptionGroup("Game Options", [
@@ -269,6 +312,12 @@ msm_option_groups = [
         BasketTime,
         EnableBPointsWin,
         BPointsToWin,
+    ]),
+    OptionGroup("Custom Dodgeball Tournament Options", [
+        DodgeTime,
+    ]),
+    OptionGroup("Custom Hockey Tournament Options", [
+        HockeyTime,
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
@@ -312,10 +361,12 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
 
-    # Basketball Tournament Rules
+    # Tournament Rules
     basket_time: BasketTime
     enable_b_points_win: EnableBPointsWin
     b_points_win: BPointsToWin
+    dodge_time: DodgeTime
+    hockey_time: HockeyTime
 
     # Deathlink
     deathlink: DeathLink

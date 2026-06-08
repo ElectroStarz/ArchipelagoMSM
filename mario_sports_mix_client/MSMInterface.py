@@ -4,7 +4,6 @@ from typing import Optional
 from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 from .MSMFunctions import get_address
-from . import MSMContext
 
 class ConnectionState(Enum):
     DISCONNECTED = 0
@@ -28,7 +27,6 @@ class MSMInterface:
         self.dolphin_client = DolphinClient(logger)
         self.current_tournament = None
         self.addresslib = AddressLib()
-        self.ctx = MSMContext
 
 
 
@@ -76,100 +74,6 @@ class MSMInterface:
         else:
             return -1
 
-    def ready_to_handle(self):
-        match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)
-        string_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
-        current_stage = string_stage[0:3]
-        paused = self.dolphin_client.read_byte(self.addresslib.paused_addr)
-        timer = self.dolphin_client.read_float(self.addresslib.timer_addr)
-        cutscene_active = self.dolphin_client.read_byte(self.addresslib.cutscene_active_addr)
-        loading_screen_active = self.dolphin_client.read_word(self.addresslib.loading_screen_addr)
-        basket_timer = self.get_basketball_time()
-        dodge_timer = self.get_dodgeball_time()
-        hockey_timer = self.get_hockey_time()
-        not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
-        ready_game = bool
-
-        if match_status == 0 and current_stage not in not_match_prefix:
-            if self.check_sport() == "Basketball":
-                if self.current_tournament is not None:
-                    if timer < 9000:
-                        ready_game = True
-                    else:
-                        ready_game = False
-                else:
-                    if timer < basket_timer:
-                        ready_game = True
-                    else:
-                        ready_game = False
-
-            elif self.check_sport() == "Dodgeball":
-                if self.current_tournament is not None:
-                    if timer < 10800:
-                        ready_game = True
-                    else:
-                        ready_game = False
-                else:
-                    if dodge_timer == "Off":
-                        ready_game = True
-                    else:
-                        if timer < dodge_timer:
-                            ready_game = True
-                        else:
-                            ready_game = False
-
-            elif self.check_sport() == "Volleyball":
-                if current_stage == "s20":
-                    try:
-                        self.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                            Offsets.Boss.behemoth_hp_offsets)
-                        ready_game = True
-                    except RuntimeError:
-                        ready_game = False
-                else:
-                    try:
-                        # Check if you can follow pointers to the address, if so, then ready
-                        self.dolphin_client.follow_pointers(self.addresslib.volley_last_held_addr,
-                                                            Offsets.Volleyball.last_held_offsets)
-                        ready_game = True
-                    except RuntimeError:
-                        ready_game = False
-            elif self.check_sport() == "Hockey":
-                if self.current_tournament is not None:
-                    if timer < 10800:
-                        ready_game = True
-                    else:
-                        ready_game = False
-                else:
-                    if timer < hockey_timer:
-                        ready_game = True
-                    else:
-                        ready_game = False
-            else:
-                ready_game = False
-
-        if paused == 0:
-            is_paused = False
-        else:
-            is_paused = True
-
-        if cutscene_active == 0:
-            is_cutscene = False
-        else:
-            is_cutscene = True
-
-        if loading_screen_active == 0:
-            is_loading = True
-        else:
-            is_loading = False
-
-        if timer == 0 and self.check_sport() != "Volleyball":
-            ready_game = False
-
-        if ready_game and not is_cutscene and not is_paused and not is_loading:
-            return True
-        else:
-            return False
 
     def match_status(self):
         match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)
@@ -196,7 +100,7 @@ class MSMInterface:
         else:
             return None
 
-    # For timer -> + 1800 for every 30 seconds
+    # For timer -> +1800 for every 30 seconds
 
     def get_basketball_time(self):
         time = self.dolphin_client.read_byte(self.addresslib.basket_time_addr)
