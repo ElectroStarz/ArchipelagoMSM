@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup, Visibility, \
     DeathLink
 
+
 class StartWithSports(Choice):
     """Start with the sports? HEAVILY RECOMMENDED
 Will cause immediate BK if off"""
@@ -108,6 +109,8 @@ class TrapChance(Range):
     range_end = 100
     default = 25
 
+# === Deathlink Options ===
+
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
 
@@ -125,7 +128,7 @@ class DeathlinkConsequence(Choice):
     option_opponent_gains_points = 1
     default = 0
 
-# Action
+# --- Action Specific Settings ---
 class DeathlinkOpponentScorePoints(Range):
     """How many points should the opponent get to send a deathlink?
 Requires Deathlink on & Every number of points action"""
@@ -134,7 +137,7 @@ Requires Deathlink on & Every number of points action"""
     range_end = 20
     default = 10
 
-# Consequence
+# --- Consequence Specific Settings ---
 class DeathlinkOpponentGetPoints(Range):
     """How many points should the opponent get when receiving a deathlink?
 Requires Deathlink on & Opponent Gains Point consequence"""
@@ -160,6 +163,8 @@ in dodgeball?"""
     range_end = 100
     default = 20
 
+# === Sanity Settings ===
+
 class CharacterSanity(Choice):
     """Turn on or off Character Sanity
 (Playing with a character and/or costume sends a check)"""
@@ -175,38 +180,80 @@ check for *both* the character and the costume"""
     display_name = "Send both Character Sanity"
     default = False
 
-# class ScoreSanity(Toggle):
-#     """(NOT WORKING) Toggle on or off score sanity"""
-#     display_name = "Score Sanity"
-#     default = False
-#
-# class ScoreSanityPoints(Range):
-#     """(NOT WORKING) Every number of points will send a check"""
-#     display_name = "Score Sanity Points"
-#     range_start = 1
-#     range_end = 10
-#     default = 5
-#
-# class ScoreSanityMax(Range):
-#     """(NOT WORKING) Score Sanity will go up to this number of points"""
-#     display_name = "Score Sanity Max"
-#     range_start = 10
-#     range_end = 100
-#     default = 40
-#
-# class SpecialSanity(Toggle):
-#     """(NOT WORKING) Using each character's special sends a check"""
-#     display_name = "Special Sanity"
-#     default = False
-#
-# class StageSanity(Choice):
-#     """(NOT WORKING) Playing and/or winning on each stage sends a check"""
-#     display_name = "Stage Sanity"
-#     option_off = 0
-#     option_playing = 1
-#     option_winning = 2
-#     option_both = 3
-#     default = 0
+class ScoreSanity(Toggle):
+    """(NOT WORKING) Toggle on or off score sanity"""
+    visibility = Visibility.none
+    display_name = "Score Sanity"
+    default = False
+
+class ScoreSanityPoints(Range):
+    """(NOT WORKING) Every number of points will send a check"""
+    visibility = Visibility.none
+    display_name = "Score Sanity Points"
+    range_start = 1
+    range_end = 10
+    default = 5
+
+class ScoreSanityMax(Range):
+    """(NOT WORKING) Score Sanity will go up to this number of points"""
+    visibility = Visibility.none
+    display_name = "Score Sanity Max"
+    range_start = 10
+    range_end = 100
+    default = 40
+
+class SpecialSanity(Toggle):
+    """(NOT WORKING) Using each character's special sends a check"""
+    visibility = Visibility.none
+    display_name = "Special Sanity"
+    default = False
+
+class StageSanity(Choice):
+    """(NOT WORKING) Playing and/or winning on each stage sends a check"""
+    visibility = Visibility.none
+    display_name = "Stage Sanity"
+    option_off = 0
+    option_playing = 1
+    option_winning = 2
+    option_both = 3
+    default = 0
+
+# === Custom Tournament Settings ===
+
+# --- Basketball ---
+class BasketTime(Choice):
+    """Select the custom amount of time for a Basketball tournament"""
+    display_name = "Basketball Tournament Time"
+    option_1_min_30_secs = 0
+    option_2_mins = 1
+    option_2_mins_30_secs = 2
+    option_3_mins = 3
+    option_3_mins_30_secs = 4
+    default = 2
+
+    @classmethod
+    def get_option_name(cls, id_):
+        match id_:
+            case 0: return "1:30"
+            case 1: return "2:00"
+            case 2: return "2:30"
+            case 3: return "3:00"
+            case 4: return "3:30"
+
+        return None
+
+
+class EnableBPointsWin(Toggle):
+    """Getting a certain amount of points wins you or the opponent the set"""
+    display_name = "Enable Points Win"
+    default = False
+
+class BPointsToWin(Range):
+    """Set the required amount of points to win"""
+    display_name = "Points to Win"
+    range_start = 10
+    range_end = 100
+    default = 30
 
 msm_option_groups = [
     OptionGroup("Game Options", [
@@ -217,6 +264,11 @@ msm_option_groups = [
         HardTournamentDifficulty,
         SportsMixUnlock,
         TrapChance,
+    ]),
+    OptionGroup("Custom Basketball Tournament Options", [
+        BasketTime,
+        EnableBPointsWin,
+        BPointsToWin,
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
@@ -259,6 +311,13 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
+
+    # Basketball Tournament Rules
+    basket_time: BasketTime
+    enable_b_points_win: EnableBPointsWin
+    b_points_win: BPointsToWin
+
+    # Deathlink
     deathlink: DeathLink
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
@@ -266,10 +325,12 @@ class MSMOptions(PerGameCommonOptions):
     deathlink_opponent_get_points: DeathlinkOpponentGetPoints
     deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
     deathlink_dodgeball_health_lost: DeathlinkDodgeballHealthLost
+
+    # Sanity Stuff
     character_sanity: CharacterSanity
     send_both_character_sanity: SendBothCharacterCostume
-    # score_sanity: ScoreSanity
-    # score_sanity_points: ScoreSanityPoints
-    # score_sanity_max: ScoreSanityMax
-    # special_sanity: SpecialSanity
-    # stage_sanity: StageSanity
+    score_sanity: ScoreSanity
+    score_sanity_points: ScoreSanityPoints
+    score_sanity_max: ScoreSanityMax
+    special_sanity: SpecialSanity
+    stage_sanity: StageSanity

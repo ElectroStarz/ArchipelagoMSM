@@ -4,6 +4,7 @@ from typing import Optional
 from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 from .MSMFunctions import get_address
+from . import MSMContext
 
 class ConnectionState(Enum):
     DISCONNECTED = 0
@@ -27,6 +28,7 @@ class MSMInterface:
         self.dolphin_client = DolphinClient(logger)
         self.current_tournament = None
         self.addresslib = AddressLib()
+        self.ctx = MSMContext
 
 
 
@@ -194,19 +196,21 @@ class MSMInterface:
         else:
             return None
 
+    # For timer -> + 1800 for every 30 seconds
+
     def get_basketball_time(self):
         time = self.dolphin_client.read_byte(self.addresslib.basket_time_addr)
 
         if time == 0:
-            return 5400
+            return 5400 # 1:30
         elif time == 1:
-            return 7200
+            return 7200 # 2:00
         elif time == 2:
-            return 9000
+            return 9000 # 2:30
         elif time == 3:
-            return 10800
+            return 10800 # 3:00
         elif time == 4:
-            return 12600
+            return 12600 # 3:30
         else:
             return 99999
 
@@ -214,15 +218,15 @@ class MSMInterface:
         time = self.dolphin_client.read_byte(self.addresslib.dodge_time_addr)
 
         if time == 0:
-            return 7200
+            return 7200 # 2:00
         elif time == 1:
-            return 9000
+            return 9000 # 2:30
         elif time == 2:
-            return 10800
+            return 10800 # 3:00
         elif time == 3:
-            return 12600
+            return 12600 # 3:30
         elif time == 4:
-            return 14400
+            return 14400 # 4:00
         elif time == 5:
             return "Off"
         else:
@@ -232,15 +236,15 @@ class MSMInterface:
         time = self.dolphin_client.read_byte(self.addresslib.hockey_time_addr)
 
         if time == 0:
-            return 7200
+            return 7200  # 2:00
         elif time == 1:
-            return 9000
+            return 9000  # 2:30
         elif time == 2:
-            return 10800
+            return 10800  # 3:00
         elif time == 3:
-            return 12600
+            return 12600  # 3:30
         elif time == 4:
-            return 14400
+            return 14400  # 4:00
         else:
             return 99999
 

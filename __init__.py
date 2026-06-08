@@ -122,18 +122,22 @@ class MSMWorld(World):
     def fill_slot_data(self) -> Mapping[str, Any]:
         slot_data = {
         "version": WORLD_VERSION,
+
+        # Boss Stuff
         "goal_condition": self.options.goal_condition.value,
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
 
-
+        # Unlock Stuff
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
+
+        # Sanity Stuff
         "character_sanity": self.options.character_sanity.value,
         "send_both_character_sanity": self.options.send_both_character_sanity.value,
 
-
+        # Deathlink Stuff
         "deathlink": self.options.deathlink.value,
         "deathlink_action": self.options.deathlink_action.value,
         "deathlink_consequence": self.options.deathlink_consequence.value,
@@ -141,6 +145,9 @@ class MSMWorld(World):
         "deathlink_opponent_scores_points": self.options.deathlink_opponent_scores_points.value,
         "deathlink_boss_health_recovered": self.options.deathlink_boss_health_recovered.value,
         "deathlink_dodgeball_health_lost": self.options.deathlink_dodgeball_health_lost.value,
+
+        # Custom Tournament Rule Stuff
+        "basket_time": self.options.basket_time.value,
         }
 
         return slot_data

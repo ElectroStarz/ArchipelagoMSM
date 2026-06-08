@@ -32,6 +32,10 @@ class AddressLib:
         return get_address(MatchAddresses.time_remaining)
 
     @cached_property
+    def max_time_addr(self):
+        return get_address(MatchAddresses.max_time)
+
+    @cached_property
     def current_period(self):
         return get_address(MatchAddresses.current_period)
 

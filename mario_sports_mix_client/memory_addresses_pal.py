@@ -11,9 +11,11 @@ class MatchAddresses:
     paused = 0x804D069B # Byte
     cutscene_on = 0x805C1999 # Byte
     loading_screen_active = 0x804D8354  # Word
+    game_speed = 0x804D77F4 # Float
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float
+    max_time = 0x804D77E0 # Float
 
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte
