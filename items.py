@@ -207,6 +207,8 @@ traps = {
     "Freeze Character 1 Trap": ItemData(base_id + 503, IC.trap, ItemGroup.TRAPS),
     "Freeze Character 2 Trap": ItemData(base_id + 504, IC.trap, ItemGroup.TRAPS),
     "Freeze Character 3 Trap": ItemData(base_id + 505, IC.trap, ItemGroup.TRAPS),
+    "Fast Trap": ItemData(base_id + 506, IC.trap, ItemGroup.TRAPS),
+    "Slow Trap": ItemData(base_id + 507, IC.trap, ItemGroup.TRAPS),
 }
 
 

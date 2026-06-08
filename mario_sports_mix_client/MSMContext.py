@@ -1624,6 +1624,8 @@ class MSMContext(CommonContext):
             "Freeze Character 3 Trap": self.run_freeze_trap_3,
             "Coins Trap": self.opponent_coins,
             "Timer Trap": self.half_timer,
+            "Fast Trap": self.fast_trap,
+            "Slow Trap": self.slow_trap,
         }
 
         queued_trap = self.traps_to_give.popleft()
@@ -1761,6 +1763,45 @@ class MSMContext(CommonContext):
             self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, new_time)
             self.debug_log(f"Timer cut in half to {new_time}")
 
+    async def fast_trap(self):
+        if not self.ready_to_handle():
+            return
+
+        self.debug_log("Fast Trap started")
+        addr = get_address(MatchAddresses.game_speed)
+        value = self.game_interface.dolphin_client.read_float(addr)
+        speed = 3
+
+        # Set timer
+        end_time = asyncio.get_event_loop().time() + 10.0
+
+        # Freeze Loop
+        while asyncio.get_event_loop().time() < end_time:
+            if value != speed:
+                self.game_interface.dolphin_client.write_float(addr, speed)
+
+        # Return to normal speed
+        self.game_interface.dolphin_client.write_float(addr, 1) # 1 = Default speed
+
+    async def slow_trap(self):
+        if not self.ready_to_handle():
+            return
+
+        self.debug_log("Slow Trap started")
+        addr = get_address(MatchAddresses.game_speed)
+        value = self.game_interface.dolphin_client.read_float(addr)
+        speed = 0.5
+
+        # Set timer
+        end_time = asyncio.get_event_loop().time() + 10.0
+
+        # Freeze Loop
+        while asyncio.get_event_loop().time() < end_time:
+            if value != speed:
+                self.game_interface.dolphin_client.write_float(addr, speed)
+
+        # Return to normal speed
+        self.game_interface.dolphin_client.write_float(addr, 1) # 1 = Default speed
 
     # === Custom Tournament Settings Stuff ===
 
