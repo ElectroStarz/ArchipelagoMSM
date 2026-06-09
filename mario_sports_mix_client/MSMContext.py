@@ -486,12 +486,6 @@ class MSMContext(CommonContext):
     deathlink_boss_recovered: Any
     deathlink_dodge_health_lost: Any
 
-    # Custom Tournament Settings
-    custom_basket_time: Any
-    enable_b_points: Any
-    b_points_win: Any
-    custom_dodge_time: Any
-    custom_hockey_time: Any
 
     # Sanity stuff
     character_sanity: Any
@@ -537,17 +531,13 @@ class MSMContext(CommonContext):
         self.minus_one = 0xFFFFFFFF
 
         # Deathlink Stuff
-        self.has_sent_death = False
-        self.received_death = False
+        self.has_sent_death = True
+        self.received_death = True
         self.previous_opponent_score = None
-
-        # Custom Tournament Settings Stuff
-        self.handled_custom_timer = False
 
         # Lists for items
         self.unlocked_sports = []
         self.unlocked_cups = []
-        self.unlocked_ex_diffs = []
         self.unlocked_sports_crystals = []
         self.unlocked_stages = []
         self.unlocked_characters = []
@@ -622,16 +612,6 @@ class MSMContext(CommonContext):
             self.deathlink_o_scores_points = self.slot_data.get("deathlink_opponent_scores_points")
             self.deathlink_boss_recovered = self.slot_data.get("deathlink_boss_health_recovered")
             self.deathlink_dodge_health_lost = self.slot_data.get("deathlink_dodgeball_health_lost")
-
-
-            # Custom Tournament Settings Data
-            self.custom_basket_time = self.slot_data.get("basket_time")
-            self.enable_b_points = self.slot_data.get("enable_b_points_win")
-            self.b_points_win = self.slot_data.get("b_points_win")
-
-            self.custom_dodge_time = self.slot_data.get("dodge_time")
-            self.custom_hockey_time = self.slot_data.get("hockey_time")
-
 
             # Sanity Data
             self.character_sanity = self.slot_data.get("character_sanity")
@@ -749,8 +729,8 @@ class MSMContext(CommonContext):
         self.boss_defeat_handled = False
         self.in_tournament_match = False
         self.last_tournament_location_name = None
-        self.has_sent_death = False
-        self.received_death = False
+        self.has_sent_death = True
+        self.received_death = True
         self.previous_opponent_score = None
         self.game_interface.current_tournament = None
         self.game_session_active = game_active
@@ -761,7 +741,6 @@ class MSMContext(CommonContext):
             self.items_received.clear()
         self.items_handled.clear()
         self.unlocked_sports.clear()
-        self.unlocked_ex_diffs.clear()
         self.unlocked_cups.clear()
         self.unlocked_sports_crystals.clear()
         self.unlocked_stages.clear()
@@ -917,12 +896,11 @@ class MSMContext(CommonContext):
         hockey_ex_timer = self.game_interface.get_hockey_time()
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
-        custom_time = self.get_custom_time()
 
-        if match_status == 0 and current_stage not in not_match_prefix and custom_time is not None:
+        if match_status == 0 and current_stage not in not_match_prefix:
             if self.game_interface.check_sport() == "Basketball":
                 if self.game_interface.current_tournament is not None:
-                    if timer < custom_time:
+                    if timer < 9000:
                         ready_game = True
                     else:
                         ready_game = False
@@ -934,7 +912,7 @@ class MSMContext(CommonContext):
 
             elif self.game_interface.check_sport() == "Dodgeball":
                 if self.game_interface.current_tournament is not None:
-                    if timer < custom_time:
+                    if timer < 10800:
                         ready_game = True
                     else:
                         ready_game = False
@@ -965,7 +943,7 @@ class MSMContext(CommonContext):
                         ready_game = False
             elif self.game_interface.check_sport() == "Hockey":
                 if self.game_interface.current_tournament is not None:
-                    if timer < custom_time:
+                    if timer < 10800:
                         ready_game = True
                     else:
                         ready_game = False
@@ -1034,11 +1012,7 @@ class MSMContext(CommonContext):
                         self.unlocked_cups.append(item_name)
                         self.debug_log(f"Added {item_name} to unlocked_cups")
 
-                if item_name.startswith("Exhibition"):
-                    self.unlocked_ex_diffs.append(item_name)
-                    self.debug_log(f"Added {item_name} to unlocked_ex_diffs")
-
-                elif item_name.startswith("Sports Crystal:"):
+                if item_name.startswith("Sports Crystal:"):
                     self.unlocked_sports_crystals.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
 
@@ -1517,12 +1491,14 @@ class MSMContext(CommonContext):
 
     def update_scoring_item_suppression(self):
         score_total = self.current_match_score_total()
+        sport = self.game_interface.check_sport()
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
 
         if self.last_match_score_total is None:
             self.last_match_score_total = score_total
             return
 
-        if score_total != self.last_match_score_total:
+        if score_total != self.last_match_score_total or (sport != "Volleyball" and timer == 0):
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 5
             self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
@@ -1632,8 +1608,6 @@ class MSMContext(CommonContext):
             "Freeze Character 3 Trap": self.run_freeze_trap_3,
             "Coins Trap": self.opponent_coins,
             "Timer Trap": self.half_timer,
-            "Fast Trap": self.fast_trap,
-            "Slow Trap": self.slow_trap,
         }
 
         queued_trap = self.traps_to_give.popleft()
@@ -1771,124 +1745,6 @@ class MSMContext(CommonContext):
             self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, new_time)
             self.debug_log(f"Timer cut in half to {new_time}")
 
-    async def fast_trap(self):
-        if not self.ready_to_handle():
-            return
-
-        self.debug_log("Fast Trap started")
-        addr = get_address(MatchAddresses.game_speed)
-        value = self.game_interface.dolphin_client.read_float(addr)
-        speed = 3
-
-        # Set timer
-        end_time = asyncio.get_event_loop().time() + 10.0
-
-        # Freeze Loop
-        while asyncio.get_event_loop().time() < end_time:
-            if value != speed:
-                self.game_interface.dolphin_client.write_float(addr, speed)
-
-        # Return to normal speed
-        self.game_interface.dolphin_client.write_float(addr, 1) # 1 = Default speed
-
-    async def slow_trap(self):
-        if not self.ready_to_handle():
-            return
-
-        self.debug_log("Slow Trap started")
-        addr = get_address(MatchAddresses.game_speed)
-        value = self.game_interface.dolphin_client.read_float(addr)
-        speed = 0.5
-
-        # Set timer
-        end_time = asyncio.get_event_loop().time() + 10.0
-
-        # Freeze Loop
-        while asyncio.get_event_loop().time() < end_time:
-            if value != speed:
-                self.game_interface.dolphin_client.write_float(addr, speed)
-
-        # Return to normal speed
-        self.game_interface.dolphin_client.write_float(addr, 1) # 1 = Default speed
-
-    # === Custom Tournament Settings Stuff ===
-
-    async def handle_custom_tournament_settings(self):
-        await self.set_custom_timer()
-
-    def get_default_time(self):
-        """Gets the default option value corresponding to the default timer value for the sport"""
-
-        sport = self.game_interface.check_sport()
-        if sport == "Basketball":
-            return 2
-        elif sport == "Dodgeball" or sport == "Hockey":
-            return 3
-        else:
-            return None
-
-    def get_custom_time(self):
-        """Retrieves the custom timer amount from the option value"""
-        b_option_to_timer = {
-            0: 5400,
-            1: 7200,
-            2: 9000,
-            3: 10800,
-            4: 12600
-        }
-
-        h_d_option_to_timer = {
-            0: 7200,
-            1: 9000,
-            2: 10800,
-            3: 12600,
-            4: 14400
-        }
-        sport = self.game_interface.check_sport()
-
-        if sport == "Basketball":
-            return b_option_to_timer.get(self.custom_basket_time)
-        elif sport == "Dodgeball":
-            return h_d_option_to_timer.get(self.custom_dodge_time)
-        elif sport == "Hockey":
-            return h_d_option_to_timer.get(self.custom_hockey_time)
-        else:
-            return 99999
-
-    async def set_custom_timer(self):
-        """Sets the custom timer depending on the sport and player's option. Electro for the love of god volleyball doesn't have a timer."""
-        new_time = None
-        status = self.game_interface.match_status()
-
-        if status in (2,3):
-            self.handled_custom_timer = False
-
-        if not self.in_tournament_match or self.handled_custom_timer:
-            return
-
-        sport = self.game_interface.check_sport()
-
-        if sport == "Volleyball": # Volleyball doesn't have a timer
-            return
-
-
-        if sport == "Basketball":
-            if self.custom_basket_time != self.get_default_time(): # If the value set is the default value, don't do anything because we don't need to.
-                new_time = self.get_custom_time()
-
-        elif sport == "Dodgeball":
-            if self.custom_dodge_time != self.get_default_time():
-                new_time = self.get_custom_time()
-
-        elif sport == "Hockey":
-            if self.custom_hockey_time != self.get_default_time():
-                new_time = self.get_custom_time()
-
-        if new_time is not None:
-            self.game_interface.dolphin_client.write_float(self.addresslib.max_time_addr, new_time)
-            self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, new_time)
-            self.handled_custom_timer = True
-            self.debug_log(f"Custom timer set to {new_time}")
 
     #async def has_points_win(self):
 
@@ -2248,33 +2104,12 @@ class MSMContext(CommonContext):
         finally:
             pass
 
-    async def handle_locked_exhibition_points(self):
-        """Locks the points in an exhibition match if you don't have the required difficulty"""
-
-        if self.in_tournament_match or not self.ready_to_handle():
-            return
-
-        _, diff_name = self.game_interface.get_exhibition_difficulty()
-
-
-        if f"Exhibition {diff_name}" in self.unlocked_ex_diffs:
-            return
-
-        logger.info(f"Blocked points for match. Missing: Exhibition {diff_name}")
-
-        try:
-            self.clear_player_score()
-            self.lock_special_meter()
-        finally:
-            pass
-
     def clear_player_score(self):
         """Locks the player's score at 0"""
 
         for address in player_score_addresses:
             new_addr = get_address(address)
             if self.game_interface.dolphin_client.read_word(new_addr) != 0:
-
                 self.game_interface.dolphin_client.write_word(new_addr, 0)
 
     def lock_special_meter(self):
@@ -2376,6 +2211,19 @@ class MSMContext(CommonContext):
 
     # === Deathlink Stuff ===
 
+    def timer_is_0(self):
+        """Checks if the timer is 0 because volleyball is stupid"""
+        sport = self.game_interface.check_sport()
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+
+        if sport == "Volleyball":
+            return False
+        else:
+            if timer == 0:
+                return True
+            else:
+                return False
+
 
     # Sending Deathlink
     async def handle_send_deathlink(self):
@@ -2387,20 +2235,30 @@ class MSMContext(CommonContext):
         possible_messages_1 = ["got DUNKED on!", "can't handle the heat!",]
 
         match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
+        #current_stage_value = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        # current_stage = current_stage_value[:3]
+        # not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+        max_timer = self.game_interface.dolphin_client.read_byte(get_address(MatchAddresses.max_time))
+
+
+        # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
+        # set received_death to false
+        if self.timer_reset() or (match_status == 0 and not self.timer_is_0()):
+            self.received_death = False
+            self.has_sent_death = False
 
         if self.deathlink_enabled:
 
             # Lose Match Action
             if self.deathlink_action == 0:
-                if (match_status == 2 or match_status == 3) and not self.received_death:
-                    if not self.has_sent_death and self.slot is not None:
-                        message = random.choice(possible_messages_0) # Pick a random message to send
-                        await self.send_death(f"{self.player_names[self.slot]} {message}")
-                        self.has_sent_death = True
-                        self.debug_log("Sent deathlink due to losing the match")
-
-                if match_status == 0:
-                    self.has_sent_death = False
+                if not self.received_death:
+                    if (match_status == 2 or match_status == 3) and (timer != max_timer or not self.timer_is_0()):
+                        if not self.has_sent_death and self.slot is not None:
+                            message = random.choice(possible_messages_0) # Pick a random message to send
+                            await self.send_death(f"{self.player_names[self.slot]} {message}")
+                            self.has_sent_death = True
+                            self.debug_log("Sent deathlink due to losing the match")
 
 
             # Every number of Points Action
@@ -2479,6 +2337,20 @@ class MSMContext(CommonContext):
         # If the score is exactly the same, do nothing
         return False
 
+    def timer_reset(self):
+        sport = self.game_interface.check_sport()
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+        if sport == "Dodgeball" or sport == "Hockey":
+            if timer == 10800:
+                return True
+            else: return False
+        elif sport == "Basketball":
+            if timer == 9000:
+                return True
+            else: return False
+        else:
+            return None
+
     # Receiving Deathlink
     def on_deathlink(self, data: dict[str, Any]):
         super().on_deathlink(data)
@@ -2488,13 +2360,10 @@ class MSMContext(CommonContext):
     def handle_received_deathlink(self):
         """Gets called when on_deathlink goes off and acts depending on deathlink_consequence
         NOTE: Dodgeball deathlinks get handled differently to everything else since it doesn't have a normal scoring system"""
+        #sport = self.game_interface.check_sport()
 
         if self.deathlink_enabled:
             if self.ready_to_handle():
-                match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
-                current_stage_value = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
-                current_stage = current_stage_value[:3]
-                not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
                 # Lose Match Consequence
                 if self.deathlink_consequence == 0:
@@ -2503,15 +2372,16 @@ class MSMContext(CommonContext):
                     else:
                         # Force opponent to win
                         self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4 = 5th Period
+                        for address in player_score_addresses:
+                            addr = get_address(address)
+                            self.game_interface.dolphin_client.write_word(addr, 0) # Write 0 for all scores
+
                         for address in opponent_score_addresses:
                             addr = get_address(address)
-                            self.game_interface.dolphin_client.write_byte(addr, 100) # Write 100 for all scores
+                            self.game_interface.dolphin_client.write_word(addr, 100)  # Write 100 for all scores
+
                         self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
                         self.received_death = True # Required so we don't send a deathlink when we get sent one
-                        # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
-                        # set received_death to false
-                        if (match_status != 2 and match_status != 3) or current_stage in not_match_prefix:
-                            self.received_death = False
 
                 # Opponent gains points
                 elif self.deathlink_consequence == 1:
@@ -2689,15 +2559,12 @@ class MSMContext(CommonContext):
         # Cup Goal - Need to wait for AP 0.6.8
         #await self.has_cup_goaled()
 
-        # Custom Tournament Settings
-        await self.handle_custom_tournament_settings()
-
         # Deathlink
         await self.handle_send_deathlink()
 
         # Lock points if you don't have the stage/cup
         await self.handle_locked_tournament_stage_points()
-        await self.handle_locked_exhibition_points()
+
 
         # Locations
         await self.handle_exhibition_win()
@@ -2743,7 +2610,8 @@ class MSMContext(CommonContext):
         await self.check_pending_tournament_location()
 
         self.handled_gecko_codes = False
-        self.handled_custom_timer = False
+        self.received_death = False
+        self.has_sent_death = False
         
         await asyncio.sleep(0.1)
 
@@ -2759,15 +2627,16 @@ class MSMContext(CommonContext):
 
         await self.handle_gecko_codes()
 
+        self.received_death = False
         self.has_sent_death = False
 
         self.forced_item_id = None
-        self.handled_custom_timer = False
 
         self.in_tournament_match = False
         self.boss_hp_handled = False
         self.is_behemoth = False
         self.is_behemoth_king = False
         self.game_interface.current_tournament = None
+
 
         await asyncio.sleep(0.1)

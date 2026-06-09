@@ -56,12 +56,6 @@ sports_mix_item = {
     "Sports Mix": ItemData(base_id + 4, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS),
 }
 
-ex_difficulties = {
-    "Exhibition Easy": ItemData(base_id + 5, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Normal": ItemData(base_id + 6, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Hard": ItemData(base_id + 7, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Expert": ItemData(base_id + 8, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-}
 
 # Cups / Tournaments (100 range)
 basketball_items_n = {
@@ -219,8 +213,6 @@ traps = {
     "Freeze Character 1 Trap": ItemData(base_id + 804, IC.trap, ItemGroup.TRAPS),
     "Freeze Character 2 Trap": ItemData(base_id + 805, IC.trap, ItemGroup.TRAPS),
     "Freeze Character 3 Trap": ItemData(base_id + 806, IC.trap, ItemGroup.TRAPS),
-    "Fast Trap": ItemData(base_id + 807, IC.trap, ItemGroup.TRAPS),
-    "Slow Trap": ItemData(base_id + 808, IC.trap, ItemGroup.TRAPS),
 }
 
 # Put all into a table
@@ -334,11 +326,6 @@ def create_all_items(world: "MSMWorld") -> None:
         for name in characters:
             new_item = world.create_item(name)
             itempool.append(new_item)
-
-    # Exhibition Difficulty Items
-    for difficulty in world.options.exhibition_difficulty.value:
-        new_item = world.create_item(f"Exhibition {difficulty}")
-        itempool.append(new_item)
 
 
     # Start with sports option
