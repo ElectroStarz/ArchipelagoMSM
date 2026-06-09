@@ -10,7 +10,7 @@ from .locations import LOCATION_NAME_TO_ID, auto_location_groups
 import json
 import pkgutil
 from Utils import visualize_regions
-from . import  components # KEEP THIS HERE
+from . import components # KEEP THIS HERE
 
 # Find world version
 
