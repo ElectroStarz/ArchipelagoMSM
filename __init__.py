@@ -146,14 +146,6 @@ class MSMWorld(World):
         "deathlink_opponent_scores_points": self.options.deathlink_opponent_scores_points.value,
         "deathlink_boss_health_recovered": self.options.deathlink_boss_health_recovered.value,
         "deathlink_dodgeball_health_lost": self.options.deathlink_dodgeball_health_lost.value,
-
-        # Custom Tournament Rule Stuff
-        "basket_time": self.options.basket_time.value,
-        "enable_b_points_win": self.options.enable_b_points_win.value,
-        "b_points_win": self.options.b_points_win.value,
-
-        "dodge_time": self.options.dodge_time.value,
-        "hockey_time": self.options.hockey_time.value,
         }
 
         return slot_data
