@@ -44,15 +44,6 @@ class HardTournamentDifficulty(DefaultOnToggle):
     """Would you like to include location checks for Hard Tournaments?"""
     display_name = "Include Hard Tournaments"
 
-class PartyMode(OptionSet):
-    """What party mode games do you want to include?
-(Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)
-Doesn't work at the moment"""
-    visibility = Visibility.none
-    display_name = "Party Mode Games"
-    valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
-    default = {}
-
 class SportsMixUnlock(Choice):
     """Unlock Sports Mix by getting 4 Sports Crystals from other players (Or yourself!)
 or get Sports Mix as an item"""
@@ -352,7 +343,6 @@ class MSMOptions(PerGameCommonOptions):
     start_with_characters: StartWithCharacters
     exhibition_difficulty: ExhibitionDifficulty
     hard_tournament_difficulty: HardTournamentDifficulty
-    party_mode: PartyMode
     sports_mix_unlock: SportsMixUnlock
     goal_condition: GoalCondition
     win_cups_amount: WinCupsAmount

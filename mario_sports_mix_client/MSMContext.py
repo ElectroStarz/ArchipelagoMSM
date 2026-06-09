@@ -474,6 +474,7 @@ class MSMContext(CommonContext):
     is_behemoth_king = False
     goal_condition: Any = int
     #win_cups_amount: Any = int
+    exhibition_difficulties: Any
     hard_tournament_difficulty: Any = bool
 
     # Deathlink Stuff
@@ -546,6 +547,7 @@ class MSMContext(CommonContext):
         # Lists for items
         self.unlocked_sports = []
         self.unlocked_cups = []
+        self.unlocked_ex_diffs = []
         self.unlocked_sports_crystals = []
         self.unlocked_stages = []
         self.unlocked_characters = []
@@ -608,6 +610,7 @@ class MSMContext(CommonContext):
             # self.win_cups_amount = self.slot_data.get("win_cups_amount")
 
             # Unlock Data
+            self.exhibition_difficulties = self.slot_data.get("exhibition_difficulty")
             self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty")
             self.sports_mix_unlock = self.slot_data.get("sports_mix_unlock")
 
@@ -758,6 +761,7 @@ class MSMContext(CommonContext):
             self.items_received.clear()
         self.items_handled.clear()
         self.unlocked_sports.clear()
+        self.unlocked_ex_diffs.clear()
         self.unlocked_cups.clear()
         self.unlocked_sports_crystals.clear()
         self.unlocked_stages.clear()
@@ -1030,7 +1034,11 @@ class MSMContext(CommonContext):
                         self.unlocked_cups.append(item_name)
                         self.debug_log(f"Added {item_name} to unlocked_cups")
 
-                if item_name.startswith("Sports Crystal:"):
+                if item_name.startswith("Exhibition"):
+                    self.unlocked_ex_diffs.append(item_name)
+                    self.debug_log(f"Added {item_name} to unlocked_ex_diffs")
+
+                elif item_name.startswith("Sports Crystal:"):
                     self.unlocked_sports_crystals.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
 
@@ -1923,7 +1931,7 @@ class MSMContext(CommonContext):
                     if behemoth_hp is not None and behemoth_hp <= 0:
                         self.boss_defeat_handled = True  # Lock execution immediately
 
-                        if self.goal_condition == 0:
+                        if self.goal_condition == 1:
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth!")
                         else:
@@ -1938,7 +1946,7 @@ class MSMContext(CommonContext):
                     if behemoth_hp is not None and behemoth_hp <= 0:
                         self.boss_defeat_handled = True  # Lock execution immediately
 
-                        if self.goal_condition == 1:
+                        if self.goal_condition == 2:
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth King!")
                         else:
@@ -2132,13 +2140,19 @@ class MSMContext(CommonContext):
         stage_code = current_stage[:3]
         stage = stage_names.get(stage_code)
         sport = self.game_interface.check_sport()
-        difficulty = self.game_interface.get_exhibition_difficulty()
+        difficulty, _ = self.game_interface.get_exhibition_difficulty()
 
         if stage is None or sport is None or difficulty is None:
             return
 
-        location_name = f"{sport} Ex: Beat {stage} ({difficulty})"
-        await self.check_location(location_name)
+        difficulties_dict = {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}
+        # Make option for just expert sending all diffs or sending previous diffs
+        for i in range(0,4):
+            if i <= difficulty: # Find all difficulties the same and below
+                diff_name = difficulties_dict.get(i)
+                if diff_name in self.exhibition_difficulties:
+                    location_name = f"{sport} Ex: Beat {stage} ({diff_name})"
+                    await self.check_location(location_name)
 
     async def check_current_cup(self):
         """Checks what cup we are in via the tournament map"""
@@ -2191,7 +2205,7 @@ class MSMContext(CommonContext):
     async def handle_locked_tournament_stage_points(self):
         """Locks the points in a tournament match if you don't have the required cup or stage"""
 
-        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.ready_to_handle():
+        if not self.in_tournament_match or not self.ready_to_handle():
             return
 
         current_stage = self.game_interface.dolphin_client.read_string(self.addresslib.current_stage_addr)
@@ -2234,6 +2248,26 @@ class MSMContext(CommonContext):
         finally:
             pass
 
+    async def handle_locked_exhibition_points(self):
+        """Locks the points in an exhibition match if you don't have the required difficulty"""
+
+        if self.in_tournament_match or not self.ready_to_handle():
+            return
+
+        _, diff_name = self.game_interface.get_exhibition_difficulty()
+
+
+        if f"Exhibition {diff_name}" in self.unlocked_ex_diffs:
+            return
+
+        logger.info(f"Blocked points for match. Missing: Exhibition {diff_name}")
+
+        try:
+            self.clear_player_score()
+            self.lock_special_meter()
+        finally:
+            pass
+
     def clear_player_score(self):
         """Locks the player's score at 0"""
 
@@ -2258,10 +2292,7 @@ class MSMContext(CommonContext):
     async def send_character_sanity_checks(self):
         """Handles sending checks for Character Sanity"""
 
-        if self.character_sanity == 0:
-            return
-
-        if not self.ready_to_handle():
+        if self.character_sanity == 0 or not self.ready_to_handle():
             return
 
         ch_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_1))
@@ -2664,6 +2695,7 @@ class MSMContext(CommonContext):
 
         # Lock points if you don't have the stage/cup
         await self.handle_locked_tournament_stage_points()
+        await self.handle_locked_exhibition_points()
 
         # Locations
         await self.handle_exhibition_win()

@@ -160,9 +160,10 @@ class MSMInterface:
             return False
 
     def get_exhibition_difficulty(self):
-        difficulty = self.dolphin_client.read_byte(self.addresslib.exhibition_diff_addr)
+        difficulty_int = self.dolphin_client.read_byte(self.addresslib.exhibition_diff_addr)
+        name = {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}.get(difficulty_int)
 
-        return {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}.get(difficulty)
+        return difficulty_int, name
 
     def get_tournament_difficulty(self, cup: str) -> Optional[str]:
         difficulty = self.dolphin_client.read_byte(self.addresslib.tournament_diff_addr)
