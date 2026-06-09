@@ -1935,7 +1935,7 @@ class MSMContext(CommonContext):
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth!")
                         else:
-                            await self.check_location("Defeated Behemoth!")
+                            await self.check_location("Defeat Behemoth!")
 
             # Behemoth King Handling
             elif self.is_behemoth_king:
@@ -1950,7 +1950,7 @@ class MSMContext(CommonContext):
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth King!")
                         else:
-                            await self.check_location("Defeated Behemoth King!")
+                            await self.check_location("Defeat Behemoth King!")
 
     async def check_boss_type(self):
         """Check which boss is currently being fought"""
@@ -2272,8 +2272,10 @@ class MSMContext(CommonContext):
         """Locks the player's score at 0"""
 
         for address in player_score_addresses:
-            if self.game_interface.dolphin_client.read_word(address) != 0:
-                self.game_interface.dolphin_client.write_word(address, 0)
+            new_addr = get_address(address)
+            if self.game_interface.dolphin_client.read_word(new_addr) != 0:
+
+                self.game_interface.dolphin_client.write_word(new_addr, 0)
 
     def lock_special_meter(self):
         """Locks the player's special meter at 0"""
