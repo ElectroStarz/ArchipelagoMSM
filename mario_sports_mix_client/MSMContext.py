@@ -1923,7 +1923,7 @@ class MSMContext(CommonContext):
                     if behemoth_hp is not None and behemoth_hp <= 0:
                         self.boss_defeat_handled = True  # Lock execution immediately
 
-                        if self.goal_condition == 0:
+                        if self.goal_condition == 1:
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth!")
                         else:
@@ -1938,7 +1938,7 @@ class MSMContext(CommonContext):
                     if behemoth_hp is not None and behemoth_hp <= 0:
                         self.boss_defeat_handled = True  # Lock execution immediately
 
-                        if self.goal_condition == 1:
+                        if self.goal_condition == 2:
                             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                             self.debug_log("Goal Achieved: Defeated Behemoth King!")
                         else:
