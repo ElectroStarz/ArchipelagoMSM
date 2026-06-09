@@ -19,8 +19,8 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.3.4"
-COMPATIBLE_VERSIONS = ["0.3.0", "0.3.1", "0.3.2", "0.3.3"]
+CLIENT_VERSION = "0.3.5"
+COMPATIBLE_VERSIONS = ["0.3.0", "0.3.1", "0.3.2", "0.3.3", "0.3.4"]
 
 
 status_messages = {
@@ -1996,19 +1996,13 @@ class MSMContext(CommonContext):
         stage_code = current_stage[:3]
         stage = stage_names.get(stage_code)
         sport = self.game_interface.check_sport()
-        difficulty, _ = self.game_interface.get_exhibition_difficulty()
+        _, diff_name = self.game_interface.get_exhibition_difficulty()
 
-        if stage is None or sport is None or difficulty is None:
+        if stage is None or sport is None or diff_name is None:
             return
 
-        difficulties_dict = {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}
-        # Make option for just expert sending all diffs or sending previous diffs
-        for i in range(0,4):
-            if i <= difficulty: # Find all difficulties the same and below
-                diff_name = difficulties_dict.get(i)
-                if diff_name in self.exhibition_difficulties:
-                    location_name = f"{sport} Ex: Beat {stage} ({diff_name})"
-                    await self.check_location(location_name)
+        location_name = f"{sport} Ex: Beat {stage} ({diff_name})"
+        await self.check_location(location_name)
 
     async def check_current_cup(self):
         """Checks what cup we are in via the tournament map"""
