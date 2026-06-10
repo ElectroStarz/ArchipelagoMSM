@@ -139,7 +139,7 @@ class DolphinClient:
     def write_string(self, address: Any, string: str) -> Any:
         self.dme.is_hooked()
         encoded = string.encode("utf-8")
-        self.dme.write_byte(address, encoded)
+        self.dme.write_bytes(address, encoded)
 
     def write_byte(self, address: Any, data: Any):
         self.dme.is_hooked()

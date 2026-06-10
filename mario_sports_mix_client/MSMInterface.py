@@ -29,7 +29,6 @@ class MSMInterface:
         self.addresslib = AddressLib()
 
 
-
     def is_in_menu(self):
         current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         if current_stage == "s39ba":
