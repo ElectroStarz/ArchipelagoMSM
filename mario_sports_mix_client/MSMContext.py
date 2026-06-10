@@ -132,6 +132,11 @@ class MSMCommandProcessor(ClientCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
+    @mark_raw
+    def _cmd_check(self, location_name: str):
+        """Check a location"""
+        Utils.async_start(self.ctx.check_location(location_name))
+
     def _cmd_debug_mode(self):
         """Toggle debugging on and off (Default off)"""
         if not self.ctx.DEBUGGING:
