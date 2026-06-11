@@ -133,6 +133,11 @@ class MSMCommandProcessor(ClientCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
+    @mark_raw
+    def _cmd_check(self, location_name: str):
+        """Check a location"""
+        Utils.async_start(self.ctx.check_location(location_name))
+
     def _cmd_debug_mode(self):
         """Toggle debugging on and off (Default off)"""
         if not self.ctx.DEBUGGING:
@@ -490,8 +495,11 @@ class MSMContext(CommonContext):
     custom_basket_time: Any
     enable_b_points: Any
     b_points_win: Any
+    v_points_win: Any
     custom_dodge_time: Any
     custom_hockey_time: Any
+    enable_h_points: Any
+    h_points_win: Any
 
     # Sanity stuff
     character_sanity: Any
@@ -537,8 +545,8 @@ class MSMContext(CommonContext):
         self.minus_one = 0xFFFFFFFF
 
         # Deathlink Stuff
-        self.has_sent_death = False
-        self.received_death = False
+        self.has_sent_death = True
+        self.received_death = True
         self.previous_opponent_score = None
 
         # Custom Tournament Settings Stuff
@@ -629,8 +637,13 @@ class MSMContext(CommonContext):
             self.enable_b_points = self.slot_data.get("enable_b_points_win")
             self.b_points_win = self.slot_data.get("b_points_win")
 
+            self.v_points_win = self.slot_data.get("v_points_win")
+
             self.custom_dodge_time = self.slot_data.get("dodge_time")
+
             self.custom_hockey_time = self.slot_data.get("hockey_time")
+            self.enable_h_points = self.slot_data.get("enable_h_points_win")
+            self.h_points_win = self.slot_data.get("h_points_win")
 
 
             # Sanity Data
@@ -749,8 +762,8 @@ class MSMContext(CommonContext):
         self.boss_defeat_handled = False
         self.in_tournament_match = False
         self.last_tournament_location_name = None
-        self.has_sent_death = False
-        self.received_death = False
+        self.has_sent_death = True
+        self.received_death = True
         self.previous_opponent_score = None
         self.game_interface.current_tournament = None
         self.game_session_active = game_active
@@ -1815,6 +1828,8 @@ class MSMContext(CommonContext):
 
     async def handle_custom_tournament_settings(self):
         await self.set_custom_timer()
+        await self.set_period_amount()
+        await self.has_points_win()
 
     def get_default_time(self):
         """Gets the default option value corresponding to the default timer value for the sport"""
@@ -1890,9 +1905,31 @@ class MSMContext(CommonContext):
             self.handled_custom_timer = True
             self.debug_log(f"Custom timer set to {new_time}")
 
-    #async def has_points_win(self):
+    async def set_period_amount(self):
+        """Sets the amount of periods in the match according to the player's option.
+        This will make it so that the player and opponent have tied the previous periods. - THEORY NEEDS TESTING"""
 
+    async def has_points_win(self):
+        """Check if the player has scored the required amount of points to win the period/set"""
 
+        sport = self.game_interface.check_sport()
+        period = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
+        curr_player_score = self.game_interface.dolphin_client.read_word(get_address(player_score_addresses[period]))
+        curr_opp_score = self.game_interface.dolphin_client.read_word(get_address(opponent_score_addresses[period]))
+
+        if sport == "Basketball":
+            if self.enable_b_points:
+                if curr_player_score >= self.b_points_win or curr_opp_score >= self.b_points_win:
+                    self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0)
+
+        elif sport == "Volleyball":
+            self.game_interface.dolphin_client.write_byte(get_address(VolleyballAddresses.points_to_win),
+                                                          self.v_points_win)
+
+        elif sport == "Hockey":
+            if self.enable_h_points:
+                if curr_player_score >= self.b_points_win or curr_opp_score >= self.b_points_win:
+                    self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0)
 
 
     # === Goal/Boss Stuff ===
@@ -2274,7 +2311,6 @@ class MSMContext(CommonContext):
         for address in player_score_addresses:
             new_addr = get_address(address)
             if self.game_interface.dolphin_client.read_word(new_addr) != 0:
-
                 self.game_interface.dolphin_client.write_word(new_addr, 0)
 
     def lock_special_meter(self):
@@ -2377,30 +2413,78 @@ class MSMContext(CommonContext):
     # === Deathlink Stuff ===
 
 
+    def timer_is_0(self):
+        """Checks if the timer is 0 because volleyball is stupid"""
+        sport = self.game_interface.check_sport()
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+
+        if sport == "Volleyball":
+            return False
+        else:
+            if timer == 0:
+                return True
+            else:
+                return False
+
+    def timer_reset(self):
+        sport = self.game_interface.check_sport()
+        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+
+        if self.in_tournament_match:
+            if sport != "Volleyball":
+                if timer == self.get_custom_time():
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        else:
+            if sport == "Basketball":
+                if timer == self.game_interface.get_basketball_time():
+                    return True
+                else:
+                    return False
+            elif sport == "Dodgeball":
+                if timer == self.game_interface.get_dodgeball_time():
+                    return True
+                else:
+                    return False
+            elif sport == "Hockey":
+                if timer == self.game_interface.get_hockey_time():
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
     # Sending Deathlink
     async def handle_send_deathlink(self):
         """Gets awaited during in match and sends a deathlink depending on what the deathlink_action is"""
 
         possible_messages_0 = ["lost the match!", "isn't good enough!", "has a MASSIVE skill issue!",
-                             "needs to take a break...", "couldn't sport their mix..."]
+                               "needs to take a break...", "couldn't sport their mix..."]
 
-        possible_messages_1 = ["got DUNKED on!", "can't handle the heat!",]
+        possible_messages_1 = ["got DUNKED on!", "can't handle the heat!", ]
 
         match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
+
+        # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
+        # set received_death to false
+        if self.timer_reset() or (match_status == 0 and not self.timer_is_0()):
+            self.received_death = False
+            self.has_sent_death = False
 
         if self.deathlink_enabled:
 
             # Lose Match Action
             if self.deathlink_action == 0:
-                if (match_status == 2 or match_status == 3) and not self.received_death:
-                    if not self.has_sent_death and self.slot is not None:
-                        message = random.choice(possible_messages_0) # Pick a random message to send
-                        await self.send_death(f"{self.player_names[self.slot]} {message}")
-                        self.has_sent_death = True
-                        self.debug_log("Sent deathlink due to losing the match")
-
-                if match_status == 0:
-                    self.has_sent_death = False
+                if not self.received_death:
+                    if (match_status == 2 or match_status == 3) and (not self.timer_reset() or not self.timer_is_0()):
+                        if not self.has_sent_death and self.slot is not None:
+                            message = random.choice(possible_messages_0)  # Pick a random message to send
+                            await self.send_death(f"{self.player_names[self.slot]} {message}")
+                            self.has_sent_death = True
+                            self.debug_log("Sent deathlink due to losing the match")
 
 
             # Every number of Points Action
@@ -2601,10 +2685,6 @@ class MSMContext(CommonContext):
                     await asyncio.sleep(1)
                     continue
 
-                if self.game_interface.dolphin_client.is_hooked_class() and self.start_process and self.slot:
-                    unlock_ex_tabs()
-                    self.start_process = False
-
                 # Ensure we have received slot data
                 if not self.slot:
                     await asyncio.sleep(1)
@@ -2695,7 +2775,7 @@ class MSMContext(CommonContext):
         # Deathlink
         await self.handle_send_deathlink()
 
-        # Lock points if you don't have the stage/cup
+        # Lock points if you don't have the stage/cup/difficulty
         await self.handle_locked_tournament_stage_points()
         await self.handle_locked_exhibition_points()
 
@@ -2755,9 +2835,12 @@ class MSMContext(CommonContext):
         await self.handle_received_items()
         await self.check_pending_tournament_location()
         await self.stop_stupid_games_played_notifs()
-        await unlock_tournament_tabs_option(self, self.hard_tournament_difficulty, self.unlocked_sports_mix)
+
 
         await self.handle_gecko_codes()
+
+        await unlock_tournament_tabs_option(self, self.hard_tournament_difficulty, self.unlocked_sports_mix)
+        unlock_ex_tabs(self.game_interface)
 
         self.has_sent_death = False
 

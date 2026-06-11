@@ -151,6 +151,9 @@ class MSMWorld(World):
         "basket_time": self.options.basket_time.value,
         "enable_b_points_win": self.options.enable_b_points_win.value,
         "b_points_win": self.options.b_points_win.value,
+        "v_points_win": self.options.v_points_win.value,
+        "enable_h_points_win": self.options.enable_h_points_win.value,
+        "h_points_win": self.options.h_points_win.value,
 
         "dodge_time": self.options.dodge_time.value,
         "hockey_time": self.options.hockey_time.value,

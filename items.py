@@ -214,13 +214,12 @@ one_time_items = {
 # Traps (800 range)
 traps = {
     "Coins Trap": ItemData(base_id + 801, IC.trap, ItemGroup.TRAPS),
-    #"Hit Stun": ItemData(base_id + 802, IC.trap, ItemGroup.TRAPS),
-    "Timer Trap": ItemData(base_id + 803, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 1 Trap": ItemData(base_id + 804, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 2 Trap": ItemData(base_id + 805, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 3 Trap": ItemData(base_id + 806, IC.trap, ItemGroup.TRAPS),
-    "Fast Trap": ItemData(base_id + 807, IC.trap, ItemGroup.TRAPS),
-    "Slow Trap": ItemData(base_id + 808, IC.trap, ItemGroup.TRAPS),
+    "Timer Trap": ItemData(base_id + 802, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 1 Trap": ItemData(base_id + 803, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 2 Trap": ItemData(base_id + 804, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 3 Trap": ItemData(base_id + 805, IC.trap, ItemGroup.TRAPS),
+    "Fast Trap": ItemData(base_id + 806, IC.trap, ItemGroup.TRAPS),
+    "Slow Trap": ItemData(base_id + 807, IC.trap, ItemGroup.TRAPS),
 }
 
 # Put all into a table

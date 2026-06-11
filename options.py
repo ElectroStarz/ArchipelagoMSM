@@ -242,7 +242,7 @@ class BPointsToWin(Range):
     """Set the required amount of points to win"""
     display_name = "Points to Win"
     range_start = 10
-    range_end = 100
+    range_end = 50
     default = 30
 
 # --- Dodgeball ---
@@ -267,6 +267,15 @@ class DodgeTime(Choice):
 
         return None
 
+
+# --- Volleyball ---
+class VPointsToWin(Range):
+    """Set the required amount of points to win"""
+    display_name = "Points to Win"
+    range_start = 10
+    range_end = 15
+    default = 10
+
 # --- Hockey ---
 class HockeyTime(Choice):
     """Select the custom amount of time for a Hockey tournament"""
@@ -289,6 +298,18 @@ class HockeyTime(Choice):
 
         return None
 
+class EnableHPointsWin(Toggle):
+    """Getting a certain amount of points wins you or the opponent the set"""
+    display_name = "Enable Points Win"
+    default = False
+
+class HPointsToWin(Range):
+    """Set the required amount of points to win"""
+    display_name = "Points to Win"
+    range_start = 10
+    range_end = 50
+    default = 20
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         StartWithSports,
@@ -301,14 +322,18 @@ msm_option_groups = [
     ]),
     OptionGroup("Custom Basketball Tournament Options", [
         BasketTime,
-        EnableBPointsWin,
         BPointsToWin,
     ]),
     OptionGroup("Custom Dodgeball Tournament Options", [
         DodgeTime,
     ]),
+    OptionGroup("Custom Volleyball Tournament Options", [
+        VPointsToWin,
+    ]),
     OptionGroup("Custom Hockey Tournament Options", [
         HockeyTime,
+        EnableHPointsWin,
+        HPointsToWin,
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
@@ -356,7 +381,10 @@ class MSMOptions(PerGameCommonOptions):
     enable_b_points_win: EnableBPointsWin
     b_points_win: BPointsToWin
     dodge_time: DodgeTime
+    v_points_win: VPointsToWin
     hockey_time: HockeyTime
+    enable_h_points_win: EnableHPointsWin
+    h_points_win: HPointsToWin
 
     # Deathlink
     deathlink: DeathLink

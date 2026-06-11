@@ -167,6 +167,7 @@ class VolleyballAddresses:
     last_held = 0x804D0F98 # Word
 
     throw_timer = 0x805C1B50 # Word
+    points_to_win = 0x804D7807 # Byte
 
     class Tournament:
         tabs = 0x90226DA4 # Byte
