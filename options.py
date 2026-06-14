@@ -245,6 +245,13 @@ class BPointsToWin(Range):
     range_end = 50
     default = 30
 
+class BPeriod(Range):
+    """How many periods do you want to be playing?
+    Recommend to set a low amount, kinda boring otherwise."""
+    display_name = "Period Amount"
+    range_start = 1
+    range_end = 10
+
 # --- Dodgeball ---
 class DodgeTime(Choice):
     """Select the custom amount of time for a Dodgeball tournament"""
@@ -267,6 +274,21 @@ class DodgeTime(Choice):
 
         return None
 
+class DPeriod(Range):
+    """How many periods do you want to be playing?
+    Recommend to set a low amount, kinda boring otherwise."""
+    display_name = "Period Amount"
+    range_start = 1
+    range_end = 10
+
+class DMaxHealth(Choice):
+    """How much health should everyone have?"""
+    display_name = "Health Amount"
+    option_100 = 100
+    option_150 = 150
+    option_200 = 200
+    option_250 = 250
+    option_300 = 300
 
 # --- Volleyball ---
 class VPointsToWin(Range):
@@ -275,6 +297,13 @@ class VPointsToWin(Range):
     range_start = 10
     range_end = 15
     default = 10
+
+class VPeriod(Range):
+    """How many sets do you want to be playing?
+    Recommend to set a low amount, kinda boring otherwise."""
+    display_name = "Set Amount"
+    range_start = 1
+    range_end = 10
 
 # --- Hockey ---
 class HockeyTime(Choice):
@@ -310,6 +339,13 @@ class HPointsToWin(Range):
     range_end = 50
     default = 20
 
+class HPeriod(Range):
+    """How many periods do you want to be playing?
+    Recommend to set a low amount, kinda boring otherwise."""
+    display_name = "Period Amount"
+    range_start = 1
+    range_end = 10
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         StartWithSports,
@@ -322,18 +358,24 @@ msm_option_groups = [
     ]),
     OptionGroup("Custom Basketball Tournament Options", [
         BasketTime,
+        EnableBPointsWin,
         BPointsToWin,
+        BPeriod,
     ]),
     OptionGroup("Custom Dodgeball Tournament Options", [
         DodgeTime,
+        DPeriod,
+        DMaxHealth,
     ]),
     OptionGroup("Custom Volleyball Tournament Options", [
         VPointsToWin,
+        VPeriod,
     ]),
     OptionGroup("Custom Hockey Tournament Options", [
         HockeyTime,
         EnableHPointsWin,
         HPointsToWin,
+        HPeriod,
     ]),
     OptionGroup("Goal Options", [
         GoalCondition,
@@ -380,11 +422,19 @@ class MSMOptions(PerGameCommonOptions):
     basket_time: BasketTime
     enable_b_points_win: EnableBPointsWin
     b_points_win: BPointsToWin
+    b_period: BPeriod
+
     dodge_time: DodgeTime
+    d_period: DPeriod
+    d_max_health: DMaxHealth
+
     v_points_win: VPointsToWin
+    v_period: VPeriod
+
     hockey_time: HockeyTime
     enable_h_points_win: EnableHPointsWin
     h_points_win: HPointsToWin
+    h_period: HPeriod
 
     # Deathlink
     deathlink: DeathLink

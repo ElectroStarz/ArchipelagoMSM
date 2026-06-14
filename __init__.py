@@ -151,12 +151,19 @@ class MSMWorld(World):
         "basket_time": self.options.basket_time.value,
         "enable_b_points_win": self.options.enable_b_points_win.value,
         "b_points_win": self.options.b_points_win.value,
-        "v_points_win": self.options.v_points_win.value,
-        "enable_h_points_win": self.options.enable_h_points_win.value,
-        "h_points_win": self.options.h_points_win.value,
+        "b_period": self.options.b_period.value,
 
         "dodge_time": self.options.dodge_time.value,
+        "d_period": self.options.d_period.value,
+        "d_max_health": self.options.d_max_health.value,
+
+        "v_points_win": self.options.v_points_win.value,
+        "v_period": self.options.v_period.value,
+
         "hockey_time": self.options.hockey_time.value,
+        "enable_h_points_win": self.options.enable_h_points_win.value,
+        "h_points_win": self.options.h_points_win.value,
+        "h_period": self.options.h_period.value,
         }
 
         return slot_data

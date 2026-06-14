@@ -91,7 +91,9 @@ def is_exception(address):
                   DodgeballAddresses.Characters,  DodgeballAddresses.Tournament,  DodgeballAddresses.Exhibition,
                   VolleyballAddresses.Characters, VolleyballAddresses.Tournament, VolleyballAddresses.Exhibition,
                   HockeyAddresses.Characters,     HockeyAddresses.Tournament,     HockeyAddresses.Exhibition,
-                                                  SportsMixAddresses.Tournament
+                                                  SportsMixAddresses.Tournament,
+
+                  CupsWonMultiple, GamesPlayed,
     )
 
     if any(address in vars(classes).values() for classes in exceptions):

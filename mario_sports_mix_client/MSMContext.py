@@ -19,8 +19,8 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "0.3.4"
-COMPATIBLE_VERSIONS = ["0.3.0", "0.3.1", "0.3.2", "0.3.3"]
+CLIENT_VERSION = "1.0.0"
+COMPATIBLE_VERSIONS = []
 
 
 status_messages = {
@@ -495,11 +495,19 @@ class MSMContext(CommonContext):
     custom_basket_time: Any
     enable_b_points: Any
     b_points_win: Any
-    v_points_win: Any
+    b_period: Any
+
     custom_dodge_time: Any
+    d_period: Any
+    d_max_health: Any
+
+    v_points_win: Any
+    v_period: Any
+
     custom_hockey_time: Any
     enable_h_points: Any
     h_points_win: Any
+    h_period: Any
 
     # Sanity stuff
     character_sanity: Any
@@ -529,6 +537,7 @@ class MSMContext(CommonContext):
         self.handled_gecko_codes = False
         self.game_session_active = False
         self.active_game_version = None
+        self.custom_health_handled = False
         self.unlocked_sports_mix = False
 
         self.one_time_running = False
@@ -636,14 +645,20 @@ class MSMContext(CommonContext):
             self.custom_basket_time = self.slot_data.get("basket_time")
             self.enable_b_points = self.slot_data.get("enable_b_points_win")
             self.b_points_win = self.slot_data.get("b_points_win")
-
-            self.v_points_win = self.slot_data.get("v_points_win")
+            self.b_period = self.slot_data.get("b_period")
 
             self.custom_dodge_time = self.slot_data.get("dodge_time")
+            self.d_period = self.slot_data.get("d_period")
+            self.d_max_health = self.slot_data.get("d_max_health")
+
+
+            self.v_points_win = self.slot_data.get("v_points_win")
+            self.v_period = self.slot_data.get("v_period")
 
             self.custom_hockey_time = self.slot_data.get("hockey_time")
             self.enable_h_points = self.slot_data.get("enable_h_points_win")
             self.h_points_win = self.slot_data.get("h_points_win")
+            self.h_period = self.slot_data.get("h_period")
 
 
             # Sanity Data
@@ -768,6 +783,11 @@ class MSMContext(CommonContext):
         self.game_interface.current_tournament = None
         self.game_session_active = game_active
         self.active_game_version = dc.GAME_VERSION if game_active else None
+
+        if game_active and self.game_interface.check_sport() == "Dodgeball" and self.custom_health_handled:
+            pass
+        else:
+            self.custom_health_handled = False
 
     def reset_local_item_state(self, clear_received: bool = False) -> None:
         if clear_received:
@@ -1305,8 +1325,10 @@ class MSMContext(CommonContext):
                 self.debug_log("Sports Mix unlocked by Sports Mix item")
 
         elif self.sports_mix_unlock == 1:
-            if ("Sports Crystal: Red" and "Sports Crystal: Green" and "Sports Crystal: Yellow" and
-                    "Sports Crystal: Blue") in self.unlocked_sports_crystals:
+            required_items = ["Sports Crystal: Red", "Sports Crystal: Green", "Sports Crystal: Yellow",
+                              "Sports Crystal: Blue"]
+            # If all elements in required_items are in self.unlocked_sports_crystals
+            if all([crystal in required_items for crystal in self.unlocked_sports_crystals]):
                 self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 self.debug_log("Sports Mix unlocked by Sports Crystals")
@@ -1830,6 +1852,7 @@ class MSMContext(CommonContext):
         await self.set_custom_timer()
         await self.set_period_amount()
         await self.has_points_win()
+        await self.set_custom_dodge_health()
 
     def get_default_time(self):
         """Gets the default option value corresponding to the default timer value for the sport"""
@@ -1906,8 +1929,22 @@ class MSMContext(CommonContext):
             self.debug_log(f"Custom timer set to {new_time}")
 
     async def set_period_amount(self):
-        """Sets the amount of periods in the match according to the player's option.
-        This will make it so that the player and opponent have tied the previous periods. - THEORY NEEDS TESTING"""
+        """Sets the amount of periods/sets in the match according to the player's option"""
+
+        sport = self.game_interface.check_sport()
+
+        sport_to_var = {
+            "Basketball": self.b_period,
+            "Dodgeball": self.d_period,
+            "Volleyball": self.v_period,
+            "Hockey": self.h_period
+        }
+        addr = get_address(MatchAddresses.max_periods)
+        target_value = sport_to_var.get(sport)
+        current_value = self.game_interface.dolphin_client.read_byte(addr)
+
+        if current_value != target_value:
+            self.game_interface.dolphin_client.write_byte(addr, target_value)
 
     async def has_points_win(self):
         """Check if the player has scored the required amount of points to win the period/set"""
@@ -1931,11 +1968,23 @@ class MSMContext(CommonContext):
                 if curr_player_score >= self.b_points_win or curr_opp_score >= self.b_points_win:
                     self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0)
 
+    async def set_custom_dodge_health(self):
+        """Sets the custom health in dodgeball"""
+        sport = self.game_interface.check_sport()
+
+        if sport == "Dodgeball":
+            if self.ready_to_handle() and not self.custom_health_handled:
+                self.game_interface.dolphin_client.write_word(PlayerAddresses.dodge_max_health, self.d_max_health)
+                self.game_interface.dolphin_client.write_word(OpponentAddresses.dodge_max_health, self.d_max_health)
+                self.custom_health_handled = True
+
+
 
     # === Goal/Boss Stuff ===
 
 
-    # Need to wait until AtLeast gets put into AP 0.6.8
+    # Need to wait until AtLeast gets put into AP 0.6.8 + Find a way to stop vanilla unlocks without disrupting this
+    # goal condition
     # async def has_cup_goaled(self):
     #     cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball, CupsWonMultiple.Volleyball,
     #                           CupsWonMultiple.Hockey]
@@ -2724,19 +2773,32 @@ class MSMContext(CommonContext):
                     logger.error(f"Sync Task Error:\n{traceback.format_exc()}")
                 await asyncio.sleep(3)
 
-    async def stop_stupid_games_played_notifs(self):
+    async def stop_stupid_unlock_notifs(self):
         """Stop SOME of the unlock messages from appearing constantly"""
+        games_played_address_list = [GamesPlayed.basketball, GamesPlayed.dodgeball,
+                                     GamesPlayed.volleyball, GamesPlayed.hockey]
 
-        basket_played = BasketballAddresses.games_played
-        dodge_played = DodgeballAddresses.games_played
-        volley_played = VolleyballAddresses.games_played
-        hockey_played = HockeyAddresses.games_played
-        address_list = [basket_played, dodge_played, volley_played, hockey_played]
+        cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball,
+                              CupsWonMultiple.Volleyball, CupsWonMultiple.Hockey]
 
-        for address in address_list:
-            value = self.game_interface.dolphin_client.read_word(address)
+        for address in games_played_address_list:
+            new_addr = get_address(address)
+            value = self.game_interface.dolphin_client.read_word(new_addr)
             if value != 0:
-                self.game_interface.dolphin_client.write_word(address, 0)
+                self.game_interface.dolphin_client.write_word(new_addr, 0)
+
+        for sport_class in cups_won_addresses:
+            for name, address in vars(sport_class).items():
+                # Ignore hidden system attributes (like __module__)
+                if name.startswith("__"):
+                    continue
+
+                new_addr = get_address(address)
+                value = self.game_interface.dolphin_client.read_word(new_addr)
+
+                if value != 0:
+                    self.game_interface.dolphin_client.write_word(new_addr, 0)
+
 
     async def handle_gecko_codes(self):
         """Handle the gecko code patches for each region"""
@@ -2824,6 +2886,7 @@ class MSMContext(CommonContext):
 
         self.handled_gecko_codes = False
         self.handled_custom_timer = False
+        self.custom_health_handled = False
         
         await asyncio.sleep(0.1)
 
@@ -2834,7 +2897,7 @@ class MSMContext(CommonContext):
 
         await self.handle_received_items()
         await self.check_pending_tournament_location()
-        await self.stop_stupid_games_played_notifs()
+        await self.stop_stupid_unlock_notifs()
 
 
         await self.handle_gecko_codes()
@@ -2846,6 +2909,7 @@ class MSMContext(CommonContext):
 
         self.forced_item_id = None
         self.handled_custom_timer = False
+        self.custom_health_handled = False
 
         self.in_tournament_match = False
         self.boss_hp_handled = False

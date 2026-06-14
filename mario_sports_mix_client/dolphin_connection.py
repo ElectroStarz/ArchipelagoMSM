@@ -5,7 +5,6 @@ import psutil
 import dolphin_memory_engine as dme
 import asyncio
 
-
 GAME_VERSION = None
 
 class DolphinException(Exception):

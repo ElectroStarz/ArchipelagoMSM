@@ -4,6 +4,7 @@ class MatchAddresses:
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_stage = 0x8047888E  # String | Uses -0xF20
     current_period = 0x804D77CC # Byte | Starts at 0
+    max_periods = 0x804D77CB # Byte # Uses normal 1, 2, 3, 4 & 5
     current_module = 0x804D1154 # Word
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
@@ -42,6 +43,12 @@ class CupsWonMultiple:
         flower_cup = 0x90229A7E
         star_cup = 0x90229A80
 
+class GamesPlayed:
+    basketball = 0x902299AC # Word
+    dodgeball = 0x90229A34 # Word
+    volleyball = 0x902299F0 # Word
+    hockey = 0x90229A78  # Word
+
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
 
@@ -57,6 +64,7 @@ class PlayerAddresses:
     costume_3 = 0x804D7814  # Byte
 
     dodge_damage = 0x805C1C70 # Word
+    dodge_max_health = 0x804D78D0 # Word
 
     # Following 3 are bytes | 1 = True, 0 = False
     is_cpu = 0x805C1B50
@@ -78,6 +86,7 @@ class PlayerAddresses:
 
 class OpponentAddresses:
     item_held = 0x804D78A0 # Word
+    dodge_max_health = 0x804D78D4 # Word
 
     # Score and coins
     class Score:
@@ -89,7 +98,6 @@ class OpponentAddresses:
         score_period_5 = 0x804D7E3C # Word
 
 class BasketballAddresses:
-    games_played = 0x902299AC # Word
     time = 0x804D9977 # Byte
 
     class Tournament:
@@ -126,7 +134,6 @@ class BasketballAddresses:
         black_mage = 0x90226949
 
 class DodgeballAddresses:
-    games_played = 0x90229A34 # Word
     time = 0x804D99AB # Byte
 
     class Tournament:
@@ -163,7 +170,6 @@ class DodgeballAddresses:
         black_mage = 0x90226BC9
 
 class VolleyballAddresses:
-    games_played = 0x902299F0 # Word
     last_held = 0x804D0F98 # Word
 
     throw_timer = 0x805C1B50 # Word
@@ -203,7 +209,6 @@ class VolleyballAddresses:
         black_mage = 0x90226A89
 
 class HockeyAddresses:
-    games_played = 0x90229A78 # Word
     time = 0x804D99CB #Byte
 
     class Tournament:
