@@ -251,6 +251,7 @@ class BPeriod(Range):
     display_name = "Period Amount"
     range_start = 1
     range_end = 10
+    default = 2
 
 # --- Dodgeball ---
 class DodgeTime(Choice):
@@ -280,6 +281,7 @@ class DPeriod(Range):
     display_name = "Period Amount"
     range_start = 1
     range_end = 10
+    default = 2
 
 class DMaxHealth(Choice):
     """How much health should everyone have?"""
@@ -289,6 +291,7 @@ class DMaxHealth(Choice):
     option_200 = 200
     option_250 = 250
     option_300 = 300
+    default = 100
 
 # --- Volleyball ---
 class VPointsToWin(Range):
@@ -304,6 +307,7 @@ class VPeriod(Range):
     display_name = "Set Amount"
     range_start = 1
     range_end = 10
+    default = 2
 
 # --- Hockey ---
 class HockeyTime(Choice):
@@ -345,6 +349,7 @@ class HPeriod(Range):
     display_name = "Period Amount"
     range_start = 1
     range_end = 10
+    default = 2
 
 msm_option_groups = [
     OptionGroup("Game Options", [
