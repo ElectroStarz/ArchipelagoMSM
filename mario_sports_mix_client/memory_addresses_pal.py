@@ -8,10 +8,12 @@ class MatchAddresses:
     current_module = 0x804D1154 # Word
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
-    exhibition_diff = 0x804D77D3 # Byte | Normal Mushroom Cup seems to use Easy
+    exhibition_diff = 0x804D77D3 # Byte
+    ex_diff_on_menu = 0x80B3B16F # Byte
     paused = 0x804D069B # Byte
     cutscene_on = 0x805C1999 # Byte
     loading_screen_active = 0x804D8354  # Word
+    set_break = 0x804D1178 # Word
     game_speed = 0x804D77F4 # Float
 
     shot_clock = 0x804D77F0  # Float
@@ -51,6 +53,7 @@ class GamesPlayed:
 
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
+    various_ball_pointers = 0x804D0F98 # Word
 
     special_meter = 0x804D0F8C # Float
 
@@ -66,7 +69,6 @@ class PlayerAddresses:
     dodge_damage = 0x805C1C70 # Word
     dodge_max_health = 0x804D78D0 # Word
 
-    # Following 3 are bytes | 1 = True, 0 = False
     is_cpu = 0x805C1B50
 
 
@@ -254,6 +256,11 @@ class SportsMixAddresses:
 class Offsets:
     class Match:
         current_module_offsets = [0x1F5]
+        set_break_offsets = [0x94]
+
+    class VBP: # Various Ball Pointers
+        item_ball = [0x18, 0x2D] # B+H+V: 0 = Regular, 1 = Item | D: 1= Regular, 2 = Item
+        v_last_held_offsets = [0x24, 0x214, 0x134]
 
     class Player:
         special_meter_offsets = [0x10,0x10C]
@@ -261,36 +268,35 @@ class Offsets:
 
         class B1:
             dodge_damage = [0x1F4]
+            is_cpu = [0x54, 0x0, 0x6F]
             class Position:
                 x_offsets = [0x54,0x0,0x90,0x98]
                 y_offsets = [0x54,0x0,0x90,0x9C]
                 z_offsets = [0x54,0x0,0x90,0xA0]
                 rotation_offsets = [0x54,0x0,0x90,0xB4]
-                is_cpu = [0x54, 0x0, 0x6F]
 
 
         class B2:
             dodge_damage = [0x1FC]
+            is_cpu = [0x54, 0x8, 0x6F]
             class Position:
                 x_offsets = [0x54,0x8,0x90,0x98]
                 y_offsets = [0x54,0x8,0x90,0x9C]
                 z_offsets = [0x54,0x8,0x90,0xA0]
                 rotation_offsets = [0x54,0x8,0x90,0xB4]
-                is_cpu = [0x54, 0x8, 0x6F]
 
 
         class B3:
             dodge_damage = [0x204]
+            is_cpu = [0x54, 0x10, 0x6F]
             class Position:
                 x_offsets = [0x54,0x10,0x90,0x98]
                 y_offsets = [0x54,0x10, 0x90,0x9C]
                 z_offsets = [0x54,0x10,0x90,0xA0]
                 rotation_offsets = [0x54,0x10,0x90,0xB4]
-                is_cpu = [0x54, 0x10, 0x6F]
 
 
     class Volleyball:
-        last_held_offsets = [0x24, 0x214, 0x134]
 
         class ThrowTimeOffsets:
             b1 = [0x54,0x0,0x90,0x1B4]

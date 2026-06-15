@@ -45,15 +45,13 @@ async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, 
             self.game_interface.dolphin_client.write_byte(address, target_value)
 
 
-def unlock_ex_tabs(self):
+def unlock_ex_tabs():
     """Unlocks all the exhibition tabs by setting their value to 15"""
     target_value = 15
 
     for sport in sports_addresses:
         new_addr = get_address(sport.Exhibition.tabs)
-        current_value = self.game_interface.dolphin_client.read_byte(new_addr)
-        if current_value != target_value:
-            dme.write_byte(new_addr, target_value)
+        dme.write_byte(new_addr, target_value)
 
 
 def lock_all_cups():

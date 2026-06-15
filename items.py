@@ -53,14 +53,14 @@ sport_items = {
 }
 
 sports_mix_item = {
-    "Sports Mix": ItemData(base_id + 4, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS),
+    "Sports Mix": ItemData(base_id + 5, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS),
 }
 
 ex_difficulties = {
-    "Exhibition Easy": ItemData(base_id + 5, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Normal": ItemData(base_id + 6, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Hard": ItemData(base_id + 7, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Expert": ItemData(base_id + 8, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Easy": ItemData(base_id + 6, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Normal": ItemData(base_id + 7, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Hard": ItemData(base_id + 8, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Expert": ItemData(base_id + 9, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
 }
 
 # Cups / Tournaments (100 range)
@@ -220,12 +220,17 @@ traps = {
     "Freeze Character 3 Trap": ItemData(base_id + 805, IC.trap, ItemGroup.TRAPS),
     "Fast Trap": ItemData(base_id + 806, IC.trap, ItemGroup.TRAPS),
     "Slow Trap": ItemData(base_id + 807, IC.trap, ItemGroup.TRAPS),
+    "Teleport Character 1 Trap": ItemData(base_id + 808, IC.trap, ItemGroup.TRAPS),
+    "Teleport Character 2 Trap": ItemData(base_id + 809, IC.trap, ItemGroup.TRAPS),
+    "Teleport Character 3 Trap": ItemData(base_id + 810, IC.trap, ItemGroup.TRAPS),
+    "Swap Trap": ItemData(base_id + 811, IC.trap, ItemGroup.TRAPS),
 }
 
 # Put all into a table
 item_table: Dict[str, ItemData] = {
     **sport_items,
     **sports_mix_item,
+    **ex_difficulties,
     **basketball_items_n,
     **basketball_items_h,
     **dodgeball_items_n,
@@ -335,9 +340,11 @@ def create_all_items(world: "MSMWorld") -> None:
             itempool.append(new_item)
 
     # Exhibition Difficulty Items
-    for difficulty in world.options.exhibition_difficulty.value:
-        new_item = world.create_item(f"Exhibition {difficulty}")
-        itempool.append(new_item)
+    selected_difficulties = world.options.exhibition_difficulty.value
+
+    for difficulty in ["Easy", "Normal", "Hard", "Expert"]:
+        if difficulty in selected_difficulties:
+            itempool.append(world.create_item(f"Exhibition {difficulty}"))
 
 
     # Start with sports option
@@ -364,18 +371,16 @@ def create_all_items(world: "MSMWorld") -> None:
             for crystal_name in sports_crystals:
                 new_item = world.create_item(crystal_name)
                 world.push_precollected(new_item)
-
     else:
         for name in sport_items:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-            if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-                sports_mix = world.create_item("Sports Mix")
-                itempool.append(sports_mix)
-            elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
-                for crystal_name in sports_crystals:
-                    new_item = world.create_item(crystal_name)
-                    itempool.append(new_item)
+            itempool.append(world.create_item(name))
+
+        if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
+            itempool.append(world.create_item("Sports Mix"))
+
+        elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
+            for crystal_name in sports_crystals:
+                itempool.append(world.create_item(crystal_name))
 
 
     # Start with mushroom cup option

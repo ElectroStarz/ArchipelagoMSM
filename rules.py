@@ -116,7 +116,6 @@ def set_all_rules(world: MSMWorld) -> None:
 # Includes exhibitions, tournaments, and goal locations
 
 def set_all_location_rules(world: MSMWorld) -> None:
-    stage_rules = {item: Has(item) for item in STAGES}
 
     # Exhibition mode rules
     # Automatically generates every enabled difficulty
@@ -127,7 +126,8 @@ def set_all_location_rules(world: MSMWorld) -> None:
         for sport, stages in EXHIBITION_RULES.items():
             for stage in stages:
                 location = world.get_location(f"{sport} Ex: Beat {stage} ({difficulty})")
-                world.set_rule(location, stage_rules[stage])
+                diff_item = f"Exhibition {difficulty}"
+                world.set_rule(location, HasAll(stage, diff_item))
 
     # Tournament cup rules
     # Each round progressively requires more stages
@@ -146,15 +146,22 @@ def set_all_location_rules(world: MSMWorld) -> None:
                 for i in range(1, 4):
                     needed = stages[:i]
                     rule = Has("") if not needed else HasAll(*needed)
-                    location = world.get_location(
-                        f"{sport}: Beat {difficulty} {cup} Cup Round {i}"
-                    )
+                    location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
                     world.set_rule(location, rule)
 
+
+    # Sports Mix Locations
     for cup in ["Mushroom", "Flower", "Star"]:
         for i in range(1, 4):
-            location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
-            rule = HasAny(*STAGES)
+            if cup == "Star" and i == 3:
+                cup_item = f"Sports Mix: Star Cup"
+                location = world.get_location("Sports Mix: Beat Star Cup Round 3")
+                rule = Has("Star Ship") & Has(cup_item)
+            else:
+                cup_item = f"Sports Mix: {cup} Cup"
+                location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
+                rule = HasAny(*STAGES) & Has(cup_item)
+
             world.set_rule(location, rule)
 
 
