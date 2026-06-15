@@ -1412,7 +1412,7 @@ class MSMContext(CommonContext):
                 elif rule["type"] == "sm":
                     if rule["value"] not in self.unlocked_cups:
                         self.unlocked_cups.append(rule["value"])
-                        logger.info(f"Progressive Cup level up! Unlocked: {formatted_name}")
+                        logger.info(f"Progressive Cup level up! Unlocked: {rule["value"]}")
 
 
     # === Sports Mix ===
