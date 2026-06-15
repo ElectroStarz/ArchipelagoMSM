@@ -363,10 +363,10 @@ class MSMCommandProcessor(ClientCommandProcessor):
 
     def unlocked_stages(self):
         """Display what stages you have unlocked."""
-        unlocked_stages = self.ctx.unlocked_stages
+        unlocked_courts = self.ctx.unlocked_courts
         final_items = []
-        if unlocked_stages:
-            for item in unlocked_stages:
+        if unlocked_courts:
+            for item in unlocked_courts:
                 final_items.append(item)
             logger.info(f"Unlocked Stages: {final_items}")
         else:
@@ -476,6 +476,8 @@ class MSMContext(CommonContext):
 
     slot_data: Dict[str, Utils.Any] = {}
     sports_mix_unlock: Any = int
+    court_unlock_type: Any = int
+    cup_unlock_type: Any = int
     behemoth_hp: Any = float
     behemoth_king_hp: Any = float
     is_behemoth = False
@@ -523,11 +525,11 @@ class MSMContext(CommonContext):
 
     def __init__(self, server_address: str, password: str):
         super().__init__(server_address, password)
-        self._last_identity_check_time = None
+        self.last_identity_check_time = 0.0
         self.game_interface = MSMInterface(logger)
         self.command_processor.ctx = self
         self.items_received = []
-        self.items_handled = []
+        self.items_handled = set()
         self.seed: Optional[str] = None
 
         # AP gives every received item a position/index in the received item list.
@@ -569,8 +571,10 @@ class MSMContext(CommonContext):
         self.unlocked_sports = []
         self.unlocked_cups = []
         self.unlocked_ex_diffs = []
+        self.progressive_courts = []
+        self.progressive_cups = []
         self.unlocked_sports_crystals = []
-        self.unlocked_stages = []
+        self.unlocked_courts = []
         self.unlocked_characters = []
         self.unlocked_costumes = []
         self.unlocked_panel_items = []
@@ -651,6 +655,8 @@ class MSMContext(CommonContext):
             self.exhibition_difficulties = self.slot_data.get("exhibition_difficulty")
             self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty")
             self.sports_mix_unlock = self.slot_data.get("sports_mix_unlock")
+            self.court_unlock_type = self.slot_data.get("court_unlock_type")
+            self.cup_unlock_type = self.slot_data.get("cup_unlock_type")
 
             # Deathlink Data
             self.deathlink_enabled = self.slot_data.get("deathlink")
@@ -816,9 +822,10 @@ class MSMContext(CommonContext):
         self.items_handled.clear()
         self.unlocked_sports.clear()
         self.unlocked_ex_diffs.clear()
+        self.progressive_courts.clear()
         self.unlocked_cups.clear()
         self.unlocked_sports_crystals.clear()
-        self.unlocked_stages.clear()
+        self.unlocked_courts.clear()
         self.unlocked_characters.clear()
         self.unlocked_costumes.clear()
         self.unlocked_panel_items.clear()
@@ -1079,10 +1086,10 @@ class MSMContext(CommonContext):
         ability_tuple = ("Special Meter", )
 
 
-        for network_item in self.items_received:
+        for index, network_item in enumerate(self.items_received):
             item_id = network_item.item
             item_name = id_to_name.get(item_id)
-            if network_item not in self.items_handled:
+            if index not in self.items_handled:
                 if item_name is None:
                     continue
 
@@ -1100,13 +1107,21 @@ class MSMContext(CommonContext):
                     self.unlocked_ex_diffs.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_ex_diffs")
 
+                elif item_name == "Progressive Cup":
+                    self.progressive_cups.append(item_name)
+                    self.debug_log(f"Added {item_name} to progressive_cups")
+
+                elif item_name == "Progressive Court":
+                    self.progressive_courts.append(item_name)
+                    self.debug_log(f"Added {item_name} to progressive_courts")
+
                 elif item_name.startswith("Sports Crystal:"):
                     self.unlocked_sports_crystals.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
 
                 elif item_name in stages_tuple:
-                    self.unlocked_stages.append(item_name)
-                    self.debug_log(f"Added {item_name} to unlocked_stages")
+                    self.unlocked_courts.append(item_name)
+                    self.debug_log(f"Added {item_name} to unlocked_courts")
 
                 elif item_name in characters_tuple:
                     self.unlocked_characters.append(item_name)
@@ -1124,15 +1139,21 @@ class MSMContext(CommonContext):
                     self.unlocked_abilities.append(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_abilities")
 
-                self.items_handled.append(network_item)
+                self.items_handled.add(index)
 
 
         # Cups / Sports Mix
         await self.handle_cup_unlocks()
+        if self.cup_unlock_type == 1:
+            await self.handle_progressive_cup_unlocks()
+
         await self.handle_sports_mix_unlock()
 
-        # Stages
-        await self.handle_stage_unlocks()
+        # Courts
+        await self.handle_court_unlocks()
+
+        if self.court_unlock_type == 1:
+            await self.handle_progressive_court_unlocks()
 
         # Characters
         await self.handle_all_characters()
@@ -1341,6 +1362,58 @@ class MSMContext(CommonContext):
             new_addr = get_address(address)
             self.game_interface.dolphin_client.write_byte(new_addr, final_value)
 
+    async def handle_progressive_cup_unlocks(self):
+        # Base Normal progression configuration (Tiers 1-3)
+        cup_unlock_order = [
+            {"type": "sport", "suffix": "Mushroom Cup (Normal)"},
+            {"type": "sport", "suffix": "Flower Cup (Normal)"},
+            {"type": "sport", "suffix": "Star Cup (Normal)"},
+        ]
+
+        # Change this variable if Hard mode is on
+        hard_enabled = self.hard_tournament_difficulty == True
+
+        if hard_enabled:
+            # Pushes Hard mode tournaments to Tiers 4-6
+            cup_unlock_order.extend([
+                {"type": "sport", "suffix": "Mushroom Cup (Hard)"},
+                {"type": "sport", "suffix": "Flower Cup (Hard)"},
+                {"type": "sport", "suffix": "Star Cup (Hard)"},
+            ])
+            # Places Sports Mix at Tiers 7-9
+            cup_unlock_order.extend([
+                {"type": "sm", "value": "Sports Mix: Mushroom Cup"},
+                {"type": "sm", "value": "Sports Mix: Flower Cup"},
+                {"type": "sm", "value": "Sports Mix: Star Cup"},
+            ])
+        else:
+            # Places Sports Mix right after Normal tournaments at Tiers 4-6
+            cup_unlock_order.extend([
+                {"type": "sm", "value": "Sports Mix: Mushroom Cup"},
+                {"type": "sm", "value": "Sports Mix: Flower Cup"},
+                {"type": "sm", "value": "Sports Mix: Star Cup"},
+            ])
+
+        sports_list = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
+        progressive_count = len(self.progressive_cups)
+
+        # Iterate up to the current total of items held
+        for index in range(progressive_count):
+            if index < len(cup_unlock_order):
+                rule = cup_unlock_order[index]
+
+                if rule["type"] == "sport":
+                    for sport in sports_list:
+                        formatted_name = f"{sport}: {rule['suffix']}"
+                        if formatted_name not in self.unlocked_cups:
+                            self.unlocked_cups.append(formatted_name)
+                            logger.info(f"Progressive Cup level up! Unlocked: {formatted_name}")
+
+                elif rule["type"] == "sm":
+                    if rule["value"] not in self.unlocked_cups:
+                        self.unlocked_cups.append(rule["value"])
+                        logger.info(f"Progressive Cup level up! Unlocked: {formatted_name}")
+
 
     # === Sports Mix ===
 
@@ -1366,7 +1439,7 @@ class MSMContext(CommonContext):
     # === Exhibition Unlocks ===
 
 
-    async def handle_stage_unlocks(self):
+    async def handle_court_unlocks(self):
         # Link variables to the address in the correct class
         # Basketball
         b_mushroom = BasketballAddresses.Exhibition.mushroom_cup
@@ -1424,17 +1497,17 @@ class MSMContext(CommonContext):
 
             # First Stage
             # If the first stage is in unlocked stages, add 1
-            if stage[0] in self.unlocked_stages:
+            if stage[0] in self.unlocked_courts:
                 value += 1
 
             # Second Stage
             # If the second stage is in unlocked stages, add 2
-            if stage[1] in self.unlocked_stages:
+            if stage[1] in self.unlocked_courts:
                 value += 2
 
             # Third Stage
             # If the third stage is in unlocked stages, add 4
-            if stage[2] in self.unlocked_stages:
+            if stage[2] in self.unlocked_courts:
                 value += 4
 
             # If no stages are unlocked (value is 0) or the difficulty isn't unlocked, set final_value to 8 which locks
@@ -1446,6 +1519,43 @@ class MSMContext(CommonContext):
 
             new_addr = get_address(address)
             self.game_interface.dolphin_client.write_byte(new_addr, final_value)
+
+    async def handle_progressive_court_unlocks(self):
+
+        # The order the stages will unlock, from first to last
+        court_unlock_order = [
+            "Mario Stadium",
+            "Koopa Troopa Beach",
+            "Toad Park",
+            "DK Dock",
+            "Peach's Castle",
+            "Daisy Garden",
+            "Luigi's Mansion",
+            "Wario Factory",
+            "Bowser Jr. Blvd.",
+            "Bowser's Castle",
+            "Waluigi Pinball",
+            "Western Junction",
+            "Ghoulish Galleon",
+            "Star Ship",
+            "Behemoth Stage"
+        ]
+
+        # Count how many total Progressive Stage items the server has sent us
+        progressive_count = len(self.progressive_courts)
+
+        # 2. Iterate through our ordered list up to the number of stages we have unlocked
+        for index in range(progressive_count):
+            # Safety check to prevent index errors if extra progressive items are somehow received
+            if index >= len(court_unlock_order):
+                break
+
+            target_stage = court_unlock_order[index]
+
+            # Add to our active unlock list if it isn't already there
+            if target_stage not in self.unlocked_courts:
+                self.unlocked_courts.append(target_stage)
+                logger.info(f"Progressive Court level up! Unlocked: {target_stage}")
 
     def has_unlocked_difficulty(self):
         """Checks if the difficulty selected is unlocked. If not, stops all the stages from showing"""
@@ -2153,7 +2263,7 @@ class MSMContext(CommonContext):
         else:
             boss = None
 
-        if required_stage in self.unlocked_stages:
+        if required_stage in self.unlocked_courts:
             return
 
         if boss is None:
@@ -2381,12 +2491,12 @@ class MSMContext(CommonContext):
         else:
             required_cup = f"{sport}: {cup} ({difficulty})"
 
-        if required_stage in self.unlocked_stages and required_cup in self.unlocked_cups:
+        if required_stage in self.unlocked_courts and required_cup in self.unlocked_cups:
             return
 
-        if required_stage not in self.unlocked_stages and required_cup not in self.unlocked_cups:
+        if required_stage not in self.unlocked_courts and required_cup not in self.unlocked_cups:
             logger.info(f"Blocked points for {sport} {cup} Round {round_number}. Missing {required_stage} & {required_cup}")
-        elif required_stage not in self.unlocked_stages:
+        elif required_stage not in self.unlocked_courts:
             logger.info(f"Blocked points for {sport} {cup} Round {round_number}. Missing {required_stage}")
         elif required_cup not in self.unlocked_cups:
             logger.info(f"Blocked points for {sport} {cup}. Missing {required_cup}")
@@ -2765,7 +2875,7 @@ class MSMContext(CommonContext):
         """The main loop managing the connection to Dolphin and game-state logic routing"""
 
         if not hasattr(self, "_last_identity_check_time"):
-            self._last_identity_check_time = 0.0
+            self.last_identity_check_time = 0.0
 
         while not self.exit_event.is_set():
             try:
@@ -2783,8 +2893,8 @@ class MSMContext(CommonContext):
 
                     # --- FUNCTION-BASED HEARTBEAT CHECK ---
                     current_time = time.time()
-                    if current_time - self._last_identity_check_time > 4.0:
-                        self._last_identity_check_time = current_time
+                    if current_time - self.last_identity_check_time > 4.0:
+                        self.last_identity_check_time = current_time
 
                         # Call the identity function verification
                         if not self.verify_game_identity():

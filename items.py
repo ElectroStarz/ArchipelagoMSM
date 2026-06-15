@@ -24,6 +24,9 @@ class ItemGroup(str, Enum):
 
     SPORTS_MIX_CUPS = "Sports Mix Cups"
 
+    PROGRESSIVE_CUPS = "Progressive Cups"
+    PROGRESSIVE_COURTS = "Progressive Courts"
+
     EXHIBITION_DIFFICULTIES = "Exhibition Difficulties"
 
     SPORTS = "Sports"
@@ -126,8 +129,8 @@ sports_crystals = {
     "Sports Crystal: Blue": ItemData(base_id + 204, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
 }
 
-# Stages (300 range)
-individual_stages = {
+# Courts (300 range)
+individual_courts = {
     "Mario Stadium": ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
     "Koopa Troopa Beach": ItemData(base_id + 302, IC.progression, ItemGroup.COURTS),
     "Peach's Castle": ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
@@ -143,6 +146,11 @@ individual_stages = {
     "Star Ship": ItemData(base_id + 313, IC.progression, ItemGroup.COURTS),
     "Western Junction": ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
     "Behemoth Stage": ItemData(base_id + 315, IC.progression_skip_balancing, ItemGroup.COURTS),
+}
+
+progressive_items = {
+    "Progressive Court": ItemData(base_id + 316, IC.progression, ItemGroup.PROGRESSIVE_COURTS),
+    "Progressive Cup": ItemData(base_id + 317, IC.progression, ItemGroup.PROGRESSIVE_CUPS),
 }
 
 # Characters (400 range)
@@ -241,7 +249,8 @@ item_table: Dict[str, ItemData] = {
     **hockey_items_h,
     **sports_mix_cups,
     **sports_crystals,
-    **individual_stages,
+    **individual_courts,
+    **progressive_items,
     **characters,
     **character_costumes,
     **unlockable_panel_items,
@@ -383,255 +392,10 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(world.create_item(crystal_name))
 
 
-    # Start with mushroom cup option
-    if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_normal_difficulty:
-        norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
-                           "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
-        for name in norm_mush_items:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
+    create_cups(world, itempool)
 
-        mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
-        for name in mush_stages:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
-
-        # Basketball
-        # Create items that aren't in precollected
-        for name in basketball_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        # Dodgeball
-        for name in dodgeball_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        # Volleyball
-        for name in volleyball_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        # Hockey
-        for name in hockey_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-
-        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
-            # Basketball Hard items
-            for name in basketball_items_h:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-            # Dodgeball Hard items
-            for name in dodgeball_items_h:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-            # Volleyball Hard items
-            for name in volleyball_items_h:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-            # Hockey Hard items
-            for name in hockey_items_h:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-
-        # Create items for actual stages
-        other_stages = ["Luigi's Mansion","Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
-                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
-
-        for name in other_stages:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-    elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_hard_difficulty:
-        hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
-                           "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
-        for name in hard_mush_items:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
-
-        mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
-        for name in mush_stages:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
-
-        # Basketball
-        for name in basketball_items_n:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-        # Dodgeball
-        for name in dodgeball_items_n:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-        # Volleyball
-        for name in volleyball_items_n:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-        # Hockey
-        for name in hockey_items_n:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-
-        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
-            # Basketball Hard items
-            for name in basketball_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-            # Dodgeball Hard items
-            for name in dodgeball_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-            # Volleyball Hard items
-            for name in volleyball_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-            # Hockey Hard items
-            for name in hockey_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-
-        # Create items for actual stages
-        other_stages = ["Luigi's Mansion","Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
-                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
-
-        for name in other_stages:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-    elif world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both:
-        # Push mushroom cups to precollected
-        norm_mush_items = ["Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
-                           "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"]
-        for name in norm_mush_items:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
-
-        hard_mush_items = ["Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
-                           "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"]
-        for name in hard_mush_items:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
-
-        # Push stages to do with mushroom cup to precollected
-        mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
-        for name in mush_stages:
-            new_item = world.create_item(name)
-            world.push_precollected(new_item)
-
-        # Create items for actual stages
-        other_stages = ["Luigi's Mansion","Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
-                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
-
-        for name in other_stages:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
-
-
-        # Create items for other items not being pushed
-        # Basketball
-        for name in basketball_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        # Dodgeball
-        for name in dodgeball_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        # Volleyball
-        for name in volleyball_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        # Hockey
-        for name in hockey_items_n:
-            if name not in norm_mush_items:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
-            # Basketball Hard items
-            for name in basketball_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-            # Dodgeball Hard items
-            for name in dodgeball_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-            # Volleyball Hard items
-            for name in volleyball_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-            # Hockey Hard items
-            for name in hockey_items_h:
-                if name not in hard_mush_items:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-
-        else:
-            # Basketball
-            for name in basketball_items_n:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-            # Dodgeball
-            for name in dodgeball_items_n:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-            # Volleyball
-            for name in volleyball_items_n:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-            # Hockey
-            for name in hockey_items_n:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
-            if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
-                # Basketball Hard items
-                for name in basketball_items_h:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-                # Dodgeball Hard items
-                for name in dodgeball_items_h:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-                # Volleyball Hard items
-                for name in volleyball_items_h:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-                # Hockey Hard items
-                for name in hockey_items_h:
-                    new_item = world.create_item(name)
-                    itempool.append(new_item)
-
-            # Stages
-            for name in individual_stages:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
-
+    # Create stages based on options
+    create_stages(world, itempool)
 
     # Calculate number of filler items needed, exclude costumes
 
@@ -644,6 +408,111 @@ def create_all_items(world: "MSMWorld") -> None:
     #print(itempool)
     world.multiworld.itempool += itempool
 
+
+def create_stages(world: "MSMWorld", itempool):
+    if world.options.court_unlock_type == CourtUnlockType.option_court_item:
+        if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
+            mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+            for name in mush_stages:
+                new_item = world.create_item(name)
+                world.push_precollected(new_item)
+
+            other_stages = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                            "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
+            for name in other_stages:
+                new_item = world.create_item(name)
+                itempool.append(new_item)
+        else:
+            for name in individual_courts:
+                item = world.create_item(name)
+                itempool.append(item)
+
+    elif world.options.court_unlock_type == CourtUnlockType.option_progressive_item:
+        total_stages = 15
+
+        if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
+            # Precollect the first 5 progressive items
+            for _ in range(5):
+                world.push_precollected(world.create_item("Progressive Court"))
+
+            # Put the remaining 10 items into the item pool
+            for _ in range(total_stages - 5):
+                itempool.append(world.create_item("Progressive Court"))
+        else:
+            # Put all 15 progressive items directly into the pool
+            for _ in range(total_stages):
+                itempool.append(world.create_item("Progressive Court"))
+
+
+def create_cups(world: "MSMWorld", itempool):
+    # --- PATH A: ALL PROGRESSIVE CUPS (INCLUDES SPORTS MIX) ---
+    if world.options.cup_unlock_type == CupUnlockType.option_progressive_item:
+        # Base: 3 Sports Mix Cups + 3 Standard Cups (Mushroom, Flower, Star)
+        total_progressive_cups = 6
+
+        # If Hard mode is enabled, add 3 more for the Hard Tournament tiers
+        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+            total_progressive_cups += 3  # Max 9 items total
+
+        start_option = world.options.start_with_mushroom_cup
+
+        # Determine how many starting levels the player gets for free
+        precollected_count = 0
+        if start_option == StartWithMushroomCup.option_normal_difficulty:
+            precollected_count = 1  # Starts with Tier 1 (Mushroom Normal)
+        elif start_option == StartWithMushroomCup.option_hard_difficulty:
+            precollected_count = 1  # Starts with Tier 1 logic level
+        elif start_option == StartWithMushroomCup.option_both:
+            precollected_count = 2  # Starts with Tier 1 and Tier 2 equivalent
+
+        # Push free starting levels to inventory
+        for _ in range(precollected_count):
+            world.push_precollected(world.create_item("Progressive Cup"))
+
+        # Fill the multiworld pool with the rest of the progressive items
+        remaining_cups = total_progressive_cups - precollected_count
+        for _ in range(remaining_cups):
+            itempool.append(world.create_item("Progressive Cup"))
+
+
+    # --- PATH B: INDIVIDUAL CUPS (MAIN 4 SPORTS ONLY) ---
+    else:
+        all_normal_items = (
+                basketball_items_n + dodgeball_items_n + volleyball_items_n + hockey_items_n
+        )
+        all_hard_items = (
+                basketball_items_h + dodgeball_items_h + volleyball_items_h + hockey_items_h
+        )
+
+        precollect_names = set()
+        start_option = world.options.start_with_mushroom_cup
+
+        if start_option in (StartWithMushroomCup.option_normal_difficulty, StartWithMushroomCup.option_both):
+            precollect_names.update([
+                "Basketball: Mushroom Cup (Normal)", "Dodgeball: Mushroom Cup (Normal)",
+                "Volleyball: Mushroom Cup (Normal)", "Hockey: Mushroom Cup (Normal)"
+            ])
+
+        if start_option in (StartWithMushroomCup.option_hard_difficulty, StartWithMushroomCup.option_both):
+            precollect_names.update([
+                "Basketball: Mushroom Cup (Hard)", "Dodgeball: Mushroom Cup (Hard)",
+                "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"
+            ])
+
+        # Push free individual starting items
+        for name in precollect_names:
+            world.push_precollected(world.create_item(name))
+
+        # Add Normal Cups to the pool
+        for name in all_normal_items:
+            if name not in precollect_names:
+                itempool.append(world.create_item(name))
+
+        # Add Hard Cups to the pool (if enabled)
+        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+            for name in all_hard_items:
+                if name not in precollect_names:
+                    itempool.append(world.create_item(name))
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification

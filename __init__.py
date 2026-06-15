@@ -133,6 +133,8 @@ class MSMWorld(World):
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
+        "court_unlock_type": self.options.court_unlock_type.value,
+        "cup_unlock_type": self.options.cup_unlock_type.value,
 
         # Sanity Stuff
         "character_sanity": self.options.character_sanity.value,

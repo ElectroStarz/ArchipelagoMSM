@@ -15,9 +15,8 @@ Will cause immediate BK if off"""
     default = 1
 
 class StartWithMushroomCup(Choice):
-    """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey? (Also unlocks related stages)
-Heavily recommended, may break some things if off"""
-    display_name = "Start with Mushroom Cup (+Stages) - READ DESCRIPTION!"
+    """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey? (Also unlocks related stages)"""
+    display_name = "Start with Mushroom Cup (+Stages)"
     option_none = 0
     option_normal_difficulty = 1
     option_hard_difficulty = 2
@@ -39,6 +38,26 @@ that difficulty
     display_name = "Exhibition Difficulty"
     valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
+
+class CourtUnlockType(Choice):
+    """How to unlock courts
+
+    **Court Item**: Each court is its own item
+    **Progressive Item**: Courts are unlocked in a certain order with progressive items"""
+    display_name = "Court Unlock Type"
+    option_court_item = 0
+    option_progressive_item = 1
+    default = 0
+
+class CupUnlockType(Choice):
+    """How to unlock cups
+
+    **Cup Item**: Each cup is its own item
+    **Progressive Item**: Cups are unlocked in a certain order with progressive items"""
+    display_name = "Court Unlock Type"
+    option_cup_item = 0
+    option_progressive_item = 1
+    default = 0
 
 class HardTournamentDifficulty(DefaultOnToggle):
     """Would you like to include location checks for Hard Tournaments?"""
@@ -355,6 +374,8 @@ msm_option_groups = [
     OptionGroup("Game Options", [
         StartWithSports,
         StartWithMushroomCup,
+        CupUnlockType,
+        CourtUnlockType,
         StartWithCharacters,
         ExhibitionDifficulty,
         HardTournamentDifficulty,
@@ -412,6 +433,8 @@ msm_option_groups = [
 class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
+    cup_unlock_type: CupUnlockType
+    court_unlock_type: CourtUnlockType
     start_with_characters: StartWithCharacters
     exhibition_difficulty: ExhibitionDifficulty
     hard_tournament_difficulty: HardTournamentDifficulty
