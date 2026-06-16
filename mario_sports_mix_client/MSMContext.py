@@ -1407,12 +1407,14 @@ class MSMContext(CommonContext):
                         formatted_name = f"{sport}: {rule['suffix']}"
                         if formatted_name not in self.unlocked_cups:
                             self.unlocked_cups.append(formatted_name)
-                            logger.info(f"Progressive Cup level up! Unlocked: {formatted_name}")
+                            self.log_once("prog_cup",
+                                          f"Progressive Cup level up! Unlocked: {rule['suffix']}", False)
 
                 elif rule["type"] == "sm":
                     if rule["value"] not in self.unlocked_cups:
                         self.unlocked_cups.append(rule["value"])
-                        logger.info(f"Progressive Cup level up! Unlocked: {rule["value"]}")
+                        self.log_once("prog_cup",
+                                      f"Progressive Cup level up! Unlocked: {rule['value']}", False)
 
 
     # === Sports Mix ===

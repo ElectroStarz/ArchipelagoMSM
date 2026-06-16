@@ -302,10 +302,7 @@ def create_all_items(world: "MSMWorld") -> None:
         new_item = world.create_item(name)
         itempool.append(new_item)
 
-    # Sports Mix Cups
-    for name in sports_mix_cups:
-        new_item = world.create_item(name)
-        itempool.append(new_item)
+
 
     # Start with random characters option
     row_1 = ["Mario", "Peach", "Wario", "Diddy Kong"]
@@ -445,7 +442,7 @@ def create_stages(world: "MSMWorld", itempool):
 
 
 def create_cups(world: "MSMWorld", itempool):
-    # --- PATH A: ALL PROGRESSIVE CUPS (INCLUDES SPORTS MIX) ---
+    # --- Progressive Cups ---
     if world.options.cup_unlock_type == CupUnlockType.option_progressive_item:
         # Base: 3 Sports Mix Cups + 3 Standard Cups (Mushroom, Flower, Star)
         total_progressive_cups = 6
@@ -475,7 +472,7 @@ def create_cups(world: "MSMWorld", itempool):
             itempool.append(world.create_item("Progressive Cup"))
 
 
-    # --- PATH B: INDIVIDUAL CUPS (MAIN 4 SPORTS ONLY) ---
+    # --- Individual Cups ---
     else:
         all_normal_items = (
                 basketball_items_n + dodgeball_items_n + volleyball_items_n + hockey_items_n
@@ -513,6 +510,11 @@ def create_cups(world: "MSMWorld", itempool):
             for name in all_hard_items:
                 if name not in precollect_names:
                     itempool.append(world.create_item(name))
+
+        # Sports Mix Cups
+        for name in sports_mix_cups:
+            new_item = world.create_item(name)
+            itempool.append(new_item)
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
