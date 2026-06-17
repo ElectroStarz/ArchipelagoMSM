@@ -54,6 +54,7 @@ class GamesPlayed:
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
     various_ball_pointers = 0x804D0F98 # Word
+    human_players = 0x804d8e14 # Byte | Is 0 in demo
 
     special_meter = 0x804D0F8C # Float
 

@@ -54,6 +54,7 @@ stage_names = {
     "s16": "Star Ship",
     "s15": "Ghoulish Galleon",
     "s17": "Western Junction",
+    "s39": "Menu",
 }
 
 tournament_round_stages = {
@@ -973,6 +974,7 @@ class MSMContext(CommonContext):
         timer = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
         cutscene_active = self.game_interface.dolphin_client.read_byte(self.addresslib.cutscene_active_addr)
         loading_screen_active = self.game_interface.dolphin_client.read_word(self.addresslib.loading_screen_addr)
+        human_players = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.human_players))
         basket_ex_timer = self.game_interface.get_basketball_time()
         dodge_ex_timer = self.game_interface.get_dodgeball_time()
         hockey_ex_timer = self.game_interface.get_hockey_time()
@@ -1061,10 +1063,15 @@ class MSMContext(CommonContext):
         else:
             is_set_break = True
 
+        if human_players == 0: # 0 = Demo
+            is_demo = True
+        else:
+            is_demo = False
+
         if timer == 0 and self.game_interface.check_sport() != "Volleyball":
             ready_game = False
 
-        if ready_game and not is_cutscene and not is_paused and not is_loading and not is_set_break:
+        if ready_game and not is_cutscene and not is_paused and not is_loading and not is_set_break and not is_demo:
             return True
         else:
             return False
@@ -1151,7 +1158,6 @@ class MSMContext(CommonContext):
 
         # Courts
         await self.handle_court_unlocks()
-
         if self.court_unlock_type == 1:
             await self.handle_progressive_court_unlocks()
 
@@ -1599,16 +1605,12 @@ class MSMContext(CommonContext):
         try:
             special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
                                                                             Offsets.Player.special_meter_offsets)
-            self.debug_log(f"Special meter pointer resolved: base={self.addresslib.p_special_meter_addr:#x}, final={special_meter:#x}")
+
             if "Special Meter" not in self.unlocked_abilities:
-                value = self.game_interface.dolphin_client.read_float(special_meter)
-                self.debug_log(f"Special meter current value: {value}")
-                if value != 0:
-                    self.game_interface.dolphin_client.write_float(special_meter, 0.0)
-                    verify_value = self.game_interface.dolphin_client.read_float(special_meter)
-                    self.debug_log(f"Changed Special Meter to 0; verify={verify_value}")
+                self.game_interface.dolphin_client.write_float(special_meter, 0.0)
+
             else:
-                self.debug_log("Special meter unlocked; not locking meter")
+                self.log_once("special_meter", "Special meter unlocked; not locking meter", True)
         except Exception as e:
             self.debug_log(f"Special meter handling failed: {e}")
 
@@ -1758,9 +1760,6 @@ class MSMContext(CommonContext):
             self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
             return
 
-        if asyncio.get_event_loop().time() < self.suppress_panel_until:
-            return
-
         # Handle Empty List
         if not self.unlocked_panel_items:
             #
@@ -1773,20 +1772,18 @@ class MSMContext(CommonContext):
 
         # Lookup Map
         item_map = {
-            "Green Shell": 0,
-            "Red Shell": 1,
-            "Mini Mushroom": 2,
-            "Bob-omb": 3,
-            "Super Star": 4,
-            "Banana": 5
+            "?-Panel: Green Shell": 0,
+            "?-Panel: Red Shell": 1,
+            "?-Panel: Mini Mushroom": 2,
+            "?-Panel: Bob-omb": 3,
+            "?-Panel: Super Star": 4,
+            "?-Panel: Banana": 5
         }
 
         # Random Selection & Execution
         random_item = random.choice(self.unlocked_panel_items)
 
-        # Extract the base name (e.g., if item is "1 Banana", get "Banana")
-        # This searches the keys of our map to find a match
-        item_id = next((val for key, val in item_map.items() if key in random_item), None)
+        item_id = item_map[random_item]
 
 
         if item_id is not None:
@@ -2065,7 +2062,8 @@ class MSMContext(CommonContext):
             return 99999
 
     async def set_custom_timer(self):
-        """Sets the custom timer depending on the sport and player's option. Electro for the love of god volleyball doesn't have a timer."""
+        """Sets the custom timer depending on the sport and player's option.
+        Volleyball doesn't have a timer."""
         new_time = None
         status = self.game_interface.match_status()
 
@@ -2101,7 +2099,6 @@ class MSMContext(CommonContext):
 
     async def set_period_amount(self):
         """Sets the amount of periods/sets in the match according to the player's option"""
-
 
         sport = self.game_interface.check_sport()
 
@@ -2150,7 +2147,6 @@ class MSMContext(CommonContext):
                 self.game_interface.dolphin_client.write_word(get_address(PlayerAddresses.dodge_max_health), self.d_max_health)
                 self.game_interface.dolphin_client.write_word(get_address(OpponentAddresses.dodge_max_health), self.d_max_health)
                 self.custom_health_handled = True
-
 
 
     # === Goal/Boss Stuff ===
@@ -2251,49 +2247,6 @@ class MSMContext(CommonContext):
                 self.debug_log(f"Behemoth King HP set to {self.behemoth_king_hp}")
                 self.boss_hp_handled = True
 
-    async def handle_lock_behemoth_hp(self):
-        """Locks the Behemoth health and Special Meter charge if in a behemoth fight without Behemoth Stage"""
-
-        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.ready_to_handle():
-            return
-
-        required_stage = "Behemoth Stage"
-        if self.is_behemoth:
-            boss = "Behemoth"
-        elif self.is_behemoth_king:
-            boss = "Behemoth King"
-        else:
-            boss = None
-
-        if required_stage in self.unlocked_courts:
-            return
-
-        if boss is None:
-            self.debug_log("Could not find boss, set to None")
-            return
-
-        self.debug_log(f"Locked points for {boss}, you do not have {required_stage}")
-
-        try:
-            self.lock_behemoth_hp()
-            self.lock_special_meter()
-        finally:
-            pass
-
-    def lock_behemoth_hp(self):
-        """Function to lock Behemoth Health, called in handle_lock_behemoth_hp"""
-
-        behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                                         Offsets.Boss.behemoth_hp_offsets)
-        value = self.game_interface.dolphin_client.read_float(behemoth_hp)
-        if self.is_behemoth:
-            if value != self.behemoth_hp:
-                self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
-
-        if self.is_behemoth_king:
-            if value != self.behemoth_king_hp:
-                self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_king_hp)
-
 
     # === Location Handling ===
 
@@ -2349,6 +2302,10 @@ class MSMContext(CommonContext):
             self.debug_log(f"Stage {stage_code} is Behemoth Stage, separate function handles that.")
             return None
 
+        if stage_code == "s39":
+            self.debug_log(f"Stage {stage_code} is the menu, player has probably been sent to the void.")
+            return None
+
         if sport is None:
             self.debug_log(f"Could not build cup location from stage={current_stage}, sport={sport}")
             return None
@@ -2401,7 +2358,7 @@ class MSMContext(CommonContext):
         sport = self.game_interface.check_sport()
         difficulty, _ = self.game_interface.get_exhibition_difficulty()
 
-        if stage is None or sport is None or difficulty is None:
+        if stage is None or stage == "Menu" or sport is None or difficulty is None:
             return
 
         difficulties_dict = {0: "Easy", 1: "Normal", 2: "Hard", 3: "Expert"}
@@ -2463,6 +2420,8 @@ class MSMContext(CommonContext):
         await self.check_location(location_name)
         self.last_tournament_location_name = None
 
+    # === Blocking Functions ===
+
     async def handle_locked_tournament_stage_points(self):
         """Locks the points in a tournament match if you don't have the required cup or stage"""
 
@@ -2510,7 +2469,8 @@ class MSMContext(CommonContext):
             pass
 
     async def handle_locked_exhibition_points(self):
-        """Locks the points in an exhibition match if you don't have the required difficulty"""
+        """Locks the points in an exhibition match if you don't have the required difficulty
+        This is just backup in case the has_unlocked_difficulty doesn't work."""
 
         if self.in_tournament_match or not self.ready_to_handle():
             return
@@ -2529,6 +2489,43 @@ class MSMContext(CommonContext):
         finally:
             pass
 
+    async def handle_lock_behemoth_hp(self):
+        """Locks the Behemoth health and Special Meter charge if in a behemoth fight without Behemoth Stage"""
+
+        if not self.in_tournament_match or self.game_interface.match_status() != 0 or not self.ready_to_handle():
+            return
+
+        required_stage = "Behemoth Stage"
+        if self.is_behemoth:
+            boss = "Behemoth"
+        elif self.is_behemoth_king:
+            boss = "Behemoth King"
+        else:
+            boss = None
+
+        if required_stage in self.unlocked_courts:
+            return
+
+        if boss is None:
+            self.debug_log("Could not find boss, set to None")
+            return
+
+        self.debug_log(f"Locked points for {boss}, you do not have {required_stage}")
+
+        try:
+            self.lock_behemoth_hp()
+            self.lock_special_meter()
+        finally:
+            pass
+
+    def send_to_void(self):
+        """Sends the player to the void (stage=s39ba, module=0x6D656E75)"""
+        current_module_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
+                                                                            Offsets.Match.current_module_offsets)
+
+        self.game_interface.dolphin_client.write_string(self.addresslib.current_stage_addr, "s39ba")
+        self.game_interface.dolphin_client.write_word(current_module_addr, 0x6D656E75)
+
     def clear_player_score(self):
         """Locks the player's score at 0"""
 
@@ -2543,6 +2540,20 @@ class MSMContext(CommonContext):
                                                                            Offsets.Player.special_meter_offsets)
 
         self.game_interface.dolphin_client.write_float(special_meter, 0)
+
+    def lock_behemoth_hp(self):
+        """Function to lock Behemoth Health, called in handle_lock_behemoth_hp"""
+
+        behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
+                                                                         Offsets.Boss.behemoth_hp_offsets)
+        value = self.game_interface.dolphin_client.read_float(behemoth_hp)
+        if self.is_behemoth:
+            if value != self.behemoth_hp:
+                self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
+
+        if self.is_behemoth_king:
+            if value != self.behemoth_king_hp:
+                self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_king_hp)
 
 
     # --- Sanity Location Handling ---
@@ -2787,7 +2798,7 @@ class MSMContext(CommonContext):
     # Receiving Deathlink
     def on_deathlink(self, data: dict[str, Any]):
         super().on_deathlink(data)
-        self.debug_log("Deathlink Received")
+        self.debug_log(f"Deathlink Received - Consequence={self.deathlink_consequence}")
         self.handle_received_deathlink()
 
     def handle_received_deathlink(self):
@@ -2872,6 +2883,7 @@ class MSMContext(CommonContext):
 
 
     # === Misc stuff idk where to put ===
+
 
     async def dolphin_sync_task(self) -> None:
         """The main loop managing the connection to Dolphin and game-state logic routing"""
@@ -3047,7 +3059,7 @@ class MSMContext(CommonContext):
         await self.handle_send_deathlink()
 
         # Lock points if you don't have the stage/cup/difficulty
-        await self.handle_locked_tournament_stage_points()
+        #await self.handle_locked_tournament_stage_points()
         await self.handle_locked_exhibition_points()
 
         # Locations

@@ -32,9 +32,9 @@ class StartWithCharacters(Choice):
     default = 0
 
 class ExhibitionDifficulty(OptionSet):
-    """Which exhibition difficulties should be included? If the difficulty is off, you won't be able to send checks with
-that difficulty
-(Easy, Normal, Hard, Expert)"""
+    """Which exhibition difficulties should be included?
+    If the difficulty is off, you won't be able to send checks with that difficulty
+    (Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulty"
     valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
@@ -60,12 +60,13 @@ class CupUnlockType(Choice):
     default = 0
 
 class HardTournamentDifficulty(DefaultOnToggle):
-    """Would you like to include location checks for Hard Tournaments?"""
+    """Would you like to include location checks for Hard Tournaments?
+    Adds 3 Progressive Cups to the pool if Progressive Cup Item is selected"""
     display_name = "Include Hard Tournaments"
 
 class SportsMixUnlock(Choice):
     """Unlock Sports Mix by getting 4 Sports Crystals from other players (Or yourself!)
-or get Sports Mix as an item"""
+    or get Sports Mix as an item"""
     display_name = "Sports Mix Unlock"
     option_sports_mix_item = 0
     option_sports_crystals = 1
@@ -89,7 +90,7 @@ class WinCupsAmount(Range):
 
 class BeMean(Choice):
     """Have locations behind bosses even if your goal isn't that boss!
-Cannot be the same as the goal condition!"""
+    Cannot be the same as the goal condition!"""
     display_name = "Be mean?"
     option_no = 0
     option_defeat_behemoth = 1
@@ -98,7 +99,7 @@ Cannot be the same as the goal condition!"""
 
 class BehemothHP(Range):
     """Behemoth Health - 2400 is default
-Recommended to edit this in the YAML (2400 - 4000)"""
+    Recommended to edit this in the YAML (2400 - 4000)"""
     display_name = "Behemoth HP"
     range_start = 2400
     range_end = 4000
@@ -106,7 +107,7 @@ Recommended to edit this in the YAML (2400 - 4000)"""
 
 class BehemothKingHP(Range):
     """Behemoth King Health - 3000 is default
-Recommended to edit this in the YAML (3000 - 7000)"""
+    Recommended to edit this in the YAML (3000 - 7000)"""
     display_name = "Behemoth King HP"
     range_start = 3000
     range_end = 7000
@@ -124,8 +125,8 @@ class TrapChance(Range):
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
 
-NOTE: Every number of points works like normal for everything BUT dodgeball.
-In dodgeball, everytime the opponent wins the set a deathlink triggers"""
+    NOTE: Every number of points works like normal for everything BUT dodgeball.
+    In dodgeball, everytime the opponent wins the set a deathlink triggers"""
     display_name = "Deathlink Action"
     option_losing_or_tying_a_match = 0
     option_every_number_of_points = 1
@@ -141,7 +142,7 @@ class DeathlinkConsequence(Choice):
 # --- Action Specific Settings ---
 class DeathlinkOpponentScorePoints(Range):
     """How many points should the opponent get to send a deathlink?
-Requires Deathlink on & Every number of points action"""
+    Requires Deathlink on & Every number of points action"""
     display_name = "[DL-A] Opponent Scores Points"
     range_start = 1
     range_end = 20
@@ -150,7 +151,7 @@ Requires Deathlink on & Every number of points action"""
 # --- Consequence Specific Settings ---
 class DeathlinkOpponentGetPoints(Range):
     """How many points should the opponent get when receiving a deathlink?
-Requires Deathlink on & Opponent Gains Point consequence"""
+    Requires Deathlink on & Opponent Gains Point consequence"""
     display_name = "[DL-C] Opponent Gets Points"
     range_start = 1
     range_end = 20
@@ -158,7 +159,7 @@ Requires Deathlink on & Opponent Gains Point consequence"""
 
 class DeathlinkBossHealthRecovered(Range):
     """What percentage of the boss' health should be recovered when sent a deathlink?
-(Behemoth & Behemoth King)"""
+    (Behemoth & Behemoth King)"""
     display_name = "[DL-C] Boss % Health Recovered"
     range_start = 0
     range_end = 100
@@ -166,8 +167,7 @@ class DeathlinkBossHealthRecovered(Range):
 
 class DeathlinkDodgeballHealthLost(Range):
     """**ONLY FOR DODGEBALL**
-How much health will you lose when you get sent a deathlink if you're
-in dodgeball?"""
+    How much health will you lose when you get sent a deathlink if you're in dodgeball?"""
     display_name = "[DL-C] Dodgeball Health Lost"
     range_start = 0
     range_end = 100
@@ -177,7 +177,7 @@ in dodgeball?"""
 
 class CharacterSanity(Choice):
     """Turn on or off Character Sanity
-(Playing with a character and/or costume sends a check)"""
+    (Playing with a character and/or costume sends a check)"""
     display_name = "Character Sanity"
     option_off = 0
     option_characters = 1
@@ -186,7 +186,7 @@ class CharacterSanity(Choice):
 
 class SendBothCharacterCostume(Toggle):
     """When playing with a costume, sends the Character Sanity
-check for *both* the character and the costume"""
+    check for *both* the character and the costume"""
     display_name = "Send both Character Sanity"
     default = False
 
@@ -218,10 +218,10 @@ class SpecialSanity(Toggle):
     display_name = "Special Sanity"
     default = False
 
-class StageSanity(Choice):
-    """(NOT WORKING) Playing and/or winning on each stage sends a check"""
+class CourtSanity(Choice):
+    """(NOT WORKING) Playing and/or winning on each court sends a check"""
     visibility = Visibility.none
-    display_name = "Stage Sanity"
+    display_name = "Court Sanity"
     option_off = 0
     option_playing = 1
     option_winning = 2
@@ -382,22 +382,22 @@ msm_option_groups = [
         SportsMixUnlock,
         TrapChance,
     ]),
-    OptionGroup("Custom Basketball Tournament Options", [
+    OptionGroup("Basketball Tournament Options", [
         BasketTime,
         EnableBPointsWin,
         BPointsToWin,
         BPeriod,
     ]),
-    OptionGroup("Custom Dodgeball Tournament Options", [
+    OptionGroup("Dodgeball Tournament Options", [
         DodgeTime,
         DPeriod,
         DMaxHealth,
     ]),
-    OptionGroup("Custom Volleyball Tournament Options", [
+    OptionGroup("Volleyball Tournament Options", [
         VPointsToWin,
         VPeriod,
     ]),
-    OptionGroup("Custom Hockey Tournament Options", [
+    OptionGroup("Hockey Tournament Options", [
         HockeyTime,
         EnableHPointsWin,
         HPointsToWin,
@@ -480,4 +480,4 @@ class MSMOptions(PerGameCommonOptions):
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
     special_sanity: SpecialSanity
-    stage_sanity: StageSanity
+    court_sanity: CourtSanity
