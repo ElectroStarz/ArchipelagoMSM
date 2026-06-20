@@ -68,6 +68,34 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
         return Has(f"{sport}: {cup_name} Cup ({category})")
 
 
+def exhibition_rule(world: MSMWorld, min_diff: str):
+    """
+        Creates a logic rule requiring the completion of at least one exhibition
+        match within the enabled difficulty range.
+
+        :param world: The current MSMWorld instance containing game options.
+        :param min_diff: The integer index of the base difficulty
+                               (0: Easy, 1: Normal, 2: Hard, 3: Expert).
+    """
+
+    all_difficulties = ["Easy", "Normal", "Hard", "Expert"]
+
+    # Find the index of the string, then slice the list safely
+    min_diff_index = all_difficulties.index(min_diff)
+    required_difficulties = all_difficulties[min_diff_index:]
+
+    # Filter these by what the user actually enabled in their options
+    items_needed = [
+        f"Exhibition {diff}"
+        for diff in required_difficulties
+        if diff in world.options.exhibition_difficulty.value
+    ]
+    # Return the rule
+    if not items_needed:
+        return False
+    return HasAny(*items_needed)
+
+
 SPORTS = ["Basketball", "Dodgeball", "Hockey", "Volleyball"]
 CUPS = ["Mushroom", "Flower", "Star"]
 
@@ -206,8 +234,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
         for sport, stages in EXHIBITION_RULES.items():
             for stage in stages:
                 location = world.get_location(f"{sport} Ex: Beat {stage} ({difficulty})")
-                diff_item = f"Exhibition {difficulty}"
-                world.set_rule(location, court_rule(world, stage) & Has(diff_item))
+                world.set_rule(location, court_rule(world, stage) & exhibition_rule(world, difficulty))
 
     # Tournament cup rules
     cup_difficulties = ["Normal"]
