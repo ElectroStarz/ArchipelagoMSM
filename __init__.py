@@ -124,12 +124,14 @@ class MSMWorld(World):
         slot_data = {
         "version": WORLD_VERSION,
 
-        # Boss Stuff
+        # Goal/Boss Stuff
         "goal_condition": self.options.goal_condition.value,
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
+        "win_cups_amount": self.options.win_cups_amount.value,
 
         # Unlock Stuff
+        "start_with_mushroom_cup": self.options.start_with_mushroom_cup.value,
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,

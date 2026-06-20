@@ -123,8 +123,9 @@ opponent_score_addresses = [
 ]
 
 logger = logging.getLogger("Client")
-CONSUMABLE_STORAGE_CATEGORY = "mario_sports_mix_client"
-LOCATION_STORAGE_CATEGORY = "mario_sports_mix_locations"
+# AP server storage is room-wide, so filler/trap save keys need seed + slot in the name.
+CONSUMABLE_STORAGE_CATEGORY = "msm_consumables"
+LOCATION_STORAGE_CATEGORY = "msm_locations"
 # Build the reverse lookup once so persisted AP location IDs can be shown as local names.
 LOCATION_ID_TO_NAME = {location_id: name for name, location_id in LOCATION_NAME_TO_ID.items()}
 
@@ -476,6 +477,11 @@ class MSMContext(CommonContext):
     last_error_message: Optional[str] = None
 
     slot_data: Dict[str, Utils.Any] = {}
+
+    # Here as placeholders, all will be replaced upon connection by slot data
+
+    has_created_consumables: Any
+    start_with_mushroom: Any = int
     sports_mix_unlock: Any = int
     court_unlock_type: Any = int
     cup_unlock_type: Any = int
@@ -484,7 +490,7 @@ class MSMContext(CommonContext):
     is_behemoth = False
     is_behemoth_king = False
     goal_condition: Any = int
-    #win_cups_amount: Any = int
+    win_cups_amount: Any = int
     exhibition_difficulties: Any
     hard_tournament_difficulty: Any = bool
 
@@ -535,16 +541,16 @@ class MSMContext(CommonContext):
 
         # AP gives every received item a position/index in the received item list.
         # Use that index, not the item name, so duplicate filler items are handled separately.
+        # AP gives every received item a stable index in the received-item list.
+        # I use that index (not the item name) so duplicate filler items are tracked separately.
         self.queued_consumable_indices: Set[int] = set()
         self.handled_consumable_indices: Set[int] = set()
-        self.consumable_storage_key: Optional[str] = None
-        self.location_storage_key: Optional[str] = None
-
+        # Set when a Get/SetReply for handled consumables has been applied this session.
+        self._consumables_load_event = asyncio.Event()
         self.start_process = True
         self.handled_gecko_codes = False
         self.game_session_active = False
         self.active_game_version = None
-        self.custom_health_handled = False
         self.unlocked_sports_mix = False
 
         self.one_time_running = False
@@ -552,11 +558,13 @@ class MSMContext(CommonContext):
         self.awaiting_use = False
         self.forced_item_id = None
         self.last_match_score_total: Optional[int] = None
+        self.previous_held_item: Optional[int] = None
         self.suppress_panel_until = 0.0
         self.boss_hp_handled = False
         self.boss_defeat_handled = False
         self.in_tournament_match = False
         self.last_tournament_location_name: Optional[str] = None
+        self.cups_won: set[int] = set()
 
         self.minus_one = 0xFFFFFFFF
 
@@ -627,6 +635,113 @@ class MSMContext(CommonContext):
                 logger.info(message)
             self._log_once_states[key] = message
 
+    @staticmethod
+    async def delay_log(message: str, delay: int):
+        logger.info(f"{message}")
+        await asyncio.sleep(delay)
+
+    # --- Consumable persistence (filler + traps) ---
+    # These are one-shot items tracked by AP received-item index and saved to server storage
+    # so reconnects don't hand them out again. Key is scoped per slot.
+
+    @property
+    def consumable_storage_key(self) -> Optional[str]:
+        if self.seed is None or self.slot is None:
+            return None
+        return f"{CONSUMABLE_STORAGE_CATEGORY}_{self.slot}"
+
+    def _on_consumables_storage_update(self, value: Any) -> None:
+        """Apply server storage for handled filler/trap indices and drop any stale queue entries."""
+        if value is None:
+            self.handled_consumable_indices = set()
+        elif isinstance(value, list):
+            self.handled_consumable_indices = {int(index) for index in value}
+        else:
+            logger.warning(f"Unexpected handled consumables value type: {type(value)}")
+            return
+
+        handled = self.handled_consumable_indices
+        self.filler_to_give = deque(
+            entry for entry in self.filler_to_give
+            if not (isinstance(entry, tuple) and entry[0] in handled)
+        )
+        self.traps_to_give = deque(
+            entry for entry in self.traps_to_give
+            if not (isinstance(entry, tuple) and entry[0] in handled)
+        )
+        self.queued_consumable_indices -= handled
+        self._consumables_load_event.set()
+        self.debug_log(f"Loaded {len(self.handled_consumable_indices)} handled consumables")
+
+    async def load_handled_consumables(self, initialize: bool = False) -> None:
+        """Load handled filler/trap indices from AP storage before queuing ReceivedItems."""
+        key = self.consumable_storage_key
+        if key is None or self._consumables_load_event.is_set():
+            return
+
+        self._consumables_load_event.clear()
+        if initialize:
+            # First connect for this seed/slot: create the key if missing, then subscribe to updates.
+            await self.send_msgs([{
+                "cmd": "Set",
+                "key": key,
+                "default": [],
+                "want_reply": False,
+                "operations": [{"operation": "default", "value": 0}],
+            }])
+            self.set_notify(key)
+        else:
+            await self.send_msgs([{"cmd": "Get", "keys": [key]}])
+
+        try:
+            await asyncio.wait_for(self._consumables_load_event.wait(), timeout=10.0)
+        except asyncio.TimeoutError:
+            logger.warning("Timed out loading handled consumables from server storage")
+            self._consumables_load_event.set()
+
+    async def _handle_received_items_consumables(self, args: dict) -> None:
+        # Wait for storage before queuing — otherwise reconnects re-fire already-handled items.
+        await self.load_handled_consumables()
+
+        start_index = args["index"]
+        if start_index == 0:
+            # CommonContext replaced items_received with a full inventory snapshot.
+            # Keep that list and rebuild only unlock state from it.
+            self.reset_local_item_state(clear_received=False)
+
+        self.debug_log(
+            f"ReceivedItems packet start={start_index}, count={len(args['items'])}, "
+            f"handled_consumables={len(self.handled_consumable_indices)}"
+        )
+
+        for offset, item in enumerate(args["items"]):
+            item_index = start_index + offset
+
+            if item_index in self.handled_consumable_indices or item_index in self.queued_consumable_indices:
+                self.debug_log(f"Skipping already queued/handled consumable index {item_index}")
+                continue
+
+            item_id = item.item if hasattr(item, "item") else item[0]
+            item_name = id_to_name.get(item_id)
+
+            if not item_name:
+                self.debug_log(f"Skipping unknown item id {item_id} at index {item_index}")
+                continue
+
+            if item_name.startswith("1"):
+                self.filler_to_give.append((item_index, item_name))
+                self.queued_consumable_indices.add(item_index)
+                logger.info(f"Queued filler: {item_name}")
+                self.debug_log(f"Filler queue size is now {len(self.filler_to_give)}")
+
+            elif "Trap" in item_name:
+                self.traps_to_give.append((item_index, item_name))
+                self.queued_consumable_indices.add(item_index)
+                logger.info(f"Queued trap: {item_name}")
+                self.debug_log(f"Trap queue size is now {len(self.traps_to_give)}")
+
+        await self.handle_received_items()
+
     async def server_auth(self, password_requested: bool = False):
         if password_requested and not self.password:
             await super(MSMContext, self).server_auth(password_requested)
@@ -637,22 +752,27 @@ class MSMContext(CommonContext):
         if cmd == "Connected":
             new_team = args["team"]
             new_slot = args["slot"]
+            ap_locations_checked = args["checked_locations"]
+            self.locations_checked.update(ap_locations_checked)
             if self.team is not None and self.slot is not None and (self.team, self.slot) != (new_team, new_slot):
                 # Clear before CommonContext handles Connected so it cannot send stale local checks for the new slot.
-                self.reset_local_item_state(clear_received=True)
+                self.reset_local_item_state(clear_received=True, clear_consumed=True)
                 self.reset_location_state()
 
         super().on_package(cmd, args)
         if cmd == "Connected":
             self.slot_data = args.get("slot_data", {})
 
+            self.has_created_consumables = self.slot_data.get("has_created_consumables")
+
             # Goal Data
             self.goal_condition = self.slot_data.get("goal_condition")
             self.behemoth_hp = self.slot_data.get("behemoth_hp")
             self.behemoth_king_hp = self.slot_data.get("behemoth_king_hp")
-            # self.win_cups_amount = self.slot_data.get("win_cups_amount")
+            self.win_cups_amount = self.slot_data.get("win_cups_amount")
 
             # Unlock Data
+            self.start_with_mushroom = self.slot_data.get("start_with_mushroom_cup")
             self.exhibition_difficulties = self.slot_data.get("exhibition_difficulty")
             self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty")
             self.sports_mix_unlock = self.slot_data.get("sports_mix_unlock")
@@ -694,13 +814,11 @@ class MSMContext(CommonContext):
             self.send_both_character_sanity = self.slot_data.get("send_both_character_sanity")
             
 
-            Utils.async_start(self.update_death_link(self.deathlink_enabled))
-
-            # Team/slot are available after Connected, so persisted filler/trap state can be loaded now.
-            self.load_handled_consumables()
-            self.load_handled_locations()
+            asyncio.create_task(self.update_death_link(self.deathlink_enabled))
+            # Slot is known now — load/create the per-slot consumable save before items arrive.
+            asyncio.create_task(self.load_handled_consumables(initialize=True))
             if self.locations_checked:
-                Utils.async_start(
+                asyncio.create_task(
                     self.send_msgs([{"cmd": "LocationChecks", "locations": sorted(self.locations_checked)}])
                 )
 
@@ -726,57 +844,21 @@ class MSMContext(CommonContext):
         elif cmd == "RoomInfo":
             new_seed = args.get("seed_name", "unknown")
             if self.seed != new_seed:
-                # A new room/seed must not inherit item or location state from the previous lobby.
-                self.reset_local_item_state(clear_received=True)
+                # New seed — don't carry consumable or location state from the previous room.
+                self.reset_local_item_state(clear_received=True, clear_consumed=True)
                 self.reset_location_state()
             self.seed = new_seed
-            # Seed is part of the storage key, so changing rooms means loading a different save bucket.
-            self.load_handled_consumables()
+
         elif cmd == "ReceivedItems":
-            # Make sure already-fired filler/traps are known before deciding what to queue.
-            self.load_handled_consumables()
-            start_index = args["index"]
-            if start_index == 0:
-                # CommonContext has just replaced items_received with the full inventory snapshot.
-                # Keep that list and rebuild only the item-derived local state from it.
-                self.reset_local_item_state(clear_received=False)
-            self.debug_log(
-                f"ReceivedItems packet start={start_index}, count={len(args['items'])}, "
-                f"handled_consumables={len(self.handled_consumable_indices)}"
-            )
+            asyncio.create_task(self._handle_received_items_consumables(args))
 
-            for offset, item in enumerate(args["items"]):
-                # Convert packet-local offset into the stable AP received-item index.
-                item_index = start_index + offset
-
-                # handled = already fired and saved; queued = waiting to fire this session.
-                if item_index in self.handled_consumable_indices or item_index in self.queued_consumable_indices:
-                    self.debug_log(f"Skipping already queued/handled consumable index {item_index}")
-                    continue
-
-                item_id = item.item if hasattr(item, "item") else item[0]
-                item_name = id_to_name.get(item_id)
-
-                if not item_name:
-                    self.debug_log(f"Skipping unknown item id {item_id} at index {item_index}")
-                    continue
-
-                if item_name.startswith("1"):
-                    # Filler waits until the player is in a safe in-match state before being given.
-                    self.filler_to_give.append((item_index, item_name))
-                    self.queued_consumable_indices.add(item_index)
-                    logger.info(f"Queued filler: {item_name}")
-                    self.debug_log(f"Filler queue size is now {len(self.filler_to_give)}")
-
-
-                elif "Trap" in item_name:
-                    # Traps are also delayed until the game can safely apply them.
-                    self.traps_to_give.append((item_index, item_name))
-                    self.queued_consumable_indices.add(item_index)
-                    logger.info(f"Queued trap: {item_name}")
-                    self.debug_log(f"Trap queue size is now {len(self.traps_to_give)}")
-
-            Utils.async_start(self.handle_received_items())
+        elif cmd in ("Retrieved", "SetReply"):
+            key = self.consumable_storage_key
+            if key:
+                if cmd == "Retrieved" and key in args.get("keys", {}):
+                    self._on_consumables_storage_update(args["keys"][key])
+                elif cmd == "SetReply" and args.get("key") == key:
+                    self._on_consumables_storage_update(args.get("value"))
 
     def make_gui(self):
         ui = super().make_gui()
@@ -800,6 +882,7 @@ class MSMContext(CommonContext):
         self.awaiting_use = False
         self.forced_item_id = None
         self.last_match_score_total = None
+        self.previous_held_item = None
         self.suppress_panel_until = 0.0
         self.boss_hp_handled = False
         self.boss_defeat_handled = False
@@ -812,12 +895,7 @@ class MSMContext(CommonContext):
         self.game_session_active = game_active
         self.active_game_version = dc.GAME_VERSION if game_active else None
 
-        if game_active and self.game_interface.check_sport() == "Dodgeball" and self.custom_health_handled:
-            pass
-        else:
-            self.custom_health_handled = False
-
-    def reset_local_item_state(self, clear_received: bool = False) -> None:
+    def reset_local_item_state(self, clear_received: bool = False, clear_consumed: bool = False) -> None:
         if clear_received:
             self.items_received.clear()
         self.items_handled.clear()
@@ -831,118 +909,44 @@ class MSMContext(CommonContext):
         self.unlocked_costumes.clear()
         self.unlocked_panel_items.clear()
         self.unlocked_abilities.clear()
-        #
-        # if clear_consumed:
-        #     # Full resets happen when changing seed/slot. Do not carry one-shot items between lobbies.
-        #     self.filler_to_give.clear()
-        #     self.traps_to_give.clear()
-        #     self.queued_consumable_indices.clear()
-        #     self.handled_consumable_indices.clear()
-        #     self.consumable_storage_key = None
 
-    def get_consumable_storage_key(self) -> Optional[str]:
-        if self.seed is None or self.team is None or self.slot is None:
-            return None
+        if clear_consumed:
+            self.filler_to_give.clear()
+            self.traps_to_give.clear()
+            self.queued_consumable_indices.clear()
+            self.handled_consumable_indices.clear()
+            self._consumables_load_event.clear()
 
-        # Scope one-shot items to this exact AP room and player slot.
-        return f"{self.seed}_{self.team}_{self.slot}_handled_consumables"
-
-    def load_handled_consumables(self) -> None:
-        storage_key = self.get_consumable_storage_key()
-        if storage_key == self.consumable_storage_key:
-            return
-
-        if storage_key is None:
-            self.debug_log("Consumable storage key is not ready yet")
-            return
-
-        key: str = storage_key
-
-        # Switching room/team/slot means any currently queued filler/traps belong to old state.
-        self.filler_to_give.clear()
-        self.traps_to_give.clear()
-        self.queued_consumable_indices.clear()
-        self.handled_consumable_indices.clear()
-
-        storage_category: Dict[str, list] = Utils.persistent_load().setdefault(CONSUMABLE_STORAGE_CATEGORY, {})
-        self.handled_consumable_indices.update(map(int, storage_category.get(key, [])))
-        self.consumable_storage_key = key
-        self.debug_log(f"Loaded {len(self.handled_consumable_indices)} handled consumable indices from storage")
-
-    def mark_consumable_handled(self, item_index: Optional[int]) -> None:
+    async def mark_consumable_handled(self, item_index: Optional[int]) -> None:
         if item_index is None:
             return
 
-        # Only save once the effect has actually been applied or started.
         self.queued_consumable_indices.discard(item_index)
         self.handled_consumable_indices.add(item_index)
-        self.save_handled_consumables()
+        # Save after the effect is applied so a disconnect mid-queue doesn't eat the item.
+        await self.save_handled_consumables()
         self.debug_log(f"Saved handled consumable index {item_index}")
 
-    def save_handled_consumables(self) -> None:
-        storage_key = self.get_consumable_storage_key()
-        if storage_key is None:
-            self.debug_log("Handled consumables in memory only; storage key is not ready")
+    async def save_handled_consumables(self) -> None:
+        key = self.consumable_storage_key
+        if key is None:
             return
-
-        key: str = storage_key
-        self.consumable_storage_key = key
-        # Store only indices. Names can duplicate and may change; AP indices are stable for the slot.
-        Utils.persistent_store(
-            CONSUMABLE_STORAGE_CATEGORY,
-            key,
-            sorted(self.handled_consumable_indices),
-        )
-
-    def get_location_storage_key(self) -> Optional[str]:
-        if self.seed is None or self.team is None or self.slot is None:
-            return None
-
-        # Scope location checks the same way AP scopes player state: generation, team, and slot.
-        return f"{self.seed}_{self.team}_{self.slot}_checked_locations"
+        await self.send_msgs([{
+            "cmd": "Set",
+            "key": key,
+            "default": [],
+            "want_reply": True,
+            "operations": [{
+                "operation": "replace",
+                "value": sorted(self.handled_consumable_indices)
+            }]
+        }])
+        self.debug_log(f"Saving handled consumables: {sorted(self.handled_consumable_indices)}")
 
     def reset_location_state(self) -> None:
         self.locations_checked.clear()
-        self.location_storage_key = None
+        self.checked_locations.clear()
         self.last_tournament_location_name = None
-
-    def load_handled_locations(self) -> None:
-        storage_key = self.get_location_storage_key()
-        if storage_key is None:
-            self.debug_log("Location storage key is not ready yet")
-            return
-        key: str = storage_key
-
-        if key != self.location_storage_key:
-            self.locations_checked.clear()
-
-        storage_category: Dict[str, list] = Utils.persistent_load().setdefault(LOCATION_STORAGE_CATEGORY, {})
-        saved_locations = set(map(int, storage_category.get(key, [])))
-        server_locations = set(self.checked_locations)
-        # Merge local checks with the server's known checks, then discard IDs this client no longer recognises.
-        valid_locations = {
-            location_id for location_id in saved_locations | server_locations
-            if location_id in LOCATION_ID_TO_NAME
-        }
-
-        self.locations_checked.update(valid_locations)
-        self.location_storage_key = key
-        self.save_handled_locations()
-        self.debug_log(f"Loaded {len(self.locations_checked)} handled locations from storage/server state")
-
-    def save_handled_locations(self) -> None:
-        storage_key = self.get_location_storage_key()
-        if storage_key is None:
-            self.debug_log("Handled locations in memory only; storage key is not ready")
-            return
-
-        self.location_storage_key = storage_key
-        # Persist IDs rather than names so display text can change without breaking saved progress.
-        Utils.persistent_store(
-            LOCATION_STORAGE_CATEGORY,
-            storage_key,
-            sorted(self.locations_checked),
-        )
 
     def current_item_func(self):
         current_item = self.game_interface.dolphin_client.read_word(self.addresslib.p_item_held_addr)
@@ -1150,14 +1154,15 @@ class MSMContext(CommonContext):
 
 
         # Cups / Sports Mix
+        # Courts
+        await self.handle_court_unlocks()
         await self.handle_cup_unlocks()
         if self.cup_unlock_type == 1:
             await self.handle_progressive_cup_unlocks()
 
         await self.handle_sports_mix_unlock()
 
-        # Courts
-        await self.handle_court_unlocks()
+
         if self.court_unlock_type == 1:
             await self.handle_progressive_court_unlocks()
 
@@ -1380,12 +1385,20 @@ class MSMContext(CommonContext):
         hard_enabled = self.hard_tournament_difficulty == True
 
         if hard_enabled:
-            # Pushes Hard mode tournaments to Tiers 4-6
-            cup_unlock_order.extend([
-                {"type": "sport", "suffix": "Mushroom Cup (Hard)"},
-                {"type": "sport", "suffix": "Flower Cup (Hard)"},
-                {"type": "sport", "suffix": "Star Cup (Hard)"},
-            ])
+            if self.start_with_mushroom == 3:
+                # Puts Mushroom Hard at tier 2 to match with creating 2 prog cups at the start
+                cup_unlock_order.insert(1, {"type": "sport", "suffix": "Mushroom Cup (Hard)"})
+                cup_unlock_order.extend([
+                    {"type": "sport", "suffix": "Flower Cup (Hard)"},
+                    {"type": "sport", "suffix": "Star Cup (Hard)"},
+                ])
+            else:
+                # Pushes Hard mode tournaments to Tiers 4-6
+                cup_unlock_order.extend([
+                    {"type": "sport", "suffix": "Mushroom Cup (Hard)"},
+                    {"type": "sport", "suffix": "Flower Cup (Hard)"},
+                    {"type": "sport", "suffix": "Star Cup (Hard)"},
+                ])
             # Places Sports Mix at Tiers 7-9
             cup_unlock_order.extend([
                 {"type": "sm", "value": "Sports Mix: Mushroom Cup"},
@@ -1552,7 +1565,7 @@ class MSMContext(CommonContext):
         # Count how many total Progressive Stage items the server has sent us
         progressive_count = len(self.progressive_courts)
 
-        # 2. Iterate through our ordered list up to the number of stages we have unlocked
+        # Iterate through ordered list up to the number of stages we have unlocked
         for index in range(progressive_count):
             # Safety check to prevent index errors if extra progressive items are somehow received
             if index >= len(court_unlock_order):
@@ -1560,7 +1573,7 @@ class MSMContext(CommonContext):
 
             target_stage = court_unlock_order[index]
 
-            # Add to our active unlock list if it isn't already there
+            # Add to unlocked_courts if it isn't already there
             if target_stage not in self.unlocked_courts:
                 self.unlocked_courts.append(target_stage)
                 logger.info(f"Progressive Court level up! Unlocked: {target_stage}")
@@ -1663,7 +1676,7 @@ class MSMContext(CommonContext):
             logger.info(f"Gave 1 Coin ({new_coins}/10)")
             self.debug_log(f"Coins changed from {current_coins} to {new_coins}")
             # The coin was written successfully, so reconnects should not grant it again.
-            self.mark_consumable_handled(item_index)
+            await self.mark_consumable_handled(item_index)
             return
 
         item_map = {
@@ -1678,7 +1691,7 @@ class MSMContext(CommonContext):
         if filler not in item_map:
             logger.warning(f"Unknown filler item: {filler}")
             # Unknown one-shot items are consumed so they do not block the queue forever.
-            self.mark_consumable_handled(item_index)
+            await self.mark_consumable_handled(item_index)
             return
 
         try:
@@ -1692,7 +1705,7 @@ class MSMContext(CommonContext):
             verify_item = self.current_item_func()
             logger.info(f"Dolphin Write Success: {filler}")
             # Save after the Dolphin write, not when queued, so disconnects before this do not eat filler.
-            self.mark_consumable_handled(item_index)
+            await self.mark_consumable_handled(item_index)
             self.debug_log(f"Wrote held item id {item_id} for {filler}; addr={self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
 
         finally:
@@ -1705,6 +1718,9 @@ class MSMContext(CommonContext):
         opponent_score = sum(self.game_interface.dolphin_client.read_word(get_address(address)) for address in opponent_score_addresses)
         return player_score + opponent_score
 
+    def score_recently_changed(self) -> bool:
+        return asyncio.get_event_loop().time() < self.suppress_panel_until
+
     def update_scoring_item_suppression(self):
         score_total = self.current_match_score_total()
 
@@ -1715,7 +1731,13 @@ class MSMContext(CommonContext):
         if score_total != self.last_match_score_total:
             self.last_match_score_total = score_total
             self.suppress_panel_until = asyncio.get_event_loop().time() + 5
-            self.debug_log("Event Occurred; suppressing ?-panel item replacement briefly")
+            self.debug_log("Score changed; suppressing ?-panel item replacement briefly")
+
+    def panel_step_detected(self, item_data: int) -> bool:
+        """True when the game just assigned an item from stepping on a ?-Panel."""
+        if self.previous_held_item is None:
+            return False
+        return self.previous_held_item == -1 and item_data != -1
 
     def has_ended(self):
         """Check if the timer is at 0 for every sport except Volleyball"""
@@ -1731,14 +1753,19 @@ class MSMContext(CommonContext):
     async def handle_question_mark_panel_items(self):
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
-        self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)},"
+        panel_step = self.panel_step_detected(item_data)
+        score_suppressed = self.score_recently_changed()
+        self.debug_log(f"Panel check: item={item_data}, prev={self.previous_held_item}, panel_step={panel_step},"
+                       f"score_suppressed={score_suppressed}, unlocked={len(self.unlocked_panel_items)},"
                        f"awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
 
-        # Handle replacement from game
-        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.forced_item_id is not None:
-            self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
-            verify_item = self.current_item_func()
-            self.debug_log(f"Forced item back to {self.forced_item_id}; previous={item_data}, verify={verify_item}")
+        # Scoring can briefly overwrite a forced panel item; restore it and wait.
+        if score_suppressed and self.forced_item_id is not None:
+            if item_data != self.forced_item_id:
+                self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
+                verify_item = self.current_item_func()
+                self.debug_log(f"Forced item back to {self.forced_item_id}; previous={item_data}, verify={verify_item}")
+            self.previous_held_item = self.current_item_func()
             return
 
         # If we don't have an item, pause.
@@ -1746,18 +1773,30 @@ class MSMContext(CommonContext):
             self.item_processed = False
             self.awaiting_use = False
             self.forced_item_id = None
+            self.previous_held_item = -1
             return
 
-        # If we are currently forcing an item from a scoring replacement
-        # or a one-time item, DO NOT let the ?-panel code claim credit for it.
+        # Only replace items when the player actually steps on a ?-Panel.
+        if not panel_step:
+            self.debug_log("Panel replacement skipped; no ?-panel step detected")
+            self.previous_held_item = item_data
+            return
+
+        if score_suppressed:
+            self.debug_log("Panel replacement skipped; score recently changed")
+            self.previous_held_item = item_data
+            return
+
+        # If we are currently forcing an item from a one-time item, DO NOT let the ?-panel code claim credit for it.
         if self.awaiting_use or item_data == self.forced_item_id or self.item_processed:
             self.debug_log("Panel replacement skipped; forced/awaiting/processed state active")
+            self.previous_held_item = item_data
             return
 
         # Standard pauses
-        if (self.one_time_running or not self.ready_to_handle() or self.item_processed
-                or self.game_interface.special_active()):
-            self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
+        if self.one_time_running or not self.ready_to_handle() or self.game_interface.special_active():
+            self.debug_log("Panel replacement skipped; one-time item active, not ready, or special active")
+            self.previous_held_item = item_data
             return
 
         # Handle Empty List
@@ -1767,36 +1806,41 @@ class MSMContext(CommonContext):
             self.debug_log("There are no items available, replaced with -1 (self.minus_one)")
             logger.info("?-Panel Activated! No items available! Sucks to be you >;]")
             self.item_processed = True  # Mark processed so we don't spam the log
+            self.previous_held_item = -1
             return
 
 
         # Lookup Map
         item_map = {
-            "?-Panel: Green Shell": 0,
-            "?-Panel: Red Shell": 1,
-            "?-Panel: Mini Mushroom": 2,
-            "?-Panel: Bob-omb": 3,
-            "?-Panel: Super Star": 4,
-            "?-Panel: Banana": 5
+            "Green Shell": 0,
+            "Red Shell": 1,
+            "Mini Mushroom": 2,
+            "Bob-omb": 3,
+            "Super Star": 4,
+            "Banana": 5
         }
 
         # Random Selection & Execution
         random_item = random.choice(self.unlocked_panel_items)
 
-        item_id = item_map[random_item]
+        # Extract the base name (e.g., if item is "1 Banana", get "Banana")
+        # This searches the keys of the map to find a match
+        item_id = next((val for key, val in item_map.items() if key in random_item), None)
 
 
         if item_id is not None:
             item_id_int = int(item_id)
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, item_id_int)
             verify_item = self.current_item_func()
-            logger.info(f"?-Panel activated! Item replaced with {random_item}!")
+            logger.info(f"?-Panel activated! Item replaced with {random_item.replace('?-Panel: ', '').replace('? Panel: ', '')}!")
             self.debug_log(f"Panel wrote item id {item_id_int}; addr={self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
             self.item_processed = True
             self.awaiting_use = True
             self.forced_item_id = item_id_int
+            self.previous_held_item = item_id_int
         else:
             self.debug_log(f"Panel selected {random_item}, but no item id matched")
+            self.previous_held_item = item_data
 
         await asyncio.sleep(0.1)
 
@@ -1827,7 +1871,7 @@ class MSMContext(CommonContext):
             "Teleport Character 1 Trap": lambda: self.teleport_trap(1),
             "Teleport Character 2 Trap": lambda: self.teleport_trap(2),
             "Teleport Character 3 Trap": lambda: self.teleport_trap(3),
-            "Swap Trap": self.swap_trap,
+            #"Swap Trap": self.swap_trap,
         }
 
         queued_trap = self.traps_to_give.popleft()
@@ -1851,18 +1895,26 @@ class MSMContext(CommonContext):
                 # Execute the lambda wrapper function inside the task creation
                 asyncio.create_task(trap_mapping[redirected_trap]())
                 self.debug_log(f"Redirected Freeze Character 3 to character {random_int}")
-                self.mark_consumable_handled(item_index)
+                await self.mark_consumable_handled(item_index)
+            elif trap == "Teleport Character 3 Trap" and self.game_interface.check_player_amount() == 2:
+                random_int = randint(1, 2)
+                logger.info(f"2-on-2 detected! Sending trap to character {random_int}")
+                redirected_trap = f"Teleport Character {random_int} Trap"
+
+                # Execute the lambda wrapper function inside the task creation
+                asyncio.create_task(trap_mapping[redirected_trap]())
+                self.debug_log(f"Redirected Teleport Character 3 to character {random_int}")
+                await self.mark_consumable_handled(item_index)
             else:
                 # For standalone methods, this runs them. For lambdas, it resolves the underlying coroutine.
-                trap_coroutine = trap_mapping[trap]()
-                asyncio.create_task(trap_coroutine)
+                asyncio.create_task(trap_mapping[trap]())
 
                 self.debug_log(f"Started trap task for {trap}")
-                self.mark_consumable_handled(item_index)
+                await self.mark_consumable_handled(item_index)
         else:
             logger.warning(f"Unknown trap item: {trap}")
             self.debug_log(f"Unknown trap {trap} consumed so it does not loop forever")
-            self.mark_consumable_handled(item_index)
+            await self.mark_consumable_handled(item_index)
 
         # Prevents multiple traps from firing at the exact same millisecond
         await asyncio.sleep(0.1)
@@ -1891,7 +1943,6 @@ class MSMContext(CommonContext):
 
         # Freeze Loop
         while asyncio.get_event_loop().time() < end_time:
-            # Write to THREE DIFFERENT addresses
             self.game_interface.dolphin_client.write_float(x_addr, freeze_x)
             self.game_interface.dolphin_client.write_float(y_addr, freeze_y)
             self.game_interface.dolphin_client.write_float(z_addr, freeze_z)
@@ -1925,7 +1976,6 @@ class MSMContext(CommonContext):
 
         self.debug_log("Fast Trap started")
         addr = get_address(MatchAddresses.game_speed)
-        value = self.game_interface.dolphin_client.read_float(addr)
         speed = 3
 
         # Set timer
@@ -1933,8 +1983,7 @@ class MSMContext(CommonContext):
 
         # Freeze Loop
         while asyncio.get_event_loop().time() < end_time:
-            if value != speed:
-                self.game_interface.dolphin_client.write_float(addr, speed)
+            self.game_interface.dolphin_client.write_float(addr, speed)
 
         # Return to normal speed
         self.game_interface.dolphin_client.write_float(addr, 1) # 1 = Default speed
@@ -1944,7 +1993,6 @@ class MSMContext(CommonContext):
 
         self.debug_log("Slow Trap started")
         addr = get_address(MatchAddresses.game_speed)
-        value = self.game_interface.dolphin_client.read_float(addr)
         speed = 0.5
 
         # Set timer
@@ -1952,8 +2000,7 @@ class MSMContext(CommonContext):
 
         # Freeze Loop
         while asyncio.get_event_loop().time() < end_time:
-            if value != speed:
-                self.game_interface.dolphin_client.write_float(addr, speed)
+            self.game_interface.dolphin_client.write_float(addr, speed)
 
         # Return to normal speed
         self.game_interface.dolphin_client.write_float(addr, 1) # 1 = Default speed
@@ -1964,6 +2011,8 @@ class MSMContext(CommonContext):
         # Get random floats
         float_x = uniform(-11, 11)
         float_z = uniform(-24, 24)
+        # Max possible values, if it's OOB the game will just force the player back in bounds
+        # We don't change the y value because that stays permanent until the player jumps
 
         # Round to 1 decimal place
         tele_x = round(float_x, 1)
@@ -1980,39 +2029,39 @@ class MSMContext(CommonContext):
         self.game_interface.dolphin_client.write_float(z_addr, tele_z)
         self.debug_log(f"Teleported character {char_id} to X: {tele_x}, Z: {tele_z}")
 
-    async def swap_trap(self):
-        """Swaps which character the player is controlling"""
-
-        cpu_offsets = [
-            Offsets.Player.B1.is_cpu,
-            Offsets.Player.B2.is_cpu,
-            Offsets.Player.B3.is_cpu,
-        ]
-
-        addr = get_address(PlayerAddresses.various_ball_pointers)
-
-        active_index = None
-
-        for i, offset in enumerate(cpu_offsets):
-            new_addr = self.game_interface.dolphin_client.follow_pointers(addr, offset)
-
-            if self.game_interface.dolphin_client.read_word(new_addr) == 1:
-                active_index = i
-                break
-
-        if active_index is None:
-            return
-
-        inactive_indices = [i for i in range(len(cpu_offsets)) if i != active_index]
-        new_active_index = random.choice(inactive_indices)
-
-        # Disable current player
-        current_addr = self.game_interface.dolphin_client.follow_pointers(addr, cpu_offsets[active_index])
-        self.game_interface.dolphin_client.write_byte(current_addr, 0)
-
-        # Enable new player
-        new_addr = self.game_interface.dolphin_client.follow_pointers(addr, cpu_offsets[new_active_index])
-        self.game_interface.dolphin_client.write_byte(new_addr, 1)
+    # async def swap_trap(self):
+    #     """Swaps which character the player is controlling"""
+    #
+    #     cpu_offsets = [
+    #         Offsets.Player.B1.is_cpu,
+    #         Offsets.Player.B2.is_cpu,
+    #         Offsets.Player.B3.is_cpu,
+    #     ]
+    #
+    #     addr = get_address(PlayerAddresses.is_cpu)
+    #
+    #     active_index = None
+    #
+    #     for i, offsets in enumerate(cpu_offsets):
+    #         new_addr = self.game_interface.dolphin_client.follow_pointers(addr, offsets)
+    #
+    #         if self.game_interface.dolphin_client.read_word(new_addr) == 1:
+    #             active_index = i
+    #             break
+    #
+    #     if active_index is None:
+    #         return
+    #
+    #     inactive_indices = [i for i in range(len(cpu_offsets)) if i != active_index]
+    #     new_active_index = random.choice(inactive_indices)
+    #
+    #     # Disable current player
+    #     current_addr = self.game_interface.dolphin_client.follow_pointers(addr, cpu_offsets[active_index])
+    #     self.game_interface.dolphin_client.write_byte(current_addr, 1)
+    #
+    #     # Enable new player
+    #     new_addr = self.game_interface.dolphin_client.follow_pointers(addr, cpu_offsets[new_active_index])
+    #     self.game_interface.dolphin_client.write_byte(new_addr, 0)
 
     # === Custom Tournament Settings Stuff ===
 
@@ -2080,7 +2129,8 @@ class MSMContext(CommonContext):
 
 
         if sport == "Basketball":
-            if self.custom_basket_time != self.get_default_time(): # If the value set is the default value, don't do anything because we don't need to.
+            # If the value set is the default value, don't do anything because we don't need to.
+            if self.custom_basket_time != self.get_default_time():
                 new_time = self.get_custom_time()
 
         elif sport == "Dodgeball":
@@ -2111,10 +2161,8 @@ class MSMContext(CommonContext):
 
         addr = get_address(MatchAddresses.max_periods)
         target_value = sport_to_var.get(sport)
-        current_value = self.game_interface.dolphin_client.read_byte(addr)
 
-        if current_value != target_value:
-            self.game_interface.dolphin_client.write_byte(addr, target_value)
+        self.game_interface.dolphin_client.write_byte(addr, target_value)
 
     async def has_points_win(self):
         """Check if the player has scored the required amount of points to win the period/set"""
@@ -2126,15 +2174,21 @@ class MSMContext(CommonContext):
 
         if sport == "Basketball":
             if self.enable_b_points:
+                # Checks if the player OR opponent has reached the points to win, if so, set timer to 0 which ends
+                # the period
                 if curr_player_score >= self.b_points_win or curr_opp_score >= self.b_points_win:
                     self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0)
 
+
         elif sport == "Volleyball":
+            # Changes the value of the points to win address since Volleyball does all this by itself
             self.game_interface.dolphin_client.write_byte(get_address(VolleyballAddresses.points_to_win),
                                                           self.v_points_win)
 
         elif sport == "Hockey":
             if self.enable_h_points:
+                # Checks if the player OR opponent has reached the points to win, if so, set timer to 0 which ends
+                # the period
                 if curr_player_score >= self.b_points_win or curr_opp_score >= self.b_points_win:
                     self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0)
 
@@ -2143,28 +2197,20 @@ class MSMContext(CommonContext):
         sport = self.game_interface.check_sport()
 
         if sport == "Dodgeball":
-            if self.ready_to_handle() and not self.custom_health_handled:
+            if self.ready_to_handle():
                 self.game_interface.dolphin_client.write_word(get_address(PlayerAddresses.dodge_max_health), self.d_max_health)
                 self.game_interface.dolphin_client.write_word(get_address(OpponentAddresses.dodge_max_health), self.d_max_health)
-                self.custom_health_handled = True
 
 
     # === Goal/Boss Stuff ===
 
+    async def has_cup_goaled(self):
+        cups_won_total = len(self.cups_won)
 
-    # Need to wait until AtLeast gets put into AP 0.6.8 + Find a way to stop vanilla unlocks without disrupting this
-    # goal condition
-    # async def has_cup_goaled(self):
-    #     cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball, CupsWonMultiple.Volleyball,
-    #                           CupsWonMultiple.Hockey]
-    #
-    #     cups_won_total = sum(self.game_interface.dolphin_client.read_word(get_address(addr) for addr in cups_won_addresses))
-    #
-    #     if self.goal_condition == 3:
-    #         if cups_won_total == self.win_cups_amount:
-    #             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-    #             self.debug_log(f"Goal Achieved: Win {self.win_cups_amount} Cups!")
-
+        if self.goal_condition == 3:
+            if cups_won_total >= self.win_cups_amount:
+                await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                self.debug_log(f"Goal Achieved: Win {self.win_cups_amount} Cups!")
 
     async def has_boss_goaled(self):
         """Check if the player has goaled in the boss, if their goal isn't that boss, send the check for it"""
@@ -2266,7 +2312,6 @@ class MSMContext(CommonContext):
 
         await self.send_msgs([{"cmd": "LocationChecks", "locations": [location_id]}])
         self.locations_checked.add(location_id)
-        self.save_handled_locations()
         self.debug_log(f"Checked location: {location_name}")
 
     def get_tournament_cup_and_round(self, sport: str, stage_code: str):
@@ -2420,7 +2465,9 @@ class MSMContext(CommonContext):
         await self.check_location(location_name)
         self.last_tournament_location_name = None
 
+
     # === Blocking Functions ===
+
 
     async def handle_locked_tournament_stage_points(self):
         """Locks the points in a tournament match if you don't have the required cup or stage"""
@@ -2456,11 +2503,11 @@ class MSMContext(CommonContext):
             return
 
         if required_stage not in self.unlocked_courts and required_cup not in self.unlocked_cups:
-            logger.info(f"Blocked points for {sport} {cup} Round {round_number}. Missing {required_stage} & {required_cup}")
+            await self.delay_log(f"Blocked points for {sport} {cup} Round {round_number}. Missing {required_stage} & {required_cup}", 10)
         elif required_stage not in self.unlocked_courts:
-            logger.info(f"Blocked points for {sport} {cup} Round {round_number}. Missing {required_stage}")
+            await self.delay_log(f"Blocked points for {sport} {cup} Round {round_number}. Missing {required_stage}", 10)
         elif required_cup not in self.unlocked_cups:
-            logger.info(f"Blocked points for {sport} {cup}. Missing {required_cup}")
+            await self.delay_log(f"Blocked points for {sport} {cup}. Missing {required_cup}", 10)
 
         try:
             self.clear_player_score()
@@ -2481,7 +2528,7 @@ class MSMContext(CommonContext):
         if f"Exhibition {diff_name}" in self.unlocked_ex_diffs:
             return
 
-        logger.info(f"Blocked points for match. Missing: Exhibition {diff_name}")
+        await self.delay_log(f"Blocked points for match. Missing: Exhibition {diff_name}", 10)
 
         try:
             self.clear_player_score()
@@ -2510,7 +2557,7 @@ class MSMContext(CommonContext):
             self.debug_log("Could not find boss, set to None")
             return
 
-        self.debug_log(f"Locked points for {boss}, you do not have {required_stage}")
+        await self.delay_log(f"Locked points for {boss}, you do not have {required_stage}", 10)
 
         try:
             self.lock_behemoth_hp()
@@ -2546,14 +2593,11 @@ class MSMContext(CommonContext):
 
         behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
                                                                          Offsets.Boss.behemoth_hp_offsets)
-        value = self.game_interface.dolphin_client.read_float(behemoth_hp)
         if self.is_behemoth:
-            if value != self.behemoth_hp:
-                self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
+            self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
 
         if self.is_behemoth_king:
-            if value != self.behemoth_king_hp:
-                self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_king_hp)
+            self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_king_hp)
 
 
     # --- Sanity Location Handling ---
@@ -2561,8 +2605,9 @@ class MSMContext(CommonContext):
 
     async def send_character_sanity_checks(self):
         """Handles sending checks for Character Sanity"""
+        value = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
 
-        if self.character_sanity == 0 or not self.ready_to_handle():
+        if self.character_sanity == 0 or value != 1:
             return
 
         ch_byte_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.character_1))
@@ -2591,6 +2636,7 @@ class MSMContext(CommonContext):
             if self.character_sanity == 1:
                 await self.send_character_character_sanity(char_1, char_2, char_3)
             elif self.character_sanity == 2:
+
                 for char, costume in zip(char_list, costume_list):
                     if char in costume_database and costume != 0:
                         await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
@@ -2603,11 +2649,12 @@ class MSMContext(CommonContext):
         if self.game_interface.check_player_amount() == 2:
             for character in [char_1, char_2]:
                 if character != "None":
-                    await self.check_location(f"Play as {character}")
+                    await self.check_location(f"Win as {character}")
+
         elif self.game_interface.check_player_amount() == 3:
             for character in [char_1, char_2, char_3]:
                 if character != "None":
-                    await self.check_location(f"Play as {character}")
+                    await self.check_location(f"Win as {character}")
 
     async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
         """Sends the location for the costume if Character Sanity is enabled"""
@@ -2627,7 +2674,7 @@ class MSMContext(CommonContext):
                     costume_name = costume_db.get(costume_byte, costume_db.get(1))
 
                     if costume_name:
-                        await self.check_location(f"Play as {costume_name}")
+                        await self.check_location(f"Win as {costume_name}")
 
         elif self.game_interface.check_player_amount() == 3:
             for character, costume_byte in zip(characters_3, costumes_3):
@@ -2639,7 +2686,7 @@ class MSMContext(CommonContext):
                     costume_name = costume_db.get(costume_byte, costume_db.get(1))
 
                     if costume_name:
-                        await self.check_location(f"Play as {costume_name}")
+                        await self.check_location(f"Win as {costume_name}")
 
 
     # === Deathlink Stuff ===
@@ -2780,7 +2827,7 @@ class MSMContext(CommonContext):
             return False
 
         # If the score drops to 0, a new match started.
-        # Reset our tracker to the new lower score and return False.
+        # Reset the tracker to the new lower score and return False.
         if current_opponent_score < self.previous_opponent_score:
             self.previous_opponent_score = current_opponent_score
             return False
@@ -2966,12 +3013,11 @@ class MSMContext(CommonContext):
                 await asyncio.sleep(3)
 
     async def stop_stupid_unlock_notifs(self):
-        """Stop SOME of the unlock messages from appearing constantly"""
+        """Stop SOME of the unlock messages from appearing constantly
+        This doesn't block cups won because the game MAY need that for Behemoth tracking idk
+        """
         games_played_address_list = [GamesPlayed.basketball, GamesPlayed.dodgeball,
                                      GamesPlayed.volleyball, GamesPlayed.hockey]
-
-        cups_won_addresses = [CupsWonMultiple.Basketball, CupsWonMultiple.Dodgeball,
-                              CupsWonMultiple.Volleyball, CupsWonMultiple.Hockey]
 
         for address in games_played_address_list:
             new_addr = get_address(address)
@@ -2979,17 +3025,17 @@ class MSMContext(CommonContext):
             if value != 0:
                 self.game_interface.dolphin_client.write_word(new_addr, 0)
 
-        for sport_class in cups_won_addresses:
-            for name, address in vars(sport_class).items():
-                # Ignore hidden system attributes (like __module__)
-                if name.startswith("__"):
-                    continue
+    async def track_cups_won(self):
+        """Tracks what cups the player has won"""
 
-                new_addr = get_address(address)
-                value = self.game_interface.dolphin_client.read_word(new_addr)
+        for location in self.checked_locations:
+            name = LOCATION_ID_TO_NAME[location]
+            if "Round 3" in name and name not in self.cups_won:
+                self.cups_won.add(name)
 
-                if value != 0:
-                    self.game_interface.dolphin_client.write_word(new_addr, 0)
+        current_cups_count = len(self.cups_won)
+        if current_cups_count <= self.win_cups_amount:
+            logger.info(f"{current_cups_count}/{self.win_cups_amount} Cups Won!")
 
     async def handle_gecko_codes(self):
         """Handle the gecko code patches for each region"""
@@ -3048,8 +3094,9 @@ class MSMContext(CommonContext):
 
     async def handle_in_match(self):
         """What functions should be handled during a match"""
-        # Cup Goal - Need to wait for AP 0.6.8
-        #await self.has_cup_goaled()
+        # Cup Goal
+        await self.has_cup_goaled()
+        await self.track_cups_won()
 
         # Custom Tournament Settings
         if self.in_tournament_match:
@@ -3059,7 +3106,7 @@ class MSMContext(CommonContext):
         await self.handle_send_deathlink()
 
         # Lock points if you don't have the stage/cup/difficulty
-        #await self.handle_locked_tournament_stage_points()
+        await self.handle_locked_tournament_stage_points()
         await self.handle_locked_exhibition_points()
 
         # Locations
@@ -3105,19 +3152,18 @@ class MSMContext(CommonContext):
 
         self.handled_gecko_codes = False
         self.handled_custom_timer = False
-        self.custom_health_handled = False
         
         await asyncio.sleep(0.1)
 
 
     async def handle_in_main_menu(self):
         """What functions should be handled in the main menu"""
-        #await self.has_cup_goaled()
+        await self.has_cup_goaled()
+        await self.track_cups_won()
 
         await self.handle_received_items()
         await self.check_pending_tournament_location()
         await self.stop_stupid_unlock_notifs()
-
 
         await self.handle_gecko_codes()
 
@@ -3128,7 +3174,6 @@ class MSMContext(CommonContext):
 
         self.forced_item_id = None
         self.handled_custom_timer = False
-        self.custom_health_handled = False
 
         self.in_tournament_match = False
         self.boss_hp_handled = False

@@ -13,3 +13,5 @@
 - Yoshmin, s0uth & Elty (Finding memory addresses)
 - Saulf (Creating Gecko Codes for AP)
 - Sylaaz & Solz (Translating into French and proof-reading)
+
+Special thanks to Plant & many others for testing out NTSC-U support :]

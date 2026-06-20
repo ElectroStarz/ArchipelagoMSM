@@ -231,7 +231,7 @@ traps = {
     "Teleport Character 1 Trap": ItemData(base_id + 808, IC.trap, ItemGroup.TRAPS),
     "Teleport Character 2 Trap": ItemData(base_id + 809, IC.trap, ItemGroup.TRAPS),
     "Teleport Character 3 Trap": ItemData(base_id + 810, IC.trap, ItemGroup.TRAPS),
-    "Swap Trap": ItemData(base_id + 811, IC.trap, ItemGroup.TRAPS),
+    #"Swap Trap": ItemData(base_id + 811, IC.trap, ItemGroup.TRAPS),
 }
 
 # Put all into a table
@@ -424,7 +424,7 @@ def create_stages(world: "MSMWorld", itempool):
                 item = world.create_item(name)
                 itempool.append(item)
 
-    elif world.options.court_unlock_type == CourtUnlockType.option_progressive_item:
+    elif world.options.court_unlock_type == CourtUnlockType.option_progressive_court:
         total_stages = 15
 
         if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
@@ -443,7 +443,7 @@ def create_stages(world: "MSMWorld", itempool):
 
 def create_cups(world: "MSMWorld", itempool):
     # --- Progressive Cups ---
-    if world.options.cup_unlock_type == CupUnlockType.option_progressive_item:
+    if world.options.cup_unlock_type == CupUnlockType.option_progressive_cup:
         # Base: 3 Sports Mix Cups + 3 Standard Cups (Mushroom, Flower, Star)
         total_progressive_cups = 6
 
@@ -456,9 +456,9 @@ def create_cups(world: "MSMWorld", itempool):
         # Determine how many starting levels the player gets for free
         precollected_count = 0
         if start_option == StartWithMushroomCup.option_normal_difficulty:
-            precollected_count = 1  # Starts with Tier 1 (Mushroom Normal)
+            precollected_count = 1  # Starts with Tier 1
         elif start_option == StartWithMushroomCup.option_hard_difficulty:
-            precollected_count = 1  # Starts with Tier 1 logic level
+            precollected_count = 1  # Starts with Tier 1
         elif start_option == StartWithMushroomCup.option_both:
             precollected_count = 2  # Starts with Tier 1 and Tier 2 equivalent
 
@@ -474,12 +474,12 @@ def create_cups(world: "MSMWorld", itempool):
 
     # --- Individual Cups ---
     else:
-        all_normal_items = (
-                basketball_items_n + dodgeball_items_n + volleyball_items_n + hockey_items_n
-        )
-        all_hard_items = (
-                basketball_items_h + dodgeball_items_h + volleyball_items_h + hockey_items_h
-        )
+        all_normal_items = {
+                **basketball_items_n, **dodgeball_items_n, **volleyball_items_n, **hockey_items_n
+        }
+        all_hard_items = {
+                **basketball_items_h, **dodgeball_items_h, **volleyball_items_h, **hockey_items_h
+        }
 
         precollect_names = set()
         start_option = world.options.start_with_mushroom_cup
