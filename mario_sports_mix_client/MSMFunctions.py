@@ -46,13 +46,17 @@ async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, 
 
 
 def unlock_ex_tabs():
-    # Exhibition
+    """Unlocks all the exhibition tabs by setting their value to 15"""
+    target_value = 15
+
     for sport in sports_addresses:
         new_addr = get_address(sport.Exhibition.tabs)
-        dme.write_byte(new_addr, 15)
+        dme.write_byte(new_addr, target_value)
 
 
 def lock_all_cups():
+    """Locks all the cups by setting their value to 8"""
+
     for sport in sports_addresses:
         for diff in cups_difficulty:
             addr = getattr(sport.Tournament, diff)
@@ -61,6 +65,8 @@ def lock_all_cups():
 
 
 def lock_all_stages():
+    """Locks all the stages by setting their value to 8"""
+
     for sport in sports_addresses:
         for cup in cups:
             addr = getattr(sport.Exhibition, cup)
@@ -69,6 +75,8 @@ def lock_all_stages():
 
 
 def lock_all_characters():
+    """Locks all the characters by setting their value to 0"""
+
     for sport in sports_addresses:
         for char in characters:
             addr = getattr(sport.Characters, char)
@@ -77,11 +85,14 @@ def lock_all_characters():
 
 
 def is_exception(address):
-    exceptions = (BasketballAddresses.Characters, DodgeballAddresses.Characters, VolleyballAddresses.Characters,
-                  HockeyAddresses.Characters, BasketballAddresses.Tournament, DodgeballAddresses.Tournament,
-                  VolleyballAddresses.Tournament, HockeyAddresses.Tournament, BasketballAddresses.Exhibition,
-                  DodgeballAddresses.Exhibition, VolleyballAddresses.Exhibition, HockeyAddresses.Exhibition,
-                  SportsMixAddresses.Tournament)
+    exceptions = (BasketballAddresses.Characters, BasketballAddresses.Tournament, BasketballAddresses.Exhibition,
+                  DodgeballAddresses.Characters,  DodgeballAddresses.Tournament,  DodgeballAddresses.Exhibition,
+                  VolleyballAddresses.Characters, VolleyballAddresses.Tournament, VolleyballAddresses.Exhibition,
+                  HockeyAddresses.Characters,     HockeyAddresses.Tournament,     HockeyAddresses.Exhibition,
+                                                  SportsMixAddresses.Tournament,
+
+                  CupsWonMultiple, GamesPlayed,
+    )
 
     if any(address in vars(classes).values() for classes in exceptions):
         return True
@@ -89,7 +100,8 @@ def is_exception(address):
         return False
 
 def get_address(address, offset=0xF80):
-    """Get the correct address depending on what region the game is"""
+    """Get the correct address depending on what region the game is.
+    Address inputted should be a PAL address which will then be converted to NTSC-U"""
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
     if is_exception(address):

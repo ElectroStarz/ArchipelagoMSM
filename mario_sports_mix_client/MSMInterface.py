@@ -28,7 +28,6 @@ class MSMInterface:
         self.current_tournament = None
         self.addresslib = AddressLib()
 
-
     def is_in_menu(self):
         current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         if current_stage == "s39ba":
@@ -72,7 +71,6 @@ class MSMInterface:
             return 2
         else:
             return -1
-
 
     def match_status(self):
         match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)

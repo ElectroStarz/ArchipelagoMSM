@@ -124,15 +124,19 @@ class MSMWorld(World):
         slot_data = {
         "version": WORLD_VERSION,
 
-        # Boss Stuff
+        # Goal/Boss Stuff
         "goal_condition": self.options.goal_condition.value,
         "behemoth_hp": self.options.behemoth_hp.value,
         "behemoth_king_hp": self.options.behemoth_king_hp.value,
+        "win_cups_amount": self.options.win_cups_amount.value,
 
         # Unlock Stuff
+        "start_with_mushroom_cup": self.options.start_with_mushroom_cup.value,
         "sports_mix_unlock": self.options.sports_mix_unlock.value,
         "exhibition_difficulty": self.options.exhibition_difficulty.value,
         "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
+        "court_unlock_type": self.options.court_unlock_type.value,
+        "cup_unlock_type": self.options.cup_unlock_type.value,
 
         # Sanity Stuff
         "character_sanity": self.options.character_sanity.value,
@@ -146,6 +150,24 @@ class MSMWorld(World):
         "deathlink_opponent_scores_points": self.options.deathlink_opponent_scores_points.value,
         "deathlink_boss_health_recovered": self.options.deathlink_boss_health_recovered.value,
         "deathlink_dodgeball_health_lost": self.options.deathlink_dodgeball_health_lost.value,
+
+        # Custom Tournament Rule Stuff
+        "basket_time": self.options.basket_time.value,
+        "enable_b_points_win": self.options.enable_b_points_win.value,
+        "b_points_win": self.options.b_points_win.value,
+        "b_period": self.options.b_period.value,
+
+        "dodge_time": self.options.dodge_time.value,
+        "d_period": self.options.d_period.value,
+        "d_max_health": self.options.d_max_health.value,
+
+        "v_points_win": self.options.v_points_win.value,
+        "v_period": self.options.v_period.value,
+
+        "hockey_time": self.options.hockey_time.value,
+        "enable_h_points_win": self.options.enable_h_points_win.value,
+        "h_points_win": self.options.h_points_win.value,
+        "h_period": self.options.h_period.value,
         }
 
         return slot_data

@@ -59,6 +59,7 @@ class LocationGroup(str, Enum):
     CHARACTER_SANITY = "Character Sanity"
     COSTUME_SANITY = "Costume Sanity"
     BOSS_LOCATIONS = "Boss Locations"
+    WIN_CUPS = "Win Cups"
 
 class LocationData(NamedTuple):
     id: int
@@ -101,12 +102,9 @@ location_table: Dict[str, LocationData] = {
     "Dodgeball: Beat Normal Star Cup Round 3": LocationData(base_loc_id + 18, LocationGroup.DODGEBALL_NORMAL_CUPS),
 
     # Volleyball
-    "Volleyball: Beat Normal Mushroom Cup Round 1": LocationData(base_loc_id + 19,
-                                                                 LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Mushroom Cup Round 2": LocationData(base_loc_id + 20,
-                                                                 LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Mushroom Cup Round 3": LocationData(base_loc_id + 21,
-                                                                 LocationGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Mushroom Cup Round 1": LocationData(base_loc_id + 19, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Mushroom Cup Round 2": LocationData(base_loc_id + 20, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Mushroom Cup Round 3": LocationData(base_loc_id + 21, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
     "Volleyball: Beat Normal Flower Cup Round 1": LocationData(base_loc_id + 22, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
     "Volleyball: Beat Normal Flower Cup Round 2": LocationData(base_loc_id + 23, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
     "Volleyball: Beat Normal Flower Cup Round 3": LocationData(base_loc_id + 24, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
@@ -241,26 +239,21 @@ location_table: Dict[str, LocationData] = {
     # === Normal Exhibition Locations ===
     # Basketball
     "Basketball Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 300, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 301,
-                                                                    LocationGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 301, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat DK Dock (Normal)": LocationData(base_loc_id + 302, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat Luigi's Mansion (Normal)": LocationData(base_loc_id + 303, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 304,
-                                                                  LocationGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 304, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat Daisy Garden (Normal)": LocationData(base_loc_id + 305, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 306,
-                                                                  LocationGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 306, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat Bowser's Castle (Normal)": LocationData(base_loc_id + 307, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat Star Ship (Normal)": LocationData(base_loc_id + 308, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 309, LocationGroup.BASKETBALL_EX_NORMAL),
     "Basketball Ex: Beat Wario Factory (Normal)": LocationData(base_loc_id + 310, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 311,
-                                                                  LocationGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 311, LocationGroup.BASKETBALL_EX_NORMAL),
 
     # Dodgeball
     "Dodgeball Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 312, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 313,
-                                                                   LocationGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 313, LocationGroup.DODGEBALL_EX_NORMAL),
     "Dodgeball Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 314, LocationGroup.DODGEBALL_EX_NORMAL),
     "Dodgeball Ex: Beat DK Dock (Normal)": LocationData(base_loc_id + 315, LocationGroup.DODGEBALL_EX_NORMAL),
     "Dodgeball Ex: Beat Toad Park (Normal)": LocationData(base_loc_id + 316, LocationGroup.DODGEBALL_EX_NORMAL),
@@ -274,21 +267,17 @@ location_table: Dict[str, LocationData] = {
 
     # Volleyball
     "Volleyball Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 324, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 325,
-                                                                    LocationGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 325, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 326, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat DK Dock (Normal)": LocationData(base_loc_id + 327, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat Luigi's Mansion (Normal)": LocationData(base_loc_id + 328, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 329,
-                                                                  LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 330,
-                                                                  LocationGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 329, LocationGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 330, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat Bowser's Castle (Normal)": LocationData(base_loc_id + 331, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat Star Ship (Normal)": LocationData(base_loc_id + 332, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat Wario Factory (Normal)": LocationData(base_loc_id + 333, LocationGroup.VOLLEYBALL_EX_NORMAL),
     "Volleyball Ex: Beat Waluigi Pinball (Normal)": LocationData(base_loc_id + 334, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 335,
-                                                                  LocationGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 335, LocationGroup.VOLLEYBALL_EX_NORMAL),
 
     # Hockey
     "Hockey Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 336, LocationGroup.HOCKEY_EX_NORMAL),
@@ -364,26 +353,21 @@ location_table: Dict[str, LocationData] = {
     # === Expert Exhibition Locations ===
     # Basketball
     "Basketball Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 500, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 501,
-                                                                    LocationGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 501, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat DK Dock (Expert)": LocationData(base_loc_id + 502, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat Luigi's Mansion (Expert)": LocationData(base_loc_id + 503, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 504,
-                                                                  LocationGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 504, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat Daisy Garden (Expert)": LocationData(base_loc_id + 505, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 506,
-                                                                  LocationGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 506, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat Bowser's Castle (Expert)": LocationData(base_loc_id + 507, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat Star Ship (Expert)": LocationData(base_loc_id + 508, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 509, LocationGroup.BASKETBALL_EX_EXPERT),
     "Basketball Ex: Beat Wario Factory (Expert)": LocationData(base_loc_id + 510, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 511,
-                                                                  LocationGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 511, LocationGroup.BASKETBALL_EX_EXPERT),
 
     # Dodgeball
     "Dodgeball Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 512, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 513,
-                                                                   LocationGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 513, LocationGroup.DODGEBALL_EX_EXPERT),
     "Dodgeball Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 514, LocationGroup.DODGEBALL_EX_EXPERT),
     "Dodgeball Ex: Beat DK Dock (Expert)": LocationData(base_loc_id + 515, LocationGroup.DODGEBALL_EX_EXPERT),
     "Dodgeball Ex: Beat Toad Park (Expert)": LocationData(base_loc_id + 516, LocationGroup.DODGEBALL_EX_EXPERT),
@@ -397,21 +381,17 @@ location_table: Dict[str, LocationData] = {
 
     # Volleyball
     "Volleyball Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 524, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 525,
-                                                                    LocationGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 525, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 526, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat DK Dock (Expert)": LocationData(base_loc_id + 527, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat Luigi's Mansion (Expert)": LocationData(base_loc_id + 528, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 529,
-                                                                  LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 530,
-                                                                  LocationGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 529, LocationGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 530, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat Bowser's Castle (Expert)": LocationData(base_loc_id + 531, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat Star Ship (Expert)": LocationData(base_loc_id + 532, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat Wario Factory (Expert)": LocationData(base_loc_id + 533, LocationGroup.VOLLEYBALL_EX_EXPERT),
     "Volleyball Ex: Beat Waluigi Pinball (Expert)": LocationData(base_loc_id + 534, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 535,
-                                                                  LocationGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 535, LocationGroup.VOLLEYBALL_EX_EXPERT),
 
     # Hockey
     "Hockey Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 536, LocationGroup.HOCKEY_EX_EXPERT),
@@ -448,41 +428,41 @@ location_table: Dict[str, LocationData] = {
     "Use Black Mage's Special!": LocationData(base_loc_id + 577, LocationGroup.SPECIAL_SANITY),
 
     # === Character Sanity Locations ===
-    "Play as Mario": LocationData(base_loc_id + 1001, LocationGroup.CHARACTER_SANITY),
-    "Play as Luigi": LocationData(base_loc_id + 1002, LocationGroup.CHARACTER_SANITY),
-    "Play as Peach": LocationData(base_loc_id + 1003, LocationGroup.CHARACTER_SANITY),
-    "Play as Daisy": LocationData(base_loc_id + 1004, LocationGroup.CHARACTER_SANITY),
-    "Play as Yoshi": LocationData(base_loc_id + 1005, LocationGroup.CHARACTER_SANITY),
-    "Play as Wario": LocationData(base_loc_id + 1006, LocationGroup.CHARACTER_SANITY),
-    "Play as Waluigi": LocationData(base_loc_id + 1007, LocationGroup.CHARACTER_SANITY),
-    "Play as Donkey Kong": LocationData(base_loc_id + 1008, LocationGroup.CHARACTER_SANITY),
-    "Play as Diddy Kong": LocationData(base_loc_id + 1009, LocationGroup.CHARACTER_SANITY),
-    "Play as Toad": LocationData(base_loc_id + 1010, LocationGroup.CHARACTER_SANITY),
-    "Play as Bowser": LocationData(base_loc_id + 1011, LocationGroup.CHARACTER_SANITY),
-    "Play as Bowser Jr": LocationData(base_loc_id + 1012, LocationGroup.CHARACTER_SANITY),
-    "Play as Moogle": LocationData(base_loc_id + 1013, LocationGroup.CHARACTER_SANITY),
-    "Play as Cactuar": LocationData(base_loc_id + 1014, LocationGroup.CHARACTER_SANITY),
-    "Play as Ninja": LocationData(base_loc_id + 1015, LocationGroup.CHARACTER_SANITY),
-    "Play as White Mage": LocationData(base_loc_id + 1016, LocationGroup.CHARACTER_SANITY),
-    "Play as Slime": LocationData(base_loc_id + 1017, LocationGroup.CHARACTER_SANITY),
-    "Play as Black Mage": LocationData(base_loc_id + 1018, LocationGroup.CHARACTER_SANITY),
-    "Play as Mii (Male)": LocationData(base_loc_id + 1019, LocationGroup.CHARACTER_SANITY),
-    "Play as Mii (Female)": LocationData(base_loc_id + 1020, LocationGroup.CHARACTER_SANITY),
+    "Win as Mario": LocationData(base_loc_id + 1001, LocationGroup.CHARACTER_SANITY),
+    "Win as Luigi": LocationData(base_loc_id + 1002, LocationGroup.CHARACTER_SANITY),
+    "Win as Peach": LocationData(base_loc_id + 1003, LocationGroup.CHARACTER_SANITY),
+    "Win as Daisy": LocationData(base_loc_id + 1004, LocationGroup.CHARACTER_SANITY),
+    "Win as Yoshi": LocationData(base_loc_id + 1005, LocationGroup.CHARACTER_SANITY),
+    "Win as Wario": LocationData(base_loc_id + 1006, LocationGroup.CHARACTER_SANITY),
+    "Win as Waluigi": LocationData(base_loc_id + 1007, LocationGroup.CHARACTER_SANITY),
+    "Win as Donkey Kong": LocationData(base_loc_id + 1008, LocationGroup.CHARACTER_SANITY),
+    "Win as Diddy Kong": LocationData(base_loc_id + 1009, LocationGroup.CHARACTER_SANITY),
+    "Win as Toad": LocationData(base_loc_id + 1010, LocationGroup.CHARACTER_SANITY),
+    "Win as Bowser": LocationData(base_loc_id + 1011, LocationGroup.CHARACTER_SANITY),
+    "Win as Bowser Jr": LocationData(base_loc_id + 1012, LocationGroup.CHARACTER_SANITY),
+    "Win as Moogle": LocationData(base_loc_id + 1013, LocationGroup.CHARACTER_SANITY),
+    "Win as Cactuar": LocationData(base_loc_id + 1014, LocationGroup.CHARACTER_SANITY),
+    "Win as Ninja": LocationData(base_loc_id + 1015, LocationGroup.CHARACTER_SANITY),
+    "Win as White Mage": LocationData(base_loc_id + 1016, LocationGroup.CHARACTER_SANITY),
+    "Win as Slime": LocationData(base_loc_id + 1017, LocationGroup.CHARACTER_SANITY),
+    "Win as Black Mage": LocationData(base_loc_id + 1018, LocationGroup.CHARACTER_SANITY),
+    "Win as Mii (Male)": LocationData(base_loc_id + 1019, LocationGroup.CHARACTER_SANITY),
+    "Win as Mii (Female)": LocationData(base_loc_id + 1020, LocationGroup.CHARACTER_SANITY),
 
     # === Costumes ===
-    "Play as Pink Yoshi": LocationData(base_loc_id + 1021, LocationGroup.COSTUME_SANITY),
-    "Play as Light Blue Yoshi": LocationData(base_loc_id + 1022, LocationGroup.COSTUME_SANITY),
-    "Play as Yellow Yoshi": LocationData(base_loc_id + 1023, LocationGroup.COSTUME_SANITY),
-    "Play as Blue Toad": LocationData(base_loc_id + 1024, LocationGroup.COSTUME_SANITY),
-    "Play as Green Toad": LocationData(base_loc_id + 1025, LocationGroup.COSTUME_SANITY),
-    "Play as Yellow Toad": LocationData(base_loc_id + 1026, LocationGroup.COSTUME_SANITY),
-    "Play as She-Slime": LocationData(base_loc_id + 1027, LocationGroup.COSTUME_SANITY),
-    "Play as Metal Slime": LocationData(base_loc_id + 1028, LocationGroup.COSTUME_SANITY),
-    "Play as Tennis-wear Peach": LocationData(base_loc_id + 1029, LocationGroup.COSTUME_SANITY),
-    "Play as Tennis-wear Daisy": LocationData(base_loc_id + 1030, LocationGroup.COSTUME_SANITY),
-    "Play as Shadow White Ninja": LocationData(base_loc_id + 1031, LocationGroup.COSTUME_SANITY),
-    "Play as Pure White - White Mage": LocationData(base_loc_id + 1032, LocationGroup.COSTUME_SANITY),
-    "Play as Magic Red Black Mage": LocationData(base_loc_id + 1033, LocationGroup.COSTUME_SANITY),
+    "Win as Pink Yoshi": LocationData(base_loc_id + 1021, LocationGroup.COSTUME_SANITY),
+    "Win as Light Blue Yoshi": LocationData(base_loc_id + 1022, LocationGroup.COSTUME_SANITY),
+    "Win as Yellow Yoshi": LocationData(base_loc_id + 1023, LocationGroup.COSTUME_SANITY),
+    "Win as Blue Toad": LocationData(base_loc_id + 1024, LocationGroup.COSTUME_SANITY),
+    "Win as Green Toad": LocationData(base_loc_id + 1025, LocationGroup.COSTUME_SANITY),
+    "Win as Yellow Toad": LocationData(base_loc_id + 1026, LocationGroup.COSTUME_SANITY),
+    "Win as She-Slime": LocationData(base_loc_id + 1027, LocationGroup.COSTUME_SANITY),
+    "Win as Metal Slime": LocationData(base_loc_id + 1028, LocationGroup.COSTUME_SANITY),
+    "Win as Tennis-wear Peach": LocationData(base_loc_id + 1029, LocationGroup.COSTUME_SANITY),
+    "Win as Tennis-wear Daisy": LocationData(base_loc_id + 1030, LocationGroup.COSTUME_SANITY),
+    "Win as Shadow White Ninja": LocationData(base_loc_id + 1031, LocationGroup.COSTUME_SANITY),
+    "Win as Pure White - White Mage": LocationData(base_loc_id + 1032, LocationGroup.COSTUME_SANITY),
+    "Win as Magic Red Black Mage": LocationData(base_loc_id + 1033, LocationGroup.COSTUME_SANITY),
 
     # === Boss Locations ===
     "Defeat Behemoth!": LocationData(base_loc_id + 2000, LocationGroup.BOSS_LOCATIONS),
@@ -905,20 +885,19 @@ def create_regular_locations(world: MSMWorld) -> None:
         h_exhibition.add_locations(h_exhibition_locations_ex)
 
     # Character Sanity Locations
-    if (world.options.character_sanity == CharacterSanity.option_characters or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
-        character_locations = get_location_names_with_ids(["Play as Mario", "Play as Luigi", "Play as Peach",
-        "Play as Daisy", "Play as Yoshi", "Play as Wario", "Play as Waluigi", "Play as Donkey Kong",
-        "Play as Diddy Kong", "Play as Toad", "Play as Bowser", "Play as Bowser Jr", "Play as Moogle",
-        "Play as Cactuar", "Play as Ninja", "Play as White Mage", "Play as Slime", "Play as Black Mage",
-        "Play as Mii (Male)", "Play as Mii (Female)"])
+    if world.options.character_sanity in (CharacterSanity.option_characters, CharacterSanity.option_characters_and_costumes):
+        character_locations = get_location_names_with_ids(["Win as Mario", "Win as Luigi", "Win as Peach",
+        "Win as Daisy", "Win as Yoshi", "Win as Wario", "Win as Waluigi", "Win as Donkey Kong",
+        "Win as Diddy Kong", "Win as Toad", "Win as Bowser", "Win as Bowser Jr", "Win as Moogle",
+        "Win as Cactuar", "Win as Ninja", "Win as White Mage", "Win as Slime", "Win as Black Mage",
+        "Win as Mii (Male)", "Win as Mii (Female)"])
         main_menu.add_locations(character_locations)
 
     if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
-        costume_locations = get_location_names_with_ids(["Play as Pink Yoshi", "Play as Light Blue Yoshi",
-        "Play as Yellow Yoshi", "Play as Blue Toad", "Play as Green Toad", "Play as Yellow Toad", "Play as She-Slime",
-        "Play as Metal Slime", "Play as Tennis-wear Peach", "Play as Tennis-wear Daisy", "Play as Shadow White Ninja",
-        "Play as Pure White - White Mage", "Play as Magic Red Black Mage"])
+        costume_locations = get_location_names_with_ids(["Win as Pink Yoshi", "Win as Light Blue Yoshi",
+        "Win as Yellow Yoshi", "Win as Blue Toad", "Win as Green Toad", "Win as Yellow Toad", "Win as She-Slime",
+        "Win as Metal Slime", "Win as Tennis-wear Peach", "Win as Tennis-wear Daisy", "Win as Shadow White Ninja",
+        "Win as Pure White - White Mage", "Win as Magic Red Black Mage"])
         main_menu.add_locations(costume_locations)
 
 
@@ -943,27 +922,18 @@ def create_events(world: "MSMWorld") -> None:
             behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_location, MSMLocation)
 
-    # if world.options.goal_condition == GoalCondition.option_win_cups:
-    #     win_cup_value = world.options.win_cups_amount.value
-    #     menu = world.get_region("Main Menu")
-    #     menu.add_event(f"Win {win_cup_value} Cups", "Victory!", location_type=MSMLocation,
-    #                    item_type=items.MSMItem)
-    #
-    #     if world.options.be_mean == BeMean.option_defeat_behemoth:
-    #         behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
-    #         behemoth_boss = world.get_region("Behemoth Boss Battle")
-    #         behemoth_boss.add_locations(behemoth_locations, MSMLocation)
-    #
-    #     elif world.options.be_mean == BeMean.option_defeat_behemoth_king:
-    #         behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
-    #         behemoth_king = world.get_region("Behemoth King Boss Battle")
-    #         behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
-    #
-    #     elif world.options.be_mean == BeMean.option_both:
-    #         behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
-    #         behemoth_boss = world.get_region("Behemoth Boss Battle")
-    #         behemoth_boss.add_locations(behemoth_locations, MSMLocation)
-    #
-    #         behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
-    #         behemoth_king = world.get_region("Behemoth King Boss Battle")
-    #         behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
+    if world.options.goal_condition == GoalCondition.option_win_cups:
+        win_cup_value = world.options.win_cups_amount.value
+        menu = world.get_region("Main Menu")
+        menu.add_event(f"Win {win_cup_value} Cups", "Victory!", location_type=MSMLocation,
+                       item_type=items.MSMItem)
+
+        if world.options.be_mean in (BeMean.option_defeat_behemoth, BeMean.option_both):
+            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+            behemoth_boss = world.get_region("Behemoth Boss Battle")
+            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+
+        if world.options.be_mean in (BeMean.option_defeat_behemoth_king, BeMean.option_both):
+            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+            behemoth_king = world.get_region("Behemoth King Boss Battle")
+            behemoth_king.add_locations(behemoth_king_locations, MSMLocation)

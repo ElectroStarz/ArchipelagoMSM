@@ -15,9 +15,9 @@ Will cause immediate BK if off"""
     default = 1
 
 class StartWithMushroomCup(Choice):
-    """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey? (Also unlocks related stages)
-Heavily recommended, may break some things if off"""
-    display_name = "Start with Mushroom Cup (+Stages) - READ DESCRIPTION!"
+    """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
+(Also unlocks related stages)"""
+    display_name = "Start with Mushroom Cup (+Stages)"
     option_none = 0
     option_normal_difficulty = 1
     option_hard_difficulty = 2
@@ -33,15 +33,38 @@ class StartWithCharacters(Choice):
     default = 0
 
 class ExhibitionDifficulty(OptionSet):
-    """Which exhibition difficulties should be included? If the difficulty is off, you won't be able to send checks with
-that difficulty
+    """Which exhibition difficulties should be included?
+If the difficulty is off, you won't be able to send checks with that difficulty
 (Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulty"
     valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
 
+class CourtUnlockType(Choice):
+    """How to unlock courts
+
+    - **Court Item**: Each court is its own item
+    - **Progressive Court**: Courts are unlocked in a certain order with progressive items
+    Note: Behemoth Stage is an item! Behemoth Stage is the last stage unlocked in Progressive Court"""
+    display_name = "Court Unlock Type"
+    option_court_item = 0
+    option_progressive_court = 1
+    default = 0
+
+class CupUnlockType(Choice):
+    """How to unlock cups
+
+    - **Cup Item**: Each cup is its own item
+    - **Progressive Cup**: Cups are unlocked in a certain order with progressive items.
+    Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
+    display_name = "Court Unlock Type"
+    option_cup_item = 0
+    option_progressive_cup = 1
+    default = 0
+
 class HardTournamentDifficulty(DefaultOnToggle):
-    """Would you like to include location checks for Hard Tournaments?"""
+    """Would you like to include location checks for Hard Tournaments?
+Adds 3 Progressive Cups to the pool if Progressive Cup Item is selected"""
     display_name = "Include Hard Tournaments"
 
 class SportsMixUnlock(Choice):
@@ -57,15 +80,14 @@ class GoalCondition(Choice):
     display_name = "Goal Condition"
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
-    #option_win_cups = 2
+    option_win_cups = 3
     default = 2
 
 class WinCupsAmount(Range):
-    """How many cups are required to goal? - Need to wait for 0.6.8 AP"""
-    visibility = Visibility.none
+    """How many cups are required to goal?"""
     display_name = "Win Cups Amount"
     range_start = 1
-    range_end = 26
+    range_end = 27
     default = 15
 
 class BeMean(Choice):
@@ -75,6 +97,7 @@ Cannot be the same as the goal condition!"""
     option_no = 0
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
+    option_both = 3
     default = 0
 
 class BehemothHP(Range):
@@ -102,19 +125,25 @@ class TrapChance(Range):
 
 # === Deathlink Options ===
 
+class Deathlink(DeathLink):
+    """When you die, everyone who enabled death link dies. Of course, the reverse is true too.
+Toggleable inside client"""
+    display_name = "Death Link"
+    default = False
+
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
 
 NOTE: Every number of points works like normal for everything BUT dodgeball.
 In dodgeball, everytime the opponent wins the set a deathlink triggers"""
-    display_name = "Deathlink Action"
+    display_name = "Death Link Action"
     option_losing_or_tying_a_match = 0
     option_every_number_of_points = 1
     default = 0
 
 class DeathlinkConsequence(Choice):
     """What happens when you receive a deathlink? Requires Deathlink on"""
-    display_name = "Deathlink Consequence"
+    display_name = "Death Link Consequence"
     option_lose_match = 0
     option_opponent_gains_points = 1
     default = 0
@@ -122,7 +151,7 @@ class DeathlinkConsequence(Choice):
 # --- Action Specific Settings ---
 class DeathlinkOpponentScorePoints(Range):
     """How many points should the opponent get to send a deathlink?
-Requires Deathlink on & Every number of points action"""
+Requires Deathlink on & Every Number Of Points action"""
     display_name = "[DL-A] Opponent Scores Points"
     range_start = 1
     range_end = 20
@@ -147,8 +176,7 @@ class DeathlinkBossHealthRecovered(Range):
 
 class DeathlinkDodgeballHealthLost(Range):
     """**ONLY FOR DODGEBALL**
-How much health will you lose when you get sent a deathlink if you're
-in dodgeball?"""
+How much health will you lose when you get sent a deathlink if you're in dodgeball?"""
     display_name = "[DL-C] Dodgeball Health Lost"
     range_start = 0
     range_end = 100
@@ -158,7 +186,7 @@ in dodgeball?"""
 
 class CharacterSanity(Choice):
     """Turn on or off Character Sanity
-(Playing with a character and/or costume sends a check)"""
+(Winning with a character and/or costume sends a check)"""
     display_name = "Character Sanity"
     option_off = 0
     option_characters = 1
@@ -166,8 +194,8 @@ class CharacterSanity(Choice):
     default = 0
 
 class SendBothCharacterCostume(Toggle):
-    """When playing with a costume, sends the Character Sanity
-check for *both* the character and the costume"""
+    """When winning with a costume, send the Character Sanity
+check for *both* the character and the costume or just the costume"""
     display_name = "Send both Character Sanity"
     default = False
 
@@ -199,35 +227,200 @@ class SpecialSanity(Toggle):
     display_name = "Special Sanity"
     default = False
 
-class StageSanity(Choice):
-    """(NOT WORKING) Playing and/or winning on each stage sends a check"""
+class CourtSanity(Choice):
+    """(NOT WORKING) Playing and/or winning on each court sends a check"""
     visibility = Visibility.none
-    display_name = "Stage Sanity"
+    display_name = "Court Sanity"
     option_off = 0
     option_playing = 1
     option_winning = 2
     option_both = 3
     default = 0
 
+# === Custom Tournament Settings ===
+
+# --- Basketball ---
+class BasketTime(Choice):
+    """Select the custom amount of time for a Basketball tournament"""
+    display_name = "Basketball Tournament Time"
+    option_1_min_30_secs = 0
+    option_2_mins = 1
+    option_2_mins_30_secs = 2
+    option_3_mins = 3
+    option_3_mins_30_secs = 4
+    default = 2
+
+    @classmethod
+    def get_option_name(cls, id_):
+        match id_:
+            case 0: return "1:30"
+            case 1: return "2:00"
+            case 2: return "2:30"
+            case 3: return "3:00"
+            case 4: return "3:30"
+
+        return None
+
+class EnableBPointsWin(Toggle):
+    """Getting a certain amount of points wins you or the opponent the set"""
+    display_name = "Enable Points Win"
+    default = False
+
+class BPointsToWin(Range):
+    """Set the required amount of points to win"""
+    display_name = "Points to Win"
+    range_start = 10
+    range_end = 50
+    default = 30
+
+class BPeriod(Range):
+    """How many periods do you want to be playing?
+Recommended to set a low amount, kinda boring otherwise."""
+    display_name = "Period Amount"
+    range_start = 1
+    range_end = 10
+    default = 2
+
+# --- Dodgeball ---
+class DodgeTime(Choice):
+    """Select the custom amount of time for a Dodgeball tournament"""
+    display_name = "Dodgeball Tournament Time"
+    option_2_mins = 0
+    option_2_mins_30_secs = 1
+    option_3_mins = 2
+    option_3_mins_30_secs = 3
+    option_4_mins = 4
+    default = 2
+
+    @classmethod
+    def get_option_name(cls, id_):
+        match id_:
+            case 0: return "2:00"
+            case 1: return "2:30"
+            case 2: return "3:00"
+            case 3: return "3:30"
+            case 4: return "4:00"
+
+        return None
+
+class DPeriod(Range):
+    """How many periods do you want to be playing?
+Recommended to set a low amount, kinda boring otherwise."""
+    display_name = "Period Amount"
+    range_start = 1
+    range_end = 10
+    default = 2
+
+class DMaxHealth(Choice):
+    """How much health should everyone have?"""
+    display_name = "Health Amount"
+    option_100 = 100
+    option_150 = 150
+    option_200 = 200
+    option_250 = 250
+    option_300 = 300
+    default = 100
+
+# --- Volleyball ---
+class VPointsToWin(Range):
+    """Set the required amount of points to win"""
+    display_name = "Points to Win"
+    range_start = 10
+    range_end = 15
+    default = 10
+
+class VPeriod(Range):
+    """How many sets do you want to be playing?
+Recommended to set a low amount, kinda boring otherwise."""
+    display_name = "Set Amount"
+    range_start = 1
+    range_end = 10
+    default = 2
+
+# --- Hockey ---
+class HockeyTime(Choice):
+    """Select the custom amount of time for a Hockey tournament"""
+    display_name = "Hockey Tournament Time"
+    option_2_mins = 0
+    option_2_mins_30_secs = 1
+    option_3_mins = 2
+    option_3_mins_30_secs = 3
+    option_4_mins = 4
+    default = 2
+
+    @classmethod
+    def get_option_name(cls, id_):
+        match id_:
+            case 0: return "2:00"
+            case 1: return "2:30"
+            case 2: return "3:00"
+            case 3: return "3:30"
+            case 4: return "4:00"
+
+        return None
+
+class EnableHPointsWin(Toggle):
+    """Getting a certain amount of points wins you or the opponent the set"""
+    display_name = "Enable Points Win"
+    default = False
+
+class HPointsToWin(Range):
+    """Set the required amount of points to win"""
+    display_name = "Points to Win"
+    range_start = 10
+    range_end = 50
+    default = 20
+
+class HPeriod(Range):
+    """How many periods do you want to be playing?
+Recommended to set a low amount, kinda boring otherwise."""
+    display_name = "Period Amount"
+    range_start = 1
+    range_end = 10
+    default = 2
 
 msm_option_groups = [
     OptionGroup("Game Options", [
         StartWithSports,
         StartWithMushroomCup,
+        CupUnlockType,
+        CourtUnlockType,
         StartWithCharacters,
         ExhibitionDifficulty,
         HardTournamentDifficulty,
         SportsMixUnlock,
         TrapChance,
     ]),
+    OptionGroup("Basketball Tournament Options", [
+        BasketTime,
+        EnableBPointsWin,
+        BPointsToWin,
+        BPeriod,
+    ]),
+    OptionGroup("Dodgeball Tournament Options", [
+        DodgeTime,
+        DPeriod,
+        DMaxHealth,
+    ]),
+    OptionGroup("Volleyball Tournament Options", [
+        VPointsToWin,
+        VPeriod,
+    ]),
+    OptionGroup("Hockey Tournament Options", [
+        HockeyTime,
+        EnableHPointsWin,
+        HPointsToWin,
+        HPeriod,
+    ]),
     OptionGroup("Goal Options", [
         GoalCondition,
+        WinCupsAmount,
         BeMean,
         BehemothHP,
         BehemothKingHP,
     ]),
     OptionGroup("Deathlink Options", [
-        DeathLink,
+        Deathlink,
         DeathlinkAction,
         DeathlinkOpponentScorePoints,
         DeathlinkConsequence,
@@ -250,6 +443,8 @@ msm_option_groups = [
 class MSMOptions(PerGameCommonOptions):
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
+    cup_unlock_type: CupUnlockType
+    court_unlock_type: CourtUnlockType
     start_with_characters: StartWithCharacters
     exhibition_difficulty: ExhibitionDifficulty
     hard_tournament_difficulty: HardTournamentDifficulty
@@ -261,9 +456,26 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
 
+    # Tournament Rules
+    basket_time: BasketTime
+    enable_b_points_win: EnableBPointsWin
+    b_points_win: BPointsToWin
+    b_period: BPeriod
+
+    dodge_time: DodgeTime
+    d_period: DPeriod
+    d_max_health: DMaxHealth
+
+    v_points_win: VPointsToWin
+    v_period: VPeriod
+
+    hockey_time: HockeyTime
+    enable_h_points_win: EnableHPointsWin
+    h_points_win: HPointsToWin
+    h_period: HPeriod
 
     # Deathlink
-    deathlink: DeathLink
+    deathlink: Deathlink
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
     deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
@@ -278,4 +490,4 @@ class MSMOptions(PerGameCommonOptions):
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
     special_sanity: SpecialSanity
-    stage_sanity: StageSanity
+    court_sanity: CourtSanity
