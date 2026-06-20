@@ -136,10 +136,10 @@ class MSMCommandProcessor(ClientCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
-    @mark_raw
-    def _cmd_check(self, location_name: str):
-        """Check a location - Used for dev purposes, or if you're lazy ig 🥀"""
-        Utils.async_start(self.ctx.check_location(location_name))
+    # @mark_raw
+    # def _cmd_check(self, location_name: str):
+    #     """Check a location - Used for dev purposes, or if you're lazy ig"""
+    #     asyncio.create_task(self.ctx.check_location(location_name))
 
     def _cmd_debug_mode(self):
         """Toggle debugging on and off (Default off)"""
@@ -289,7 +289,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
     def _cmd_deathlink(self):
         """Toggle deathlink from client. Overrides default setting."""
         self.ctx.deathlink_enabled = not self.ctx.deathlink_enabled
-        Utils.async_start(self.ctx.update_death_link(self.ctx.deathlink_enabled))
+        asyncio.create_task(self.ctx.update_death_link(self.ctx.deathlink_enabled))
         logger.info(f"Deathlink {'Enabled' if self.ctx.deathlink_enabled else 'Disabled'}!")
 
     @mark_raw
@@ -391,7 +391,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
         final_items = []
         if unlocked_panel:
             for item in unlocked_panel:
-                final_items.append(item.replace("?-Panel:", ""))
+                final_items.append(item.replace("?-Panel: ", ""))
             logger.info(f"Unlocked Panel Items: {final_items}")
         else:
             logger.info("No unlocked ?-Panel items")
@@ -558,7 +558,8 @@ class MSMContext(CommonContext):
         self.awaiting_use = False
         self.forced_item_id = None
         self.last_match_score_total: Optional[int] = None
-        self.previous_held_item: Optional[int] = None
+        self.previous_held_item: Optional[int] = -1
+        self.pending_panel_replacement = False
         self.suppress_panel_until = 0.0
         self.boss_hp_handled = False
         self.boss_defeat_handled = False
@@ -882,7 +883,8 @@ class MSMContext(CommonContext):
         self.awaiting_use = False
         self.forced_item_id = None
         self.last_match_score_total = None
-        self.previous_held_item = None
+        self.previous_held_item = -1
+        self.pending_panel_replacement = False
         self.suppress_panel_until = 0.0
         self.boss_hp_handled = False
         self.boss_defeat_handled = False
@@ -1533,7 +1535,7 @@ class MSMContext(CommonContext):
 
             # If no stages are unlocked (value is 0) or the difficulty isn't unlocked, set final_value to 8 which locks
             # all stages, otherwise set final value to value
-            if value == 0 or not self.has_unlocked_difficulty():
+            if value == 0:# or not self.has_unlocked_difficulty():
                 final_value = 8
             else:
                 final_value = value
@@ -1718,9 +1720,6 @@ class MSMContext(CommonContext):
         opponent_score = sum(self.game_interface.dolphin_client.read_word(get_address(address)) for address in opponent_score_addresses)
         return player_score + opponent_score
 
-    def score_recently_changed(self) -> bool:
-        return asyncio.get_event_loop().time() < self.suppress_panel_until
-
     def update_scoring_item_suppression(self):
         score_total = self.current_match_score_total()
 
@@ -1733,11 +1732,6 @@ class MSMContext(CommonContext):
             self.suppress_panel_until = asyncio.get_event_loop().time() + 5
             self.debug_log("Score changed; suppressing ?-panel item replacement briefly")
 
-    def panel_step_detected(self, item_data: int) -> bool:
-        """True when the game just assigned an item from stepping on a ?-Panel."""
-        if self.previous_held_item is None:
-            return False
-        return self.previous_held_item == -1 and item_data != -1
 
     def has_ended(self):
         """Check if the timer is at 0 for every sport except Volleyball"""
@@ -1753,19 +1747,14 @@ class MSMContext(CommonContext):
     async def handle_question_mark_panel_items(self):
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
-        panel_step = self.panel_step_detected(item_data)
-        score_suppressed = self.score_recently_changed()
-        self.debug_log(f"Panel check: item={item_data}, prev={self.previous_held_item}, panel_step={panel_step},"
-                       f"score_suppressed={score_suppressed}, unlocked={len(self.unlocked_panel_items)},"
+        self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)},"
                        f"awaiting={self.awaiting_use}, forced={self.forced_item_id}, processed={self.item_processed}")
 
-        # Scoring can briefly overwrite a forced panel item; restore it and wait.
-        if score_suppressed and self.forced_item_id is not None:
-            if item_data != self.forced_item_id:
-                self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
-                verify_item = self.current_item_func()
-                self.debug_log(f"Forced item back to {self.forced_item_id}; previous={item_data}, verify={verify_item}")
-            self.previous_held_item = self.current_item_func()
+        # Handle replacement from game
+        if asyncio.get_event_loop().time() < self.suppress_panel_until and self.forced_item_id is not None:
+            self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, self.forced_item_id)
+            verify_item = self.current_item_func()
+            self.debug_log(f"Forced item back to {self.forced_item_id}; previous={item_data}, verify={verify_item}")
             return
 
         # If we don't have an item, pause.
@@ -1773,30 +1762,18 @@ class MSMContext(CommonContext):
             self.item_processed = False
             self.awaiting_use = False
             self.forced_item_id = None
-            self.previous_held_item = -1
             return
 
-        # Only replace items when the player actually steps on a ?-Panel.
-        if not panel_step:
-            self.debug_log("Panel replacement skipped; no ?-panel step detected")
-            self.previous_held_item = item_data
-            return
-
-        if score_suppressed:
-            self.debug_log("Panel replacement skipped; score recently changed")
-            self.previous_held_item = item_data
-            return
-
-        # If we are currently forcing an item from a one-time item, DO NOT let the ?-panel code claim credit for it.
+        # If we are currently forcing an item from a scoring replacement
+        # or a one-time item, DO NOT let the ?-panel code claim credit for it.
         if self.awaiting_use or item_data == self.forced_item_id or self.item_processed:
             self.debug_log("Panel replacement skipped; forced/awaiting/processed state active")
-            self.previous_held_item = item_data
             return
 
         # Standard pauses
-        if self.one_time_running or not self.ready_to_handle() or self.game_interface.special_active():
-            self.debug_log("Panel replacement skipped; one-time item active, not ready, or special active")
-            self.previous_held_item = item_data
+        if (self.one_time_running or not self.ready_to_handle() or self.item_processed
+                or self.game_interface.special_active()):
+            self.debug_log("Panel replacement skipped; one-time item active, not ready, or already processed")
             return
 
         # Handle Empty List
@@ -1806,9 +1783,7 @@ class MSMContext(CommonContext):
             self.debug_log("There are no items available, replaced with -1 (self.minus_one)")
             logger.info("?-Panel Activated! No items available! Sucks to be you >;]")
             self.item_processed = True  # Mark processed so we don't spam the log
-            self.previous_held_item = -1
             return
-
 
         # Lookup Map
         item_map = {
@@ -1827,20 +1802,17 @@ class MSMContext(CommonContext):
         # This searches the keys of the map to find a match
         item_id = next((val for key, val in item_map.items() if key in random_item), None)
 
-
         if item_id is not None:
             item_id_int = int(item_id)
             self.game_interface.dolphin_client.write_word(self.addresslib.p_item_held_addr, item_id_int)
             verify_item = self.current_item_func()
-            logger.info(f"?-Panel activated! Item replaced with {random_item.replace('?-Panel: ', '').replace('? Panel: ', '')}!")
+            logger.info(f"?-Panel activated! Item replaced with {random_item}!")
             self.debug_log(f"Panel wrote item id {item_id_int}; addr={self.addresslib.p_item_held_addr:#x}, verify={verify_item}")
             self.item_processed = True
             self.awaiting_use = True
             self.forced_item_id = item_id_int
-            self.previous_held_item = item_id_int
         else:
             self.debug_log(f"Panel selected {random_item}, but no item id matched")
-            self.previous_held_item = item_data
 
         await asyncio.sleep(0.1)
 
@@ -3028,13 +3000,18 @@ class MSMContext(CommonContext):
     async def track_cups_won(self):
         """Tracks what cups the player has won"""
 
+        added = False
+
         for location in self.checked_locations:
             name = LOCATION_ID_TO_NAME[location]
             if "Round 3" in name and name not in self.cups_won:
                 self.cups_won.add(name)
+                added = True
+            else:
+                added = False
 
         current_cups_count = len(self.cups_won)
-        if current_cups_count <= self.win_cups_amount:
+        if current_cups_count <= self.win_cups_amount and added:
             logger.info(f"{current_cups_count}/{self.win_cups_amount} Cups Won!")
 
     async def handle_gecko_codes(self):

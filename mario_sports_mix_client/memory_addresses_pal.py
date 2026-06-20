@@ -9,7 +9,7 @@ class MatchAddresses:
     special_active = 0x804D0F98 # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
     exhibition_diff = 0x804D77D3 # Byte
-    ex_diff_on_menu = 0x80B3B16F # Byte
+    ex_diff_on_menu = 0x902319E3  # Byte - UNRELIABLE
     paused = 0x804D069B # Byte
     cutscene_on = 0x805C1999 # Byte
     loading_screen_active = 0x804D8354  # Word
