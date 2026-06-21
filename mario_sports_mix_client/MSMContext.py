@@ -20,8 +20,8 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "1.0.2"
-COMPATIBLE_VERSIONS = ["1.0.0", "1.0.1"]
+CLIENT_VERSION = "1.0.3"
+COMPATIBLE_VERSIONS = ["1.0.0", "1.0.1", "1.0.2"]
 
 
 status_messages = {
