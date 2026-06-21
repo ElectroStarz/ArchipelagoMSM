@@ -2176,7 +2176,7 @@ class MSMContext(CommonContext):
             if self.enable_h_points:
                 # Checks if the player OR opponent has reached the points to win, if so, set timer to 0 which ends
                 # the period
-                if curr_player_score >= self.b_points_win or curr_opp_score >= self.b_points_win:
+                if curr_player_score >= self.h_points_win or curr_opp_score >= self.h_points_win:
                     self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0)
 
     async def set_custom_dodge_health(self):
