@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from typing import Any
 from BaseClasses import Tutorial
 from Options import OptionError
+from worlds.LauncherComponents import Component, Type, components, launch, icon_paths
 from worlds.AutoWorld import WebWorld, World
 from . import regions, rules, locations
 from .options import *
@@ -10,7 +11,24 @@ from .locations import LOCATION_NAME_TO_ID, auto_location_groups
 import json
 import pkgutil
 from Utils import visualize_regions
-from . import components # KEEP THIS HERE
+
+def run_client(*args: str) -> None:
+    from .mario_sports_mix_client.main_client import launch_mario_sports_mix_client as launch_msm_client
+    launch(launch_msm_client, name="Mario Sports Mix Client", args=args)
+
+icon_paths["SportMixIcon"] = f"ap:{__name__}/icon/SportMixIcon.png"
+components.append(
+    Component(
+        "Mario Sports Mix Client",
+        func=run_client,
+        game_name="Mario Sports Mix",
+        component_type=Type.CLIENT,
+        supports_uri=True,
+        icon="SportMixIcon",
+
+    )
+)
+
 
 # Find world version
 
@@ -77,19 +95,25 @@ class MSMWorld(World):
     def generate_early(self) -> None:
         if self.options.goal_condition.value == self.options.be_mean.value:
             raise OptionError(
-                f"[Mario Sports Mix] Player {self.player_name}'s Be Mean option is the same as their win condition!"
+                f"[Mario Sports Mix] {self.player_name}'s Be Mean option is the same as their win condition!"
             )
 
-        if self.options.behemoth_hp < 2400 or self.options.behemoth_hp > 4000:
-            raise OptionError(
-                f"[Mario Sports Mix] Player {self.player_name}'s Behemoth HP is smaller or larger than the allowed value!\n"
-                f"[Mario Sports Mix] Value set: {self.options.behemoth_hp}"
-            )
 
-        if self.options.behemoth_king_hp < 3000 or self.options.behemoth_king_hp > 7000:
+        points_to_win = {
+            "b_points": {"value": self.options.b_points_win.value, "enabled": self.options.enable_b_points_win.value},
+            "h_points": {"value": self.options.h_points_win.value, "enabled": self.options.enable_h_points_win.value},
+            "v_points": {"value": self.options.v_points_win.value, "enabled": True}, # Volleyball always has win points
+        }
+
+        # Filter to get values only if 'enabled' is True
+        active_values = [item["value"] for item in points_to_win.values() if item["enabled"]]
+
+        # Perform the comparison
+        if (active_values and self.options.deathlink_opponent_scores_points.value > max(active_values)
+                and self.options.deathlink.value):
             raise OptionError(
-                f"[Mario Sports Mix] Player {self.player_name}'s Behemoth King HP is smaller or larger than the allowed value!\n"
-                f"[Mario Sports Mix] Value set: {self.options.behemoth_king_hp}"
+                f"[Mario Sports Mix] {self.player_name}'s Opponent Scores Points value is bigger than one of their "
+                f"points to win values, they won't be able to send a deathlink in that sport!"
             )
 
     def create_regions(self) -> None:
