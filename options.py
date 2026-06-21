@@ -1,8 +1,6 @@
 from dataclasses import dataclass
-
 from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup, Visibility, \
     DeathLink
-
 
 class StartWithSports(Choice):
     """Start with the sports? HEAVILY RECOMMENDED
@@ -16,7 +14,7 @@ Will cause immediate BK if off"""
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
-(Also unlocks related stages)"""
+(Also unlocks related stages) - Recommended if you don't have party games on!"""
     display_name = "Start with Mushroom Cup (+Stages)"
     option_none = 0
     option_normal_difficulty = 1

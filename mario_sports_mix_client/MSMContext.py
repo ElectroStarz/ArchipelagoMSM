@@ -20,8 +20,8 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "1.0.0"
-COMPATIBLE_VERSIONS = []
+CLIENT_VERSION = "1.0.2"
+COMPATIBLE_VERSIONS = ["1.0.0", "1.0.1"]
 
 
 status_messages = {
@@ -861,6 +861,7 @@ class MSMContext(CommonContext):
 
         elif cmd == "ReceivedItems":
             asyncio.create_task(self._handle_received_items_consumables(args))
+            asyncio.create_task(self.handle_received_items())
 
         elif cmd in ("Retrieved", "SetReply"):
             key = self.consumable_storage_key
