@@ -17,6 +17,7 @@ class DolphinClient:
         self.attempt = 1
         self.told_region = False
 
+
     @staticmethod
     def check_for_dolphin():
         # Determine the expected executable name based on the OS
@@ -43,7 +44,6 @@ class DolphinClient:
             return 1
         else:
             return 0
-
 
     async def attempt_to_hook(self):
         if not self.dme.is_hooked():
@@ -91,8 +91,6 @@ class DolphinClient:
             self.told_region = True
 
         return True
-
-
 
     def is_hooked_class(self):
         if self.dme.is_hooked():
@@ -143,6 +141,9 @@ class DolphinClient:
     def write_byte(self, address: Any, data: Any):
         self.dme.is_hooked()
         self.dme.write_byte(address, data)
+        value = self.read_byte(address)
+        if value != data:
+            self.logger.error(f"{value} != {data} - You may need to restart dolphin!")
 
     def write_bytes(self, address: Any, data: Any) -> Any:
         self.dme.is_hooked()
@@ -151,10 +152,16 @@ class DolphinClient:
     def write_float(self, address: Any, data: Any):
         self.dme.is_hooked()
         self.dme.write_float(address, data)
+        value = self.read_float(address)
+        if value != data:
+            self.logger.error(f"{value} != {data} - You may need to restart dolphin!")
 
     def write_word(self, address: Any, data: Any):
         self.dme.is_hooked()
         self.dme.write_word(address, data)
+        value = self.read_word(address)
+        if value != data:
+            self.logger.error(f"{value} != {data} - You may need to restart dolphin!")
 
     def follow_pointers(self, address: Any, pointers: list):
         self.dme.is_hooked()

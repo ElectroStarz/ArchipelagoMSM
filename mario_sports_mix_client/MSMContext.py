@@ -142,7 +142,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
     #     asyncio.create_task(self.ctx.check_location(location_name))
 
     def _cmd_debug_mode(self):
-        """Toggle debugging on and off (Default off)"""
+        """Toggle client debugging on and off (Default off)"""
         if not self.ctx.DEBUGGING:
             self.ctx.DEBUGGING = True
             logger.info("Debugging on")
@@ -159,8 +159,12 @@ class MSMCommandProcessor(ClientCommandProcessor):
             self.ctx.DEBUGGING = False
             logger.info("Debugging off")
 
+
     def _cmd_change_debug_amount(self, amount: str):
-        """Change the amount of debug messages that are stored so they don't repeat"""
+        """Change the amount of debug messages that are stored so they don't repeat
+
+        :param amount: The amount of debug messages to store
+        """
         try:
             new_amount = int(amount)
             from collections import deque
@@ -552,6 +556,7 @@ class MSMContext(CommonContext):
         self.game_session_active = False
         self.active_game_version = None
         self.unlocked_sports_mix = False
+        self.locking_period = False
 
         self.one_time_running = False
         self.item_processed = False
@@ -561,8 +566,10 @@ class MSMContext(CommonContext):
         self.previous_held_item: Optional[int] = -1
         self.pending_panel_replacement = False
         self.suppress_panel_until = 0.0
+
         self.boss_hp_handled = False
         self.boss_defeat_handled = False
+
         self.in_tournament_match = False
         self.last_tournament_location_name: Optional[str] = None
         self.cups_won: set[int] = set()
@@ -600,6 +607,8 @@ class MSMContext(CommonContext):
         self.last_debug_messages = deque(maxlen=5)  # Stores up to 5 messages at a time at default
         self._toggle_log_states = {}
         self._log_once_states = {}
+
+    # --- Log types ---
 
     def debug_log(self, message: str) -> None:
         """Sends messages to the client if debugging is on"""
@@ -2121,6 +2130,12 @@ class MSMContext(CommonContext):
 
     async def set_period_amount(self):
         """Sets the amount of periods/sets in the match according to the player's option"""
+        addr = get_address(MatchAddresses.max_periods)
+
+        # This is true when we're locking points
+        if self.locking_period:
+            self.game_interface.dolphin_client.write_byte(addr, 4) # Make sure the game doesn't end after 1 period
+            return
 
         sport = self.game_interface.check_sport()
 
@@ -2131,7 +2146,6 @@ class MSMContext(CommonContext):
             "Hockey": self.h_period
         }
 
-        addr = get_address(MatchAddresses.max_periods)
         target_value = sport_to_var.get(sport)
 
         self.game_interface.dolphin_client.write_byte(addr, target_value)
@@ -2180,6 +2194,7 @@ class MSMContext(CommonContext):
         cups_won_total = len(self.cups_won)
 
         if self.goal_condition == 3:
+            await self.track_cups_won()
             if cups_won_total >= self.win_cups_amount:
                 await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                 self.debug_log(f"Goal Achieved: Win {self.win_cups_amount} Cups!")
@@ -2472,6 +2487,7 @@ class MSMContext(CommonContext):
             required_cup = f"{sport}: {cup} ({difficulty})"
 
         if required_stage in self.unlocked_courts and required_cup in self.unlocked_cups:
+            self.locking_period = False
             return
 
         if required_stage not in self.unlocked_courts and required_cup not in self.unlocked_cups:
@@ -2482,8 +2498,9 @@ class MSMContext(CommonContext):
             await self.delay_log(f"Blocked points for {sport} {cup}. Missing {required_cup}", 10)
 
         try:
-            self.clear_player_score()
-            self.lock_special_meter()
+            await self.clear_player_score()
+            await self.lock_period_1()
+            await self.lock_special_meter()
         finally:
             pass
 
@@ -2498,13 +2515,15 @@ class MSMContext(CommonContext):
 
 
         if f"Exhibition {diff_name}" in self.unlocked_ex_diffs:
+            self.locking_period = False
             return
 
         await self.delay_log(f"Blocked points for match. Missing: Exhibition {diff_name}", 10)
 
         try:
-            self.clear_player_score()
-            self.lock_special_meter()
+            await self.clear_player_score()
+            await self.lock_period_1()
+            await self.lock_special_meter()
         finally:
             pass
 
@@ -2532,8 +2551,8 @@ class MSMContext(CommonContext):
         await self.delay_log(f"Locked points for {boss}, you do not have {required_stage}", 10)
 
         try:
-            self.lock_behemoth_hp()
-            self.lock_special_meter()
+            await self.lock_behemoth_hp()
+            await self.lock_special_meter()
         finally:
             pass
 
@@ -2545,14 +2564,19 @@ class MSMContext(CommonContext):
         self.game_interface.dolphin_client.write_string(self.addresslib.current_stage_addr, "s39ba")
         self.game_interface.dolphin_client.write_word(current_module_addr, 0x6D656E75)
 
-    def clear_player_score(self):
+    async def clear_player_score(self):
         """Locks the player's score at 0"""
 
         for address in player_score_addresses:
             new_addr = get_address(address)
             self.game_interface.dolphin_client.write_word(new_addr, 0)
 
-    def lock_special_meter(self):
+    async def lock_period_1(self):
+        """Locks the period/set counter at period 1"""
+        self.locking_period = True
+        self.game_interface.dolphin_client.write_byte(get_address(MatchAddresses.current_period), 0)
+
+    async def lock_special_meter(self):
         """Locks the player's special meter at 0"""
 
         special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
@@ -2560,7 +2584,7 @@ class MSMContext(CommonContext):
 
         self.game_interface.dolphin_client.write_float(special_meter, 0)
 
-    def lock_behemoth_hp(self):
+    async def lock_behemoth_hp(self):
         """Function to lock Behemoth Health, called in handle_lock_behemoth_hp"""
 
         behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
@@ -2727,6 +2751,10 @@ class MSMContext(CommonContext):
 
         if self.deathlink_enabled:
 
+            if self.locking_period:
+                # Failsafe in case the period change doesn't get applied and the player loses,shouldn't count as a death
+                return
+
             # Lose Match Action
             if self.deathlink_action == 0:
                 if not self.received_death:
@@ -2735,7 +2763,7 @@ class MSMContext(CommonContext):
                             message = random.choice(possible_messages_0)  # Pick a random message to send
                             await self.send_death(f"{self.player_names[self.slot]} {message}")
                             self.has_sent_death = True
-                            self.debug_log("Sent deathlink due to losing the match")
+                            self.debug_log("Sent deathlink due to losing/tying the match")
 
 
             # Every number of Points Action
@@ -3073,7 +3101,6 @@ class MSMContext(CommonContext):
         """What functions should be handled during a match"""
         # Cup Goal
         await self.has_cup_goaled()
-        await self.track_cups_won()
 
         # Custom Tournament Settings
         if self.in_tournament_match:
@@ -3136,7 +3163,6 @@ class MSMContext(CommonContext):
     async def handle_in_main_menu(self):
         """What functions should be handled in the main menu"""
         await self.has_cup_goaled()
-        await self.track_cups_won()
 
         await self.handle_received_items()
         await self.check_pending_tournament_location()
