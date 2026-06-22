@@ -331,19 +331,6 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
     cup_tiers = ["Mushroom", "Flower", "Star"]
     hard_enabled = world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true
 
-    # Normal Cup Entrance Rules
-    for sport in sports:
-        for cup in cup_tiers:
-            entrance = world.get_entrance(f"{sport} -> {cup} Cup (Normal)")
-            world.set_rule(entrance, Has(sport) & cup_rule(world, sport, cup, "Normal"))
-
-    # Hard Cup Entrance Rules
-    if hard_enabled:
-        for sport in sports:
-            for cup in cup_tiers:
-                entrance = world.get_entrance(f"{sport} -> {cup} Cup (Hard)")
-                world.set_rule(entrance, Has(sport) & cup_rule(world, sport, cup, "Hard"))
-
     sports_mix_rule = (
             (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_mix_item)]) |
              HasAll(
@@ -353,10 +340,33 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
              ))
     )
 
+    # Menu rules
+    for sport in sports:
+        entrance = world.get_entrance(f"Main Menu -> {sport}")
+        world.set_rule(entrance, Has(sport))
+
+    sm_entrance = world.get_entrance(f"Main Menu -> Sports Mix")
+    world.set_rule(sm_entrance, sports_mix_rule)
+
+    # Normal Cup Entrance Rules
+    for sport in sports:
+        for cup in cup_tiers:
+            entrance = world.get_entrance(f"{sport} -> {cup} Cup (Normal)")
+            world.set_rule(entrance, cup_rule(world, sport, cup, "Normal"))
+
+    # Hard Cup Entrance Rules
+    if hard_enabled:
+        for sport in sports:
+            for cup in cup_tiers:
+                entrance = world.get_entrance(f"{sport} -> {cup} Cup (Hard)")
+                world.set_rule(entrance, cup_rule(world, sport, cup, "Hard"))
+
+
+
     # Sports Mix Entrance Rules
     for cup in cup_tiers:
         entrance = world.get_entrance(f"Sports Mix -> {cup} Cup")
-        world.set_rule(entrance, sports_mix_rule & cup_rule(world, "Sports Mix", cup, "Sports Mix"))
+        world.set_rule(entrance, cup_rule(world, "Sports Mix", cup, "Sports Mix"))
 
 
 def set_completion_condition(world: MSMWorld) -> None:
