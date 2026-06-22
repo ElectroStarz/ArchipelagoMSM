@@ -118,5 +118,5 @@ def get_address(address, offset=0xF80):
         new_addr = address - offset
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         return new_addr
-
-    return address
+    else:
+        return address

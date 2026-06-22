@@ -62,7 +62,7 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
         return Has("Progressive Cup", needed_count)
     else:
         # If Sports Mix
-        if category == "Sports Mix":
+        if category == "Sports Mix" or sport == "Sports Mix":
             return Has(f"Sports Mix: {cup_name} Cup")
         # If Main Sport
         return Has(f"{sport}: {cup_name} Cup ({category})")
@@ -326,7 +326,6 @@ def set_goal_rules(world: MSMWorld) -> None:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
 
-
 def set_all_entrance_rules(world: MSMWorld) -> None:
     sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
     cup_tiers = ["Mushroom", "Flower", "Star"]
@@ -345,10 +344,19 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                 entrance = world.get_entrance(f"{sport} -> {cup} Cup (Hard)")
                 world.set_rule(entrance, Has(sport) & cup_rule(world, sport, cup, "Hard"))
 
+    sports_mix_rule = (
+            (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_mix_item)]) |
+             HasAll(
+                 "Sports Crystal: Red", "Sports Crystal: Green",
+                 "Sports Crystal: Yellow", "Sports Crystal: Blue",
+                 options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_crystals)]
+             ))
+    )
+
     # Sports Mix Entrance Rules
     for cup in cup_tiers:
         entrance = world.get_entrance(f"Sports Mix -> {cup} Cup")
-        world.set_rule(entrance, cup_rule(world, "Sports Mix", cup, "Sports Mix"))
+        world.set_rule(entrance, sports_mix_rule & cup_rule(world, "Sports Mix", cup, "Sports Mix"))
 
 
 def set_completion_condition(world: MSMWorld) -> None:
