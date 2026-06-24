@@ -110,7 +110,7 @@ class AddressLib:
         "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
         "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
         "p_pos_addr", "p_item_held_addr", "p_coins_addr",
-        "o_coins_addr", "p_special_meter_addr"
+        "o_coins_addr", "o_item_held_addr", "p_special_meter_addr"
     ]
 
     def reset_all_addresses(self, logger):

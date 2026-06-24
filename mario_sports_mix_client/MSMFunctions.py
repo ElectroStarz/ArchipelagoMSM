@@ -99,6 +99,12 @@ def is_exception(address):
     else:
         return False
 
+def is_ntscu(address):
+    if address in vars(NTSCUAddresses).values():
+        return True
+    else:
+        return False
+
 def get_address(address, offset=0xF80):
     """Get the correct address depending on what region the game is.
     Address inputted should be a PAL address which will then be converted to NTSC-U"""
@@ -119,4 +125,7 @@ def get_address(address, offset=0xF80):
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         return new_addr
     else:
-        return address
+        if is_ntscu(address):
+            return address + offset
+        else:
+            return address

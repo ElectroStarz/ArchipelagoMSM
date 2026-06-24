@@ -167,7 +167,7 @@ class DodgeballAddresses:
         black_mage = 0x90226BC9
 
 class VolleyballAddresses:
-    throw_timer = 0x805C1B50 # Word | Has Offsets
+    throw_timer = 0x805C1B50 # Word | Has Pointers
     points_to_win = 0x804D7807 # Byte
 
     class Tournament:
@@ -247,9 +247,12 @@ class SportsMixAddresses:
         cups = 0x90226D9C # Byte
 
 class BossAddresses:
-    behemoth_hp = 0x804D0F74 # Float | Has Offsets | In CAL
+    behemoth_hp = 0x804D0F74 # Float | Has Pointers | In CAL
 
-class Offsets:
+class NTSCUAddresses:
+    pass # Remove pass once an address has been added
+
+class Pointers:
     class Match:
         current_module_offsets = [0x1F5]
         set_break_offsets = [0x94]

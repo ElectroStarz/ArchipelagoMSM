@@ -1008,7 +1008,7 @@ class MSMContext(CommonContext):
         ready_game = bool
         custom_time = self.get_custom_time()
         set_break_addr = self.game_interface.dolphin_client.follow_pointers(get_address(MatchAddresses.set_break),
-                                                                            Offsets.Match.set_break_offsets)
+                                                                            Pointers.Match.set_break_offsets)
         set_break = self.game_interface.dolphin_client.read_word(set_break_addr)
 
         if match_status == 0 and current_stage not in not_match_prefix and custom_time is not None:
@@ -1043,7 +1043,7 @@ class MSMContext(CommonContext):
                 if current_stage == "s20":
                     try:
                         self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                            Offsets.Boss.behemoth_hp_offsets)
+                                                            Pointers.Boss.behemoth_hp_offsets)
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
@@ -1051,7 +1051,7 @@ class MSMContext(CommonContext):
                     try:
                         # Check if you can follow pointers to the address, if so, then ready
                         self.game_interface.dolphin_client.follow_pointers(self.addresslib.vbp_addr,
-                                                            Offsets.VBP.v_last_held_offsets)
+                                                            Pointers.VBP.v_last_held_offsets)
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
@@ -1644,7 +1644,7 @@ class MSMContext(CommonContext):
 
         try:
             special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
-                                                                            Offsets.Player.special_meter_offsets)
+                                                                            Pointers.Player.special_meter_offsets)
 
             if "Special Meter" not in self.unlocked_abilities:
                 self.game_interface.dolphin_client.write_float(special_meter, 0.0)
@@ -1922,7 +1922,7 @@ class MSMContext(CommonContext):
         """Freezes the character in place for 5 seconds"""
 
         char = f"B{char_id}"
-        offset_1 = getattr(Offsets.Player, char)
+        offset_1 = getattr(Pointers.Player, char)
         offset_group = getattr(offset_1, "Position")
 
         x_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_pos_addr, offset_group.x_offsets)
@@ -2020,7 +2020,7 @@ class MSMContext(CommonContext):
         tele_z = round(float_z, 1)
 
         char = f"B{char_id}"
-        offset_1 = getattr(Offsets.Player, char)
+        offset_1 = getattr(Pointers.Player, char)
         offset_group = getattr(offset_1, "Position")
 
         x_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_pos_addr, offset_group.x_offsets)
@@ -2227,7 +2227,7 @@ class MSMContext(CommonContext):
 
         if self.ready_to_handle():
             address_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                                                     Offsets.Boss.behemoth_hp_offsets)
+                                                                                     Pointers.Boss.behemoth_hp_offsets)
 
             # Behemoth Handling
             if self.is_behemoth:
@@ -2285,9 +2285,9 @@ class MSMContext(CommonContext):
 
         if not self.boss_hp_handled and self.ready_to_handle():
             max_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                                                 Offsets.Boss.max_hp_offsets)
+                                                                                 Pointers.Boss.max_hp_offsets)
             behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                                             Offsets.Boss.behemoth_hp_offsets)
+                                                                             Pointers.Boss.behemoth_hp_offsets)
             if self.is_behemoth:
                 self.game_interface.dolphin_client.write_float(max_behemoth_hp, self.behemoth_hp)
                 self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
@@ -2579,7 +2579,7 @@ class MSMContext(CommonContext):
     def send_to_void(self):
         """Sends the player to the void (stage=s39ba, module=0x6D656E75)"""
         current_module_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
-                                                                            Offsets.Match.current_module_offsets)
+                                                                            Pointers.Match.current_module_offsets)
 
         self.game_interface.dolphin_client.write_string(self.addresslib.current_stage_addr, "s39ba")
         self.game_interface.dolphin_client.write_word(current_module_addr, 0x6D656E75)
@@ -2600,7 +2600,7 @@ class MSMContext(CommonContext):
         """Locks the player's special meter at 0"""
 
         special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
-                                                                           Offsets.Player.special_meter_offsets)
+                                                                           Pointers.Player.special_meter_offsets)
 
         self.game_interface.dolphin_client.write_float(special_meter, 0)
 
@@ -2608,7 +2608,7 @@ class MSMContext(CommonContext):
         """Function to lock Behemoth Health, called in handle_lock_behemoth_hp"""
 
         behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
-                                                                         Offsets.Boss.behemoth_hp_offsets)
+                                                                         Pointers.Boss.behemoth_hp_offsets)
         if self.is_behemoth:
             self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_hp)
 
@@ -2928,12 +2928,12 @@ class MSMContext(CommonContext):
                             # Lists start at 0, we need to take away one from the value
                             random_char = randint(0, self.game_interface.check_player_amount() - 1)
 
-                            offsets = [Offsets.Player.B1.dodge_damage,
-                                       Offsets.Player.B2.dodge_damage,
-                                       Offsets.Player.B3.dodge_damage,]
+                            pointers = [Pointers.Player.B1.dodge_damage,
+                                        Pointers.Player.B2.dodge_damage,
+                                        Pointers.Player.B3.dodge_damage,]
 
                             addr = get_address(PlayerAddresses.dodge_damage)
-                            final_addr = self.game_interface.dolphin_client.follow_pointers(addr, offsets[random_char])
+                            final_addr = self.game_interface.dolphin_client.follow_pointers(addr, pointers[random_char])
                             curr_damage = self.game_interface.dolphin_client.read_word(final_addr)
                             new_damage = curr_damage + self.deathlink_dodge_health_lost
                             self.game_interface.dolphin_client.write_word(final_addr, new_damage)
@@ -3068,7 +3068,7 @@ class MSMContext(CommonContext):
         """Handle the gecko code patches for each region"""
 
         current_module = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
-                                                                            Offsets.Match.current_module_offsets)
+                                                                            Pointers.Match.current_module_offsets)
         value = self.game_interface.dolphin_client.read_word(current_module)
 
         if value == 0x6D656E75 and not self.handled_gecko_codes:
