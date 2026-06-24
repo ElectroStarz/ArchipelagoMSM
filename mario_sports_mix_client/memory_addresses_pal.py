@@ -2,7 +2,7 @@ class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
-    current_stage = 0x8047888E  # String | Uses -0xF20
+    current_stage = 0x8047888E  # String | Uses -0xF20 for NTSC-U
     current_period = 0x804D77CC # Byte | Starts at 0
     max_periods = 0x804D77CB # Byte # Uses normal 1, 2, 3, 4 & 5
     current_module = 0x804D1154 # Word
