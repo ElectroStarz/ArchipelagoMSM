@@ -2174,7 +2174,7 @@ class MSMContext(CommonContext):
         """Check if the player has scored the required amount of points to win the period/set"""
 
         sport = self.game_interface.check_sport()
-        period = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
+        period = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period_addr)
         curr_player_score = self.game_interface.dolphin_client.read_word(get_address(player_score_addresses[period]))
         curr_opp_score = self.game_interface.dolphin_client.read_word(get_address(opponent_score_addresses[period]))
 
@@ -2594,7 +2594,7 @@ class MSMContext(CommonContext):
     async def lock_period_1(self):
         """Locks the period/set counter at period 1"""
         self.locking_period = True
-        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 0)
+        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period_addr, 0)
 
     async def lock_special_meter(self):
         """Locks the player's special meter at 0"""
@@ -2900,7 +2900,7 @@ class MSMContext(CommonContext):
                         self.recover_boss_hp()
                     else:
                         # Force opponent to win
-                        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4 = 5th Period
+                        self.game_interface.dolphin_client.write_byte(self.addresslib.current_period_addr, 4)# 4 = 5th Period
                         for address in opponent_score_addresses:
                             addr = get_address(address)
                             self.game_interface.dolphin_client.write_word(addr, 100) # Write 100 for all scores
@@ -2917,7 +2917,7 @@ class MSMContext(CommonContext):
                         self.recover_boss_hp()
                     else:
                         if self.game_interface.check_sport() != "Dodgeball":
-                            value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period)
+                            value = self.game_interface.dolphin_client.read_byte(self.addresslib.current_period_addr)
                             addr = get_address(opponent_score_addresses[value]) # Get the address for current period
                             points = self.game_interface.dolphin_client.read_word(addr)
                             new_points = points + self.deathlink_o_get_points

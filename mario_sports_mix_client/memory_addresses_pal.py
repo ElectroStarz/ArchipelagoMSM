@@ -1,27 +1,27 @@
 class MatchAddresses:
     game_code = 0x800000 # String
-    match_status = 0x804D78BC  # Byte
+    match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
-    current_stage = 0x8047888E  # String | Uses -0xF20 for NTSC-U
-    current_period = 0x804D77CC # Byte | Starts at 0
-    max_periods = 0x804D77CB # Byte # Uses normal 1, 2, 3, 4 & 5
-    current_module = 0x804D1154 # Word | Has Pointers
+    current_stage = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
+    current_period = 0x804D77CC # Byte | Starts at 0 | In CAL
+    max_periods = 0x804D77CB # Byte | Uses normal 1, 2, 3, 4 & 5
+    current_module = 0x804D1154 # Word | Has Pointers | In CAL
     special_active = 0x804D0F98 # Word | Has Pointers
-    tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
-    exhibition_diff = 0x804D77D3 # Byte
-    ex_diff_on_menu = 0x902319E3  # Byte - UNRELIABLE
-    paused = 0x804D069B # Byte
-    cutscene_on = 0x805C1999 # Byte
-    loading_screen_active = 0x804D8354  # Word
+    tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0 for Normal, 1 for Hard) | In CAL
+    exhibition_diff = 0x804D77D3 # Byte | In CAL
+    ex_diff_on_menu = 0x902319E3  # Byte | UNRELIABLE
+    paused = 0x804D069B # Byte | In CAL
+    cutscene_active = 0x805C1999 # Byte | In CAL
+    loading_screen_active = 0x804D8354  # Word | In CAL
     set_break = 0x804D1178 # Word | Has Pointers
     game_speed = 0x804D77F4 # Float
 
     shot_clock = 0x804D77F0  # Float
-    time_remaining = 0x804D77E4  # Float
-    max_time = 0x804D77E0 # Float
+    time_remaining = 0x804D77E4  # Float | In CAL
+    max_time = 0x804D77E0 # Float | In CAL
 
     # 4 = 2v2, 0 = 3v3
-    game_layout = 0x804D77C6 # Byte
+    game_layout = 0x804D77C6 # Byte | In CAL
 
 class CupsWonMultiple:
     # All are halfwords (2 bytes)
@@ -49,11 +49,11 @@ class GamesPlayed:
     hockey = 0x90229A78  # Word
 
 class PlayerAddresses:
-    item_held = 0x804D789C  # Word
-    various_ball_pointers = 0x804D0F98 # Word | Has Pointers
+    item_held = 0x804D789C  # Word | In CAL
+    various_ball_pointers = 0x804D0F98 # Word | Has Pointers | In CAL
     human_players = 0x804d8e14 # Byte | Is 0 in demo
 
-    special_meter = 0x804D0F8C # Float | Has Pointers
+    special_meter = 0x804D0F8C # Float | Has Pointers | In CAL
 
     # Characters and costumes
     character_1 = 0x804D7808  # Byte
@@ -69,10 +69,9 @@ class PlayerAddresses:
 
     is_cpu = 0x805C1B50 # Byte | Has Pointers
 
-
     # Score and coins
     class Score:
-        coins = 0x804D785C  # Word
+        coins = 0x804D785C  # Word | In CAL
         score_period_1 = 0x804D7E18  # Word
         score_period_2 = 0x804D7E1C  # Word
         score_period_3 = 0x804D7E20  # Word
@@ -80,15 +79,15 @@ class PlayerAddresses:
         score_period_5 = 0x804D7E28  # Word
 
     class Position:
-        pos = 0x805C1B50 # Float | Has Pointers
+        pos = 0x805C1B50 # Float | Has Pointers | In CAL
 
 class OpponentAddresses:
-    item_held = 0x804D78A0 # Word
+    item_held = 0x804D78A0 # Word | In CAL
     dodge_max_health = 0x804D78D4 # Word
 
     # Score and coins
     class Score:
-        coins = 0x804D7860 # Word
+        coins = 0x804D7860 # Word | In CAL
         score_period_1 = 0x804D7E2C # Word
         score_period_2 = 0x804D7E30 # Word
         score_period_3 = 0x804D7E34 # Word
@@ -96,7 +95,7 @@ class OpponentAddresses:
         score_period_5 = 0x804D7E3C # Word
 
 class BasketballAddresses:
-    time = 0x804D9977 # Byte
+    time = 0x804D9977 # Byte | In CAL
 
     class Tournament:
         tabs = 0x90226D98 # Byte | 2 = Normal, 3 = Normal + Hard
@@ -132,7 +131,7 @@ class BasketballAddresses:
         black_mage = 0x90226949
 
 class DodgeballAddresses:
-    time = 0x804D99AB # Byte
+    time = 0x804D99AB # Byte | In CAL
 
     class Tournament:
         tabs = 0x90226DB0 # Byte
@@ -205,7 +204,7 @@ class VolleyballAddresses:
         black_mage = 0x90226A89
 
 class HockeyAddresses:
-    time = 0x804D99CB # Byte
+    time = 0x804D99CB # Byte | In CAL
 
     class Tournament:
         tabs = 0x90226DBC # Byte
@@ -241,14 +240,14 @@ class HockeyAddresses:
         black_mage = 0x90226D09
 
 class SportsMixAddresses:
-    is_sports_mix = 0x804D7913 # Byte
+    is_sports_mix = 0x804D7913 # Byte | In CAL
     sports_mix_unlocked = 0x90226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
 
     class Tournament:
         cups = 0x90226D9C # Byte
 
 class BossAddresses:
-    behemoth_hp = 0x804D0F74 # Float | Has Offsets
+    behemoth_hp = 0x804D0F74 # Float | Has Offsets | In CAL
 
 class Offsets:
     class Match:
