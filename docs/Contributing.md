@@ -89,3 +89,6 @@ run at the same time as everything else. Now, for the function name I want you t
 have a function called 'handle_received_deathlink', what do you think it does? If you said it handles received
 deathlinks you'd be correct! Now, I can't tell you how exactly to make your function because I can't read your mind from
 the past, but if you have any questions please feel free to ping me!
+
+### Values
+I've made a little helper doc for some values of some addresses :] [Value Guide](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/contributing_resources/value_guide.md)
