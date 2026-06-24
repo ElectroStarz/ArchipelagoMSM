@@ -1050,7 +1050,7 @@ class MSMContext(CommonContext):
                 else:
                     try:
                         # Check if you can follow pointers to the address, if so, then ready
-                        self.game_interface.dolphin_client.follow_pointers(self.addresslib.volley_last_held_addr,
+                        self.game_interface.dolphin_client.follow_pointers(self.addresslib.vbp_addr,
                                                             Offsets.VBP.v_last_held_offsets)
                         ready_game = True
                     except RuntimeError:

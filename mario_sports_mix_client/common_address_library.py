@@ -8,6 +8,10 @@ from .MSMFunctions import get_address
 class AddressLib:
 
     @cached_property
+    def vbp_addr(self):
+        return get_address(PlayerAddresses.various_ball_pointers)
+
+    @cached_property
     def current_stage_addr(self):
         return get_address(MatchAddresses.current_stage)
 
@@ -50,10 +54,6 @@ class AddressLib:
     @cached_property
     def behemoth_hp_addr(self):
         return get_address(BossAddresses.behemoth_hp)
-
-    @cached_property
-    def volley_last_held_addr(self):
-        return get_address(VolleyballAddresses.last_held)
 
     @cached_property
     def basket_time_addr(self):

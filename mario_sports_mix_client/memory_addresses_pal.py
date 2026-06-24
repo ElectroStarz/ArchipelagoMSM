@@ -5,15 +5,15 @@ class MatchAddresses:
     current_stage = 0x8047888E  # String | Uses -0xF20 for NTSC-U
     current_period = 0x804D77CC # Byte | Starts at 0
     max_periods = 0x804D77CB # Byte # Uses normal 1, 2, 3, 4 & 5
-    current_module = 0x804D1154 # Word
-    special_active = 0x804D0F98 # Word
+    current_module = 0x804D1154 # Word | Has Pointers
+    special_active = 0x804D0F98 # Word | Has Pointers
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
     exhibition_diff = 0x804D77D3 # Byte
     ex_diff_on_menu = 0x902319E3  # Byte - UNRELIABLE
     paused = 0x804D069B # Byte
     cutscene_on = 0x805C1999 # Byte
     loading_screen_active = 0x804D8354  # Word
-    set_break = 0x804D1178 # Word
+    set_break = 0x804D1178 # Word | Has Pointers
     game_speed = 0x804D77F4 # Float
 
     shot_clock = 0x804D77F0  # Float
@@ -22,9 +22,6 @@ class MatchAddresses:
 
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte
-
-class BossAddresses:
-    behemoth_hp = 0x804D0F74 # Float
 
 class CupsWonMultiple:
     # All are halfwords (2 bytes)
@@ -53,10 +50,10 @@ class GamesPlayed:
 
 class PlayerAddresses:
     item_held = 0x804D789C  # Word
-    various_ball_pointers = 0x804D0F98 # Word
+    various_ball_pointers = 0x804D0F98 # Word | Has Pointers
     human_players = 0x804d8e14 # Byte | Is 0 in demo
 
-    special_meter = 0x804D0F8C # Float
+    special_meter = 0x804D0F8C # Float | Has Pointers
 
     # Characters and costumes
     character_1 = 0x804D7808  # Byte
@@ -67,10 +64,10 @@ class PlayerAddresses:
     costume_2 = 0x804D7812  # Byte
     costume_3 = 0x804D7814  # Byte
 
-    dodge_damage = 0x805C1C70 # Word
+    dodge_damage = 0x805C1C70 # Word | Has Pointers
     dodge_max_health = 0x804D78D0 # Word
 
-    is_cpu = 0x805C1B50
+    is_cpu = 0x805C1B50 # Byte | Has Pointers
 
 
     # Score and coins
@@ -83,9 +80,7 @@ class PlayerAddresses:
         score_period_5 = 0x804D7E28  # Word
 
     class Position:
-        # All Floats
-        pos = 0x805C1B50
-        rotation = 0x805C1B50
+        pos = 0x805C1B50 # Float | Has Pointers
 
 class OpponentAddresses:
     item_held = 0x804D78A0 # Word
@@ -173,9 +168,7 @@ class DodgeballAddresses:
         black_mage = 0x90226BC9
 
 class VolleyballAddresses:
-    last_held = 0x804D0F98 # Word
-
-    throw_timer = 0x805C1B50 # Word
+    throw_timer = 0x805C1B50 # Word | Has Offsets
     points_to_win = 0x804D7807 # Byte
 
     class Tournament:
@@ -212,7 +205,7 @@ class VolleyballAddresses:
         black_mage = 0x90226A89
 
 class HockeyAddresses:
-    time = 0x804D99CB #Byte
+    time = 0x804D99CB # Byte
 
     class Tournament:
         tabs = 0x90226DBC # Byte
@@ -253,6 +246,9 @@ class SportsMixAddresses:
 
     class Tournament:
         cups = 0x90226D9C # Byte
+
+class BossAddresses:
+    behemoth_hp = 0x804D0F74 # Float | Has Offsets
 
 class Offsets:
     class Match:
@@ -295,7 +291,6 @@ class Offsets:
                 y_offsets = [0x54,0x10, 0x90,0x9C]
                 z_offsets = [0x54,0x10,0x90,0xA0]
                 rotation_offsets = [0x54,0x10,0x90,0xB4]
-
 
     class Volleyball:
 
