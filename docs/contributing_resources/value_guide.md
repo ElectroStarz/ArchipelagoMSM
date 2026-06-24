@@ -13,7 +13,7 @@ Add these together to get different combinations
 Mushroom = 1\
 Flower = 2\
 Star = 4\
-?-Block =\
+?-Block = 8\
 All = 15
 
 ### **Exhibition Stages**
