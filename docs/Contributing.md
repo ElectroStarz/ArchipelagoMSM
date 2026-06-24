@@ -63,7 +63,7 @@ addresses to do with the save file), if so it returns true. This brings us back 
 is_exception(address), return the normal address'.
 
 If it's not an exception, we check the game region! If the region isn't NTSC-U, it just passes back the address given,
-however if it isn't, we do a few more checks. Remember that current_stage variable? Remember how it said "Uses -0xF20
+however if it is, we do a few more checks. Remember that current_stage variable? Remember how it said "Uses -0xF20
 for NTSC-U"? Well, this is where we check if it's that address and if so, we return the correct address. However, if it
 isn't we just return the address minus the default offset.
 
