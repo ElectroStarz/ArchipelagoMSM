@@ -82,18 +82,20 @@ def exhibition_rule(world: MSMWorld, min_diff: str):
 
     # Find the index of the string, then slice the list safely
     min_diff_index = all_difficulties.index(min_diff)
+    base_diff_item = f"Exhibition {min_diff}"
     required_difficulties = all_difficulties[min_diff_index:]
 
     # Filter these by what the user actually enabled in their options
-    items_needed = [
+    diffs_above = [
         f"Exhibition {diff}"
         for diff in required_difficulties
-        if diff in world.options.exhibition_difficulty.value
+        if diff in world.options.exhibition_difficulty.value and diff != min_diff
     ]
     # Return the rule
-    if not items_needed:
-        return False
-    return HasAny(*items_needed)
+    if not diffs_above:
+        return Has(base_diff_item) # Player just needs base diff
+
+    return Has(base_diff_item) | (Has(base_diff_item) & HasAny(*diffs_above)) # Player needs base diff and/or diff above
 
 
 SPORTS = ["Basketball", "Dodgeball", "Hockey", "Volleyball"]

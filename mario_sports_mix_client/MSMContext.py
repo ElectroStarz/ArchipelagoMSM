@@ -2777,8 +2777,10 @@ class MSMContext(CommonContext):
 
             # Lose Match Action
             if self.deathlink_action == 0:
+                if self.is_behemoth or self.is_behemoth_king:
+                    await self.check_behemoth_deathlink()
 
-                if not self.received_death:
+                elif not self.received_death:
                     if (match_status == 2 or match_status == 3) and (not self.timer_reset() or not self.timer_is_0()):
                         if not self.has_sent_death and self.slot is not None:
                             message = random.choice(possible_messages_0)  # Pick a random message to send
@@ -2789,9 +2791,11 @@ class MSMContext(CommonContext):
 
             # Every number of Points Action
             elif self.deathlink_action == 1:
+                if self.is_behemoth or self.is_behemoth_king:
+                    await self.check_behemoth_deathlink()
 
                 # Dodgeball logic
-                if self.game_interface.check_sport() == "Dodgeball":
+                elif self.game_interface.check_sport() == "Dodgeball":
                     if self.has_dodge_opponent_scored():
                         if self.slot is not None:
                             message = random.choice(possible_messages_1)
@@ -2805,6 +2809,16 @@ class MSMContext(CommonContext):
                             message = random.choice(possible_messages_1)
                             await self.send_death(f"{self.player_names[self.slot]} {message}")
                             self.debug_log("Sent deathlink due to the opponent scoring a threshold")
+
+    async def check_behemoth_deathlink(self):
+        """Checks if the player has lost during the Behemoth boss fight"""
+        match_status = self.game_interface.dolphin_client.read_byte(self.addresslib.match_status_addr)
+
+        if match_status == 2 or match_status == 3:
+            type = " King" if self.is_behemoth_king else "" # If Behemoth King, change message accordingly
+            if self.slot is not None:
+                await self.send_death(f"{self.player_names[self.slot]} has lost to the might of the Behemoth{type}...")
+
 
     def has_score_reached_threshold(self) -> bool:
         """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points) in
@@ -2889,7 +2903,7 @@ class MSMContext(CommonContext):
                         self.game_interface.dolphin_client.write_byte(self.addresslib.current_period, 4)# 4 = 5th Period
                         for address in opponent_score_addresses:
                             addr = get_address(address)
-                            self.game_interface.dolphin_client.write_byte(addr, 100) # Write 100 for all scores
+                            self.game_interface.dolphin_client.write_word(addr, 100) # Write 100 for all scores
                         self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
                         self.received_death = True # Required so we don't send a deathlink when we get sent one
                         # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
@@ -2930,9 +2944,10 @@ class MSMContext(CommonContext):
                                      PlayerAddresses.character_3,]
 
                             value = self.game_interface.dolphin_client.read_byte(chars[random_char])
-                            character = char_to_id.get(value)
+                            character = char_to_id[value]
 
                             logger.info(f"Watch out! It may not look like it, but {character} is on {health} HP!")
+
 
     def recover_boss_hp(self):
         """Calculates the amount of HP recovered when sent a deathlink"""
@@ -2942,12 +2957,14 @@ class MSMContext(CommonContext):
             current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)
             new_health = current_health + health_recovered
             self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
+            logger.info(f"Behemoth has powered up back to {new_health} HP!")
 
         elif self.is_behemoth_king:
             health_recovered = (self.deathlink_boss_recovered / 100) * self.behemoth_king_hp
             current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)
             new_health = current_health + health_recovered
             self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
+            logger.info(f"Behemoth King has powered up back to {new_health} HP!")
 
 
     # === Misc stuff idk where to put ===
@@ -2992,8 +3009,8 @@ class MSMContext(CommonContext):
                 self.last_error_message = None
 
                 # Route Game State Execution
-                connection_state = self.game_interface.get_connection_state()
                 self.update_connection_status()
+                connection_state = self.game_interface.get_connection_state()
 
                 if connection_state == ConnectionState.IN_MATCH:
                     await self.handle_in_match()
@@ -3041,7 +3058,7 @@ class MSMContext(CommonContext):
                 self.cups_won.add(name)
                 added = True
             else:
-                added = False
+                added = False # Stop client spam
 
         current_cups_count = len(self.cups_won)
         if current_cups_count <= self.win_cups_amount and added:
@@ -3086,7 +3103,7 @@ class MSMContext(CommonContext):
             else:
                 logger.error(f"WARNING: It doesn't seem like things are working! You may need to restart Dolphin.\n"
                              f"If you can, please remember what you did prior as this may help solve this bug overall\n"
-                             f"addr={hex(addr)}, type={type}, read={read_value}, corr={correct_value}")
+                             f"addr={hex(addr)}, type={type}, read_val={read_value}, corr_val={correct_value}")
                 return False
         else:
             self.delay_log(f"Uh oh, I'm stupid! This read type doesn't exist! Please ping @electrostarz\n"
