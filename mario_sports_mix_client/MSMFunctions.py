@@ -19,7 +19,7 @@ sports_addresses = [
 ]
 
 
-async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, unlocked_sports_mix: bool):
+async def unlock_tournament_tabs_option(hard_tournament_difficulty: bool, unlocked_sports_mix: bool):
     """Unlocks the tournament tabs depending on YAML settings."""
 
     # If Sports Mix is unlocked, stop right here and do absolutely nothing.
@@ -38,11 +38,11 @@ async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, 
 
     # Run the memory check/write loop exactly once
     for address in address_list:
-        current_value = self.game_interface.dolphin_client.read_byte(address)
+        current_value = dme.read_byte(address)
 
         # Only write if the value needs changing to avoid spamming the emulator
         if current_value != target_value:
-            self.game_interface.dolphin_client.write_byte(address, target_value)
+            dme.write_byte(address, target_value)
 
 
 def unlock_ex_tabs():
@@ -52,6 +52,14 @@ def unlock_ex_tabs():
     for sport in sports_addresses:
         new_addr = get_address(sport.Exhibition.tabs)
         dme.write_byte(new_addr, target_value)
+
+def unlock_party_tabs():
+    """Unlocks all the tabs in party mode"""
+
+    dme.write_byte(get_address(PartyMode.FeedPetey.Tabs.tabs), 3)
+    dme.write_byte(get_address(PartyMode.HarmonyHustle.Tabs.tabs), 7)
+    dme.write_byte(get_address(PartyMode.BobOmbDodge.Tabs.tabs), 3)
+    dme.write_byte(get_address(PartyMode.SmashSkate.Tabs.tabs), 3)
 
 
 def lock_all_cups():
@@ -90,6 +98,9 @@ def is_exception(address):
                   VolleyballAddresses.Characters, VolleyballAddresses.Tournament, VolleyballAddresses.Exhibition,
                   HockeyAddresses.Characters,     HockeyAddresses.Tournament,     HockeyAddresses.Exhibition,
                                                   SportsMixAddresses.Tournament,
+
+                  PartyMode.FeedPetey.Tabs, PartyMode.HarmonyHustle.Tabs,
+                  PartyMode.BobOmbDodge.Tabs, PartyMode.SmashSkate.Tabs,
 
                   CupsWonMultiple, GamesPlayed,
     )

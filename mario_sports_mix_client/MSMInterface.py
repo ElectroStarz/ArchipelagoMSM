@@ -12,15 +12,53 @@ class ConnectionState(Enum):
     IN_TOURNAMENT_MAP = 4
     IN_MATCH = 5
     IN_BOSS = 6
+    FEED_PETEY = 7
+    HARMONY_HUSTLE = 8
+    BOB_OMB_DODGE = 9
+    SMASH_SKATE = 10
 
 stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
+
+player_score_addresses = [
+    PlayerAddresses.Score.score_period_1,
+    PlayerAddresses.Score.score_period_2,
+    PlayerAddresses.Score.score_period_3,
+    PlayerAddresses.Score.score_period_4,
+    PlayerAddresses.Score.score_period_5,
+]
+
+opponent_score_addresses = [
+    OpponentAddresses.Score.score_period_1,
+    OpponentAddresses.Score.score_period_2,
+    OpponentAddresses.Score.score_period_3,
+    OpponentAddresses.Score.score_period_4,
+    OpponentAddresses.Score.score_period_5,
+]
+
+fp_opp_score_addresses = [
+    OpponentAddresses.Score.r1_fp_score,
+    OpponentAddresses.Score.r2_fp_score,
+    OpponentAddresses.Score.r3_fp_score,
+]
+
+bod_opp_damage_pointers = [
+    Pointers.Opponent.R1.bod_dodge_damage,
+    Pointers.Opponent.R2.bod_dodge_damage,
+    Pointers.Opponent.R3.bod_dodge_damage,
+]
+
+ss_opp_score_pointers = [
+    Pointers.Opponent.R1.ss_score,
+    Pointers.Opponent.R2.ss_score,
+    Pointers.Opponent.R3.ss_score,
+]
 
 class MSMInterface:
     dolphin_client: DolphinClient
     connection_state: str
     logger: Logger
     game_ver: int
-    current_tournament = str
+    current_tournament: Optional[str] = None
 
     def __init__(self, logger: Logger):
         self.logger = logger
@@ -55,9 +93,44 @@ class MSMInterface:
     def is_in_tournament_map(self):
         current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
         current_stage_prefix = current_stage[:3]
-        maps = ["s31", "s32", "s33"]
 
-        if current_stage_prefix in maps:
+        if current_stage_prefix in ["s31", "s32", "s33"]:
+            return True
+        else:
+            return False
+
+    def is_in_feed_petey(self):
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage_prefix = current_stage[:3]
+
+        if current_stage_prefix in ["s70", "s71", "s72"]:
+            return True
+        else:
+            return False
+
+    def is_in_harmony(self):
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage_prefix = current_stage[:3]
+
+        if current_stage_prefix in ["s40", "s41", "s42"]:
+            return True
+        else:
+            return False
+
+    def is_in_bob_omb(self):
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage_prefix = current_stage[:3]
+
+        if current_stage_prefix in ["s55", "s56", "s57"]:
+            return True
+        else:
+            return False
+
+    def is_in_smash(self):
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage_prefix = current_stage[:3]
+
+        if current_stage_prefix in ["s85", "s86", "s87"]:
             return True
         else:
             return False
@@ -71,6 +144,43 @@ class MSMInterface:
             return 2
         else:
             return -1
+
+    def get_player_score_addr(self):
+        if self.is_in_match():
+            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+            return get_address(player_score_addresses[current_period])
+        elif self.is_in_feed_petey():
+            return get_address(PlayerAddresses.Score.feed_petey_score)
+        elif self.is_in_bob_omb():
+            return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
+                                                       Pointers.Player.B1.bod_dodge_damage)
+        elif self.is_in_harmony():
+            return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
+                                                       Pointers.PartyMode.hh_current_score)
+        elif self.is_in_smash():
+            return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
+                                                       Pointers.Player.B1.ss_score)
+        else: return None
+
+    def get_opponent_score_addr(self, opponent: int):
+        ls_opponent = opponent - 1
+        if self.is_in_match():
+            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+            return get_address(opponent_score_addresses[current_period])
+        elif self.is_in_feed_petey():
+            return get_address(fp_opp_score_addresses[ls_opponent])
+        elif self.is_in_bob_omb():
+            return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
+                                                       bod_opp_damage_pointers[ls_opponent])
+        elif self.is_in_harmony():
+            return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
+                                                       Pointers.PartyMode.hh_current_score)
+        elif self.is_in_smash():
+            return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
+                                                       ss_opp_score_pointers[ls_opponent])
+        else: return None
+
+
 
     def match_status(self):
         match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)
@@ -196,6 +306,18 @@ class MSMInterface:
 
             if self.is_in_boss():
                 return ConnectionState.IN_BOSS
+
+            if self.is_in_feed_petey():
+                return ConnectionState.FEED_PETEY
+
+            if self.is_in_harmony():
+                return ConnectionState.HARMONY_HUSTLE
+
+            if self.is_in_bob_omb():
+                return ConnectionState.BOB_OMB_DODGE
+
+            if self.is_in_smash():
+                return ConnectionState.SMASH_SKATE
 
             # Fallback, likely connected
             return ConnectionState.CONNECTED

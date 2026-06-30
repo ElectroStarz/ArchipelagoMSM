@@ -23,6 +23,39 @@ class MatchAddresses:
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL
 
+class PartyMode:
+    difficulty = 0x804D7978 # Word | Also used for HH stage
+
+    class FeedPetey:
+        difficulty = 0x804D99DC # Word
+
+        class Tabs:
+            tabs = 0x90226D74 # Byte
+            apple_tab = 0x90226D75 # Byte
+            watermelon_tab = 0x90226D76 # Byte
+
+    class HarmonyHustle:
+        stage = 0x804D7978 # Word | Used for PM difficulty
+        class Tabs:
+            tabs = 0x90226D68 # Byte
+            one_note_tab = 0x90226D69 # Byte
+            two_note_tab = 0x90226D6A # Byte
+            three_note_tab = 0x90226D6B # Byte
+
+    class BobOmbDodge:
+        difficulty = 0x804D99FC # Word
+        class Tabs:
+            tabs = 0x90226D8C # Byte
+            bob_omb_tab = 0x90226D8D # Byte
+            cannon_tab = 0x90226D8E # Byte
+
+    class SmashSkate:
+        difficulty = 0x804D9A0C # Word
+        class Tabs:
+            tabs = 0x90226D80 # Byte
+            hockey_stick_tab = 0x90226D81 # Byte
+            skate_tab = 0x90226D82 # Byte
+
 class CupsWonMultiple:
     # All are halfwords (2 bytes)
     class Basketball:
@@ -64,7 +97,7 @@ class PlayerAddresses:
     costume_2 = 0x804D7812  # Byte
     costume_3 = 0x804D7814  # Byte
 
-    dodge_damage = 0x805C1C70 # Word | Has Pointers
+    various_shp_pointers = 0x805C1C70 # Word | Various Score/HP Pointers | Has Pointers
     dodge_max_health = 0x804D78D0 # Word
 
     is_cpu = 0x805C1B50 # Byte | Has Pointers
@@ -77,6 +110,7 @@ class PlayerAddresses:
         score_period_3 = 0x804D7E20  # Word
         score_period_4 = 0x804D7E24  # Word
         score_period_5 = 0x804D7E28  # Word
+        feed_petey_score = 0x804D7DF8 # Word
 
     class Position:
         pos = 0x805C1B50 # Float | Has Pointers | In CAL
@@ -93,6 +127,9 @@ class OpponentAddresses:
         score_period_3 = 0x804D7E34 # Word
         score_period_4 = 0x804D7E38 # Word
         score_period_5 = 0x804D7E3C # Word
+        r1_fp_score = 0x804D7DFC # Word
+        r2_fp_score = 0x804D7E00 # Word
+        r3_fp_score = 0x804D7E04 # Word
 
 class BasketballAddresses:
     time = 0x804D9977 # Byte | In CAL
@@ -252,10 +289,16 @@ class BossAddresses:
 class NTSCUAddresses:
     pass # Remove pass once an address has been added
 
+# Pointers are usually the same for PAL & NTSC-U
 class Pointers:
     class Match:
         current_module_offsets = [0x1F5]
         set_break_offsets = [0x94]
+
+    class PartyMode:
+        hh_current_score = [0x27C]
+        hh_goal_score = [0x294]
+        hh_perfection = [0x2B4] # 1 = Perfect, 0 = Flawed
 
     class VBP: # Various Ball Pointers
         item_ball = [0x18, 0x2D] # B+H+V: 0 = Regular, 1 = Item | D: 1= Regular, 2 = Item
@@ -268,12 +311,14 @@ class Pointers:
         class B1:
             dodge_damage = [0x1F4]
             is_cpu = [0x54, 0x0, 0x6F]
+            bod_dodge_damage = [0x1B4]
+            ss_score = [0x2D4]
+            hh_balls_received = [0x26C]
             class Position:
                 x_offsets = [0x54,0x0,0x90,0x98]
                 y_offsets = [0x54,0x0,0x90,0x9C]
                 z_offsets = [0x54,0x0,0x90,0xA0]
                 rotation_offsets = [0x54,0x0,0x90,0xB4]
-
 
         class B2:
             dodge_damage = [0x1FC]
@@ -284,7 +329,6 @@ class Pointers:
                 z_offsets = [0x54,0x8,0x90,0xA0]
                 rotation_offsets = [0x54,0x8,0x90,0xB4]
 
-
         class B3:
             dodge_damage = [0x204]
             is_cpu = [0x54, 0x10, 0x6F]
@@ -293,6 +337,23 @@ class Pointers:
                 y_offsets = [0x54,0x10, 0x90,0x9C]
                 z_offsets = [0x54,0x10,0x90,0xA0]
                 rotation_offsets = [0x54,0x10,0x90,0xB4]
+
+    class Opponent:
+        class R1: # This is P2 in party mode
+            bod_dodge_damage = [0x1B8]
+            ss_score = [0x2D8]
+            hh_balls_received = [0x270]
+
+        class R2: # This is P3 in party mode
+            bod_dodge_damage = [0x1BC]
+            ss_score = [0x2DC]
+            hh_balls_received = [0x274]
+
+        class R3: # This is P4 in party mode
+            bod_dodge_damage = [0x1C0]
+            ss_score = [0x2E0]
+            hh_balls_received = [0x278]
+
 
     class Volleyball:
 

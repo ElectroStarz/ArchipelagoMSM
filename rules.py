@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 from rule_builder.rules import *
 from .options import *
 
@@ -17,12 +18,14 @@ STAGES = {
 
 # --- NEW HELPER ENGINE ---
 
-def court_rule(world: MSMWorld, stage_name: str):
+def court_rule(world: MSMWorld, stage_name: str, sm: bool, round_num: Optional[int] = None):
     """Dynamically returns Progressive Court or Individual Court."""
     if world.options.court_unlock_type == CourtUnlockType.option_progressive_court:
         return Has("Progressive Court", STAGES[stage_name])
-    return Has(stage_name)
-
+    elif sm:
+        return sports_mix_court_rule(round_num if round_num is not None else 1)
+    else:
+        return Has(stage_name)
 
 def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
     """Calculates exactly how many Progressive Cups are needed for a specific tier."""
@@ -54,7 +57,6 @@ def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
     else:
         return 1
 
-
 def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
     """Returns either the Unified Progressive item requirement, or the Individual item requirement."""
     if world.options.cup_unlock_type == CupUnlockType.option_progressive_cup:
@@ -66,7 +68,6 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
             return Has(f"Sports Mix: {cup_name} Cup")
         # If Main Sport
         return Has(f"{sport}: {cup_name} Cup ({category})")
-
 
 def exhibition_rule(world: MSMWorld, min_diff: str):
     """
@@ -97,6 +98,23 @@ def exhibition_rule(world: MSMWorld, min_diff: str):
 
     return Has(base_diff_item) | (Has(base_diff_item) & HasAny(*diffs_above)) # Player needs base diff and/or diff above
 
+def sports_mix_court_rule(round_num: int):
+    round_1_courts = ["Mario Stadium", "DK Dock", "Luigi's Mansion", "Western Junction", "Bowser Jr. Blvd.",
+                      "Wario Factory"]
+
+    round_2_courts = ["Koopa Troopa Beach", "Western Junction", "Luigi's Mansion", "Toad Park", "Bowser's Castle",
+                      "Wario Factory", "Waluigi Pinball"]
+
+    round_3_courts = ["DK Dock", "Peach's Castle", "Daisy Garden", "Western Junction", "Star Ship"]
+
+    if round_num == 1:
+        return HasGroup(*round_1_courts)
+    elif round_num == 2:
+        return HasGroup(*round_2_courts)
+    elif round_num == 3:
+        return HasGroup(*round_3_courts)
+    else:
+        return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
 
 SPORTS = ["Basketball", "Dodgeball", "Hockey", "Volleyball"]
 CUPS = ["Mushroom", "Flower", "Star"]
@@ -236,29 +254,30 @@ def set_all_location_rules(world: MSMWorld) -> None:
         for sport, stages in EXHIBITION_RULES.items():
             for stage in stages:
                 location = world.get_location(f"{sport} Ex: Beat {stage} ({difficulty})")
-                world.set_rule(location, court_rule(world, stage) & exhibition_rule(world, difficulty))
+                world.set_rule(location, court_rule(world, stage, False) & exhibition_rule(world, difficulty))
 
     # Tournament cup rules
     cup_difficulties = ["Normal"]
     if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
         cup_difficulties.append("Hard")
 
-    for difficulty in cup_difficulties:
-        for sport, cups in TOURNAMENT_RULES.items():
-            for cup, stages in cups.items():
-                base_cup_logic = cup_rule(world, sport, cup, difficulty)
+    if world.options.include_tournaments == IncludeTournaments.option_true:
+        for difficulty in cup_difficulties:
+            for sport, cups in TOURNAMENT_RULES.items():
+                for cup, stages in cups.items():
+                    base_cup_logic = cup_rule(world, sport, cup, difficulty)
 
-                for i in range(1, 4):
-                    needed = stages[:i]
-                    if not needed:
-                        court_logic = Has("")
-                    else:
-                        court_logic = court_rule(world, needed[0])
-                        for stage in needed[1:]:
-                            court_logic &= court_rule(world, stage)
+                    for i in range(1, 4):
+                        needed = stages[:i]
+                        if not needed:
+                            court_logic = Has("")
+                        else:
+                            court_logic = court_rule(world, needed[0], False)
+                            for stage in needed[1:]:
+                                court_logic &= court_rule(world, stage, False)
 
-                    location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
-                    world.set_rule(location, Has(sport) & base_cup_logic & court_logic)
+                        location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
+                        world.set_rule(location, Has(sport) & base_cup_logic & court_logic)
 
     # Sports Mix Locations
     for cup in ["Mushroom", "Flower", "Star"]:
@@ -267,11 +286,11 @@ def set_all_location_rules(world: MSMWorld) -> None:
         for i in range(1, 4):
             if cup == "Star" and i == 3:
                 location = world.get_location("Sports Mix: Beat Star Cup Round 3")
-                rule = court_rule(world, "Star Ship") & base_sm_logic
+                rule = court_rule(world, "Star Ship", False) & base_sm_logic
             else:
                 location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
                 # Dynamically maps to Progressive Court 5 or "Peach's Castle" based on options
-                rule = court_rule(world, "Peach's Castle") & base_sm_logic
+                rule = court_rule(world, "Peach's Castle", True) & base_sm_logic
 
             world.set_rule(location, rule)
 
@@ -294,7 +313,7 @@ def set_goal_rules(world: MSMWorld) -> None:
             CanReachLocation("Dodgeball: Beat Normal Star Cup Round 3") &
             CanReachLocation("Volleyball: Beat Normal Star Cup Round 3") &
             CanReachLocation("Hockey: Beat Normal Star Cup Round 3") &
-            court_rule(world, "Behemoth Stage")
+            court_rule(world, "Behemoth Stage", False)
     )
 
     behemoth_king_rule = (
@@ -303,7 +322,7 @@ def set_goal_rules(world: MSMWorld) -> None:
                  "Sports Crystal: Red", "Sports Crystal: Green",
                  "Sports Crystal: Yellow", "Sports Crystal: Blue",
                  options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_crystals)]
-             )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3") & court_rule(world, "Behemoth Stage")
+             )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3") & court_rule(world, "Behemoth Stage", False)
     )
 
 
@@ -312,14 +331,14 @@ def set_goal_rules(world: MSMWorld) -> None:
         if world.options.be_mean == BeMean.option_defeat_behemoth_king:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+    elif world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
         world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
         if world.options.be_mean == BeMean.option_defeat_behemoth:
             world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
-    if world.options.goal_condition == GoalCondition.option_win_cups:
+    elif world.options.goal_condition == GoalCondition.option_win_cups:
         value = world.options.win_cups_amount.value
-        world.set_rule(world.get_location(f"Win {value} Cups"), CanCupGoal().resolve(world))
+        world.set_rule(world.get_location(f"Win {value} Cups!"), CanCupGoal().resolve(world))
 
         if world.options.be_mean in (BeMean.option_defeat_behemoth, BeMean.option_both):
             world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
@@ -362,7 +381,6 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
             for cup in cup_tiers:
                 entrance = world.get_entrance(f"{sport} -> {cup} Cup (Hard)")
                 world.set_rule(entrance, cup_rule(world, sport, cup, "Hard"))
-
 
 
     # Sports Mix Entrance Rules

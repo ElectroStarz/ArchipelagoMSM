@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, OptionSet, PerGameCommonOptions, Range, Toggle, DefaultOnToggle, OptionGroup, Visibility, \
-    DeathLink
+from Options import *
 
 class StartWithSports(Choice):
     """Start with the sports? HEAVILY RECOMMENDED
@@ -11,6 +10,20 @@ Will cause immediate BK if off"""
     option_excluding_sports_mix = 1
     option_with_sports_mix = 2
     default = 1
+
+class EnabledSports(OptionSet):
+    """Choose which sports to enable"""
+    display_name = "Enabled Sports"
+    valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
+    default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
+
+class IncludeTournaments(DefaultOnToggle):
+    """Include tournament locations and items"""
+    display_name = "Include Tournaments"
+
+class IncludeExhibition(DefaultOnToggle):
+    """Include exhibition locations and items"""
+    display_name = "Include Exhibition"
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
@@ -61,7 +74,7 @@ class CupUnlockType(Choice):
     default = 0
 
 class HardTournamentDifficulty(DefaultOnToggle):
-    """Would you like to include location checks for Hard Tournaments?
+    """Would you like to include locations and items for Hard Tournaments?
 Adds 3 Progressive Cups to the pool if Progressive Cup Item is selected"""
     display_name = "Include Hard Tournaments"
 
@@ -74,11 +87,19 @@ or get Sports Mix as an item"""
     default = 0
 
 class GoalCondition(Choice):
-    """What is your goal?"""
+    """What is your goal?
+
+    - **Defeat Behemoth**: Defeat the Behemoth to goal!
+    - **Defeat Behemoth King**: Defeat the Behemoth King to goal!
+    - **Win Cups**: Win a certain amount of cups to goal!
+    - **Exhibition Across The World**: Win every exhibition match for your selected difficulty!
+    - **Party Palooza**: Win every game in every Party Mode to goal!"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
     option_win_cups = 3
+    option_exhibition_across_the_world = 4
+    option_party_palooza = 5
     default = 2
 
 class WinCupsAmount(Range):
@@ -249,15 +270,14 @@ class BasketTime(Choice):
     default = 2
 
     @classmethod
-    def get_option_name(cls, id_):
-        match id_:
+    def get_option_name(cls, value):
+        match value:
             case 0: return "1:30"
             case 1: return "2:00"
             case 2: return "2:30"
             case 3: return "3:00"
             case 4: return "3:30"
-
-        return None
+            case _: return "ERROR"
 
 class EnableBPointsWin(Toggle):
     """Getting a certain amount of points wins you or the opponent the set"""
@@ -291,15 +311,14 @@ class DodgeTime(Choice):
     default = 2
 
     @classmethod
-    def get_option_name(cls, id_):
-        match id_:
+    def get_option_name(cls, value):
+        match value:
             case 0: return "2:00"
             case 1: return "2:30"
             case 2: return "3:00"
             case 3: return "3:30"
             case 4: return "4:00"
-
-        return None
+            case _: return "ERROR"
 
 class DPeriod(Range):
     """How many periods do you want to be playing?
@@ -347,15 +366,14 @@ class HockeyTime(Choice):
     default = 2
 
     @classmethod
-    def get_option_name(cls, id_):
-        match id_:
+    def get_option_name(cls, value):
+        match value:
             case 0: return "2:00"
             case 1: return "2:30"
             case 2: return "3:00"
             case 3: return "3:30"
             case 4: return "4:00"
-
-        return None
+            case _: return "ERROR"
 
 class EnableHPointsWin(Toggle):
     """Getting a certain amount of points wins you or the opponent the set"""
@@ -377,8 +395,30 @@ Recommended to set a low amount, kinda boring otherwise."""
     range_end = 10
     default = 2
 
+# === Party Mode Options ===
+class PartyMode(OptionSet):
+    """Which (if any) Party Modes do you want enabled?
+(Feed Petey, Harmony Hustle, Bob-Omb Dodge, Smash Skate)
+
+NOTE: All are required if your goal is Party Palooza"""
+    display_name = "Enabled Party Modes"
+    valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
+    default = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
+
+class PartyModeOpponent(Choice):
+    """Which CPU will be your main opponent?
+(This CPU will get things like points from deathlink, points
+from Coins Trap etc)"""
+    options_CPU_2 = 0
+    options_CPU_3 = 1
+    options_CPU_4 = 2
+    default = 0
+
 msm_option_groups = [
     OptionGroup("Game Options", [
+        EnabledSports,
+        IncludeExhibition,
+        IncludeTournaments,
         StartWithSports,
         StartWithMushroomCup,
         CupUnlockType,
@@ -417,6 +457,10 @@ msm_option_groups = [
         BehemothHP,
         BehemothKingHP,
     ]),
+    OptionGroup("Party Mode Options", [
+        PartyMode,
+        PartyModeOpponent,
+    ]),
     OptionGroup("Deathlink Options", [
         Deathlink,
         DeathlinkAction,
@@ -439,6 +483,9 @@ msm_option_groups = [
 
 @dataclass
 class MSMOptions(PerGameCommonOptions):
+    enabled_sports: EnabledSports
+    include_exhibition: IncludeExhibition
+    include_tournaments: IncludeTournaments
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
     cup_unlock_type: CupUnlockType
@@ -471,6 +518,10 @@ class MSMOptions(PerGameCommonOptions):
     enable_h_points_win: EnableHPointsWin
     h_points_win: HPointsToWin
     h_period: HPeriod
+
+    # Party Mode
+    party_mode: PartyMode
+    party_mode_opponent: PartyModeOpponent
 
     # Deathlink
     deathlink: Deathlink
