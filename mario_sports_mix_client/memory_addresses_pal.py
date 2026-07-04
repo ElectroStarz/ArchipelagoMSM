@@ -1,30 +1,27 @@
 class MatchAddresses:
     game_code = 0x800000 # String
-    match_status = 0x804D78BC  # Byte
+    match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
-    current_stage = 0x8047888E  # String | Uses -0xF20
-    current_period = 0x804D77CC # Byte | Starts at 0
-    max_periods = 0x804D77CB # Byte # Uses normal 1, 2, 3, 4 & 5
-    current_module = 0x804D1154 # Word
-    special_active = 0x804D0F98 # Word
-    tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0x00 for Normal & 0x01 for Hard)
-    exhibition_diff = 0x804D77D3 # Byte
-    ex_diff_on_menu = 0x902319E3  # Byte - UNRELIABLE
-    paused = 0x804D069B # Byte
-    cutscene_on = 0x805C1999 # Byte
-    loading_screen_active = 0x804D8354  # Word
-    set_break = 0x804D1178 # Word
+    current_stage = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
+    current_period = 0x804D77CC # Byte | Starts at 0 | In CAL
+    max_periods = 0x804D77CB # Byte | Uses normal 1, 2, 3, 4 & 5
+    current_module = 0x804D1154 # Word | Has Pointers | In CAL
+    special_active = 0x804D0F98 # Word | Has Pointers
+    tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0 for Normal, 1 for Hard) | In CAL
+    exhibition_diff = 0x804D77D3 # Byte | In CAL
+    ex_diff_on_menu = 0x902319E3  # Byte | UNRELIABLE
+    paused = 0x804D069B # Byte | In CAL
+    cutscene_active = 0x805C1999 # Byte | In CAL
+    loading_screen_active = 0x804D8354  # Word | In CAL
+    set_break = 0x804D1178 # Word | Has Pointers
     game_speed = 0x804D77F4 # Float
 
     shot_clock = 0x804D77F0  # Float
-    time_remaining = 0x804D77E4  # Float
-    max_time = 0x804D77E0 # Float
+    time_remaining = 0x804D77E4  # Float | In CAL
+    max_time = 0x804D77E0 # Float | In CAL
 
     # 4 = 2v2, 0 = 3v3
-    game_layout = 0x804D77C6 # Byte
-
-class BossAddresses:
-    behemoth_hp = 0x804D0F74 # Float
+    game_layout = 0x804D77C6 # Byte | In CAL
 
 class CupsWonMultiple:
     # All are halfwords (2 bytes)
@@ -52,11 +49,11 @@ class GamesPlayed:
     hockey = 0x90229A78  # Word
 
 class PlayerAddresses:
-    item_held = 0x804D789C  # Word
-    various_ball_pointers = 0x804D0F98 # Word
+    item_held = 0x804D789C  # Word | In CAL
+    various_ball_pointers = 0x804D0F98 # Word | Has Pointers | In CAL
     human_players = 0x804d8e14 # Byte | Is 0 in demo
 
-    special_meter = 0x804D0F8C # Float
+    special_meter = 0x804D0F8C # Float | Has Pointers | In CAL
 
     # Characters and costumes
     character_1 = 0x804D7808  # Byte
@@ -67,41 +64,42 @@ class PlayerAddresses:
     costume_2 = 0x804D7812  # Byte
     costume_3 = 0x804D7814  # Byte
 
-    dodge_damage = 0x805C1C70 # Word
+    various_shp_pointers = 0x805C1C70 # Word | Various Score/HP Pointers | Has Pointers
     dodge_max_health = 0x804D78D0 # Word
 
-    is_cpu = 0x805C1B50
-
+    is_cpu = 0x805C1B50 # Byte | Has Pointers
 
     # Score and coins
     class Score:
-        coins = 0x804D785C  # Word
+        coins = 0x804D785C  # Word | In CAL
         score_period_1 = 0x804D7E18  # Word
         score_period_2 = 0x804D7E1C  # Word
         score_period_3 = 0x804D7E20  # Word
         score_period_4 = 0x804D7E24  # Word
         score_period_5 = 0x804D7E28  # Word
+        feed_petey_score = 0x804D7DF8 # Word
 
     class Position:
-        # All Floats
-        pos = 0x805C1B50
-        rotation = 0x805C1B50
+        pos = 0x805C1B50 # Float | Has Pointers | In CAL
 
 class OpponentAddresses:
-    item_held = 0x804D78A0 # Word
+    item_held = 0x804D78A0 # Word | In CAL
     dodge_max_health = 0x804D78D4 # Word
 
     # Score and coins
     class Score:
-        coins = 0x804D7860 # Word
+        coins = 0x804D7860 # Word | In CAL
         score_period_1 = 0x804D7E2C # Word
         score_period_2 = 0x804D7E30 # Word
         score_period_3 = 0x804D7E34 # Word
         score_period_4 = 0x804D7E38 # Word
         score_period_5 = 0x804D7E3C # Word
+        r1_fp_score = 0x804D7DFC # Word
+        r2_fp_score = 0x804D7E00 # Word
+        r3_fp_score = 0x804D7E04 # Word
 
 class BasketballAddresses:
-    time = 0x804D9977 # Byte
+    time = 0x804D9977 # Byte | In CAL
 
     class Tournament:
         tabs = 0x90226D98 # Byte | 2 = Normal, 3 = Normal + Hard
@@ -137,7 +135,7 @@ class BasketballAddresses:
         black_mage = 0x90226949
 
 class DodgeballAddresses:
-    time = 0x804D99AB # Byte
+    time = 0x804D99AB # Byte | In CAL
 
     class Tournament:
         tabs = 0x90226DB0 # Byte
@@ -173,9 +171,7 @@ class DodgeballAddresses:
         black_mage = 0x90226BC9
 
 class VolleyballAddresses:
-    last_held = 0x804D0F98 # Word
-
-    throw_timer = 0x805C1B50 # Word
+    throw_timer = 0x805C1B50 # Word | Has Pointers
     points_to_win = 0x804D7807 # Byte
 
     class Tournament:
@@ -212,7 +208,7 @@ class VolleyballAddresses:
         black_mage = 0x90226A89
 
 class HockeyAddresses:
-    time = 0x804D99CB #Byte
+    time = 0x804D99CB # Byte | In CAL
 
     class Tournament:
         tabs = 0x90226DBC # Byte
@@ -248,16 +244,28 @@ class HockeyAddresses:
         black_mage = 0x90226D09
 
 class SportsMixAddresses:
-    is_sports_mix = 0x804D7913 # Byte
+    is_sports_mix = 0x804D7913 # Byte | In CAL
     sports_mix_unlocked = 0x90226D98 # Byte | Same as basketball tournament tabs, set to 11 if Sports Mix unlocked
 
     class Tournament:
         cups = 0x90226D9C # Byte
 
-class Offsets:
+class BossAddresses:
+    behemoth_hp = 0x804D0F74 # Float | Has Pointers | In CAL
+
+class NTSCUAddresses:
+    pass # Remove pass once an address has been added
+
+# Pointers are usually the same for PAL & NTSC-U
+class Pointers:
     class Match:
         current_module_offsets = [0x1F5]
         set_break_offsets = [0x94]
+
+    class PartyMode:
+        hh_current_score = [0x27C]
+        hh_goal_score = [0x294]
+        hh_perfection = [0x2B4] # 1 = Perfect, 0 = Flawed
 
     class VBP: # Various Ball Pointers
         item_ball = [0x18, 0x2D] # B+H+V: 0 = Regular, 1 = Item | D: 1= Regular, 2 = Item
@@ -270,12 +278,14 @@ class Offsets:
         class B1:
             dodge_damage = [0x1F4]
             is_cpu = [0x54, 0x0, 0x6F]
+            bod_dodge_damage = [0x1B4]
+            ss_score = [0x2D4]
+            hh_balls_received = [0x26C]
             class Position:
                 x_offsets = [0x54,0x0,0x90,0x98]
                 y_offsets = [0x54,0x0,0x90,0x9C]
                 z_offsets = [0x54,0x0,0x90,0xA0]
                 rotation_offsets = [0x54,0x0,0x90,0xB4]
-
 
         class B2:
             dodge_damage = [0x1FC]
@@ -286,7 +296,6 @@ class Offsets:
                 z_offsets = [0x54,0x8,0x90,0xA0]
                 rotation_offsets = [0x54,0x8,0x90,0xB4]
 
-
         class B3:
             dodge_damage = [0x204]
             is_cpu = [0x54, 0x10, 0x6F]
@@ -295,6 +304,22 @@ class Offsets:
                 y_offsets = [0x54,0x10, 0x90,0x9C]
                 z_offsets = [0x54,0x10,0x90,0xA0]
                 rotation_offsets = [0x54,0x10,0x90,0xB4]
+
+    class Opponent:
+        class R1: # This is P2 in party mode
+            bod_dodge_damage = [0x1B8]
+            ss_score = [0x2D8]
+            hh_balls_received = [0x270]
+
+        class R2: # This is P3 in party mode
+            bod_dodge_damage = [0x1BC]
+            ss_score = [0x2DC]
+            hh_balls_received = [0x274]
+
+        class R3: # This is P4 in party mode
+            bod_dodge_damage = [0x1C0]
+            ss_score = [0x2E0]
+            hh_balls_received = [0x278]
 
 
     class Volleyball:

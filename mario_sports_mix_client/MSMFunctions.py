@@ -19,12 +19,8 @@ sports_addresses = [
 ]
 
 
-async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, unlocked_sports_mix: bool):
+def unlock_tournament_tabs_option(hard_tournament_difficulty: bool):
     """Unlocks the tournament tabs depending on YAML settings."""
-
-    # If Sports Mix is unlocked, stop right here and do absolutely nothing.
-    if unlocked_sports_mix:
-        return
 
     address_list = [
         get_address(BasketballAddresses.Tournament.tabs),
@@ -38,11 +34,7 @@ async def unlock_tournament_tabs_option(self, hard_tournament_difficulty: bool, 
 
     # Run the memory check/write loop exactly once
     for address in address_list:
-        current_value = self.game_interface.dolphin_client.read_byte(address)
-
-        # Only write if the value needs changing to avoid spamming the emulator
-        if current_value != target_value:
-            self.game_interface.dolphin_client.write_byte(address, target_value)
+        dme.write_byte(address, target_value)
 
 
 def unlock_ex_tabs():
@@ -52,7 +44,6 @@ def unlock_ex_tabs():
     for sport in sports_addresses:
         new_addr = get_address(sport.Exhibition.tabs)
         dme.write_byte(new_addr, target_value)
-
 
 def lock_all_cups():
     """Locks all the cups by setting their value to 8"""
@@ -91,10 +82,17 @@ def is_exception(address):
                   HockeyAddresses.Characters,     HockeyAddresses.Tournament,     HockeyAddresses.Exhibition,
                                                   SportsMixAddresses.Tournament,
 
+
                   CupsWonMultiple, GamesPlayed,
     )
 
     if any(address in vars(classes).values() for classes in exceptions):
+        return True
+    else:
+        return False
+
+def is_ntscu(address):
+    if address in vars(NTSCUAddresses).values():
         return True
     else:
         return False
@@ -119,4 +117,7 @@ def get_address(address, offset=0xF80):
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
         return new_addr
     else:
-        return address
+        if is_ntscu(address):
+            return address + offset
+        else:
+            return address
