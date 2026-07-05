@@ -41,7 +41,7 @@ class AddressLib:
 
     @cached_property
     def cutscene_active_addr(self):
-        return get_address(MatchAddresses.cutscene_on)
+        return get_address(MatchAddresses.cutscene_active)
 
     @cached_property
     def loading_screen_addr(self):
@@ -53,7 +53,7 @@ class AddressLib:
 
     @cached_property
     def volley_last_held_addr(self):
-        return get_address(VolleyballAddresses.last_held)
+        return get_address(PlayerAddresses.various_ball_pointers)
 
     @cached_property
     def basket_time_addr(self):

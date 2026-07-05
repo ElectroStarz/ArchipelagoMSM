@@ -172,7 +172,7 @@ class MSMInterface:
 
     def special_active(self):
         addr = self.dolphin_client.follow_pointers(get_address(MatchAddresses.special_active),
-                                                                  Offsets.Player.special_active_offsets)
+                                                                  Pointers.Player.special_active_offsets)
         value = self.dolphin_client.read_word(addr)
 
         if value == 1:
