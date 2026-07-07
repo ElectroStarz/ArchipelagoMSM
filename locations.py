@@ -73,6 +73,7 @@ class LocGroup(str, Enum):
     SPECIAL_SANITY = "Special Sanity"
     CHARACTER_SANITY = "Character Sanity"
     COSTUME_SANITY = "Costume Sanity"
+    COURT_SANITY = "Court Sanity"
     BOSS_LOCATIONS = "Boss Locations"
     WIN_CUPS = "Win Cups"
 
@@ -479,6 +480,38 @@ location_table: Dict[str, LocData] = {
     "Win as Pure White - White Mage":                  LocData(base_id + 6032, LocGroup.COSTUME_SANITY),
     "Win as Magic Red Black Mage":                     LocData(base_id + 6033, LocGroup.COSTUME_SANITY),
 
+    "Win on Mario Stadium":                            LocData(base_id + 7000, LocGroup.COURT_SANITY),
+    "Win on Koopa Troopa Beach":                       LocData(base_id + 7001, LocGroup.COURT_SANITY),
+    "Win on Peach's Castle":                           LocData(base_id + 7002, LocGroup.COURT_SANITY),
+    "Win on Toad Park":                                LocData(base_id + 7003, LocGroup.COURT_SANITY),
+    "Win on DK Dock":                                  LocData(base_id + 7004, LocGroup.COURT_SANITY),
+    "Win on Luigi's Mansion":                          LocData(base_id + 7005, LocGroup.COURT_SANITY),
+    "Win on Daisy Garden":                             LocData(base_id + 7006, LocGroup.COURT_SANITY),
+    "Win on Wario Factory":                            LocData(base_id + 7007, LocGroup.COURT_SANITY),
+    "Win on Bowser Jr. Blvd.":                         LocData(base_id + 7008, LocGroup.COURT_SANITY),
+    "Win on Bowser's Castle":                          LocData(base_id + 7009, LocGroup.COURT_SANITY),
+    "Win on Waluigi Pinball":                          LocData(base_id + 7010, LocGroup.COURT_SANITY),
+    "Win on Ghoulish Galleon":                         LocData(base_id + 7011, LocGroup.COURT_SANITY),
+    "Win on Star Ship":                                LocData(base_id + 7012, LocGroup.COURT_SANITY),
+    "Win on Western Junction":                         LocData(base_id + 7013, LocGroup.COURT_SANITY),
+
+    "Win on Sherbet Sea":                              LocData(base_id + 7014, LocGroup.COURT_SANITY),
+    "Win on Fire Mountain":                            LocData(base_id + 7015, LocGroup.COURT_SANITY),
+    "Win on Rowdy Raft":                               LocData(base_id + 7016, LocGroup.COURT_SANITY),
+
+    "Win on Classic Ocean":                            LocData(base_id + 7017, LocGroup.COURT_SANITY),
+    "Win on Chocobo Rhythm":                           LocData(base_id + 7018, LocGroup.COURT_SANITY),
+    "Win on Mario Athletic":                           LocData(base_id + 7019, LocGroup.COURT_SANITY),
+    "Win on Bloocheep Ocean":                          LocData(base_id + 7020, LocGroup.COURT_SANITY),
+    "Win on Chocobo Pop":                              LocData(base_id + 7021, LocGroup.COURT_SANITY),
+    "Win on Punk Athletic":                            LocData(base_id + 7022, LocGroup.COURT_SANITY),
+    "Win on Punk Ocean":                               LocData(base_id + 7023, LocGroup.COURT_SANITY),
+    "Win on Chocobo Beat":                             LocData(base_id + 7024, LocGroup.COURT_SANITY),
+    "Win on Island Athletic":                          LocData(base_id + 7025, LocGroup.COURT_SANITY),
+    "Win on Mushroom Mix Medley":                      LocData(base_id + 7026, LocGroup.COURT_SANITY, LPT.PRIORITY),
+    "Win on Blossom Mix Medley":                       LocData(base_id + 7027, LocGroup.COURT_SANITY, LPT.PRIORITY),
+    "Win on Star Mix Medley":                          LocData(base_id + 7028, LocGroup.COURT_SANITY, LPT.PRIORITY),
+
     # === Boss Locations ===
     "Defeat Behemoth!":                                LocData(base_id + 20000, LocGroup.BOSS_LOCATIONS, LPT.PRIORITY),
     "Defeat Behemoth King!":                           LocData(base_id + 20001, LocGroup.BOSS_LOCATIONS, LPT.PRIORITY),
@@ -720,6 +753,71 @@ def create_regular_locations(world: MSMWorld) -> None:
     if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
         costume_locations = get_location_names_with_ids([f"Win as {costume}" for costume in costumes])
         main_menu.add_locations(costume_locations)
+
+    # Court Sanity Locations
+    if world.options.court_sanity == CourtSanity.option_true:
+        locations = {}
+
+        main_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
+                       "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+            "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction"]
+
+        smash_skate_courts = ["Sherbet Sea", "Fire Mountain", "Rowdy Raft"]
+
+        harmony_courts = ["Classic Ocean", "Chocobo Rhythm", "Mario Athletic", "Bloocheep Ocean", "Chocobo Pop",
+                          "Punk Athletic", "Punk Ocean", "Chocobo Beat", "Island Athletic", "Mushroom Mix Medley",
+                          "Blossom Mix Medley", "Star Mix Medley",
+        ]
+
+        basket_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Daisy Garden",
+                         "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
+                         "Wario Factory", "Star Ship", "Western Junction"]
+
+        dodge_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Toad Park", "Daisy Garden",
+                        "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
+                        "Wario Factory", "Star Ship", "Western Junction"]
+
+        volley_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Toad Park", "Peach's Castle",
+                         "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
+                         "Waluigi Pinball", "Star Ship", "Western Junction"]
+
+        hockey_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "Daisy Garden",
+                         "Waluigi Pinball", "Luigi's Mansion", "Wario Factory", "Star Ship", "Ghoulish Galleon",
+                         "Bowser's Castle", "Western Junction"]
+
+        mode_to_court = {
+            "Basketball": basket_courts,
+            "Dodgeball": dodge_courts,
+            "Volleyball": volley_courts,
+            "Hockey": hockey_courts,
+            "Harmony Hustle": harmony_courts,
+            "Smash Skate": smash_skate_courts,
+        }
+
+        if (world.options.include_tournaments == IncludeTournaments.option_true or world.options.include_exhibition ==
+            IncludeExhibition.option_true):
+
+            if world.options.enabled_sports:
+                for sport in world.options.enabled_sports:
+                    # Get the viable courts for the sport
+                    court_list = mode_to_court[sport]
+
+                    for name in main_courts:
+                        # Make sure that court exists for the sport
+                        if name in court_list:
+                            locations.append(get_location_names_with_ids([f"Win on {name}"]))
+
+        if world.options.party_mode:
+            for mode in world.options.party_mode:
+                if mode in mode_to_court:
+                    court_list = mode_to_court[mode]
+
+                    for name in court_list:
+                        locations.append(get_location_names_with_ids([f"Win on {name}"]))
+
+        main_menu.add_locations(locations)
+
+
 
 
 def create_events(world: "MSMWorld") -> None:

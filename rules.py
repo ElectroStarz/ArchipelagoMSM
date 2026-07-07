@@ -294,6 +294,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
             world.set_rule(location, rule)
 
+    # Character Sanity Locations
     if world.options.character_sanity in (CharacterSanity.option_characters,
                                           CharacterSanity.option_characters_and_costumes):
         for character in CHARACTER_NAMES:
@@ -304,6 +305,10 @@ def set_all_location_rules(world: MSMWorld) -> None:
         for costume, char in COSTUME_NAMES.items():
             location = world.get_location(f"Win as {costume}")
             world.set_rule(location, HasAll(char, costume))
+
+    # Court Sanity Locations
+    if world.options.court_sanity == CourtSanity.option_true:
+
 
 
 def set_goal_rules(world: MSMWorld) -> None:

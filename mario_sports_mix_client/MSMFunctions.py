@@ -127,7 +127,7 @@ def get_address(address, offset=0xF80):
     # Some addresses are the same in PAL and NTSC-U
 
     if dc.GAME_VERSION == "NTSC-U":
-        if address == MatchAddresses.current_stage:
+        if address == MatchAddresses.current_court:
             #print(f"[DEBUG] Current Stage detected! Returning NTSC-U Address {new_addr}")
             new_addr = 0x8047796E
             return new_addr

@@ -17,7 +17,62 @@ class ConnectionState(Enum):
     BOB_OMB_DODGE = 9
     SMASH_SKATE = 10
 
-stage_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
+court_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
+
+court_names = {
+    # Sport Stages
+    "s01": "Mario Stadium",
+    "s02": "Koopa Troopa Beach",
+    "s03": "Peach's Castle",
+    "s04": "Toad Park",
+    "s05": "DK Dock",
+    "s06": "Luigi's Mansion",
+    "s07": "Daisy Garden",
+    "s09": "Wario Factory",
+    "s10": "Bowser Jr. Blvd.",
+    "s11": "Bowser's Castle",
+    "s12": "Waluigi Pinball",
+    "s15": "Ghoulish Galleon",
+    "s16": "Star Ship",
+    "s17": "Western Junction",
+    "s20": "Behemoth Stage",
+    "s39": "Main Menu",
+
+    # Harmony Hustle
+    "s40": "Classic Ocean", # & Mario Mix Medley
+    "s41": "Mario Athletic",
+    "s42": "Chocobo Rhythm",
+
+    # Bob-Omb Dodge
+    "s55": "Mario Stadium",
+    "s56": "Ghoulish Galleon",
+    "s57": "Western Junction",
+
+    # Feed Petey
+    "s70": "Daisy Garden",
+    "s71": "DK Dock",
+    "s72": "Wario Factory",
+
+    # Smash Skate
+    "s85": "Sherbet Sea",
+    "s86": "Fire Mountain",
+    "s87": "Rowdy Raft",
+}
+
+harmony_mapping = {
+    0: "Classic Ocean",
+    1: "Chocobo Rhythm",
+    2: "Mario Athletic",
+    3: "Bloocheep Ocean",
+    4: "Chocobo Pop",
+    5: "Punk Athletic",
+    6: "Punk Ocean",
+    7: "Chocobo Beat",
+    8: "Island Athletic",
+    9: "Mushroom Mix Medley",
+    10: "Blossom Mix Medley",
+    11: "Star Mix Medley",
+}
 
 player_score_addresses = [
     PlayerAddresses.Score.score_period_1,
@@ -67,23 +122,23 @@ class MSMInterface:
         self.addresslib = AddressLib()
 
     def is_in_menu(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
-        if current_stage == "s39ba":
+        current_court = self.dolphin_client.read_string(self.addresslib.current_court_addr)
+        if current_court == "s39ba":
             return True
         else:
             return False
 
     def is_in_match(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
-        current_stage_prefix = current_stage[:3]
+        current_court = self.dolphin_client.read_string(self.addresslib.current_court_addr)
+        current_stage_prefix = current_court[:3]
 
-        if current_stage_prefix in stage_ids:
+        if current_stage_prefix in court_ids:
             return True
         else:
             return False
 
     def is_in_boss(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
 
         if current_stage == "s20VO":
             return True
@@ -91,7 +146,7 @@ class MSMInterface:
             return False
 
     def is_in_tournament_map(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
         current_stage_prefix = current_stage[:3]
 
         if current_stage_prefix in ["s31", "s32", "s33"]:
@@ -100,7 +155,7 @@ class MSMInterface:
             return False
 
     def is_in_feed_petey(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
         current_stage_prefix = current_stage[:3]
 
         if current_stage_prefix in ["s70", "s71", "s72"]:
@@ -109,7 +164,7 @@ class MSMInterface:
             return False
 
     def is_in_harmony(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
         current_stage_prefix = current_stage[:3]
 
         if current_stage_prefix in ["s40", "s41", "s42"]:
@@ -118,7 +173,7 @@ class MSMInterface:
             return False
 
     def is_in_bob_omb(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
         current_stage_prefix = current_stage[:3]
 
         if current_stage_prefix in ["s55", "s56", "s57"]:
@@ -127,7 +182,7 @@ class MSMInterface:
             return False
 
     def is_in_smash(self):
-        current_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        current_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
         current_stage_prefix = current_stage[:3]
 
         if current_stage_prefix in ["s85", "s86", "s87"]:
@@ -180,21 +235,27 @@ class MSMInterface:
                                                        ss_opp_score_pointers[ls_opponent])
         else: return None
 
-
-
     def match_status(self):
-        match_status = self.dolphin_client.read_byte(self.addresslib.match_status_addr)
-        if match_status == 1:
-            return 1 # Won
-        elif match_status == 2:
-            return 2 # Lost
-        elif match_status == 3:
-            return 3 # Tied
+        return self.dolphin_client.read_byte(self.addresslib.match_status_addr)
+
+    def get_court(self):
+        """Returns the current court ID and name"""
+
+        if not self.is_in_harmony():
+            base_id = self.dolphin_client.read_string(self.addresslib.current_court_addr)
+            court_id = base_id[:3]
+            court_name = court_names.get(court_id)
+
+            return court_id, court_name
         else:
-            return 0 # Ongoing
+
+            court_id = self.dolphin_client.read_byte(get_address(PartyMode.difficulty))
+            court_name = harmony_mapping.get(court_id)
+
+            return court_id, court_name
 
     def check_sport(self):
-        string_stage = self.dolphin_client.read_string(self.addresslib.current_stage_addr)
+        string_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
         current_sport = string_stage[-2:]
         if current_sport == "BA":
             return "Basketball"
@@ -324,4 +385,3 @@ class MSMInterface:
 
         except (DolphinException, RuntimeError):
             return ConnectionState.DISCONNECTED
-

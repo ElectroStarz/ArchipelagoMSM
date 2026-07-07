@@ -246,15 +246,9 @@ class SpecialSanity(Toggle):
     display_name = "Special Sanity"
     default = False
 
-class CourtSanity(Choice):
-    """(NOT WORKING) Playing and/or winning on each court sends a check"""
-    visibility = Visibility.none
+class CourtSanity(DefaultOnToggle):
+    """Winning on each court sends a check"""
     display_name = "Court Sanity"
-    option_off = 0
-    option_playing = 1
-    option_winning = 2
-    option_both = 3
-    default = 0
 
 # === Custom Tournament Settings ===
 
@@ -409,9 +403,9 @@ class PartyModeOpponent(Choice):
     """Which CPU will be your main opponent?
 (This CPU will get things like points from deathlink, points
 from Coins Trap etc)"""
-    options_CPU_2 = 0
-    options_CPU_3 = 1
-    options_CPU_4 = 2
+    option_CPU_2 = 0
+    option_CPU_3 = 1
+    option_CPU_4 = 2
     default = 0
 
 msm_option_groups = [

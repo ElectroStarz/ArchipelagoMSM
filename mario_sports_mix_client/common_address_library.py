@@ -12,8 +12,8 @@ class AddressLib:
         return get_address(PlayerAddresses.various_ball_pointers)
 
     @cached_property
-    def current_stage_addr(self):
-        return get_address(MatchAddresses.current_stage)
+    def current_court_addr(self):
+        return get_address(MatchAddresses.current_court)
 
     @cached_property
     def current_module_addr(self):

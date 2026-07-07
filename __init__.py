@@ -178,6 +178,7 @@ class MSMWorld(World):
             # Sanity Stuff
             "character_sanity": self.options.character_sanity.value,
             "send_both_character_sanity": self.options.send_both_character_sanity.value,
+            "court_sanity": self.options.court_sanity.value,
 
             # Deathlink Stuff
             "deathlink": self.options.deathlink.value,
