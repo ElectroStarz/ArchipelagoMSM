@@ -925,7 +925,7 @@ def create_events(world: "MSMWorld") -> None:
     if world.options.goal_condition == GoalCondition.option_win_cups:
         win_cup_value = world.options.win_cups_amount.value
         menu = world.get_region("Main Menu")
-        menu.add_event(f"Win {win_cup_value} Cups", "Victory!", location_type=MSMLocation,
+        menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
                        item_type=items.MSMItem)
 
         if world.options.be_mean in (BeMean.option_defeat_behemoth, BeMean.option_both):
