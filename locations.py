@@ -628,9 +628,9 @@ def create_regular_locations(world: MSMWorld) -> None:
         }
 }
 
-    if world.options.include_tournaments == IncludeTournaments.option_true:
+    if world.options.include_tournaments:
         for difficulty, sports in cup_regions.items():
-            if difficulty == "Hard" and world.options.hard_tournament_difficulty != HardTournamentDifficulty.option_true:
+            if difficulty == "Hard" and not world.options.hard_tournament_difficulty:
                 continue
 
             for sport, cups in sports.items():
@@ -728,7 +728,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey": h_exhibition,
     }
 
-    if world.options.include_exhibition == IncludeExhibition.option_true:
+    if world.options.include_exhibition:
         for difficulty in world.options.exhibition_difficulty:
             if difficulty not in ("Easy", "Normal", "Hard", "Expert"):
                 continue
@@ -755,7 +755,8 @@ def create_regular_locations(world: MSMWorld) -> None:
         main_menu.add_locations(costume_locations)
 
     # Court Sanity Locations
-    if world.options.court_sanity == CourtSanity.option_true:
+    # Can this be simplified? Probably. Will I? No. THIS TOOK SO LONG TO MAKE
+    if world.options.court_sanity:
         locations = {}
 
         main_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
@@ -794,8 +795,7 @@ def create_regular_locations(world: MSMWorld) -> None:
             "Smash Skate": smash_skate_courts,
         }
 
-        if (world.options.include_tournaments == IncludeTournaments.option_true or world.options.include_exhibition ==
-            IncludeExhibition.option_true):
+        if world.options.include_tournaments or world.options.include_exhibition:
 
             if world.options.enabled_sports:
                 for sport in world.options.enabled_sports:
@@ -816,8 +816,6 @@ def create_regular_locations(world: MSMWorld) -> None:
                         locations.append(get_location_names_with_ids([f"Win on {name}"]))
 
         main_menu.add_locations(locations)
-
-
 
 
 def create_events(world: "MSMWorld") -> None:

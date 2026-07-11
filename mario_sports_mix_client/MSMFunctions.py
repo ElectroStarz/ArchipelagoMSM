@@ -19,12 +19,13 @@ sports_addresses = [
 ]
 
 
-async def unlock_tournament_tabs_option(hard_tournament_difficulty: bool, unlocked_sports_mix: bool):
-    """Unlocks the tournament tabs depending on YAML settings."""
+def unlock_tabs(hard_tournament_difficulty):
+    unlock_tournament_tabs(hard_tournament_difficulty)
+    unlock_ex_tabs()
+    unlock_party_tabs()
 
-    # If Sports Mix is unlocked, stop right here and do absolutely nothing.
-    if unlocked_sports_mix:
-        return
+def unlock_tournament_tabs(hard_tournament_difficulty: bool):
+    """Unlocks the tournament tabs depending on YAML settings."""
 
     address_list = [
         get_address(BasketballAddresses.Tournament.tabs),
@@ -36,14 +37,8 @@ async def unlock_tournament_tabs_option(hard_tournament_difficulty: bool, unlock
     # Determine what value we want to write (3 for hard, 2 for normal)
     target_value = 3 if hard_tournament_difficulty else 2
 
-    # Run the memory check/write loop exactly once
     for address in address_list:
-        current_value = dme.read_byte(address)
-
-        # Only write if the value needs changing to avoid spamming the emulator
-        if current_value != target_value:
-            dme.write_byte(address, target_value)
-
+        dme.write_byte(address, target_value)
 
 def unlock_ex_tabs():
     """Unlocks all the exhibition tabs by setting their value to 15"""
@@ -71,7 +66,6 @@ def lock_all_cups():
             new_addr = get_address(addr)
             dme.write_byte(new_addr, 8)
 
-
 def lock_all_stages():
     """Locks all the stages by setting their value to 8"""
 
@@ -80,7 +74,6 @@ def lock_all_stages():
             addr = getattr(sport.Exhibition, cup)
             new_addr = get_address(addr)
             dme.write_byte(new_addr, 8)
-
 
 def lock_all_characters():
     """Locks all the characters by setting their value to 0"""
@@ -118,7 +111,7 @@ def is_ntscu(address):
 
 def get_address(address, offset=0xF80):
     """Get the correct address depending on what region the game is.
-    Address inputted should be a PAL address which will then be converted to NTSC-U"""
+    Address inputted should be a PAL address which will then be converted to NTSC-U & vice versa"""
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
     if is_exception(address):

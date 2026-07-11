@@ -25,6 +25,16 @@ class IncludeExhibition(DefaultOnToggle):
     """Include exhibition locations and items"""
     display_name = "Include Exhibition"
 
+class ExhibitionType(Choice):
+    """What type of exhibition locations do you want?
+
+    - **All Sports**: Exhibition locations will be for all the 4 main sports
+    - **Universal**: Exhibition locations will be for **any** sport"""
+    display_name = "Exhibition Type"
+    option_all_sports = 0
+    option_universal = 1
+    default = 0
+
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
 (Also unlocks related stages) - Recommended if you don't have party games on!"""
@@ -66,7 +76,8 @@ class CupUnlockType(Choice):
     """How to unlock cups
 
     - **Cup Item**: Each cup is its own item
-    - **Progressive Cup**: Cups are unlocked in a certain order with progressive items.
+    - **Progressive Cup**: Cups are unlocked in a certain order with progressive items. (Normal -> Hard (If enabled) ->
+Sports Mix)
     Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
     display_name = "Court Unlock Type"
     option_cup_item = 0
@@ -79,8 +90,7 @@ Adds 3 Progressive Cups to the pool if Progressive Cup Item is selected"""
     display_name = "Include Hard Tournaments"
 
 class SportsMixUnlock(Choice):
-    """Unlock Sports Mix by getting 4 Sports Crystals from other players (Or yourself!)
-or get Sports Mix as an item"""
+    """Unlock Sports Mix by getting the Sports Mix item or the 4 Sports Crystals"""
     display_name = "Sports Mix Unlock"
     option_sports_mix_item = 0
     option_sports_crystals = 1
@@ -92,13 +102,13 @@ class GoalCondition(Choice):
     - **Defeat Behemoth**: Defeat the Behemoth to goal!
     - **Defeat Behemoth King**: Defeat the Behemoth King to goal!
     - **Win Cups**: Win a certain amount of cups to goal!
-    - **Exhibition Across The World**: Win every exhibition match for your selected difficulty!
+    - **Exhibition Tour**: Win every exhibition match for your selected difficulty to goal! (Needs All Sports option)
     - **Party Palooza**: Win every game in every Party Mode to goal!"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
     option_win_cups = 3
-    option_exhibition_across_the_world = 4
+    option_exhibition_tour = 4
     option_party_palooza = 5
     default = 2
 
@@ -467,11 +477,11 @@ msm_option_groups = [
     OptionGroup("Sanity Options", [
         CharacterSanity,
         SendBothCharacterCostume,
+        CourtSanity,
         # ScoreSanity,
         # ScoreSanityPoints,
         # ScoreSanityMax,
         # SpecialSanity,
-        # StageSanity,
     ]),
 ]
 
@@ -529,8 +539,8 @@ class MSMOptions(PerGameCommonOptions):
     # Sanity Stuff
     character_sanity: CharacterSanity
     send_both_character_sanity: SendBothCharacterCostume
+    court_sanity: CourtSanity
     score_sanity: ScoreSanity
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
     special_sanity: SpecialSanity
-    court_sanity: CourtSanity

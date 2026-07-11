@@ -49,7 +49,7 @@ def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
             return base_index + 4  # 4, 5, 6
     elif category == "Sports Mix":
         # Sports Mix shifts to 7,8,9 if Hard mode is on, else 4,5,6
-        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+        if world.options.hard_tournament_difficulty:
             return base_index + 7
         else:
             return base_index + 4
@@ -86,25 +86,25 @@ def sports_mix_court_rule(round_num: int):
     else:
         return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
 
-SPORTS = ["Basketball", "Dodgeball", "Hockey", "Volleyball"]
-CUPS = ["Mushroom", "Flower", "Star"]
+sports = ["Basketball", "Dodgeball", "Hockey", "Volleyball"]
+cups = ["Mushroom", "Flower", "Star"]
 
 def get_all_cup_locations(hard_mode_enabled):
     locations = []
 
     # Normal Difficulty
-    for sport in SPORTS:
-        for cup in CUPS:
+    for sport in sports:
+        for cup in cups:
             locations.append(f"{sport}: Beat Normal {cup} Cup Round 3")
 
     # Hard Difficulty (if enabled)
     if hard_mode_enabled:
-        for sport in SPORTS:
-            for cup in CUPS:
+        for sport in sports:
+            for cup in cups:
                 locations.append(f"{sport}: Beat Hard {cup} Cup Round 3")
 
     # Sports Mix
-    for cup in CUPS:
+    for cup in cups:
         locations.append(f"Sports Mix: Beat {cup} Cup Round 3")
 
     return locations
@@ -141,7 +141,7 @@ class CanCupGoal(Rule["MSMWorld"], game="Mario Sports Mix"):
 # --- END HELPER ENGINE ---
 
 
-EXHIBITION_RULES = {
+exhibition_rules = {
     "Basketball": [
         "Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Luigi's Mansion",
         "Western Junction", "Daisy Garden", "Bowser Jr. Blvd.",
@@ -168,7 +168,7 @@ EXHIBITION_RULES = {
     ]
 }
 
-TOURNAMENT_RULES = {
+tournament_rules = {
     "Basketball": {
         "Mushroom": ["Mario Stadium", "Koopa Troopa Beach", "DK Dock"],
         "Flower": ["Luigi's Mansion", "Western Junction", "Daisy Garden"],
@@ -191,15 +191,15 @@ TOURNAMENT_RULES = {
     }
 }
 
-EXHIBITION_DIFFICULTIES = {"Easy": "Easy", "Normal": "Normal", "Hard": "Hard", "Expert": "Expert"}
-TOURNAMENT_DIFFICULTIES = {"Normal": "Normal", "Hard": "Hard"}
+exhibition_difficulties = {"Easy": "Easy", "Normal": "Normal", "Hard": "Hard", "Expert": "Expert"}
+tournament_difficulties = {"Normal": "Normal", "Hard": "Hard"}
 
-CHARACTER_NAMES = [
+character_names = [
     "Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong", "Diddy Kong", "Toad", "Bowser",
     "Bowser Jr", "Moogle", "White Mage", "Black Mage", "Ninja", "Cactuar", "Slime"
 ]
 
-COSTUME_NAMES = {
+costume_names = {
     "Pink Yoshi": "Yoshi", "Light Blue Yoshi": "Yoshi", "Yellow Yoshi": "Yoshi",
     "Blue Toad": "Toad", "Green Toad": "Toad", "Yellow Toad": "Toad",
     "She-Slime": "Slime", "Metal Slime": "Slime",
@@ -218,23 +218,23 @@ def set_all_rules(world: MSMWorld) -> None:
 def set_all_location_rules(world: MSMWorld) -> None:
     # Exhibition mode rules
     for difficulty in world.options.exhibition_difficulty:
-        if difficulty not in EXHIBITION_DIFFICULTIES:
+        if difficulty not in exhibition_difficulties:
             continue
 
-        for sport, stages in EXHIBITION_RULES.items():
+        for sport, stages in exhibition_rules.items():
             for stage in stages:
                 location = world.get_location(f"{sport} Ex: Beat {stage} ({difficulty})")
                 world.set_rule(location, court_rule(world, stage, False) & Has(f"Exhibition {difficulty}"))
 
     # Tournament cup rules
     cup_difficulties = ["Normal"]
-    if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+    if world.options.hard_tournament_difficulty:
         cup_difficulties.append("Hard")
 
-    if world.options.include_tournaments == IncludeTournaments.option_true:
+    if world.options.include_tournaments:
         for difficulty in cup_difficulties:
-            for sport, cups in TOURNAMENT_RULES.items():
-                for cup, stages in cups.items():
+            for sport, tournament_cups in tournament_rules.items():
+                for cup, stages in tournament_cups.items():
                     base_cup_logic = cup_rule(world, sport, cup, difficulty)
 
                     for i in range(1, 4):
@@ -267,17 +267,17 @@ def set_all_location_rules(world: MSMWorld) -> None:
     # Character Sanity Locations
     if world.options.character_sanity in (CharacterSanity.option_characters,
                                           CharacterSanity.option_characters_and_costumes):
-        for character in CHARACTER_NAMES:
+        for character in character_names:
             location = world.get_location(f"Win as {character}")
             world.set_rule(location, Has(character))
 
     if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
-        for costume, char in COSTUME_NAMES.items():
+        for costume, char in costume_names.items():
             location = world.get_location(f"Win as {costume}")
             world.set_rule(location, HasAll(char, costume))
 
     # Court Sanity Locations
-    if world.options.court_sanity == CourtSanity.option_true:
+    if world.options.court_sanity:
         main_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
                        "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction"]
@@ -288,7 +288,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                           "Punk Athletic", "Punk Ocean", "Chocobo Beat", "Island Athletic", "Mushroom Mix Medley",
                           "Blossom Mix Medley", "Star Mix Medley"]
 
-        # Map of which cups contain which courts for each sport
+        # Map of which tournament_cups contain which courts for each sport
         sport_court_to_cups = {
             "Basketball": {
                 "Mario Stadium": ["Mushroom Cup"],
@@ -365,22 +365,23 @@ def set_all_location_rules(world: MSMWorld) -> None:
                 try:
                     win_location = world.get_location(f"Win on {court_name}")
 
-                    # Only get the cups that have those stages
+                    # Only get the tournament_cups that have those stages
                     cups_list = sport_court_to_cups.get(sport_name, {}).get(court_name, [])
                     formatted_cups = [f"{sport_name}: {cup_name}" for cup_name in cups_list]
                     # Any enabled ex diff will allow the player to get the check
                     ex_diffs = [f"Exhibition {diff}" for diff in world.options.exhibition_difficulty]
 
+                    # The player MUST have the sport AND the court
                     can_win_rule = (Has(sport_name) & Has(court_name) &
 
                                     # This section tells the generator "HEY! If this person has this rule on, add this
                                     # to the rule!"
                                     (HasAny(*formatted_cups,
-                                    options=[OptionFilter(IncludeTournaments, IncludeTournaments.option_true)])
-                                    # If both are on, either one of the cups OR one of the ex diffs will allow them
+                                    options=[OptionFilter(IncludeTournaments, 1)])
+                                    # If both are on, either one of the tournament_cups OR one of the ex diffs will allow them
                                     # to get the check
                                     | HasAny(*ex_diffs,
-                                      options=[OptionFilter(IncludeExhibition, IncludeExhibition.option_true)])))
+                                      options=[OptionFilter(IncludeExhibition, 1)])))
 
                     # Assign rule for the target location
                     world.set_rule(win_location, can_win_rule)
@@ -388,8 +389,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                     continue
 
         # Main Sports Tournament / Exhibition Logic
-        if (world.options.include_tournaments == IncludeTournaments.option_true or
-                world.options.include_exhibition == IncludeExhibition.option_true):
+        if world.options.include_tournaments or world.options.include_exhibition:
             if world.options.enabled_sports:
                 for sport in world.options.enabled_sports:
                     if sport in sport_court_to_cups:
@@ -446,8 +446,8 @@ def set_goal_rules(world: MSMWorld) -> None:
             world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
 
     elif world.options.goal_condition == GoalCondition.option_win_cups:
-        value = world.options.win_cups_amount.value
-        world.set_rule(world.get_location(f"Win {value} Cups!"), CanCupGoal().resolve(world))
+        win_cup_value = world.options.win_cups_amount.value
+        world.set_rule(world.get_location(f"Win {win_cup_value} Cups!"), CanCupGoal().resolve(world))
 
         if world.options.be_mean in (BeMean.option_defeat_behemoth, BeMean.option_both):
             world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
@@ -457,9 +457,8 @@ def set_goal_rules(world: MSMWorld) -> None:
 
 
 def set_all_entrance_rules(world: MSMWorld) -> None:
-    sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
     cup_tiers = ["Mushroom", "Flower", "Star"]
-    hard_enabled = world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true
+    hard_enabled = bool(world.options.hard_tournament_difficulty)
 
     sports_mix_rule = (
             (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_mix_item)]) |
@@ -500,3 +499,4 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
 
 def set_completion_condition(world: MSMWorld) -> None:
     world.set_completion_rule(Has("Victory!"))
+    # Player is granted the "Victory!" item upon goaling

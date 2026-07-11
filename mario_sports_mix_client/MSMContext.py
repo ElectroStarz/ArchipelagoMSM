@@ -9,7 +9,7 @@ from typing import Dict, Set, Optional, Any
 import Utils
 from CommonClient import ClientCommandProcessor, CommonContext
 from MultiServer import mark_raw
-from NetUtils import ClientStatus
+from NetUtils import ClientStatus, JSONMessagePart
 from .MSMInterface import MSMInterface, ConnectionState
 from ..items import item_table
 from ..locations import LOCATION_NAME_TO_ID
@@ -229,6 +229,11 @@ class MSMCommandProcessor(ClientCommandProcessor):
         """Reapply unlocks if you don't have them!"""
         asyncio.create_task(self.ctx.handle_received_items())
         logger.info("Reapplied unlocks!")
+
+    def _cmd_unlock_tabs(self):
+        """This command unlocks the tabs if they are already not unlocked"""
+        unlock_tabs(self.ctx.hard_tournament_difficulty)
+        logger.info("Tabs unlocked!")
 
     def _cmd_print_cached(self):
         """Print out the cached values"""
@@ -1014,9 +1019,8 @@ class MSMContext(CommonContext):
         not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
         ready_game = bool
         custom_time = self.get_custom_time()
-        set_break_addr = self.game_interface.dolphin_client.follow_pointers(get_address(MatchAddresses.set_break),
-                                                                            Pointers.Match.set_break_offsets)
-        set_break = self.game_interface.dolphin_client.read_word(set_break_addr)
+        set_break = self.game_interface.dolphin_client.read_pointer(get_address(MatchAddresses.set_break),
+                                                                    Pointers.Match.set_break_offsets, "word")
 
         if match_status == 0 and court_id not in not_match_prefix and custom_time is not None:
             if self.game_interface.check_sport() == "Basketball":
@@ -1734,11 +1738,10 @@ class MSMContext(CommonContext):
             return
 
         try:
-            special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
-                                                                            Pointers.Player.special_meter_offsets)
-
             if "Special Meter" not in self.unlocked_abilities:
-                self.game_interface.dolphin_client.write_float(special_meter, 0.0)
+                self.game_interface.dolphin_client.write_pointer(self.addresslib.p_special_meter_addr,
+                                                                 Pointers.Player.special_meter_offsets,
+                                                                 "float", 0.0)
 
             else:
                 self.log_once("special_meter", "Special meter unlocked; not locking meter", True)
@@ -2120,11 +2123,12 @@ class MSMContext(CommonContext):
         offset_1 = getattr(Pointers.Player, char)
         offset_group = getattr(offset_1, "Position")
 
-        x_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_pos_addr, offset_group.x_offsets)
-        z_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_pos_addr, offset_group.z_offsets)
+        self.game_interface.dolphin_client.write_pointer(self.addresslib.p_pos_addr, offset_group.x_offsets,
+                                                         "float", tele_x)
 
-        self.game_interface.dolphin_client.write_float(x_addr, tele_x)
-        self.game_interface.dolphin_client.write_float(z_addr, tele_z)
+        self.game_interface.dolphin_client.write_pointer(self.addresslib.p_pos_addr, offset_group.z_offsets,
+                                                         "float", tele_z)
+
         self.debug_log(f"Teleported character {char_id} to X: {tele_x}, Z: {tele_z}")
 
     # async def swap_trap(self):
@@ -2416,7 +2420,7 @@ class MSMContext(CommonContext):
 
         await self.send_msgs([{"cmd": "LocationChecks", "locations": [location_id]}])
         self.locations_checked.add(location_id)
-        self.debug_log(f"Checked location: {location_name}")
+        self.debug_log(f"Checked location: name={location_name}, id={location_id}")
 
     def get_tournament_cup_and_round(self, sport: str, stage_code: str):
         """Gets the current cup and round (if applicable)"""
@@ -2670,11 +2674,11 @@ class MSMContext(CommonContext):
 
     def send_to_void(self):
         """Sends the player to the void (stage=s39ba, module=0x6D656E75)"""
-        current_module_addr = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
-                                                                                 Pointers.Match.current_module_offsets)
+        self.game_interface.dolphin_client.write_pointer(self.addresslib.current_module_addr,
+                                                         Pointers.Match.current_module_offsets,
+                                                         "word", 0x6D656E75)
 
         self.game_interface.dolphin_client.write_string(self.addresslib.current_court_addr, "s39ba")
-        self.game_interface.dolphin_client.write_word(current_module_addr, 0x6D656E75)
 
     async def clear_player_score(self):
         """Locks the player's score at 0"""
@@ -2689,10 +2693,9 @@ class MSMContext(CommonContext):
     async def lock_special_meter(self):
         """Locks the player's special meter at 0"""
 
-        special_meter = self.game_interface.dolphin_client.follow_pointers(self.addresslib.p_special_meter_addr,
-                                                                           Pointers.Player.special_meter_offsets)
-
-        self.game_interface.dolphin_client.write_float(special_meter, 0)
+        self.game_interface.dolphin_client.write_pointer(self.addresslib.p_special_meter_addr,
+                                                         Pointers.Player.special_meter_offsets,
+                                                         "float", 0.0)
 
     async def lock_behemoth_hp(self):
         """Function to lock Behemoth Health, called in handle_lock_behemoth_hp"""
@@ -2970,6 +2973,7 @@ class MSMContext(CommonContext):
     def on_deathlink(self, data: dict[str, Any]):
         super().on_deathlink(data)
         self.debug_log(f"Deathlink Received - Consequence={self.deathlink_consequence}")
+        self.received_death = True  # Required so we don't send a deathlink when we get sent one
         self.handle_received_deathlink()
 
     def handle_received_deathlink(self):
@@ -2978,9 +2982,6 @@ class MSMContext(CommonContext):
 
         if self.deathlink_enabled:
             if self.ready_to_handle():
-                match_status = self.game_interface.match_status()
-                court_id, _ = self.game_interface.get_court()
-                not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
                 # Lose Match Consequence
                 if self.deathlink_consequence == 0:
@@ -2988,21 +2989,17 @@ class MSMContext(CommonContext):
                         self.recover_boss_hp()
                     else:
                         # Force player to lose
-                        if not self.game_interface.is_in_harmony(): # HH uses 1 score since it's teamwork|4 = 5th Period
+                        # Harmony Hustle uses 1 score since it's teamwork
+                        if not self.game_interface.is_in_harmony():                                     # 4 = 5th Period
                             self.game_interface.dolphin_client.write_byte(self.addresslib.current_period_addr, 4)
                             self.game_interface.dolphin_client.write_word(self.game_interface.get_opponent_score_addr
                                                                 (self.party_modes), 900) # Write 900 for scores
 
-                        # In all other modes, updating the player's score should cause them to lose
+                        # In all modes, updating the player's score should cause them to lose
                         self.game_interface.dolphin_client.write_word(self.game_interface.get_player_score_addr(), 0)
 
                         self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
 
-                        self.received_death = True # Required so we don't send a deathlink when we get sent one
-                        # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
-                        # set received_death to false
-                        if (match_status != 2 and match_status != 3) or court_id in not_match_prefix:
-                            self.received_death = False
 
                 # Opponent gains points
                 elif self.deathlink_consequence == 1:
@@ -3025,10 +3022,11 @@ class MSMContext(CommonContext):
                                         Pointers.Player.B3.dodge_damage,]
 
                             addr = get_address(PlayerAddresses.various_shp_pointers)
-                            final_addr = self.game_interface.dolphin_client.follow_pointers(addr, pointers[random_char])
-                            curr_damage = self.game_interface.dolphin_client.read_word(final_addr)
+                            curr_damage = self.game_interface.dolphin_client.read_pointer(addr, pointers[random_char],
+                                                                                         "word")
                             new_damage = curr_damage + self.deathlink_dodge_health_lost
-                            self.game_interface.dolphin_client.write_word(final_addr, new_damage)
+                            self.game_interface.dolphin_client.write_pointer(addr, pointers[random_char],
+                                                                             "word", new_damage)
                             health = 100 - new_damage
                             # Find current the character selected by randint
                             chars = [PlayerAddresses.character_1,
@@ -3042,13 +3040,16 @@ class MSMContext(CommonContext):
 
     def recover_boss_hp(self):
         """Calculates the amount of HP recovered when sent a deathlink"""
+        behemoth_text: JSONMessagePart = {"type": "color",
+                                          "text": f"Behemoth{" King" if self.is_behemoth_king else ""}",
+                                          "color": "red"}
 
         if self.is_behemoth:
             health_recovered = (self.deathlink_boss_recovered / 100) * self.behemoth_hp
             current_health = self.game_interface.dolphin_client.read_float(self.addresslib.behemoth_hp_addr)
             new_health = current_health + health_recovered
             self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
-            logger.info(f"Behemoth has powered up back to {new_health} HP!")
+            logger.info(f"{behemoth_text} has powered up back to {new_health} HP!")
 
         elif self.is_behemoth_king:
             health_recovered = (self.deathlink_boss_recovered / 100) * self.behemoth_king_hp
@@ -3056,9 +3057,28 @@ class MSMContext(CommonContext):
             new_health = current_health + health_recovered
             self.game_interface.dolphin_client.write_float(self.addresslib.behemoth_hp_addr, new_health)
             logger.info(f"Behemoth King has powered up back to {new_health} HP!")
+            self.log_colour(f"{behemoth_text} has powered up back to {new_health} HP!", "red")
 
+    async def reset_deathlink_status(self):
+        """Resets the received and sent deathlink bools"""
+        # Received Deathlink
+        match_status = self.game_interface.match_status()
+        court_id, _ = self.game_interface.get_court()
+        not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
+        # If we're not in the state where we've died to deathlink, or we're in some kind of menu/cutscene,
+        # set received_death to false
+        if (match_status != 2 and match_status != 3) or court_id in not_match_prefix:
+            self.received_death = False
+
+        # Sent Deathlink
+        # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
+        # set received_death to false
+        if self.timer_reset() or (match_status == 0 and not self.timer_is_0()):
+            self.received_death = False
+            self.has_sent_death = False
 
     # === Misc stuff idk where to put ===
+
 
 
     async def dolphin_sync_task(self):
@@ -3094,8 +3114,7 @@ class MSMContext(CommonContext):
                     continue
 
                 if self.start_process:
-                    unlock_ex_tabs()
-                    unlock_party_tabs()
+                    unlock_tabs(self.hard_tournament_difficulty)
                     self.start_process = False
 
                 self.last_error_message = None
@@ -3214,11 +3233,10 @@ class MSMContext(CommonContext):
     async def handle_gecko_codes(self):
         """Handle the gecko code patches for each region"""
 
-        current_module = self.game_interface.dolphin_client.follow_pointers(self.addresslib.current_module_addr,
-                                                                            Pointers.Match.current_module_offsets)
-        value = self.game_interface.dolphin_client.read_word(current_module)
+        current_module = self.game_interface.dolphin_client.read_pointer(self.addresslib.current_module_addr,
+                                                                         Pointers.Match.current_module_offsets, "word")
 
-        if value == 0x6D656E75 and not self.handled_gecko_codes:
+        if current_module == 0x6D656E75 and not self.handled_gecko_codes:
             # print(f"Game Version: {dc.GAME_VERSION}")
             # print(f"Current Module Value (Hex): {hex(value)}")
 
@@ -3257,6 +3275,10 @@ class MSMContext(CommonContext):
                                 f"type={type}", 10))
             return False
 
+    def log_colour(self, text: str, colour: str):
+        if self.ui is not None:
+            message: JSONMessagePart = {"type": "color", "text": text, "color": colour}
+            self.ui.print_json([message])
 
     # === Where to handle what ===
 
@@ -3337,10 +3359,6 @@ class MSMContext(CommonContext):
         await self.stop_stupid_unlock_notifs()
 
         await self.handle_gecko_codes()
-
-        await unlock_tournament_tabs_option(self.hard_tournament_difficulty, self.unlocked_sports_mix)
-        unlock_ex_tabs()
-        unlock_party_tabs()
 
         self.has_sent_death = False
 

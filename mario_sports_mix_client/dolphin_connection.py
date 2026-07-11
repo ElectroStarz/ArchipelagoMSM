@@ -162,3 +162,51 @@ class DolphinClient:
         self._assert_hooked()
         result = self.dme.follow_pointers(address, list(pointers))
         return result
+
+    def read_pointer(self, address: Any, pointers: list[int], data_type: str, length: int = 4) -> Any:
+        """
+        Resolves a pointer path and extracts the final value using structural pattern matching.
+        Supported types: 'string', 'byte', 'bytes', 'float', 'word'
+        This function is only used when the address at the pointer isn't used multiple times within the function
+        """
+        self._assert_hooked()
+
+        resolved_addr = self.dme.follow_pointers(address, list(pointers))
+
+        match data_type.lower().strip():
+            case "string":
+                return self.read_string(resolved_addr)
+            case "byte":
+                return self.read_byte(resolved_addr)
+            case "bytes":
+                return self.read_bytes(resolved_addr, length)
+            case "float":
+                return self.read_float(resolved_addr)
+            case "word":
+                return self.read_word(resolved_addr)
+            case _:
+                raise ValueError(f"Unsupported data type: {data_type}")
+
+    def write_pointer(self, address: Any, pointers: list[int], data_type: str, data: Any) -> None:
+        """
+        Resolves a pointer path and writes the value to the final address based on a type string.
+        Supported types: 'string', 'byte', 'bytes', 'float', 'word'
+        This function is only used when the address at the pointer isn't used multiple times within the function
+        """
+        self._assert_hooked()
+
+        resolved_addr = self.dme.follow_pointers(address, list(pointers))
+
+        match data_type.lower().strip():
+            case "string":
+                self.write_string(resolved_addr, str(data))
+            case "byte":
+                self.write_byte(resolved_addr, data)
+            case "bytes":
+                self.write_bytes(resolved_addr, data)
+            case "float":
+                self.write_float(resolved_addr, float(data))
+            case "word":
+                self.write_word(resolved_addr, data)
+            case _:
+                raise ValueError(f"Unsupported data type for writing: {data_type}")

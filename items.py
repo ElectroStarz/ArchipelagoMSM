@@ -326,19 +326,16 @@ def get_random_filler_item_name(world: "MSMWorld") -> str:
 def create_all_items(world: "MSMWorld") -> None:
     itempool = []
     # Character costume items
-    for name in character_costumes:
-        new_item = world.create_item(name)
-        itempool.append(new_item)
+    for costume in character_costumes:
+        itempool.append(world.create_item(costume))
 
     # Unlockable panel items
-    for name in unlockable_panel_items:
-        new_item = world.create_item(name)
-        itempool.append(new_item)
+    for panel in unlockable_panel_items:
+        itempool.append(world.create_item(panel))
 
     # Unlockable abilities
-    for name in unlockable_abilities:
-        new_item = world.create_item(name)
-        itempool.append(new_item)
+    for ability in unlockable_abilities:
+        itempool.append(world.create_item(ability))
 
 
 
@@ -357,15 +354,12 @@ def create_all_items(world: "MSMWorld") -> None:
         # Select random characters from said rows
         character_1 = world.random.choice(selected_1)
         character_2 = world.random.choice(selected_2)
-        item_1 = world.create_item(character_1)
-        item_2 = world.create_item(character_2)
-        world.push_precollected(item_1)
-        world.push_precollected(item_2)
+        world.push_precollected(world.create_item(character_1))
+        world.push_precollected(world.create_item(character_2))
 
         for name in characters:
             if name not in (character_1, character_2):
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+                itempool.append(world.create_item(name))
 
     elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
         character_1 = world.random.choice(row_1)
@@ -378,13 +372,11 @@ def create_all_items(world: "MSMWorld") -> None:
 
         for name in characters:
             if name not in (character_1, character_2, character_3):
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+                itempool.append(world.create_item(name))
 
     else:
         for name in characters:
-            new_item = world.create_item(name)
-            itempool.append(new_item)
+            itempool.append(world.create_item(name))
 
     # Exhibition Difficulty Items
     selected_difficulties = world.options.exhibition_difficulty.value
@@ -399,39 +391,34 @@ def create_all_items(world: "MSMWorld") -> None:
     if world.options.start_with_sports == StartWithSports.option_excluding_sports_mix:
         for sport in sport_items:
             if sport in enabled_sports:
-                item = world.create_item(sport)
-                world.push_precollected(item)
+                world.push_precollected(world.create_item(sport))
+
         if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
             if "Sports Mix" in enabled_sports:
-                sports_mix = world.create_item("Sports Mix")
-                itempool.append(sports_mix)
+                itempool.append(world.create_item("Sports Mix"))
+
         elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
-            for name in sports_crystals:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+            for crystal in sports_crystals:
+                itempool.append(world.create_item(crystal))
 
     elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
         for sport in sport_items:
             if sport in enabled_sports:
-                item = world.create_item(sport)
-                world.push_precollected(item)
+                world.push_precollected(world.create_item(sport))
 
         if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
             if "Sports Mix" in enabled_sports:
-                sports_mix = world.create_item("Sports Mix")
-                world.push_precollected(sports_mix)
+                world.push_precollected(world.create_item("Sports Mix"))
 
         elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
             for crystal_name in sports_crystals:
                 if "Sports Mix" in enabled_sports:
-                    new_item = world.create_item(crystal_name)
-                    world.push_precollected(new_item)
+                    world.push_precollected(world.create_item(crystal_name))
 
     else:
         for sport in sport_items:
             if sport in enabled_sports:
-                item = world.create_item(sport)
-                itempool.append(item)
+                itempool.append(world.create_item(sport))
 
         if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
             if "Sports Mix" in enabled_sports:
@@ -466,7 +453,7 @@ def create_all_items(world: "MSMWorld") -> None:
     create_cups(world, itempool)
 
     # Create stages based on options
-    create_stages(world, itempool)
+    create_courts(world, itempool)
 
     # Calculate number of filler items needed, exclude costumes
 
@@ -480,23 +467,20 @@ def create_all_items(world: "MSMWorld") -> None:
     world.multiworld.itempool += itempool
 
 
-def create_stages(world: "MSMWorld", itempool):
+def create_courts(world: "MSMWorld", itempool):
     if world.options.court_unlock_type == CourtUnlockType.option_court_item:
         if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
-            mush_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
-            for name in mush_stages:
-                new_item = world.create_item(name)
-                world.push_precollected(new_item)
+            mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+            for court in mush_courts:
+                world.push_precollected(world.create_item(court))
 
-            other_stages = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+            other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
                             "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
-            for name in other_stages:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+            for court in other_courts:
+                itempool.append(world.create_item(court))
         else:
-            for name in individual_courts:
-                item = world.create_item(name)
-                itempool.append(item)
+            for court in individual_courts:
+                itempool.append(world.create_item(court))
 
     elif world.options.court_unlock_type == CourtUnlockType.option_progressive_court:
         total_stages = 15
@@ -523,7 +507,7 @@ def create_cups(world: "MSMWorld", itempool):
         total_progressive_cups = 3
 
         # If Hard mode is enabled, add 3 more for the Hard Tournament tiers
-        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+        if world.options.hard_tournament_difficulty:
             total_progressive_cups += 3  # 6 items
 
         if "Sports Mix" in enabled_sports:
@@ -590,7 +574,7 @@ def create_cups(world: "MSMWorld", itempool):
                     itempool.append(world.create_item(name))
 
         # Add Hard Cups to the pool (if enabled)
-        if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
+        if world.options.hard_tournament_difficulty:
             for name in all_hard_items:
                 sport = prefix_to_sport[name[:1]]
                 if sport in enabled_sports:
@@ -599,9 +583,8 @@ def create_cups(world: "MSMWorld", itempool):
 
         # Sports Mix Cups
         if "Sports Mix" in enabled_sports:
-            for name in sports_mix_cups:
-                new_item = world.create_item(name)
-                itempool.append(new_item)
+            for cup in sports_mix_cups:
+                itempool.append(world.create_item(cup))
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification

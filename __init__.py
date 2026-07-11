@@ -93,11 +93,13 @@ class MSMWorld(World):
     origin_region_name = "Main Menu"
 
     def generate_early(self) -> None:
+        # Be mean check
         if self.options.goal_condition.value == self.options.be_mean.value:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name}'s Be Mean option is the same as their win condition!"
             )
 
+        # Max points voids deathlink points check
         points_to_win = {
             "b_points": {"value": self.options.b_points_win.value, "enabled": self.options.enable_b_points_win.value},
             "h_points": {"value": self.options.h_points_win.value, "enabled": self.options.enable_h_points_win.value},
@@ -115,6 +117,7 @@ class MSMWorld(World):
                 f"points to win values, they won't be able to send a deathlink in that sport!"
             )
 
+        # Goal Checking
         if self.options.goal_condition.value in (1, 2, 3) and not self.options.include_tournaments:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name}'s goal condition requires tournaments but they don't have them on!"
