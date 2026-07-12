@@ -926,7 +926,7 @@ class MSMContext(CommonContext):
         self.has_sent_death = True
         self.received_death = True
         self.previous_opponent_score = None
-        self.game_interface.current_tournament = None
+        self.game_interface.current_tournament = None if not game_active else self.game_interface.current_tournament
         self.game_session_active = game_active
         self.active_game_version = dc.GAME_VERSION if game_active else None
 
@@ -1217,7 +1217,6 @@ class MSMContext(CommonContext):
 
         # Traps + Filler aren't here because they can only be received in game and this function gets awaited during
         # every connection state, if you were to receive a trap or filler in the menu it wouldn't work.
-
 
     def has_unlocked_sport(self, sport: str):
         if sport == "SM":
@@ -1605,7 +1604,7 @@ class MSMContext(CommonContext):
 
     async def handle_progressive_court_unlocks(self):
 
-        # The order the stages will unlock, from first to last
+        # The order the courts will unlock, from first to last
         court_unlock_order = [
             "Mario Stadium",
             "Koopa Troopa Beach",
@@ -2687,8 +2686,11 @@ class MSMContext(CommonContext):
 
     async def lock_period_1(self):
         """Locks the period/set counter at period 1"""
+
         self.locking_period = True
         self.game_interface.dolphin_client.write_byte(self.addresslib.current_period_addr, 0)
+        self.game_interface.dolphin_client.write_byte(get_address(MatchAddresses.max_periods), 4)
+        # Make sure the game doesn't end after 1 period
 
     async def lock_special_meter(self):
         """Locks the player's special meter at 0"""
@@ -2711,7 +2713,7 @@ class MSMContext(CommonContext):
 
     # --- Sanity Location Handling ---
 
-
+    # --- Character Sanity ---
     async def send_character_sanity_checks(self):
         """Handles sending checks for Character Sanity"""
         value = self.game_interface.match_status()
@@ -2795,6 +2797,13 @@ class MSMContext(CommonContext):
 
                     if costume_name:
                         await self.check_location(f"Win as {costume_name}")
+
+    # --- Court Sanity ---
+    async def send_court_sanity_checks(self):
+        value = self.game_interface.match_status()
+
+        if self.court_sanity == 0 or value != 1:
+            return
 
 
     # === Deathlink Stuff ===
@@ -3177,59 +3186,6 @@ class MSMContext(CommonContext):
             # won so far (So it doesn't log 1 Cups Won, 2, 3 all the way up to 12 or smth, only logs 12 Cups Won!)
             logger.info(f"{current_cups_count}/{self.win_cups_amount} Cups Won!")
 
-    async def apply_cups_won(self):
-        """Applies the cups the player has won to the ingame cup tracker, no clue if this does anything"""
-
-        b_mush = CupsWonMultiple.Basketball.mushroom_cup
-        b_flow = CupsWonMultiple.Basketball.flower_cup
-        b_star = CupsWonMultiple.Basketball.star_cup
-
-        d_mush = CupsWonMultiple.Dodgeball.mushroom_cup
-        d_flow = CupsWonMultiple.Dodgeball.flower_cup
-        d_star = CupsWonMultiple.Dodgeball.star_cup
-
-        v_mush = CupsWonMultiple.Volleyball.mushroom_cup
-        v_flow = CupsWonMultiple.Volleyball.flower_cup
-        v_star = CupsWonMultiple.Volleyball.star_cup
-
-        h_mush = CupsWonMultiple.Hockey.mushroom_cup
-        h_flow = CupsWonMultiple.Hockey.flower_cup
-        h_star = CupsWonMultiple.Hockey.star_cup
-
-        cup_mapping = {
-            b_mush: ["Basketball", "Mushroom"],
-            b_flow: ["Basketball", "Flower"],
-            b_star: ["Basketball", "Star"],
-
-            d_mush: ["Dodgeball", "Mushroom"],
-            d_flow: ["Dodgeball", "Flower"],
-            d_star: ["Dodgeball", "Star"],
-
-            v_mush: ["Volleyball", "Mushroom"],
-            v_flow: ["Volleyball", "Flower"],
-            v_star: ["Volleyball", "Star"],
-
-            h_mush: ["Hockey", "Mushroom"],
-            h_flow: ["Hockey", "Flower"],
-            h_star: ["Hockey", "Star"],
-        }
-        value = 0
-
-        if self.cups_won is not None:
-            for location in self.cups_won:
-                for address, types in cup_mapping.items():
-                    if types[0] in self.enabled_sports:
-                        if types[0] in location and types[1] in location:
-                            value += 1
-
-                        write_val = value.to_bytes(2, "big")
-                        self.game_interface.dolphin_client.write_byte(get_address(address), write_val)
-                    else:
-
-                        value = 1
-                        write_val = value.to_bytes(2, "big")
-                        self.game_interface.dolphin_client.write_byte(get_address(address), write_val)
-
     async def handle_gecko_codes(self):
         """Handle the gecko code patches for each region"""
 
@@ -3287,9 +3243,7 @@ class MSMContext(CommonContext):
         """What functions should be handled during a match"""
         # Cup Goal
         await self.has_cup_goaled()
-
         await self.track_cups_won()
-        await self.apply_cups_won()
 
         # Custom Tournament Settings
         if self.in_tournament_match:
@@ -3352,7 +3306,6 @@ class MSMContext(CommonContext):
     async def handle_in_main_menu(self):
         """What functions should be handled in the main menu"""
         await self.has_cup_goaled()
-        await self.apply_cups_won()
 
         await self.handle_received_items()
         await self.check_pending_tournament_location()
