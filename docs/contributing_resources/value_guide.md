@@ -1,42 +1,43 @@
-# **Tournament**
+# **Add all of these values to get different combinations!**
+
+
+
+## **Tournament**
+### **Tournament Tabs**
 Normal Tab = 2\
 Hard Tab = 3
 
+### **Tournaments**
 Mushroom Cup = 1\
 Flower Cup = 2\
 Star Cup = 4\
-None = 8\
-Add these together to get different combinations
+All = 7\
+None = 8
 
-# **Exhibition**
+## **Exhibition**
 ### **Exhibition Tabs**
+
 Mushroom = 1\
 Flower = 2\
-Star = 4\
+Star Tab = 4\
 ?-Block = 8\
-All = 15
 
-### **Exhibition Stages**
-1 = First Stage\
-2 = Second Stage\
-4 = Third Stage\
-8 = None\
-Add together to get different combinations
 
-### **Character/Costume Unlocks**
+### **Exhibition Courts**
+1 = First Court\
+2 = Second Court\
+4 = Third Court\
+7 = All\
+8 = None
 
-**Universal (Applies to all)**\
-0 = Locked\
-1 - Unlocked
 
+
+#### **Character/Costume Unlocks**
+**Universal (For all characters)**\
+0 = Locked
+1 - Unlocked\
 **Specific**\
-Peach: 1 = Normal, 4 = Alt\
-Daisy: 1 = Normal, 4 = Alt\
-Ninja: 1 = Normal, 4 = Alt\
-White Mage: 1 = Normal, 4 = Alt\
-Black Mage: 1 = Normal, 4 = Alt
-
-Add the numbers to get different combinations
+Peach, Daisy, Ninja, White \& Black Mage: 1 = Normal, 4 = Alt Costume
 
 **Yoshi:**
 * 1 = Green
@@ -54,17 +55,17 @@ Add the numbers to get different combinations
 
 **Slime:**
 * 1 = Slime
-* 4 = She-Slime
+* 4 = She-slime
 * 16 = Metal slime
 * 21 = All
 
-### **Items**
+##### **Items**
 -1 = No Item\
 0 = Green Shell\
 1 = Red Shell\
-2 = Mini-Mushroom\
+2 = Minishroom\
 3 = Bob-Omb\
 4 = Star\
 5 = Banana\
-6 = Slippery Mini-Mushroom (UNUSED - Looks like a Mini-Mushroom, behaves like a Banana)
+6 = Slippery Minishroom (UNUSED - Looks like a Mini Mushroom, behaves like a banana)
 
