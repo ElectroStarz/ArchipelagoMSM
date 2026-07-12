@@ -104,6 +104,15 @@ def create_all_regions(world: "MSMWorld") -> None:
     regions.append(h_flower_cup_h)
     regions.append(h_star_cup_h)
 
+    # Party Mode Stuff
+    feed_petey = Region("Feed Petey", world.player, world.multiworld)
+    harmony_hustle = Region("Harmony Hustle", world.player, world.multiworld)
+    bob_omb_dodge = Region("Bob-Omb Dodge", world.player, world.multiworld)
+    smash_skate = Region("Smash Skate", world.player, world.multiworld)
+    regions.append(feed_petey)
+    regions.append(harmony_hustle)
+    regions.append(bob_omb_dodge)
+    regions.append(smash_skate)
 
     # Boss stuff
     behemoth_boss = Region("Behemoth Boss Battle", world.player, world.multiworld)
@@ -163,6 +172,12 @@ def connect_regions(world: MSMWorld) -> None:
     sm_flower_cup = world.get_region("Sports Mix: Flower Cup")
     sm_star_cup = world.get_region("Sports Mix: Star Cup")
 
+    # Party Mode
+    feed_petey = world.get_region("Feed Petey")
+    harmony_hustle = world.get_region("Harmony Hustle")
+    bob_omb_dodge = world.get_region("Bob-Omb Dodge")
+    smash_skate = world.get_region("Smash Skate")
+
     # Boss
     behemoth_boss = world.get_region("Behemoth Boss Battle")
     behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
@@ -173,6 +188,11 @@ def connect_regions(world: MSMWorld) -> None:
     main_menu.connect(volleyball, "Main Menu -> Volleyball")
     main_menu.connect(hockey, "Main Menu -> Hockey")
     main_menu.connect(sports_mix, "Main Menu -> Sports Mix")
+
+    main_menu.connect(feed_petey, "Main Menu -> Feed Petey")
+    main_menu.connect(harmony_hustle, "Main Menu -> Harmony Hustle")
+    main_menu.connect(bob_omb_dodge, "Main Menu -> Bob-Omb Dodge")
+    main_menu.connect(smash_skate, "Main Menu -> Smash Skate")
 
 
     # Connect Basketball to everything

@@ -12,7 +12,10 @@ Will cause immediate BK if off"""
     default = 1
 
 class EnabledSports(OptionSet):
-    """Choose which sports to enable"""
+    """Choose which sports to enable
+    Can't do this yet because I haven't found the flag for Behemoth yet :/
+    Keeping this here because I'm not removing it from every file in this"""
+    visibility = Visibility.none
     display_name = "Enabled Sports"
     valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
     default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
@@ -428,6 +431,7 @@ msm_option_groups = [
         CupUnlockType,
         CourtUnlockType,
         StartWithCharacters,
+        ExhibitionType,
         ExhibitionDifficulty,
         HardTournamentDifficulty,
         SportsMixUnlock,
@@ -495,6 +499,7 @@ class MSMOptions(PerGameCommonOptions):
     cup_unlock_type: CupUnlockType
     court_unlock_type: CourtUnlockType
     start_with_characters: StartWithCharacters
+    exhibition_type: ExhibitionType
     exhibition_difficulty: ExhibitionDifficulty
     hard_tournament_difficulty: HardTournamentDifficulty
     sports_mix_unlock: SportsMixUnlock

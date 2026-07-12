@@ -240,7 +240,10 @@ traps = {
 
 # Party Mode Items (900 - 1300 range)
 feed_petey_items = {
-    "Feed Petey":                        ItemData(base_id + 900, IC.useful, ItemGroup.FEED_PETEY)
+    "Feed Petey":                        ItemData(base_id + 900, IC.useful, ItemGroup.FEED_PETEY),
+    "Daisy Garden":                      ItemData(base_id + 307, IC.progression, ItemGroup.COURTS),
+    "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
+    "Wario Factory":                     ItemData(base_id + 308, IC.progression, ItemGroup.COURTS),
 }
 
 harmony_hustle_items = {
@@ -254,10 +257,16 @@ harmony_hustle_items = {
     "Punk Ocean":                        ItemData(base_id + 1007, IC.useful, ItemGroup.HARMONY_HUSTLE),
     "Chocobo Beat":                      ItemData(base_id + 1008, IC.useful, ItemGroup.HARMONY_HUSTLE),
     "Island Athletic":                   ItemData(base_id + 1009, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Peach's Castle":                    ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
+    "Bowser Jr. Blvd.":                  ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
+    "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
 }
 
 bob_omb_dodge_items = {
-    "Bob-Omb Dodge":                     ItemData(base_id + 1100, IC.useful, ItemGroup.BOB_OMB_DODGE)
+    "Bob-Omb Dodge":                     ItemData(base_id + 1100, IC.useful, ItemGroup.BOB_OMB_DODGE),
+    "Mario Stadium":                     ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
+    "Ghoulish Galleon":                  ItemData(base_id + 312, IC.progression, ItemGroup.COURTS),
+    "Western Junction":                  ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
 }
 
 smash_skate_items = {
@@ -446,8 +455,9 @@ def create_all_items(world: "MSMWorld") -> None:
             create_dict = party_mode_to_dict[enabled]
 
             for item in create_dict:
-                # Create all the items and add them to the itempool
-                itempool.append(world.create_item(item))
+                # Create all the items (that haven't already been created) and add them to the itempool
+                if item not in itempool:
+                    itempool.append(world.create_item(item))
 
     # Create cups based on options
     create_cups(world, itempool)
@@ -463,7 +473,7 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    #print(itempool)
+    print(itempool)
     world.multiworld.itempool += itempool
 
 
