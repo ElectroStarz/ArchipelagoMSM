@@ -1030,7 +1030,7 @@ class MSMContext(CommonContext):
                                                                     Pointers.Match.set_break_offsets, "word")
 
         if match_status == 0 and court_id not in not_match_prefix and custom_time is not None:
-            if self.game_interface.check_sport() == "Basketball":
+            if self.game_interface.get_mode() == "Basketball":
                 if self.game_interface.current_tournament is not None:
                     if timer < custom_time:
                         ready_game = True
@@ -1042,7 +1042,7 @@ class MSMContext(CommonContext):
                     else:
                         ready_game = False
 
-            elif self.game_interface.check_sport() == "Dodgeball":
+            elif self.game_interface.get_mode() == "Dodgeball":
                 if self.game_interface.current_tournament is not None:
                     if timer < custom_time:
                         ready_game = True
@@ -1057,7 +1057,7 @@ class MSMContext(CommonContext):
                         else:
                             ready_game = False
 
-            elif self.game_interface.check_sport() == "Volleyball":
+            elif self.game_interface.get_mode() == "Volleyball":
                 if court_id == "s20":
                     try:
                         self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
@@ -1073,7 +1073,7 @@ class MSMContext(CommonContext):
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
-            elif self.game_interface.check_sport() == "Hockey":
+            elif self.game_interface.get_mode() == "Hockey":
                 if self.game_interface.current_tournament is not None:
                     if timer < custom_time:
                         ready_game = True
@@ -1112,7 +1112,7 @@ class MSMContext(CommonContext):
         else:
             is_demo = False
 
-        if timer == 0 and self.game_interface.check_sport() != "Volleyball":
+        if timer == 0 and self.game_interface.get_mode() != "Volleyball":
             ready_game = False
 
         if ready_game and not is_cutscene and not is_paused and not is_loading and not is_set_break and not is_demo:
@@ -1873,10 +1873,10 @@ class MSMContext(CommonContext):
     def has_ended(self):
         """Check if the timer is at 0 for every sport except Volleyball"""
         timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
-        if self.game_interface.check_sport() == "Volleyball":
+        if self.game_interface.get_mode() == "Volleyball":
             return False
 
-        elif timer == 0 and self.game_interface.check_sport() != "Volleyball":
+        elif timer == 0 and self.game_interface.get_mode() != "Volleyball":
             return True
         else:
             return False
@@ -2184,7 +2184,7 @@ class MSMContext(CommonContext):
     def get_default_time(self):
         """Gets the default option value corresponding to the default timer value for the sport"""
 
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
         if sport == "Basketball":
             return 2
         elif sport == "Dodgeball" or sport == "Hockey":
@@ -2209,7 +2209,7 @@ class MSMContext(CommonContext):
             3: 12600,
             4: 14400
         }
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
 
         if sport == "Basketball":
             return b_option_to_timer.get(self.custom_basket_time)
@@ -2232,7 +2232,7 @@ class MSMContext(CommonContext):
         if self.handled_custom_timer:
             return
 
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
 
         if sport == "Volleyball": # Volleyball doesn't have a timer
             return
@@ -2265,7 +2265,7 @@ class MSMContext(CommonContext):
         if self.locking_period:
             return
 
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
 
         sport_to_var = {
             "Basketball": self.b_period,
@@ -2281,7 +2281,7 @@ class MSMContext(CommonContext):
     async def has_points_win(self):
         """Check if the player has scored the required amount of points to win the period/set"""
 
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
         curr_player_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_player_score_addr())
         curr_opp_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_opponent_score_addr
                                                                       (self.party_mode_opponent))
@@ -2308,7 +2308,7 @@ class MSMContext(CommonContext):
 
     async def set_custom_dodge_health(self):
         """Sets the custom health in dodgeball"""
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
 
         if sport == "Dodgeball":
             if self.ready_to_handle():
@@ -2371,7 +2371,7 @@ class MSMContext(CommonContext):
     async def check_boss_type(self):
         """Check which boss is currently being fought"""
 
-        is_sports_mix = self.game_interface.check_sports_mix()
+        is_sports_mix = self.game_interface.get_modes_mix()
         _, court_name = self.game_interface.get_court()
         match_status = self.game_interface.match_status()
 
@@ -2452,8 +2452,8 @@ class MSMContext(CommonContext):
         """Get the correct location name for the sport, cup and round"""
 
         court_code, court_name = self.game_interface.get_court()
-        sports_mix_activated = self.game_interface.check_sports_mix()
-        sport = self.game_interface.check_sport()
+        sports_mix_activated = self.game_interface.get_modes_mix()
+        sport = self.game_interface.get_mode()
 
 
         if court_code == "s20":
@@ -2502,7 +2502,7 @@ class MSMContext(CommonContext):
             return
 
         # If Sports Mix is running, standard Exhibition checks shouldn't fire
-        if self.game_interface.check_sports_mix():
+        if self.game_interface.get_modes_mix():
             return
 
         _, court_name = self.game_interface.get_court()
@@ -2511,7 +2511,7 @@ class MSMContext(CommonContext):
         if match_status != 1:
             return
 
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
         difficulty, _ = self.game_interface.get_exhibition_difficulty()
 
         if court_name is None or court_name == "Main Menu" or sport is None or difficulty is None:
@@ -2543,8 +2543,8 @@ class MSMContext(CommonContext):
             return
 
         # Sports Mix Override
-        sports_mix_activated = self.game_interface.check_sports_mix()
-        sport = self.game_interface.check_sport()
+        sports_mix_activated = self.game_interface.get_modes_mix()
+        sport = self.game_interface.get_mode()
 
         if sports_mix_activated and sport:
             # If we are actively playing a court that belongs to a tournament path,
@@ -2588,8 +2588,8 @@ class MSMContext(CommonContext):
 
 
         court_code, court_name = self.game_interface.get_court()
-        sports_mix_activated = self.game_interface.check_sports_mix()
-        sport = self.game_interface.check_sport()
+        sports_mix_activated = self.game_interface.get_modes_mix()
+        sport = self.game_interface.get_mode()
 
 
         if court_name is None or sport is None:
@@ -2817,7 +2817,7 @@ class MSMContext(CommonContext):
 
     def timer_is_0(self):
         """Checks if the timer is 0 because volleyball is stupid"""
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
         timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
 
         if sport == "Volleyball":
@@ -2831,7 +2831,7 @@ class MSMContext(CommonContext):
     def timer_reset(self):
         """Checks if the timer has been reset"""
 
-        sport = self.game_interface.check_sport()
+        sport = self.game_interface.get_mode()
         timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
 
         if self.in_tournament_match:
@@ -2905,7 +2905,7 @@ class MSMContext(CommonContext):
                     await self.check_behemoth_deathlink()
 
                 # Dodgeball logic
-                elif self.game_interface.check_sport() == "Dodgeball":
+                elif self.game_interface.get_mode() == "Dodgeball":
                     if self.has_dodge_opponent_scored():
                         if self.slot is not None:
                             message = random.choice(possible_messages_1)
@@ -3023,7 +3023,7 @@ class MSMContext(CommonContext):
                     if self.is_behemoth or self.is_behemoth_king:
                         self.recover_boss_hp()
                     else:
-                        if self.game_interface.check_sport() != "Dodgeball":
+                        if self.game_interface.get_mode() != "Dodgeball":
                             addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent)
                             points = self.game_interface.dolphin_client.read_word(addr)
                             new_points = points + self.deathlink_o_get_points
