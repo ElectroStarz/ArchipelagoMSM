@@ -254,10 +254,19 @@ class MSMInterface:
 
             return court_id, court_name
 
-    def check_sport(self):
-        string_stage = self.dolphin_client.read_string(self.addresslib.current_court_addr)
+    def get_mode(self):
+        string_stage = self.dolphin_client.read_string(MatchAddresses.current_court)
         current_sport = string_stage[-2:]
-        if current_sport == "BA":
+        
+        if self.is_in_feed_petey():
+            return "Feed Petey"
+        elif self.is_in_harmony():
+            return "Harmony Hustle"
+        elif self.is_in_bob_omb():
+            return "Bob-Omb Dodge"
+        elif self.is_in_smash():
+            return "Smash Skate"
+        elif current_sport == "BA":
             return "Basketball"
         elif current_sport == "DO":
             return "Dodgeball"
@@ -267,6 +276,21 @@ class MSMInterface:
             return "Hockey"
         else:
             return None
+
+    def get_tab(self):
+        if self.is_in_harmony():
+            return "HH ERROR"
+            
+        diff = self.dolphin_client.read_byte(PartyMode.difficulty)
+            
+        if self.is_in_feed_petey():
+            return {0: "Apple", 1: "Watermelon"}.get(diff)
+            
+        elif self.is_in_bob_omb():
+            return {0: "Bob-Omb", 1: "Cannon"}.get(diff)
+            
+        elif self.is_in_smash():
+            return {0: "Hockey Stick", 1: "Hockey Skate"}.get(diff)
 
     # For timer: +1800 for every 30 seconds
 
@@ -320,7 +344,7 @@ class MSMInterface:
         else:
             return 99999
 
-    def check_sports_mix(self):
+    def get_modes_mix(self):
         is_sports_mix = self.dolphin_client.read_byte(self.addresslib.is_sports_mix_addr)
         if is_sports_mix == 1:
             return True
