@@ -2576,6 +2576,23 @@ class MSMContext(CommonContext):
         await self.check_location(location_name)
         self.last_tournament_location_name = None
 
+    async def handle_party_wins(self):
+        """Handles sending party mode wins"""
+        match_status = self.game_interface.match_status()
+        _, court_name = self.game_interface.get_court()
+        mode = self.game_interface.get_mode()
+        
+        if match_status != 1 or mode is None:
+            return
+        
+        if mode in ["Feed Petey", "Bob-Omb Dodge", "Smash Skate"]:
+            tab = f" ({self.game_interface.get_tab()})"
+        else:
+            tab = ""
+        
+        location = f"{mode}: Beat {court_name}{tab}"
+        await self.check_location(location)
+
 
     # === Blocking Functions ===
 
