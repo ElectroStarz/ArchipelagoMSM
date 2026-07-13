@@ -712,14 +712,14 @@ class MSMContext(CommonContext):
         self._consumables_load_event.set()
         self.debug_log(f"Loaded {len(self.handled_consumable_indices)} handled consumables")
 
-    async def load_handled_consumables(self, initialize: bool = False) -> None:
+    async def load_handled_consumables(self, initialise: bool = False) -> None:
         """Load handled filler/trap indices from AP storage before queuing ReceivedItems."""
         key = self.consumable_storage_key
         if key is None or self._consumables_load_event.is_set():
             return
 
         self._consumables_load_event.clear()
-        if initialize:
+        if initialise:
             # First connect for this seed/slot: create the key if missing, then subscribe to updates.
             await self.send_msgs([{
                 "cmd": "Set",
@@ -858,7 +858,7 @@ class MSMContext(CommonContext):
 
             asyncio.create_task(self.update_death_link(self.deathlink_enabled))
             # Slot is known now — load/create the per-slot consumable save before items arrive.
-            asyncio.create_task(self.load_handled_consumables(initialize=True))
+            asyncio.create_task(self.load_handled_consumables(initialise=True))
             if self.locations_checked:
                 asyncio.create_task(
                     self.send_msgs([{"cmd": "LocationChecks", "locations": sorted(self.locations_checked)}])
@@ -2763,19 +2763,19 @@ class MSMContext(CommonContext):
         costume_list = [costume_1, costume_2, costume_3]
 
         if self.send_both_character_sanity and self.character_sanity == 2:
-            await self.send_character_character_sanity(char_1, char_2, char_3)
-            await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
+            await self.send_character_character_sanity(*char_list)
+            await self.send_costume_character_sanity(*char_list, *costume_list)
 
         else:
             if self.character_sanity == 1:
-                await self.send_character_character_sanity(char_1, char_2, char_3)
+                await self.send_character_character_sanity(*char_list)
 
             elif self.character_sanity == 2:
                 for char, costume in zip(char_list, costume_list):
                     if char in costume_database and costume != 0:
-                        await self.send_costume_character_sanity(char_1, char_2, char_3, costume_1, costume_2, costume_3)
+                        await self.send_costume_character_sanity(*char_list, *costume_list)
                     else:
-                        await self.send_character_character_sanity(char_1, char_2, char_3)
+                        await self.send_character_character_sanity(*char_list)
 
     async def send_character_character_sanity(self, char_1, char_2, char_3):
         """Sends the location for the character if Character Sanity is enabled"""
@@ -3109,8 +3109,8 @@ class MSMContext(CommonContext):
             self.received_death = False
             self.has_sent_death = False
 
-    # === Misc stuff idk where to put ===
 
+    # === Misc stuff idk where to put ===
 
 
     async def dolphin_sync_task(self):
@@ -3328,12 +3328,11 @@ class MSMContext(CommonContext):
 
 
     async def handle_in_party_modes(self):
-
-
         # Deathlink
         await self.handle_send_deathlink()
 
         # Locations
+        await self.handle_party_wins()
         await self.send_character_sanity_checks()
         await self.send_court_sanity_checks()
 
