@@ -1,15 +1,10 @@
 from dataclasses import dataclass
 from Options import *
 
-class StartWithSports(Choice):
-    """Start with the sports? HEAVILY RECOMMENDED
-Will cause immediate BK if off"""
-    visibility = Visibility.none
+class StartWithSports(DefaultOnToggle):
+    """Start with 4 sports? HEAVILY RECOMMENDED
+Will cause immediate BK if off and you DON'T have any party modes given at the start."""
     display_name = "Start With Sports - READ DESCRIPTION!"
-    option_none = 0
-    option_excluding_sports_mix = 1
-    option_with_sports_mix = 2
-    default = 1
 
 class EnabledSports(OptionSet):
     """Choose which sports to enable
@@ -412,6 +407,11 @@ NOTE: All are required if your goal is Party Palooza"""
     valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
     default = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
 
+class StartWithParty(Toggle):
+    """Start with the enabled party modes
+Useful if you're not starting with the sports!"""
+    display_name = "Start with Party Modes"
+
 class PartyModeOpponent(Choice):
     """Which CPU will be your main opponent?
 (This CPU will get things like points from deathlink, points
@@ -467,6 +467,7 @@ msm_option_groups = [
     ]),
     OptionGroup("Party Mode Options", [
         PartyMode,
+        StartWithParty,
         PartyModeOpponent,
     ]),
     OptionGroup("Deathlink Options", [
@@ -530,6 +531,7 @@ class MSMOptions(PerGameCommonOptions):
 
     # Party Mode
     party_mode: PartyMode
+    start_with_party_modes: StartWithParty
     party_mode_opponent: PartyModeOpponent
 
     # Deathlink

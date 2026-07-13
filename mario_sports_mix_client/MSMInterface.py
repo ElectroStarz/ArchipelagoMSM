@@ -190,7 +190,7 @@ class MSMInterface:
         else:
             return False
 
-    def check_player_amount(self):
+    def check_team_amount(self):
         value = self.dolphin_client.read_byte(self.addresslib.game_layout_addr)
         
         if value == 0:
@@ -268,7 +268,7 @@ class MSMInterface:
         else:
             return None
 
-    # For timer -> +1800 for every 30 seconds
+    # For timer: +1800 for every 30 seconds
 
     def get_basketball_time(self):
         time = self.dolphin_client.read_byte(self.addresslib.basket_time_addr)
@@ -342,9 +342,8 @@ class MSMInterface:
         return {1: "Normal", 2: "Hard"}.get(difficulty)
 
     def special_active(self):
-        addr = self.dolphin_client.follow_pointers(get_address(MatchAddresses.special_active),
-                                                               Pointers.Player.special_active_offsets)
-        value = self.dolphin_client.read_word(addr)
+        value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
+                                                 Pointers.Player.special_active_offsets, "word")
 
         if value == 1:
             return True
@@ -353,7 +352,7 @@ class MSMInterface:
 
     def get_connection_state(self):
         try:
-            if not self.dolphin_client.is_hooked_class():
+            if not self.dolphin_client.is_hooked():
                 return ConnectionState.DISCONNECTED
 
             if self.is_in_menu():

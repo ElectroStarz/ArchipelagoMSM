@@ -42,11 +42,9 @@ def unlock_tournament_tabs(hard_tournament_difficulty: bool):
 
 def unlock_ex_tabs():
     """Unlocks all the exhibition tabs by setting their value to 15"""
-    target_value = 15
-
     for sport in sports_addresses:
         new_addr = get_address(sport.Exhibition.tabs)
-        dme.write_byte(new_addr, target_value)
+        dme.write_byte(new_addr, 15)
 
 def unlock_party_tabs():
     """Unlocks all the tabs in party mode"""
@@ -98,6 +96,7 @@ def is_exception(address):
                   CupsWonMultiple, GamesPlayed,
     )
 
+    # If any of the variables inside those classes are in the classes that are in the exceptions tuple
     if any(address in vars(classes).values() for classes in exceptions):
         return True
     else:
@@ -122,8 +121,7 @@ def get_address(address, offset=0xF80):
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_court:
             #print(f"[DEBUG] Current Stage detected! Returning NTSC-U Address {new_addr}")
-            new_addr = 0x8047796E
-            return new_addr
+            return 0x8047796E
 
         new_addr = address - offset
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")

@@ -251,12 +251,15 @@ harmony_hustle_items = {
     "Classic Ocean":                     ItemData(base_id + 1001, IC.useful, ItemGroup.HARMONY_HUSTLE),
     "Chocobo Rhythm":                    ItemData(base_id + 1002, IC.useful, ItemGroup.HARMONY_HUSTLE),
     "Mario Athletic":                    ItemData(base_id + 1003, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Bloocheep Ocean":                   ItemData(base_id + 1004, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Pop":                       ItemData(base_id + 1005, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Punk Athletic":                     ItemData(base_id + 1006, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Punk Ocean":                        ItemData(base_id + 1007, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Beat":                      ItemData(base_id + 1008, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Island Athletic":                   ItemData(base_id + 1009, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Mushroom Mix Medley":               ItemData(base_id + 1004, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Bloocheep Ocean":                   ItemData(base_id + 1005, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Pop":                       ItemData(base_id + 1006, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Punk Athletic":                     ItemData(base_id + 1007, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Blossom Mix Medley":                ItemData(base_id + 1008, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Punk Ocean":                        ItemData(base_id + 1009, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Beat":                      ItemData(base_id + 1010, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Island Athletic":                   ItemData(base_id + 1011, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Star Mix Medley":                   ItemData(base_id + 1012, IC.useful, ItemGroup.HARMONY_HUSTLE),
     "Peach's Castle":                    ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
     "Bowser Jr. Blvd.":                  ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
     "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
@@ -453,6 +456,9 @@ def create_all_items(world: "MSMWorld") -> None:
 
             # Get the dictionary of items to do with it
             create_dict = party_mode_to_dict[enabled]
+
+            if world.options.start_with_party_modes:
+                world.push_precollected(world.create_item(enabled))
 
             for item in create_dict:
                 # Create all the items (that haven't already been created) and add them to the itempool
