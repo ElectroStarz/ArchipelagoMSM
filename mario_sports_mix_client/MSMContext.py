@@ -31,7 +31,7 @@ status_messages = {
     ConnectionState.IN_TOURNAMENT_MAP: "In Tournament Map",
     ConnectionState.FEED_PETEY: "In Feed Petey",
     ConnectionState.HARMONY_HUSTLE: "In Harmony Hustle",
-    ConnectionState.BOB_OMB_DODGE: "In Bob-Omb Dodge",
+    ConnectionState.BOB_OMB_DODGE: "In Bob-omb Dodge",
     ConnectionState.SMASH_SKATE: "In Smash Skate",
     ConnectionState.DISCONNECTED: "Unable to connect to the Dolphin instance, attempting to reconnect...",
     ConnectionState.CONNECTED: "Connected to Dolphin!",
@@ -295,7 +295,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
 
         type_to_cmd = {
             "modes": self.unlocked_modes,
-            "courts": self.unlocked_courts,
+            "courts_dict": self.unlocked_courts,
             "cups": self.unlocked_cups,
             "exhibition": self.unlocked_ex,
             "ex": self.unlocked_ex,
@@ -319,7 +319,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
             logger.error(f"Invalid type: {type}. Check the command description for valid types.")
 
     def unlocked_modes(self):
-        """Display what sports you have unlocked."""
+        """Display what main_sports you have unlocked."""
         unlocked_modes = self.ctx.unlocked_modes
         final_items = []
         if unlocked_modes:
@@ -374,7 +374,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
             logger.info("No unlocked cups")
 
     def unlocked_courts(self):
-        """Display what courts you have unlocked."""
+        """Display what courts_dict you have unlocked."""
         unlocked_courts = self.ctx.unlocked_courts
         final_items = []
         if unlocked_courts:
@@ -382,7 +382,7 @@ class MSMCommandProcessor(ClientCommandProcessor):
                 final_items.append(item)
             logger.info(f"Unlocked Courts: {final_items}")
         else:
-            logger.info("No unlocked courts")
+            logger.info("No unlocked courts_dict")
 
     def unlocked_abilities(self):
         """Display what abilities you have unlocked."""
@@ -1126,7 +1126,7 @@ class MSMContext(CommonContext):
 
     async def handle_received_items(self):
         sport_tuple = ("Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix")
-        party_tuple = ("Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate")
+        party_tuple = ("Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate")
 
         characters_tuple = ("Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong",
         "Diddy Kong", "Toad", "Bowser", "Bowser Jr", "Moogle", "Cactuar", "Ninja", "White Mage", "Slime", "Black Mage")
@@ -1274,7 +1274,7 @@ class MSMContext(CommonContext):
 
             for sport in sports_classes:
                 try:
-                    # Getting a character unlocks it for all sports, write it to all sports
+                    # Getting a character unlocks it for all main_sports, write it to all main_sports
                     addr = getattr(sport.Characters, char)
                     new_addr = get_address(addr)
                     self.game_interface.dolphin_client.write_byte(new_addr, value)
@@ -1516,7 +1516,7 @@ class MSMContext(CommonContext):
         elif self.sports_mix_unlock == 1:
             required_items = ["Sports Crystal: Red", "Sports Crystal: Green", "Sports Crystal: Yellow",
                               "Sports Crystal: Blue"]
-            # If all sports crystals are unlocked
+            # If all main_sports crystals are unlocked
             if all(crystal in self.unlocked_sports_crystals for crystal in required_items):
                 self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
@@ -1584,22 +1584,22 @@ class MSMContext(CommonContext):
             value = 0
 
             # First Court
-            # If the first court is in unlocked courts, add 1
+            # If the first court is in unlocked courts_dict, add 1
             if court[1] in self.unlocked_courts:
                 value += 1
 
             # Second Court
-            # If the second court is in unlocked courts, add 2
+            # If the second court is in unlocked courts_dict, add 2
             if court[2] in self.unlocked_courts:
                 value += 2
 
             # Third Court
-            # If the third court is in unlocked courts, add 4
+            # If the third court is in unlocked courts_dict, add 4
             if court[3] in self.unlocked_courts:
                 value += 4
 
-            # If no courts are unlocked (value is 0) or the sport isn't unlocked, set final_value to 8 which locks
-            # all courts, otherwise set final value to value
+            # If no courts_dict are unlocked (value is 0) or the sport isn't unlocked, set final_value to 8 which locks
+            # all courts_dict, otherwise set final value to value
             if value == 0 or not self.has_unlocked_mode(court[0]):
                 final_value = 8
             else:
@@ -1611,7 +1611,7 @@ class MSMContext(CommonContext):
 
     async def handle_progressive_court_unlocks(self):
 
-        # The order the courts will unlock, from first to last
+        # The order the courts_dict will unlock, from first to last
         court_unlock_order = [
             "Mario Stadium",
             "Koopa Troopa Beach",
@@ -1697,8 +1697,8 @@ class MSMContext(CommonContext):
             hh_2:          ["Harmony Hustle", "Bloocheep Ocean", "Chocobo Pop", "Punk Athletic", "Blossom Mix Medley"],
             hh_3:          ["Harmony Hustle", "Punk Ocean", "Chocobo Beat", "Island Athletic", "Star Mix Medley"],
 
-            bod_bomb:      ["Bob-Omb Dodge", "Mario Stadium", "Ghoulish Galleon", "Western Junction"],
-            bod_cannon:    ["Bob-Omb Dodge", "Mario Stadium", "Ghoulish Galleon", "Western Junction"],
+            bod_bomb:      ["Bob-omb Dodge", "Mario Stadium", "Ghoulish Galleon", "Western Junction"],
+            bod_cannon:    ["Bob-omb Dodge", "Mario Stadium", "Ghoulish Galleon", "Western Junction"],
 
             ss_hockey:     ["Smash Skate", "Sherbet Sea", "Rowdy Raft", "Fire Mountain"],
             ss_skate:      ["Smash Skate", "Sherbet Sea", "Rowdy Raft", "Fire Mountain"],
@@ -2585,7 +2585,7 @@ class MSMContext(CommonContext):
         if match_status != 1 or mode is None:
             return
         
-        if mode in ["Feed Petey", "Bob-Omb Dodge", "Smash Skate"]:
+        if mode in ["Feed Petey", "Bob-omb Dodge", "Smash Skate"]:
             tab = f" ({self.game_interface.get_tab()})"
         else:
             tab = ""
@@ -2929,7 +2929,7 @@ class MSMContext(CommonContext):
                             await self.send_death(f"{self.player_names[self.slot]} {message}")
                             self.debug_log("Sent deathlink due to the opponent scoring in dodgeball")
 
-                # All other sports logic
+                # All other main_sports logic
                 else:
                     if self.has_score_reached_threshold():
                         if self.slot is not None:
@@ -3153,18 +3153,17 @@ class MSMContext(CommonContext):
 
                 # Route Game State Execution
                 self.update_connection_status()
-                connection_state = self.game_interface.get_connection_state()
 
-                if connection_state == ConnectionState.IN_MATCH:
+                if self.connection_state == ConnectionState.IN_MATCH:
                     await self.handle_in_match()
-                elif connection_state == ConnectionState.IN_BOSS:
+                elif self.connection_state == ConnectionState.IN_BOSS:
                     await self.handle_in_boss()
-                elif connection_state == ConnectionState.IN_TOURNAMENT_MAP:
+                elif self.connection_state == ConnectionState.IN_TOURNAMENT_MAP:
                     await self.handle_in_tournament_map()
-                elif connection_state == ConnectionState.IN_MENU:
+                elif self.connection_state == ConnectionState.IN_MENU:
                     await self.handle_in_main_menu()
-                elif connection_state in (ConnectionState.FEED_PETEY, ConnectionState.HARMONY_HUSTLE,
-                                          ConnectionState.BOB_OMB_DODGE, ConnectionState.SMASH_SKATE):
+                elif self.connection_state in (ConnectionState.FEED_PETEY, ConnectionState.HARMONY_HUSTLE,
+                                               ConnectionState.BOB_OMB_DODGE, ConnectionState.SMASH_SKATE):
                     await self.handle_in_party_modes()
                 else:
                     await asyncio.sleep(1)

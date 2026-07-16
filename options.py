@@ -60,7 +60,7 @@ If the difficulty is off, you won't be able to send checks with that difficulty
     default = {"Normal", "Hard"}
 
 class CourtUnlockType(Choice):
-    """How to unlock courts
+    """How to unlock courts_dict
 
     - **Court Item**: Each court is its own item
     - **Progressive Court**: Courts are unlocked in a certain order with progressive items
@@ -249,14 +249,14 @@ class ScoreSanityMax(Range):
     default = 40
 
 class SpecialSanity(Toggle):
-    """(NOT WORKING) Using each character's special sends a check"""
-    visibility = Visibility.none
+    """Using each character's special sends a check"""
     display_name = "Special Sanity"
     default = False
 
-class CourtSanity(DefaultOnToggle):
+class CourtSanity(Toggle):
     """Winning on each court sends a check"""
     display_name = "Court Sanity"
+    default = False
 
 # === Custom Tournament Settings ===
 
@@ -400,12 +400,12 @@ Recommended to set a low amount, kinda boring otherwise."""
 # === Party Mode Options ===
 class PartyMode(OptionSet):
     """Which (if any) Party Modes do you want enabled?
-(Feed Petey, Harmony Hustle, Bob-Omb Dodge, Smash Skate)
+(Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)
 
 NOTE: All are required if your goal is Party Palooza"""
     display_name = "Enabled Party Modes"
-    valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
-    default = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
+    valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
+    default = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
 
 class StartWithParty(Toggle):
     """Start with the enabled party modes
@@ -416,6 +416,7 @@ class PartyModeOpponent(Choice):
     """Which CPU will be your main opponent?
 (This CPU will get things like points from deathlink, points
 from Coins Trap etc)"""
+    display_name = "Party Mode Opponent"
     option_CPU_2 = 0
     option_CPU_3 = 1
     option_CPU_4 = 2
@@ -483,10 +484,10 @@ msm_option_groups = [
         CharacterSanity,
         SendBothCharacterCostume,
         CourtSanity,
+        SpecialSanity,
         # ScoreSanity,
         # ScoreSanityPoints,
         # ScoreSanityMax,
-        # SpecialSanity,
     ]),
 ]
 

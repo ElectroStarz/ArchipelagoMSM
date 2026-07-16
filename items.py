@@ -41,7 +41,7 @@ class ItemGroup(str, Enum):
 
     FEED_PETEY = "Feed Petey"
     HARMONY_HUSTLE = "Harmony Hustle"
-    BOB_OMB_DODGE = "Bob-Omb Dodge"
+    BOB_OMB_DODGE = "Bob-omb Dodge"
     SMASH_SKATE = "Smash Skate"
 
 class ItemData(NamedTuple):
@@ -239,44 +239,48 @@ traps = {
 }
 
 # Party Mode Items (900 - 1300 range)
-feed_petey_items = {
+
+party_mode_items = {
     "Feed Petey":                        ItemData(base_id + 900, IC.useful, ItemGroup.FEED_PETEY),
+    "Harmony Hustle":                    ItemData(base_id + 1000, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Bob-omb Dodge":                     ItemData(base_id + 1100, IC.useful, ItemGroup.BOB_OMB_DODGE),
+    "Smash Skate":                       ItemData(base_id + 1200, IC.useful, ItemGroup.SMASH_SKATE),
+}
+
+feed_petey_items = {
     "Daisy Garden":                      ItemData(base_id + 307, IC.progression, ItemGroup.COURTS),
     "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
     "Wario Factory":                     ItemData(base_id + 308, IC.progression, ItemGroup.COURTS),
 }
 
 harmony_hustle_items = {
-    "Harmony Hustle":                    ItemData(base_id + 1000, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Classic Ocean":                     ItemData(base_id + 1001, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Rhythm":                    ItemData(base_id + 1002, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Mario Athletic":                    ItemData(base_id + 1003, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Mushroom Mix Medley":               ItemData(base_id + 1004, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Bloocheep Ocean":                   ItemData(base_id + 1005, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Pop":                       ItemData(base_id + 1006, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Punk Athletic":                     ItemData(base_id + 1007, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Blossom Mix Medley":                ItemData(base_id + 1008, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Punk Ocean":                        ItemData(base_id + 1009, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Beat":                      ItemData(base_id + 1010, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Island Athletic":                   ItemData(base_id + 1011, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Star Mix Medley":                   ItemData(base_id + 1012, IC.useful, ItemGroup.HARMONY_HUSTLE),
+    "Classic Ocean":                     ItemData(base_id + 1001, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Rhythm":                    ItemData(base_id + 1002, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Mario Athletic":                    ItemData(base_id + 1003, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Mushroom Mix Medley":               ItemData(base_id + 1004, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Bloocheep Ocean":                   ItemData(base_id + 1005, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Pop":                       ItemData(base_id + 1006, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Punk Athletic":                     ItemData(base_id + 1007, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Blossom Mix Medley":                ItemData(base_id + 1008, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Punk Ocean":                        ItemData(base_id + 1009, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Beat":                      ItemData(base_id + 1010, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Island Athletic":                   ItemData(base_id + 1011, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Star Mix Medley":                   ItemData(base_id + 1012, IC.progression, ItemGroup.HARMONY_HUSTLE),
     "Peach's Castle":                    ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
     "Bowser Jr. Blvd.":                  ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
     "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
 }
 
 bob_omb_dodge_items = {
-    "Bob-Omb Dodge":                     ItemData(base_id + 1100, IC.useful, ItemGroup.BOB_OMB_DODGE),
     "Mario Stadium":                     ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
     "Ghoulish Galleon":                  ItemData(base_id + 312, IC.progression, ItemGroup.COURTS),
     "Western Junction":                  ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
 }
 
 smash_skate_items = {
-    "Smash Skate":                       ItemData(base_id + 1200, IC.useful, ItemGroup.SMASH_SKATE),
-    "Sherbet Sea":                       ItemData(base_id + 1201, IC.useful, ItemGroup.SMASH_SKATE),
-    "Rowdy Raft":                        ItemData(base_id + 1202, IC.useful, ItemGroup.SMASH_SKATE),
-    "Fire Mountain":                     ItemData(base_id + 1203, IC.useful, ItemGroup.SMASH_SKATE),
+    "Sherbet Sea":                       ItemData(base_id + 1201, IC.progression, ItemGroup.SMASH_SKATE),
+    "Rowdy Raft":                        ItemData(base_id + 1202, IC.progression, ItemGroup.SMASH_SKATE),
+    "Fire Mountain":                     ItemData(base_id + 1203, IC.progression, ItemGroup.SMASH_SKATE),
 }
 
 
@@ -303,6 +307,7 @@ item_table: Dict[str, ItemData] = {
     **unlockable_abilities,
     **one_time_items,
     **traps,
+    **party_mode_items,
     **feed_petey_items,
     **harmony_hustle_items,
     **bob_omb_dodge_items,
@@ -400,7 +405,7 @@ def create_all_items(world: "MSMWorld") -> None:
     enabled_sports = world.options.enabled_sports.value
 
     # Start with sports option
-    if world.options.start_with_sports == StartWithSports.option_excluding_sports_mix:
+    if world.options.start_with_sports:
         for sport in sport_items:
             if sport in enabled_sports:
                 world.push_precollected(world.create_item(sport))
@@ -410,23 +415,9 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(world.create_item("Sports Mix"))
 
         elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
-            for crystal in sports_crystals:
-                itempool.append(world.create_item(crystal))
-
-    elif world.options.start_with_sports == StartWithSports.option_with_sports_mix:
-        for sport in sport_items:
-            if sport in enabled_sports:
-                world.push_precollected(world.create_item(sport))
-
-        if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-            if "Sports Mix" in enabled_sports:
-                world.push_precollected(world.create_item("Sports Mix"))
-
-        elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
             for crystal_name in sports_crystals:
                 if "Sports Mix" in enabled_sports:
-                    world.push_precollected(world.create_item(crystal_name))
-
+                    itempool.append(world.create_item(crystal_name))
     else:
         for sport in sport_items:
             if sport in enabled_sports:
@@ -444,7 +435,7 @@ def create_all_items(world: "MSMWorld") -> None:
     party_mode_to_dict = {
         "Feed Petey": feed_petey_items,
         "Harmony Hustle": harmony_hustle_items,
-        "Bob-Omb Dodge": bob_omb_dodge_items,
+        "Bob-omb Dodge": bob_omb_dodge_items,
         "Smash Skate": smash_skate_items,
     }
 
@@ -459,11 +450,12 @@ def create_all_items(world: "MSMWorld") -> None:
 
             if world.options.start_with_party_modes:
                 world.push_precollected(world.create_item(enabled))
+            else:
+                itempool.append(world.create_item(enabled))
 
             for item in create_dict:
-                # Create all the items (that haven't already been created) and add them to the itempool
-                if item not in itempool:
-                    itempool.append(world.create_item(item))
+                # Create all the other items and add them to the itempool
+                itempool.append(world.create_item(item))
 
     # Create cups based on options
     create_cups(world, itempool)

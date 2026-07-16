@@ -43,7 +43,7 @@ court_names = {
     "s41": "Mario Athletic",
     "s42": "Chocobo Rhythm",
 
-    # Bob-Omb Dodge
+    # Bob-omb Dodge
     "s55": "Mario Stadium",
     "s56": "Ghoulish Galleon",
     "s57": "Western Junction",
@@ -60,16 +60,16 @@ court_names = {
 }
 
 harmony_mapping = {
-    0: "Classic Ocean",
-    1: "Chocobo Rhythm",
-    2: "Mario Athletic",
-    3: "Bloocheep Ocean",
-    4: "Chocobo Pop",
-    5: "Punk Athletic",
-    6: "Punk Ocean",
-    7: "Chocobo Beat",
-    8: "Island Athletic",
-    9: "Mushroom Mix Medley",
+    0:  "Classic Ocean",
+    1:  "Chocobo Rhythm",
+    2:  "Mario Athletic",
+    3:  "Bloocheep Ocean",
+    4:  "Chocobo Pop",
+    5:  "Punk Athletic",
+    6:  "Punk Ocean",
+    7:  "Chocobo Beat",
+    8:  "Island Athletic",
+    9:  "Mushroom Mix Medley",
     10: "Blossom Mix Medley",
     11: "Star Mix Medley",
 }
@@ -263,7 +263,7 @@ class MSMInterface:
         elif self.is_in_harmony():
             return "Harmony Hustle"
         elif self.is_in_bob_omb():
-            return "Bob-Omb Dodge"
+            return "Bob-omb Dodge"
         elif self.is_in_smash():
             return "Smash Skate"
         elif current_sport == "BA":
@@ -278,9 +278,6 @@ class MSMInterface:
             return None
 
     def get_tab(self):
-        if self.is_in_harmony():
-            return "HH ERROR"
-            
         diff = self.dolphin_client.read_byte(PartyMode.difficulty)
             
         if self.is_in_feed_petey():
@@ -291,6 +288,8 @@ class MSMInterface:
             
         elif self.is_in_smash():
             return {0: "Hockey Stick", 1: "Hockey Skate"}.get(diff)
+        else:
+            return "HH ERROR"
 
     # For timer: +1800 for every 30 seconds
 
