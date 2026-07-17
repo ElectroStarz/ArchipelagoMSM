@@ -2998,7 +2998,7 @@ class MSMContext(CommonContext):
 
         for location in self.checked_locations:
             name = LOCATION_ID_TO_NAME[location]
-            if any(["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]) in name:
+            if any(["Feed Petey:", "Harmony Hustle:", "Bob-omb Dodge:", "Smash Skate:"]) in name:
                 if name not in self.party_won:
                     self.party_won.add(name)
                 added = True
