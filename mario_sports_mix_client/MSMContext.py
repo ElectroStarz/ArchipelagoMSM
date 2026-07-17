@@ -3006,7 +3006,7 @@ class MSMContext(CommonContext):
                 added = False # Stop client spam
 
         won_count = len(self.party_won)
-        if won_count <= 30 and added and self.goal_condition == 4:
+        if won_count <= 30 and added and self.goal_condition == 5:
             # Only show this message if the goal condition is Palooza, we've added a location, and we're logging the max
             # won so far (So it doesn't log 1 Match Won, 2, 3 all the way up to 12 or smth, only logs 12 Matches Won!)
             logger.info(f"{won_count}/30 Match{'' if won_count == 1 else 'es'} Won!")
@@ -3426,6 +3426,7 @@ class MSMContext(CommonContext):
                 f"type={type}", 10
             )
             return False
+
 
     # === Where to handle what ===
 
