@@ -173,15 +173,25 @@ def sports_mix_court_rule(round_num: int):
 
     round_3_courts = ["DK Dock", "Peach's Castle", "Daisy Garden", "Western Junction", "Star Ship"]
 
+    sub_rules = []
+
     if round_num == 1:
-        return HasAll(*round_1_courts)
+        sub_rules.append(HasAll(*round_1_courts))
     elif round_num == 2:
-        return HasAll(*round_2_courts)
+        sub_rules.append(HasAll(*round_2_courts))
     elif round_num == 3:
-        return HasAll(*round_3_courts)
+        sub_rules.append(HasAll(*round_3_courts))
     else:
         return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
 
+    if not sub_rules:
+        return Rule()
+
+    combined_rule = sub_rules[0]
+    for rule in sub_rules[1:]:
+        combined_rule &= rule
+
+    return combined_rule
 
 def get_all_cup_locations(hard_mode_enabled):
     locations = []
