@@ -27,9 +27,6 @@ directement dans l’application, et sélectionnez le fichier installé.
 - Vérifiez que vous utilisez le client Mario Sports Mix et que vous êtes connecté quand vous jouez au jeu, sans quoi,
 **ça ne fonctionnera pas.**
 
-### Dolphin
-* <ins>**Sauvegardez bien vos données lorsque vous jouez!**</ins>
-
 
 ## Créer le fichier yaml
 ### Explication d’un fichier yaml et pourquoi en avoir besoin
