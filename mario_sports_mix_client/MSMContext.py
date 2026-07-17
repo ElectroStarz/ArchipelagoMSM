@@ -3434,11 +3434,14 @@ class MSMContext(CommonContext):
         """What functions should be handled during a match"""
         # Cup Goal
         await self.track_cups_won()
-        await self.has_cup_goaled()
+        if self.goal_condition == 3:
+            await self.has_cup_goaled()
 
         # Exhibition Goal
-        await self.track_exhibitions_won()
-        await self.has_ex_goaled()
+        if self.goal_condition == 4:
+            await self.track_exhibitions_won()
+            await self.has_ex_goaled()
+
 
         # Custom Tournament Settings
         if self.in_tournament_match:
@@ -3506,8 +3509,9 @@ class MSMContext(CommonContext):
 
     async def handle_in_party_modes(self):
         # Party Goal
-        await self.track_party_won()
-        await self.has_party_goaled()
+        if self.goal_condition == 5:
+            await self.track_party_won()
+            await self.has_party_goaled()
 
         # Deathlink
         await self.handle_send_deathlink()
@@ -3531,7 +3535,6 @@ class MSMContext(CommonContext):
         await self.track_cups_won()
         if self.goal_condition == 3:
             await self.has_cup_goaled()
-
 
         # Exhibition Goal
         if self.goal_condition == 4:
