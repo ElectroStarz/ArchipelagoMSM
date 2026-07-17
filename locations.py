@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, NamedTuple, Dict
 from BaseClasses import Location, LocationProgressType as LPT
 from . import items
 from .options import *
+from .MSMUtils import *
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -16,8 +17,7 @@ characters = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "
 
 costumes = ["Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad",
             "Yellow Toad", "She-Slime", "Metal Slime", "Tennis-wear Peach", "Tennis-wear Daisy",
-            "Shadow White Ninja", "Pure White - White Mage", "Magic Red Black Mage",
-]
+            "Shadow White Ninja", "Pure White - White Mage", "Magic Red Black Mage"]
 
 class MSMLocation(Location):
     game = "Mario Sports Mix"
@@ -261,7 +261,6 @@ easy_exhibition_locations: Dict[str, LocData] = {
     "Hockey Ex: Beat Koopa Troopa Beach (Easy)":       LocData(base_id + 245, LocGroup.HOCKEY_EX_EASY),
     "Hockey Ex: Beat Ghoulish Galleon (Easy)":         LocData(base_id + 246, LocGroup.HOCKEY_EX_EASY),
     "Hockey Ex: Beat Bowser's Castle (Easy)":          LocData(base_id + 247, LocGroup.HOCKEY_EX_EASY),
-
 }
 
 normal_exhibition_locations: Dict[str, LocData] = {
@@ -320,7 +319,6 @@ normal_exhibition_locations: Dict[str, LocData] = {
     "Hockey Ex: Beat Koopa Troopa Beach (Normal)":     LocData(base_id + 345, LocGroup.HOCKEY_EX_NORMAL),
     "Hockey Ex: Beat Ghoulish Galleon (Normal)":       LocData(base_id + 346, LocGroup.HOCKEY_EX_NORMAL),
     "Hockey Ex: Beat Bowser's Castle (Normal)":        LocData(base_id + 347, LocGroup.HOCKEY_EX_NORMAL),
-
 }
 
 hard_exhibition_locations: Dict[str, LocData] = {
@@ -379,7 +377,6 @@ hard_exhibition_locations: Dict[str, LocData] = {
     "Hockey Ex: Beat Koopa Troopa Beach (Hard)":       LocData(base_id + 445, LocGroup.HOCKEY_EX_HARD),
     "Hockey Ex: Beat Ghoulish Galleon (Hard)":         LocData(base_id + 446, LocGroup.HOCKEY_EX_HARD),
     "Hockey Ex: Beat Bowser's Castle (Hard)":          LocData(base_id + 447, LocGroup.HOCKEY_EX_HARD),
-
 }
 
 expert_exhibition_locations: Dict[str, LocData] = {
@@ -438,11 +435,9 @@ expert_exhibition_locations: Dict[str, LocData] = {
     "Hockey Ex: Beat Koopa Troopa Beach (Expert)":     LocData(base_id + 545, LocGroup.HOCKEY_EX_EXPERT),
     "Hockey Ex: Beat Ghoulish Galleon (Expert)":       LocData(base_id + 546, LocGroup.HOCKEY_EX_EXPERT),
     "Hockey Ex: Beat Bowser's Castle (Expert)":        LocData(base_id + 547, LocGroup.HOCKEY_EX_EXPERT),
-
 }
 
 global_exhibition_locations: Dict[str, LocData] = {
-
     # Easy
     "Exhibition: Beat Mario Stadium (Easy)":           LocData(base_id + 600, LocGroup.EXHIBITION_EASY),
     "Exhibition: Beat Toad Park (Easy)":               LocData(base_id + 601, LocGroup.EXHIBITION_EASY),
@@ -591,7 +586,6 @@ character_sanity_locations: Dict[str, LocData] = {
 }
 
 costume_char_sanity_locations: Dict[str, LocData] = {
-        # --- Costumes ---
     "Win as Pink Yoshi":                               LocData(base_id + 6021, LocGroup.COSTUME_SANITY),
     "Win as Light Blue Yoshi":                         LocData(base_id + 6022, LocGroup.COSTUME_SANITY),
     "Win as Yellow Yoshi":                             LocData(base_id + 6023, LocGroup.COSTUME_SANITY),
@@ -884,7 +878,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     }
 
     if world.options.include_exhibition:
-        for difficulty in world.options.exhibition_difficulty:
+        for difficulty in world.options.exhibition_difficulties:
             if difficulty not in ("Easy", "Normal", "Hard", "Expert"):
                 continue
 
@@ -952,10 +946,7 @@ def create_regular_locations(world: MSMWorld) -> None:
 
         smash_skate_courts = ["Sherbet Sea", "Fire Mountain", "Rowdy Raft"]
 
-        harmony_courts = ["Classic Ocean", "Chocobo Rhythm", "Mario Athletic", "Bloocheep Ocean", "Chocobo Pop",
-                          "Punk Athletic", "Punk Ocean", "Chocobo Beat", "Island Athletic", "Mushroom Mix Medley",
-                          "Blossom Mix Medley", "Star Mix Medley",
-        ]
+        harmony_courts = ["Peach's Castle", "DK Dock", "Bowser Jr. Blvd."]
 
         basket_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Daisy Garden",
                          "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
@@ -993,7 +984,9 @@ def create_regular_locations(world: MSMWorld) -> None:
                         for name in main_courts:
                             # Make sure that court exists for the sport
                             if name in court_list:
-                                locations.update(get_location_names_with_ids([f"Win on {name}"]))
+                                location = get_location_names_with_ids([f"Win on {name}"])
+                                if f"Win on {name}" not in locations:
+                                    locations.update(location)
 
         if world.options.party_mode:
             for mode in world.options.party_mode:
@@ -1001,35 +994,36 @@ def create_regular_locations(world: MSMWorld) -> None:
                     court_list = mode_to_court[mode]
 
                     for name in court_list:
-                        locations.update(get_location_names_with_ids([f"Win on {name}"]))
+                        location = get_location_names_with_ids([f"Win on {name}"])
+                        if f"Win on {name}" not in locations:
+                            locations.update(location)
 
         main_menu.add_locations(locations)
 
+    # Special Sanity
     if world.options.special_sanity:
         special_locations = get_location_names_with_ids([location for location in special_sanity_locations])
         main_menu.add_locations(special_locations)
 
-
-
 def create_events(world: "MSMWorld") -> None:
+    behemoth_boss = world.get_region("Behemoth Boss Battle")
+    behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
+    main_menu = world.get_region("Main Menu")
+
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-        behemoth_boss = world.get_region("Behemoth Boss Battle")
         behemoth_boss.add_event("Defeat Behemoth!", "Victory!", location_type=MSMLocation,
                                  item_type=items.MSMItem)
 
-        if world.options.be_mean == BeMean.option_defeat_behemoth_king:
+        if world.options.boss_locations == BossLocations.option_defeat_behemoth_king:
             behemoth_king_location = get_location_names_with_ids(["Defeat Behemoth King!"])
-            behemoth_boss = world.get_region("Behemoth King Boss Battle")
             behemoth_boss.add_locations(behemoth_king_location, MSMLocation)
 
     elif world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-        behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
         behemoth_king_boss.add_event("Defeat Behemoth King!", "Victory!", location_type=MSMLocation,
                                      item_type=items.MSMItem)
 
-        if world.options.be_mean == BeMean.option_defeat_behemoth:
+        if world.options.boss_locations == BossLocations.option_defeat_behemoth:
             behemoth_location = get_location_names_with_ids(["Defeat Behemoth!"])
-            behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_location, MSMLocation)
 
     elif world.options.goal_condition == GoalCondition.option_win_cups:
@@ -1038,12 +1032,36 @@ def create_events(world: "MSMWorld") -> None:
         menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
                        item_type=items.MSMItem)
 
-        if world.options.be_mean in (BeMean.option_defeat_behemoth, BeMean.option_both):
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
-            behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
 
-        if world.options.be_mean in (BeMean.option_defeat_behemoth_king, BeMean.option_both):
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
-            behemoth_king = world.get_region("Behemoth King Boss Battle")
-            behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
+            behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
+
+    elif world.options.goal_condition == GoalCondition.option_exhibition_tour:
+        amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
+
+        main_menu.add_event(f"Win {amount} Exhibition Matches!", "Victory!", location_type=MSMLocation,
+                            item_type=items.MSMItem)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+            behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
+
+    elif world.options.goal_condition == GoalCondition.option_party_palooza:
+        main_menu.add_event(f"Win Party Mode!", "Victory!", location_type=MSMLocation,
+                            item_type=items.MSMItem)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+            behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)

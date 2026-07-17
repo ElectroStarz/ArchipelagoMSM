@@ -241,10 +241,10 @@ traps = {
 # Party Mode Items (900 - 1300 range)
 
 party_mode_items = {
-    "Feed Petey":                        ItemData(base_id + 900, IC.useful, ItemGroup.FEED_PETEY),
-    "Harmony Hustle":                    ItemData(base_id + 1000, IC.useful, ItemGroup.HARMONY_HUSTLE),
-    "Bob-omb Dodge":                     ItemData(base_id + 1100, IC.useful, ItemGroup.BOB_OMB_DODGE),
-    "Smash Skate":                       ItemData(base_id + 1200, IC.useful, ItemGroup.SMASH_SKATE),
+    "Feed Petey":                        ItemData(base_id + 900, IC.progression, ItemGroup.FEED_PETEY),
+    "Harmony Hustle":                    ItemData(base_id + 1000, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Bob-omb Dodge":                     ItemData(base_id + 1100, IC.progression, ItemGroup.BOB_OMB_DODGE),
+    "Smash Skate":                       ItemData(base_id + 1200, IC.progression, ItemGroup.SMASH_SKATE),
 }
 
 feed_petey_items = {
@@ -355,14 +355,13 @@ def create_all_items(world: "MSMWorld") -> None:
         itempool.append(world.create_item(ability))
 
 
-
     # Start with random characters option
     # This only uses the main roster as getting characters outside
     # the main roster before getting characters in the roster can bug
     # the game and make them not appear
-    row_1 = ["Mario", "Peach", "Wario", "Diddy Kong"]
-    row_2 = ["Luigi", "Daisy", "Donkey Kong", "Bowser Jr"]
-    row_3 = ["Yoshi", "Waluigi", "Bowser", "Toad"]
+    row_1 = ["Mario", "Peach",   "Wario",       "Diddy Kong"]
+    row_2 = ["Luigi", "Daisy",   "Donkey Kong", "Bowser Jr"]
+    row_3 = ["Yoshi", "Waluigi", "Bowser",      "Toad"]
     all_rows = [row_1, row_2, row_3]
 
     if world.options.start_with_characters == StartWithCharacters.option_2_characters:
@@ -374,9 +373,9 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(world.create_item(character_1))
         world.push_precollected(world.create_item(character_2))
 
-        for name in characters:
-            if name not in (character_1, character_2):
-                itempool.append(world.create_item(name))
+        for character in characters:
+            if character not in (character_1, character_2):
+                itempool.append(world.create_item(character))
 
     elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
         character_1 = world.random.choice(row_1)
@@ -387,50 +386,59 @@ def create_all_items(world: "MSMWorld") -> None:
         world.push_precollected(world.create_item(character_2))
         world.push_precollected(world.create_item(character_3))
 
-        for name in characters:
-            if name not in (character_1, character_2, character_3):
-                itempool.append(world.create_item(name))
+        for character in characters:
+            if character not in (character_1, character_2, character_3):
+                itempool.append(world.create_item(character))
 
     else:
-        for name in characters:
-            itempool.append(world.create_item(name))
+        for character in characters:
+            itempool.append(world.create_item(character))
+
+    # Create cups & courts based on options
+    if world.options.include_tournaments:
+        create_cups(world, itempool)
+
+    if world.options.include_tournaments or world.options.include_exhibition:
+        create_courts(world, itempool)
 
     # Exhibition Difficulty Items
-    selected_difficulties = world.options.exhibition_difficulty.value
+    if world.options.include_exhibition:
+        selected_difficulties = set(world.options.exhibition_difficulties.value)
+        first_difficulty = next(
+            (difficulty for difficulty in ("Easy", "Normal", "Hard", "Expert")
+             if difficulty in selected_difficulties),
+            None,
+        )
 
-    for difficulty in ["Easy", "Normal", "Hard", "Expert"]:
-        if difficulty in selected_difficulties:
-            itempool.append(world.create_item(f"Exhibition {difficulty}"))
+        # Every exhibition location needs its difficulty unlock. Precollect one
+        # selected difficulty to ensure an exhibition-only seed has an initial
+        # reachable check; additional selected difficulties remain randomised.
+        if first_difficulty is not None:
+            world.push_precollected(world.create_item(f"Exhibition {first_difficulty}"))
+
+        for difficulty in selected_difficulties:
+            if difficulty != first_difficulty:
+                itempool.append(world.create_item(f"Exhibition {difficulty}"))
 
     enabled_sports = world.options.enabled_sports.value
 
     # Start with sports option
     if world.options.start_with_sports:
-        for sport in sport_items:
-            if sport in enabled_sports:
+        for sport in enabled_sports:
+            if sport != "Sports Mix":
                 world.push_precollected(world.create_item(sport))
+    else:
+        for sport in enabled_sports:
+            if sport != "Sports Mix":
+                itempool.append(world.create_item(sport))
 
+    if "Sports Mix" in enabled_sports:
         if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-            if "Sports Mix" in enabled_sports:
-                itempool.append(world.create_item("Sports Mix"))
+            itempool.append(world.create_item("Sports Mix"))
 
         elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
             for crystal_name in sports_crystals:
-                if "Sports Mix" in enabled_sports:
-                    itempool.append(world.create_item(crystal_name))
-    else:
-        for sport in sport_items:
-            if sport in enabled_sports:
-                itempool.append(world.create_item(sport))
-
-        if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
-            if "Sports Mix" in enabled_sports:
-                itempool.append(world.create_item("Sports Mix"))
-
-        elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
-            if "Sports Mix" in enabled_sports:
-                for crystal_name in sports_crystals:
-                    itempool.append(world.create_item(crystal_name))
+                itempool.append(world.create_item(crystal_name))
 
     party_mode_to_dict = {
         "Feed Petey": feed_petey_items,
@@ -455,23 +463,34 @@ def create_all_items(world: "MSMWorld") -> None:
 
             for item in create_dict:
                 # Create all the other items and add them to the itempool
-                itempool.append(world.create_item(item))
+                if item not in itempool:
+                    itempool.append(world.create_item(item))
 
-    # Create cups based on options
-    create_cups(world, itempool)
-
-    # Create stages based on options
-    create_courts(world, itempool)
-
-    # Calculate number of filler items needed, exclude costumes
-
-    number_of_items = len(itempool)
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
-    needed_number_of_filler_items = number_of_unfilled_locations - number_of_items
+
+    # Small configurations (for example, Exhibition Tour with one difficulty)
+    # can have fewer locations than optional cosmetics.  Remove filler items
+    # first so every generated pool item has a valid destination.
+    overflow = len(itempool) - number_of_unfilled_locations
+    if overflow > 0:
+        filler_indices = [
+            index for index, item in enumerate(itempool)
+            if item.classification == IC.filler
+        ]
+        if len(filler_indices) < overflow:
+            raise OptionError(
+                f"[Mario Sports Mix] {world.player_name}'s enabled locations cannot hold all required items. "
+                "Enable more checks or reduce progression options."
+            )
+
+        for index in reversed(filler_indices[-overflow:]):
+            itempool.pop(index)
+
+    needed_number_of_filler_items = number_of_unfilled_locations - len(itempool)
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    print(itempool)
+    #print(itempool)
     world.multiworld.itempool += itempool
 
 
@@ -484,6 +503,7 @@ def create_courts(world: "MSMWorld", itempool):
 
             other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
                             "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
+
             for court in other_courts:
                 itempool.append(world.create_item(court))
         else:
@@ -597,6 +617,10 @@ def create_cups(world: "MSMWorld", itempool):
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
 
+    # These unlocks gate enabled location sets. They must be progression while
+    # their checks exist, otherwise the fill can place them behind their own
+    # access rules.
+
     # Character Sanity (Characters)
     if (world.options.character_sanity == CharacterSanity.option_characters or
         world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
@@ -607,5 +631,9 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
         if name in character_costumes:
             classification = IC.progression
+
+    # Special Sanity
+    if name == "Special Meter" and world.options.special_sanity:
+        classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

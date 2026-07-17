@@ -25,7 +25,6 @@ components.append(
         component_type=Type.CLIENT,
         supports_uri=True,
         icon="SportMixIcon",
-
     )
 )
 
@@ -94,7 +93,7 @@ class MSMWorld(World):
 
     def generate_early(self) -> None:
         # Be mean check
-        if self.options.goal_condition.value == self.options.be_mean.value:
+        if self.options.goal_condition.value == self.options.boss_locations.value:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name}'s Be Mean option is the same as their win condition!"
             )
@@ -118,18 +117,29 @@ class MSMWorld(World):
             )
 
         # Goal Checking
-        if self.options.goal_condition.value in (1, 2, 3) and not self.options.include_tournaments:
+        if self.options.goal_condition.value in (1, 2, 3) and not self.options.include_tournaments.value:
             raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s goal condition requires tournaments but they don't have them on!"
+                f"[Mario Sports Mix] {self.player_name}'s goal condition requires tournaments but they don't have them enabled"
+            )
+
+        if self.options.goal_condition.value == 2 and "Sports Mix" not in self.options.enabled_sports.value:
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name}'s goal condition requires Sports Mix but they don't have it enabled"
             )
 
         if self.options.goal_condition.value == 4 and not self.options.include_exhibition.value:
             raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s goal condition requires exhibitions but they don't have them on!"
+                f"[Mario Sports Mix] {self.player_name}'s goal condition requires exhibitions but they don't have them enabled"
             )
 
         if self.options.goal_condition.value == 5 and len(self.options.party_mode.value) != 4:
-            self.options.party_mode.value = {"Feed Petey", "Harmony Hustle", "Bob-Omb Dodge", "Smash Skate"}
+            self.options.party_mode.value = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
+
+        if (self.options.goal_condition.value == 3 and
+           (not self.options.hard_tournament_difficulty.value and self.options.win_cups_amount.value > 12)):
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name}'s Win Cups amount is larger than the amount of cups they can receive"
+            )
 
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
@@ -173,15 +183,17 @@ class MSMWorld(World):
             "enabled_sports": self.options.enabled_sports.value,
             "start_with_mushroom_cup": self.options.start_with_mushroom_cup.value,
             "sports_mix_unlock": self.options.sports_mix_unlock.value,
-            "exhibition_difficulty": self.options.exhibition_difficulty.value,
+            "exhibition_difficulties": self.options.exhibition_difficulties.value,
             "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,
             "court_unlock_type": self.options.court_unlock_type.value,
             "cup_unlock_type": self.options.cup_unlock_type.value,
+            "exhibition_type": self.options.exhibition_type.value,
 
             # Sanity Stuff
             "character_sanity": self.options.character_sanity.value,
             "send_both_character_sanity": self.options.send_both_character_sanity.value,
             "court_sanity": self.options.court_sanity.value,
+            "special_sanity": self.options.special_sanity.value,
 
             # Deathlink Stuff
             "deathlink": self.options.deathlink.value,

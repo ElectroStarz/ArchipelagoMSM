@@ -19,6 +19,15 @@ class ConnectionState(Enum):
 
 court_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
 
+id_to_char = {
+    255: "None",
+    0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
+    5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
+    10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
+    14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
+    19: "Mii (Male)", 20: "Mii (Female)",
+}
+
 court_names = {
     # Sport Stages
     "s01": "Mario Stadium",
@@ -39,9 +48,9 @@ court_names = {
     "s39": "Main Menu",
 
     # Harmony Hustle
-    "s40": "Classic Ocean", # & Mario Mix Medley
-    "s41": "Mario Athletic",
-    "s42": "Chocobo Rhythm",
+    "s40": "Peach's Castle",
+    "s41": "DK Dock",
+    "s42": "Bowser Jr. Blvd.",
 
     # Bob-omb Dodge
     "s55": "Mario Stadium",
@@ -200,6 +209,15 @@ class MSMInterface:
         else:
             return -1
 
+    def get_p_character(self, character: int):
+        ls_char = character - 1
+
+        addresses = [PlayerAddresses.character_1, PlayerAddresses.character_2, PlayerAddresses.character_3]
+
+        value = self.dolphin_client.read_byte(get_address(addresses[ls_char]))
+
+        return id_to_char[value]
+
     def get_player_score_addr(self):
         if self.is_in_match():
             current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
@@ -343,7 +361,7 @@ class MSMInterface:
         else:
             return 99999
 
-    def get_modes_mix(self):
+    def is_sports_mix(self):
         is_sports_mix = self.dolphin_client.read_byte(self.addresslib.is_sports_mix_addr)
         if is_sports_mix == 1:
             return True

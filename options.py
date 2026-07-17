@@ -8,9 +8,9 @@ Will cause immediate BK if off and you DON'T have any party modes given at the s
 
 class EnabledSports(OptionSet):
     """Choose which sports to enable
-    Can't do this yet because I haven't found the flag for Behemoth yet :/
-    Keeping this here because I'm not removing it from every file in this"""
-    visibility = Visibility.none
+
+    NOTE: You can still do Behemoth without all the 4 main sports enabled however
+    Behemoth King **requires** Sports Mix enabled"""
     display_name = "Enabled Sports"
     valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
     default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
@@ -51,7 +51,7 @@ class StartWithCharacters(Choice):
     option_3_characters = 3
     default = 0
 
-class ExhibitionDifficulty(OptionSet):
+class ExhibitionDifficulties(OptionSet):
     """Which exhibition difficulties should be included?
 If the difficulty is off, you won't be able to send checks with that difficulty
 (Easy, Normal, Hard, Expert)"""
@@ -100,8 +100,11 @@ class GoalCondition(Choice):
     - **Defeat Behemoth**: Defeat the Behemoth to goal!
     - **Defeat Behemoth King**: Defeat the Behemoth King to goal!
     - **Win Cups**: Win a certain amount of cups to goal!
-    - **Exhibition Tour**: Win every exhibition match for your selected difficulty to goal! (Needs All Sports option)
-    - **Party Palooza**: Win every game in every Party Mode to goal!"""
+    - **Exhibition Tour**: Win every exhibition match for your selected difficulties to goal! (Needs All Sports option)
+    - **Party Palooza**: Win every game in every Party Mode to goal!
+
+    NOTE: Exhibition Tour disables the QoL feature for winning exhibition matches, recommended to have 2 difficulties
+    selected"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
@@ -117,10 +120,10 @@ class WinCupsAmount(Range):
     range_end = 27
     default = 15
 
-class BeMean(Choice):
+class BossLocations(Choice):
     """Have locations behind bosses even if your goal isn't that boss!
 Cannot be the same as the goal condition!"""
-    display_name = "Be mean?"
+    display_name = "Boss Locations"
     option_no = 0
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
@@ -422,6 +425,14 @@ from Coins Trap etc)"""
     option_CPU_4 = 2
     default = 0
 
+    @classmethod
+    def get_option_name(cls, value):
+        match value:
+            case 0: return "CPU 2 (Red)"
+            case 1: return "CPU 3 (Green)"
+            case 2: return "CPU 4 (Yellow)"
+            case _: return "ERROR"
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
@@ -433,7 +444,7 @@ msm_option_groups = [
         CourtUnlockType,
         StartWithCharacters,
         ExhibitionType,
-        ExhibitionDifficulty,
+        ExhibitionDifficulties,
         HardTournamentDifficulty,
         SportsMixUnlock,
         TrapChance,
@@ -462,7 +473,7 @@ msm_option_groups = [
     OptionGroup("Goal Options", [
         GoalCondition,
         WinCupsAmount,
-        BeMean,
+        BossLocations,
         BehemothHP,
         BehemothKingHP,
     ]),
@@ -494,20 +505,20 @@ msm_option_groups = [
 @dataclass
 class MSMOptions(PerGameCommonOptions):
     enabled_sports: EnabledSports
-    include_exhibition: IncludeExhibition
     include_tournaments: IncludeTournaments
+    include_exhibition: IncludeExhibition
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
     cup_unlock_type: CupUnlockType
     court_unlock_type: CourtUnlockType
     start_with_characters: StartWithCharacters
     exhibition_type: ExhibitionType
-    exhibition_difficulty: ExhibitionDifficulty
+    exhibition_difficulties: ExhibitionDifficulties
     hard_tournament_difficulty: HardTournamentDifficulty
     sports_mix_unlock: SportsMixUnlock
     goal_condition: GoalCondition
     win_cups_amount: WinCupsAmount
-    be_mean: BeMean
+    boss_locations: BossLocations
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
@@ -548,7 +559,9 @@ class MSMOptions(PerGameCommonOptions):
     character_sanity: CharacterSanity
     send_both_character_sanity: SendBothCharacterCostume
     court_sanity: CourtSanity
+    special_sanity: SpecialSanity
     score_sanity: ScoreSanity
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
-    special_sanity: SpecialSanity
+
+    start_inventory_from_pool: StartInventoryPool

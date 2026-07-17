@@ -83,7 +83,7 @@ def lock_all_characters():
             dme.write_byte(new_addr, 0)
 
 
-def is_exception(address):
+def is_save_addr(address):
     exceptions = (BasketballAddresses.Characters, BasketballAddresses.Tournament, BasketballAddresses.Exhibition,
                   DodgeballAddresses.Characters,  DodgeballAddresses.Tournament,  DodgeballAddresses.Exhibition,
                   VolleyballAddresses.Characters, VolleyballAddresses.Tournament, VolleyballAddresses.Exhibition,
@@ -93,7 +93,7 @@ def is_exception(address):
                   PartyMode.FeedPetey.Tabs, PartyMode.HarmonyHustle.Tabs,
                   PartyMode.BobOmbDodge.Tabs, PartyMode.SmashSkate.Tabs,
 
-                  CupsWonMultiple, GamesPlayed,
+                  CupsWonMultiple, GamesPlayed, WonStarCups,
     )
 
     # If any of the variables inside those classes are in the classes that are in the exceptions tuple
@@ -108,26 +108,41 @@ def is_ntscu(address):
     else:
         return False
 
+def apply_file_offset(address):
+    if dc.GAME_VERSION == "PAL":
+        addr = dme.follow_pointers(0x804D1154, [0x1C3])
+    else:
+        addr = dme.follow_pointers(0x804D01D4, [0x1C3])
+
+    file_selected = dme.read_byte(addr)
+
+    if file_selected != 0:
+        for _ in range(file_selected):
+            address += 0xAB70
+
+    return address
+
 def get_address(address, offset=0xF80):
     """Get the correct address depending on what region the game is.
     Address inputted should be a PAL address which will then be converted to NTSC-U & vice versa"""
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
-    if is_exception(address):
-        return address
+    if is_save_addr(address):
+        return apply_file_offset(address)
 
     # Some addresses are the same in PAL and NTSC-U
 
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_court:
             #print(f"[DEBUG] Current Stage detected! Returning NTSC-U Address {new_addr}")
-            return 0x8047796E
-
-        new_addr = address - offset
+            final_addr = 0x8047796E
+        else:
+            final_addr = address - offset
         # print(f"[DEBUG] Taking away offset from {address}. Result: {new_addr}")
-        return new_addr
     else:
         if is_ntscu(address):
-            return address + offset
+            final_addr = address + offset
         else:
-            return address
+            final_addr = address
+
+    return final_addr
