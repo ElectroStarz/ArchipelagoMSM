@@ -173,25 +173,14 @@ def sports_mix_court_rule(round_num: int):
 
     round_3_courts = ["DK Dock", "Peach's Castle", "Daisy Garden", "Western Junction", "Star Ship"]
 
-    sub_rules = []
-
     if round_num == 1:
-        sub_rules.append(HasAll(*round_1_courts))
+        return HasAll(*round_1_courts)
     elif round_num == 2:
-        sub_rules.append(HasAll(*round_2_courts))
+        return HasAll(*round_2_courts) & HasAll(*round_1_courts)
     elif round_num == 3:
-        sub_rules.append(HasAll(*round_3_courts))
+        return HasAll(*round_3_courts) & HasAll(*round_1_courts) & HasAll(*round_2_courts)
     else:
         return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
-
-    if not sub_rules:
-        return Rule()
-
-    combined_rule = sub_rules[0]
-    for rule in sub_rules[1:]:
-        combined_rule &= rule
-
-    return combined_rule
 
 def get_all_cup_locations(hard_mode_enabled):
     locations = []
@@ -485,7 +474,50 @@ def set_all_location_rules(world: MSMWorld) -> None:
     # Court Sanity Locations
     if world.options.court_sanity:
         sport_court_to_cups = {
-            # ... (Keep your existing sport_court_to_cups dict)
+            "Basketball": {
+                "Mario Stadium": ["Mushroom Cup"],
+                "Koopa Troopa Beach": ["Mushroom Cup"],
+                "DK Dock": ["Mushroom Cup"],
+                "Luigi's Mansion": ["Flower Cup"],
+                "Western Junction": ["Flower Cup"],
+                "Daisy Garden": ["Flower Cup"],
+                "Bowser Jr. Blvd.": ["Star Cup"],
+                "Bowser's Castle": ["Star Cup"],
+                "Star Ship": ["Star Cup"],
+            },
+            "Dodgeball": {
+                "Mario Stadium": ["Mushroom Cup"],
+                "Koopa Troopa Beach": ["Mushroom Cup"],
+                "Peach's Castle": ["Mushroom Cup"],
+                "DK Dock": ["Flower Cup"],
+                "Toad Park": ["Flower Cup"],
+                "Daisy Garden": ["Flower Cup"],
+                "Wario Factory": ["Star Cup"],
+                "Bowser's Castle": ["Star Cup"],
+                "Star Ship": ["Star Cup"],
+            },
+            "Volleyball": {
+                "Mario Stadium": ["Mushroom Cup"],
+                "Koopa Troopa Beach": ["Mushroom Cup"],
+                "Peach's Castle": ["Mushroom Cup"],
+                "DK Dock": ["Flower Cup"],
+                "Luigi's Mansion": ["Flower Cup"],
+                "Western Junction": ["Flower Cup"],
+                "Bowser Jr. Blvd.": ["Star Cup"],
+                "Bowser's Castle": ["Star Cup"],
+                "Star Ship": ["Star Cup"],
+            },
+            "Hockey": {
+                "Mario Stadium": ["Mushroom Cup"],
+                "Toad Park": ["Mushroom Cup"],
+                "Peach's Castle": ["Mushroom Cup"],
+                "Western Junction": ["Flower Cup"],
+                "Wario Factory": ["Flower Cup"],
+                "Daisy Garden": ["Flower Cup"],
+                "Bowser Jr. Blvd.": ["Star Cup"],
+                "Waluigi Pinball": ["Star Cup"],
+                "Star Ship": ["Star Cup"],
+            },
         }
 
         mode_to_court = {
@@ -520,13 +552,14 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
                 if world.options.include_tournaments or world.options.include_exhibition:
                     for sport_name in world.options.enabled_sports.value:
-                        if sport_name in sport_court_to_cups and court_name in sport_court_to_cups[sport_name]:
+                        tournament_cups = sport_court_to_cups.get(sport_name, {}).get(court_name, [])
+                        has_exhibition_match = court_name in exhibition_rules.get(sport_name, [])
+
+                        if tournament_cups or has_exhibition_match:
                             base_sport_rule = Has(sport_name) & Has(court_name)
 
-                            cups_list = sport_court_to_cups[sport_name][court_name]
-                            formatted_cups = [f"{sport_name}: {cup_name} ({diff})" for cup_name in cups_list
+                            formatted_cups = [f"{sport_name}: {cup_name} ({diff})" for cup_name in tournament_cups
                                               for diff in cup_difficulties]
-                            ex_diffs = [f"Exhibition {diff}" for diff in world.options.exhibition_difficulties.value]
 
                             allowed_modes = []
 
@@ -534,7 +567,9 @@ def set_all_location_rules(world: MSMWorld) -> None:
                                 allowed_modes.append(
                                     HasAny(*formatted_cups, options=[OptionFilter(IncludeTournaments, IncludeTournaments.option_true)])
                                 )
-                            if ex_diffs:
+                            if has_exhibition_match:
+                                ex_diffs = [f"Exhibition {diff}"
+                                            for diff in world.options.exhibition_difficulties.value]
                                 allowed_modes.append(
                                     HasAny(*ex_diffs, options=[OptionFilter(IncludeExhibition, IncludeExhibition.option_true)])
                                 )
@@ -562,7 +597,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                         final_court_rule |= court_rule
                     world.set_rule(win_location, final_court_rule)
                 else:
-                    world.set_rule(win_location, Has(court_name) & False_())
+                    world.set_rule(win_location, False_())
 
         apply_all_court_rules()
 
@@ -622,13 +657,29 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
 
 def set_goal_rules(world: MSMWorld) -> None:
     # Safely checks if the locations themselves are accessible logically
-    behemoth_rule = (
-            CanReachLocation("Basketball: Beat Normal Star Cup Round 3") &
-            CanReachLocation("Dodgeball: Beat Normal Star Cup Round 3") &
-            CanReachLocation("Volleyball: Beat Normal Star Cup Round 3") &
-            CanReachLocation("Hockey: Beat Normal Star Cup Round 3") &
-            court_rule(world, "Behemoth Stage", False)
-    )
+
+    valid_behemoth_normal_rules = []
+    valid_behemoth_hard_rules = []
+
+    for sport in world.options.enabled_sports.value:
+        if sport != "Sports Mix":
+            valid_behemoth_normal_rules.append(CanReachLocation(f"{sport}: Beat Normal Star Cup Round 3"))
+
+            if world.options.hard_tournament_difficulty:
+                valid_behemoth_hard_rules.append(CanReachLocation(f"{sport}: Beat Hard Star Cup Round 3"))
+
+    behemoth_normal_rule = valid_behemoth_normal_rules[0]
+    for access_rule in valid_behemoth_normal_rules[1:]:
+        behemoth_normal_rule &= access_rule
+
+    if valid_behemoth_hard_rules:
+        behemoth_hard_rule = valid_behemoth_hard_rules[0]
+        for access_rule in valid_behemoth_hard_rules[1:]:
+            behemoth_hard_rule &= access_rule
+    else:
+        behemoth_hard_rule = False_()
+
+    final_behemoth_rule = (behemoth_normal_rule | behemoth_hard_rule) & court_rule(world, "Behemoth Stage", False)
 
     behemoth_king_rule = (
             (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_mix_item)]) |
@@ -640,21 +691,21 @@ def set_goal_rules(world: MSMWorld) -> None:
     )
 
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-        world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+        world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
         if world.options.boss_locations == BossLocations.option_defeat_behemoth_king:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
     elif world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
         world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
         if world.options.boss_locations == BossLocations.option_defeat_behemoth:
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
     elif world.options.goal_condition == GoalCondition.option_win_cups:
         win_cup_value = world.options.win_cups_amount.value
         world.set_rule(world.get_location(f"Win {win_cup_value} Cups!"), CanCupGoal().resolve(world))
 
         if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
         if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
@@ -665,7 +716,7 @@ def set_goal_rules(world: MSMWorld) -> None:
         world.set_rule(world.get_location(f"Win {amount} Exhibition Matches!"), CanExGoal().resolve(world))
 
         if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
         if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
@@ -674,7 +725,7 @@ def set_goal_rules(world: MSMWorld) -> None:
         world.set_rule(world.get_location("Win Party Mode!"), get_all_party_location_rules(world))
 
         if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
-            world.set_rule(world.get_location("Defeat Behemoth!"), behemoth_rule)
+            world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
         if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
