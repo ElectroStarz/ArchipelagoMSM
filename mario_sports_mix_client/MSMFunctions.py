@@ -19,7 +19,7 @@ sports_addresses = [
 ]
 
 
-def unlock_tabs(hard_tournament_difficulty):
+def unlock_tabs(hard_tournament_difficulty: bool):
     unlock_tournament_tabs(hard_tournament_difficulty)
     unlock_ex_tabs()
     unlock_party_tabs()
@@ -64,8 +64,8 @@ def lock_all_cups():
             new_addr = get_address(addr)
             dme.write_byte(new_addr, 8)
 
-def lock_all_stages():
-    """Locks all the stages by setting their value to 8"""
+def lock_all_courts():
+    """Locks all the courts by setting their value to 8"""
 
     for sport in sports_addresses:
         for cup in cups:
@@ -82,7 +82,7 @@ def lock_all_characters():
             new_addr = get_address(addr)
             dme.write_byte(new_addr, 0)
 
-
+# These functions are used to find the correct address for things like regions, save files, etc
 def is_save_addr(address):
     exceptions = (BasketballAddresses.Characters, BasketballAddresses.Tournament, BasketballAddresses.Exhibition,
                   DodgeballAddresses.Characters,  DodgeballAddresses.Tournament,  DodgeballAddresses.Exhibition,
