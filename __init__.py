@@ -78,6 +78,27 @@ class MSMWorld(World):
     game = "Mario Sports Mix"
     web = MSMWebWorld()
 
+    ut_can_gen_without_yaml = True
+    ut_generation_options = (
+        "enabled_sports",
+        "include_tournaments",
+        "include_exhibition",
+        "cup_unlock_type",
+        "court_unlock_type",
+        "exhibition_type",
+        "exhibition_difficulties",
+        "hard_tournament_difficulty",
+        "sports_mix_unlock",
+        "goal_condition",
+        "win_cups_amount",
+        "boss_locations",
+        "party_mode",
+        "character_sanity",
+        "court_sanity",
+        "special_sanity",
+        "start_inventory_from_pool",
+    )
+
     options_dataclass = MSMOptions
     options: MSMOptions
 
@@ -92,7 +113,17 @@ class MSMWorld(World):
     origin_region_name = "Main Menu"
 
     def generate_early(self) -> None:
-        # Be mean check
+        # Universal Tracker performs its initial fake generation with an empty
+        # YAML, then supplies the original slot data for regeneration. Restore
+        # every MSM generation option before creating regions, items, or rules.
+        re_gen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
+        slot_data = re_gen_passthrough.get(self.game, {})
+        for option_name, value in slot_data.get("options", {}).items():
+            option = getattr(self.options, option_name, None)
+            if option is not None:
+                setattr(self.options, option_name, option.from_any(value))
+
+        # Boss Location check
         if self.options.goal_condition.value == self.options.boss_locations.value:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name}'s Be Mean option is the same as their win condition!"
@@ -141,6 +172,18 @@ class MSMWorld(World):
                 f"[Mario Sports Mix] {self.player_name}'s Win Cups amount is larger than the amount of cups they can receive"
             )
 
+        time_values = [self.options.basket_time.value, self.options.hockey_time.value]
+        enable_points = [self.options.b_points_win.value, self.options.h_points_win.value]
+        sport_names = ["Basketball", "Hockey"]
+
+        for i, (time, point_win) in enumerate(zip(time_values, enable_points)):
+            if time == 5 and not point_win:
+                raise OptionError(
+                    f"[Mario Sports Mix] {self.player_name}'s {sport_names[i]} timer is off while their points to win is"
+                    f" off, the match will run indefinitely."
+                )
+
+
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
@@ -168,10 +211,18 @@ class MSMWorld(World):
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)
 
+    @staticmethod
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
+        """Request a Universal Tracker regeneration using the seed's slot data."""
+        return slot_data
+
     # Stuff to send to the client/tracker because it needs to know that
     def fill_slot_data(self) -> Mapping[str, Any]:
         slot_data = {
             "version": WORLD_VERSION,
+            # Universal Tracker uses this to generate the same MSM world without
+            # requiring a local YAML file.
+            "options": self.options.as_dict(*self.ut_generation_options),
 
             # Goal/Boss Stuff
             "goal_condition": self.options.goal_condition.value,
