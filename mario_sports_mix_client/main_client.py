@@ -3,7 +3,7 @@ import multiprocessing
 import Utils
 
 from CommonClient import get_base_parser, handle_url_arg, gui_enabled, server_loop
-from .MSMContext import MSMContext, logger
+from .MSMContext import MSMContext, logger, tracker_loaded
 
 
 def launch_mario_sports_mix_client(*args):
@@ -22,23 +22,26 @@ def launch_mario_sports_mix_client(*args):
 
         logger.info("Connecting to server...")
         ctx.server_task = asyncio.create_task(server_loop(ctx), name="Server Loop")
+
+        if tracker_loaded:
+            ctx.run_generator() # type: ignore
         if gui_enabled:
             ctx.run_gui()
         ctx.run_cli()
 
         logger.info("Running game...")
-        ctx.dolphin_sync_task = asyncio.create_task(ctx.dolphin_sync_task(), name="Dolphin Sync") # type: ignore
+        ctx.dolphin_sync_task = asyncio.create_task(ctx.dolphin_sync_task(), name="Dolphin Sync")
 
         await ctx.exit_event.wait()
         ctx.server_address = None
 
         if ctx.dolphin_sync_task:
             await asyncio.sleep(3)
-            await ctx.dolphin_sync_task()
+            await ctx.dolphin_sync_task
 
 
     import colorama
-    parser = get_base_parser(description="Mario Sports Mix Archipelago Client.")
+    parser = get_base_parser(description="Mario Sports Mix Client.")
     parser.add_argument('--name', default=None, help="Slot Name to connect as.")
     parser.add_argument("url", nargs="?", help="Archipelago connection url")
 

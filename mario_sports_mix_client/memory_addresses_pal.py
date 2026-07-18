@@ -38,6 +38,7 @@ class PartyMode:
 
     class HarmonyHustle:
         stage = 0x804D7978 # Word | Used for PM difficulty
+        started = 0x80925F48
         class Tabs:
             tabs = 0x90226D68 # Byte
             one_note_tab = 0x90226D69 # Byte
