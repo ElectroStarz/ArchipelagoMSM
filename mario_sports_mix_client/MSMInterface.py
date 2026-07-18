@@ -24,7 +24,7 @@ id_to_char = {
     0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
     5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
     10: "Bowser", 11: "Bowser Jr", 12: "Moogle", 13: "Cactuar",
-    14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage",
+    14: "Ninja", 15: "White Mage", 16: "Slime", 17: "Black Mage", 18: "None",
     19: "Mii (Male)", 20: "Mii (Female)",
 }
 
@@ -216,7 +216,7 @@ class MSMInterface:
 
         value = self.dolphin_client.read_byte(get_address(addresses[ls_char]))
 
-        return id_to_char[value]
+        return id_to_char.get(value, "None")
 
     def get_player_score_addr(self):
         if self.is_in_match():
@@ -267,7 +267,7 @@ class MSMInterface:
             return court_id, court_name
         else:
 
-            court_id = self.dolphin_client.read_byte(get_address(PartyMode.difficulty))
+            court_id = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
             court_name = harmony_mapping.get(court_id)
 
             return court_id, court_name
