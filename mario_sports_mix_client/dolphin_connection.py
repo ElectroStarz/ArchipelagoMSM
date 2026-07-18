@@ -1,11 +1,33 @@
 from logging import Logger
 from typing import Any
-import sys
 import psutil
 import dolphin_memory_engine as dme
 import asyncio
 
 GAME_VERSION = None
+
+# Process names used by the common Dolphin builds and forks.  Store names
+# without the optional Windows .exe suffix so one list works on every OS.
+STANDARD_DOLPHIN_PROCESS_NAMES = frozenset({
+    "dolphin",
+    "dolphinqt2",
+    "dolphin-emu",
+    "dolphin-emu-qt2",
+    "dolphin-emu-wx",
+})
+
+FORK_DOLPHIN_PROCESS_NAMES = frozenset({
+    "slippi dolphin",
+    "slippi-dolphin",
+    "slippi_dolphin",
+    "dolphinmpn",
+    "dolphin mpn",
+    "dolphin-mpn",
+    "primehack",
+    "ishiiruka",
+})
+
+SUPPORTED_DOLPHIN_PROCESS_NAMES = STANDARD_DOLPHIN_PROCESS_NAMES | FORK_DOLPHIN_PROCESS_NAMES
 
 class DolphinException(Exception):
     pass
@@ -16,27 +38,34 @@ class DolphinClient:
         self.logger = logger
         self.attempt = 1
         self.told_region = False
+        self.told_fork_warning = False
 
 
     @staticmethod
-    def check_for_dolphin():
-        # Determine the expected executable name based on the OS
-        # Windows uses Dolphin.exe, while Mac/Linux use lowercase 'dolphin'
-        if sys.platform == "win32":
-            target_process = "dolphin.exe"
-        else:
-            target_process = "dolphin"
-
-        dolphin_count = 0
+    def get_running_dolphin_processes() -> list[str]:
+        """Return the names of running supported Dolphin processes."""
+        running_processes = []
 
         # Iterate through all running processes across the OS
         for proc in psutil.process_iter(['name']):
             try:
-                # Lowercase comparison to avoid case-sensitivity issues across different OS environments
-                if proc.info['name'] and proc.info['name'].lower() == target_process:
-                    dolphin_count += 1
+                process_name = proc.info['name']
+                if process_name is None:
+                    continue
+
+                # Windows adds .exe; normalise it and compare case-insensitively
+                # so the same aliases work on Windows, macOS, and Linux.
+                normalised_name = process_name.casefold().removesuffix(".exe")
+                if normalised_name in SUPPORTED_DOLPHIN_PROCESS_NAMES:
+                    running_processes.append(process_name)
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
+
+        return running_processes
+
+    @classmethod
+    def check_for_dolphin(cls):
+        dolphin_count = len(cls.get_running_dolphin_processes())
 
         if dolphin_count > 1:
             return 2
@@ -46,6 +75,19 @@ class DolphinClient:
             return 0
 
     async def attempt_to_hook(self):
+        fork_processes = [
+            process_name
+            for process_name in self.get_running_dolphin_processes()
+            if process_name.casefold().removesuffix(".exe") in FORK_DOLPHIN_PROCESS_NAMES
+        ]
+        if fork_processes and not self.told_fork_warning:
+            self.logger.warning(
+                "Detected Dolphin fork: %s. Mario Sports Mix is developed and tested with standard Dolphin, "
+                "memory addresses or client behaviour may not work correctly. Please report back if things work or don't.",
+                ", ".join(fork_processes),
+            )
+            self.told_fork_warning = True
+
         if not self.dme.is_hooked():
             self.logger.info(f"Attempting to hook: Attempt {self.attempt}")
             self.dme.hook()
