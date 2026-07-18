@@ -31,8 +31,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.0.1"
-COMPATIBLE_VERSIONS = ["2.0.0"]
+CLIENT_VERSION = "2.0.2"
+COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
