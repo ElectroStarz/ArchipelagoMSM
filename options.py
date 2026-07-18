@@ -9,8 +9,8 @@ Will cause immediate BK if off and you DON'T have any party modes given at the s
 class EnabledSports(OptionSet):
     """Choose which sports to enable
 
-    NOTE: You can still do Behemoth without all the 4 main sports enabled however
-    Behemoth King **requires** Sports Mix enabled"""
+NOTE: You can still do Behemoth without all the 4 main sports enabled however
+Behemoth King **requires** Sports Mix enabled"""
     display_name = "Enabled Sports"
     valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
     default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
@@ -26,8 +26,8 @@ class IncludeExhibition(DefaultOnToggle):
 class ExhibitionType(Choice):
     """What type of exhibition locations do you want?
 
-    - **All Sports**: Exhibition locations will be for all the 4 main sports
-    - **Universal**: Exhibition locations will be for **any** sport"""
+**All Sports**: Exhibition locations will be for all the 4 main sports
+**Universal**: Exhibition locations will be for **any** sport"""
     display_name = "Exhibition Type"
     option_all_sports = 0
     option_universal = 1
@@ -35,8 +35,8 @@ class ExhibitionType(Choice):
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
-(Also unlocks related stages) - Recommended if you don't have party games on!"""
-    display_name = "Start with Mushroom Cup (+Stages)"
+(Also unlocks related courts) - Recommended if you don't have party games on!"""
+    display_name = "Start with Mushroom Cup (+Courts)"
     option_none = 0
     option_normal_difficulty = 1
     option_hard_difficulty = 2
@@ -55,16 +55,16 @@ class ExhibitionDifficulties(OptionSet):
     """Which exhibition difficulties should be included?
 If the difficulty is off, you won't be able to send checks with that difficulty
 (Easy, Normal, Hard, Expert)"""
-    display_name = "Exhibition Difficulty"
+    display_name = "Exhibition Difficulties"
     valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
 
 class CourtUnlockType(Choice):
-    """How to unlock courts_dict
+    """How to unlock courts
 
-    - **Court Item**: Each court is its own item
-    - **Progressive Court**: Courts are unlocked in a certain order with progressive items
-    Note: Behemoth Stage is an item! Behemoth Stage is the last stage unlocked in Progressive Court"""
+**Court Item**: Each court is its own item
+**Progressive Court**: Courts are unlocked in a certain order with progressive items
+Note: Behemoth Stage is an item! Behemoth Stage is the last court unlocked in Progressive Court"""
     display_name = "Court Unlock Type"
     option_court_item = 0
     option_progressive_court = 1
@@ -73,10 +73,10 @@ class CourtUnlockType(Choice):
 class CupUnlockType(Choice):
     """How to unlock cups
 
-    - **Cup Item**: Each cup is its own item
-    - **Progressive Cup**: Cups are unlocked in a certain order with progressive items. (Normal -> Hard (If enabled) ->
+**Cup Item**: Each cup is its own item
+**Progressive Cup**: Cups are unlocked in a certain order with progressive items. (Normal -> Hard (If enabled) ->
 Sports Mix)
-    Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
+Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
     display_name = "Court Unlock Type"
     option_cup_item = 0
     option_progressive_cup = 1
@@ -97,14 +97,14 @@ class SportsMixUnlock(Choice):
 class GoalCondition(Choice):
     """What is your goal?
 
-    - **Defeat Behemoth**: Defeat the Behemoth to goal!
-    - **Defeat Behemoth King**: Defeat the Behemoth King to goal!
-    - **Win Cups**: Win a certain amount of cups to goal!
-    - **Exhibition Tour**: Win every exhibition match for your selected difficulties to goal! (Needs All Sports option)
-    - **Party Palooza**: Win every game in every Party Mode to goal!
+**Defeat Behemoth**: Defeat the Behemoth to goal!
+**Defeat Behemoth King**: Defeat the Behemoth King to goal!
+**Win Cups**: Win a certain amount of cups to goal!
+**Exhibition Tour**: Win every exhibition match for your selected difficulties to goal! (Needs All Sports option)
+**Party Palooza**: Win every game in every Party Mode to goal!
 
-    NOTE: Exhibition Tour disables the QoL feature for winning exhibition matches, recommended to have 2 difficulties
-    selected"""
+NOTE: Exhibition Tour disables the QoL feature for winning exhibition matches, recommended to have 2 difficulties
+selected"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
@@ -272,6 +272,7 @@ class BasketTime(Choice):
     option_2_mins_30_secs = 2
     option_3_mins = 3
     option_3_mins_30_secs = 4
+    option_off = 5
     default = 2
 
     @classmethod
@@ -282,6 +283,7 @@ class BasketTime(Choice):
             case 2: return "2:30"
             case 3: return "3:00"
             case 4: return "3:30"
+            case 5: return "OFF"
             case _: return "ERROR"
 
 class EnableBPointsWin(Toggle):
@@ -290,7 +292,9 @@ class EnableBPointsWin(Toggle):
     default = False
 
 class BPointsToWin(Range):
-    """Set the required amount of points to win"""
+    """Set the required amount of points to win
+NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
+to the nearest 1 decimal place"""
     display_name = "Points to Win"
     range_start = 10
     range_end = 50
@@ -301,8 +305,8 @@ class BPeriod(Range):
 Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Period Amount"
     range_start = 1
-    range_end = 10
-    default = 2
+    range_end = 5
+    default = 1
 
 # --- Dodgeball ---
 class DodgeTime(Choice):
@@ -313,6 +317,7 @@ class DodgeTime(Choice):
     option_3_mins = 2
     option_3_mins_30_secs = 3
     option_4_mins = 4
+    option_off = 5
     default = 2
 
     @classmethod
@@ -323,6 +328,7 @@ class DodgeTime(Choice):
             case 2: return "3:00"
             case 3: return "3:30"
             case 4: return "4:00"
+            case 5: return "OFF"
             case _: return "ERROR"
 
 class DPeriod(Range):
@@ -330,8 +336,8 @@ class DPeriod(Range):
 Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Period Amount"
     range_start = 1
-    range_end = 10
-    default = 2
+    range_end = 5
+    default = 1
 
 class DMaxHealth(Choice):
     """How much health should everyone have?"""
@@ -345,10 +351,12 @@ class DMaxHealth(Choice):
 
 # --- Volleyball ---
 class VPointsToWin(Range):
-    """Set the required amount of points to win"""
+    """Set the required amount of points to win
+NOTE: The requirement for Bowser Jr. Blvd. is value x 2 rounded
+to the nearest 1 decimal place"""
     display_name = "Points to Win"
     range_start = 10
-    range_end = 15
+    range_end = 20
     default = 10
 
 class VPeriod(Range):
@@ -356,8 +364,8 @@ class VPeriod(Range):
 Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Set Amount"
     range_start = 1
-    range_end = 10
-    default = 2
+    range_end = 5
+    default = 1
 
 # --- Hockey ---
 class HockeyTime(Choice):
@@ -368,6 +376,7 @@ class HockeyTime(Choice):
     option_3_mins = 2
     option_3_mins_30_secs = 3
     option_4_mins = 4
+    option_off = 5
     default = 2
 
     @classmethod
@@ -378,6 +387,7 @@ class HockeyTime(Choice):
             case 2: return "3:00"
             case 3: return "3:30"
             case 4: return "4:00"
+            case 5: return "OFF"
             case _: return "ERROR"
 
 class EnableHPointsWin(Toggle):
@@ -386,7 +396,9 @@ class EnableHPointsWin(Toggle):
     default = False
 
 class HPointsToWin(Range):
-    """Set the required amount of points to win"""
+    """Set the required amount of points to win
+NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
+to the nearest 1 decimal place"""
     display_name = "Points to Win"
     range_start = 10
     range_end = 50
@@ -397,8 +409,8 @@ class HPeriod(Range):
 Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Period Amount"
     range_start = 1
-    range_end = 10
-    default = 2
+    range_end = 5
+    default = 1
 
 # === Party Mode Options ===
 class PartyMode(OptionSet):
@@ -408,7 +420,7 @@ class PartyMode(OptionSet):
 NOTE: All are required if your goal is Party Palooza"""
     display_name = "Enabled Party Modes"
     valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
-    default = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
+    default = {"Feed Petey", "Smash Skate"}
 
 class StartWithParty(Toggle):
     """Start with the enabled party modes
@@ -418,7 +430,7 @@ Useful if you're not starting with the sports!"""
 class PartyModeOpponent(Choice):
     """Which CPU will be your main opponent?
 (This CPU will get things like points from deathlink, points
-from Coins Trap etc)"""
+from Coins Trap, etc)"""
     display_name = "Party Mode Opponent"
     option_CPU_2 = 0
     option_CPU_3 = 1
