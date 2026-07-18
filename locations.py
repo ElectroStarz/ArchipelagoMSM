@@ -3,18 +3,27 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, NamedTuple, Dict
 
-from BaseClasses import Location
+from BaseClasses import Location, LocationProgressType as LPT
 from . import items
-from .options import GoalCondition, BeMean, HardTournamentDifficulty, CharacterSanity
+from .options import *
+from .MSMUtils import *
 
 if TYPE_CHECKING:
     from . import MSMWorld
+
+characters = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong"
+              "Diddy Kong", "Toad", "Bowser", "Bowser Jr", "Moogle", "Cactuar", "Ninja",
+              "White Mage", "Slime", "Black Mage", "Mii (Male)", "Mii (Female)"]
+
+costumes = ["Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad",
+            "Yellow Toad", "She-Slime", "Metal Slime", "Tennis-wear Peach", "Tennis-wear Daisy",
+            "Shadow White Ninja", "Pure White - White Mage", "Magic Red Black Mage"]
 
 class MSMLocation(Location):
     game = "Mario Sports Mix"
 
 
-class LocationGroup(str, Enum):
+class LocGroup(str, Enum):
     # === Cup Groups ===
     BASKETBALL_NORMAL_CUPS = "Basketball Normal Cups"
     BASKETBALL_HARD_CUPS = "Basketball Hard Cups"
@@ -54,17 +63,30 @@ class LocationGroup(str, Enum):
     HOCKEY_EX_HARD = "Hockey Exhibition Hard"
     HOCKEY_EX_EXPERT = "Hockey Exhibition Expert"
 
+    # === Global Exhibitions ===
+    EXHIBITION_EASY = "Exhibition Easy"
+    EXHIBITION_NORMAL = "Exhibition Normal"
+    EXHIBITION_HARD = "Exhibition Hard"
+    EXHIBITION_EXPERT = "Exhibition Expert"
+
+    # === Party Mode ===
+    FEED_PETEY = "Feed Petey"
+    HARMONY_HUSTLE = "Harmony Hustle"
+    BOB_OMB_DODGE = "Bob-omb Dodge"
+    SMASH_SKATE = "Smash Skate"
+
     # === Sanity & Misc ===
     SPECIAL_SANITY = "Special Sanity"
     CHARACTER_SANITY = "Character Sanity"
     COSTUME_SANITY = "Costume Sanity"
+    COURT_SANITY = "Court Sanity"
     BOSS_LOCATIONS = "Boss Locations"
     WIN_CUPS = "Win Cups"
 
-class LocationData(NamedTuple):
+class LocData(NamedTuple):
     id: int
-    group: LocationGroup
-
+    group: LocGroup
+    location_type: LPT = LPT.DEFAULT
 
 
 def create_all_locations(world: "MSMWorld") -> None:
@@ -72,402 +94,571 @@ def create_all_locations(world: "MSMWorld") -> None:
     create_events(world)
 
 
-base_loc_id = 0
+base_id = 0
 
 
-location_table: Dict[str, LocationData] = {
+# Split from the original location_table. IDs, groups, and priorities are unchanged.
 
-    # === Beating Cup Round Locations ===
-    # === Normal ===
+cup_round_locations: Dict[str, LocData] = {
+    # --- Normal ---
     # Basketball
-    "Basketball: Beat Normal Mushroom Cup Round 1": LocationData(base_loc_id + 1, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Mushroom Cup Round 2": LocationData(base_loc_id + 2, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Mushroom Cup Round 3": LocationData(base_loc_id + 3, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Flower Cup Round 1": LocationData(base_loc_id + 4, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Flower Cup Round 2": LocationData(base_loc_id + 5, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Flower Cup Round 3": LocationData(base_loc_id + 6, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Star Cup Round 1": LocationData(base_loc_id + 7, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Star Cup Round 2": LocationData(base_loc_id + 8, LocationGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Beat Normal Star Cup Round 3": LocationData(base_loc_id + 9, LocationGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Mushroom Cup Round 1":    LocData(base_id + 1, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Mushroom Cup Round 2":    LocData(base_id + 2, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Mushroom Cup Round 3":    LocData(base_id + 3, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Flower Cup Round 1":      LocData(base_id + 4, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Flower Cup Round 2":      LocData(base_id + 5, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Flower Cup Round 3":      LocData(base_id + 6, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Star Cup Round 1":        LocData(base_id + 7, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Star Cup Round 2":        LocData(base_id + 8, LocGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Beat Normal Star Cup Round 3":        LocData(base_id + 9, LocGroup.BASKETBALL_NORMAL_CUPS, LPT.PRIORITY),
 
     # Dodgeball
-    "Dodgeball: Beat Normal Mushroom Cup Round 1": LocationData(base_loc_id + 10, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Mushroom Cup Round 2": LocationData(base_loc_id + 11, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Mushroom Cup Round 3": LocationData(base_loc_id + 12, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Flower Cup Round 1": LocationData(base_loc_id + 13, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Flower Cup Round 2": LocationData(base_loc_id + 14, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Flower Cup Round 3": LocationData(base_loc_id + 15, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Star Cup Round 1": LocationData(base_loc_id + 16, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Star Cup Round 2": LocationData(base_loc_id + 17, LocationGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Beat Normal Star Cup Round 3": LocationData(base_loc_id + 18, LocationGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Mushroom Cup Round 1":     LocData(base_id + 10, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Mushroom Cup Round 2":     LocData(base_id + 11, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Mushroom Cup Round 3":     LocData(base_id + 12, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Flower Cup Round 1":       LocData(base_id + 13, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Flower Cup Round 2":       LocData(base_id + 14, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Flower Cup Round 3":       LocData(base_id + 15, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Star Cup Round 1":         LocData(base_id + 16, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Star Cup Round 2":         LocData(base_id + 17, LocGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Beat Normal Star Cup Round 3":         LocData(base_id + 18, LocGroup.DODGEBALL_NORMAL_CUPS, LPT.PRIORITY),
 
     # Volleyball
-    "Volleyball: Beat Normal Mushroom Cup Round 1": LocationData(base_loc_id + 19, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Mushroom Cup Round 2": LocationData(base_loc_id + 20, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Mushroom Cup Round 3": LocationData(base_loc_id + 21, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Flower Cup Round 1": LocationData(base_loc_id + 22, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Flower Cup Round 2": LocationData(base_loc_id + 23, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Flower Cup Round 3": LocationData(base_loc_id + 24, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Star Cup Round 1": LocationData(base_loc_id + 25, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Star Cup Round 2": LocationData(base_loc_id + 26, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Beat Normal Star Cup Round 3": LocationData(base_loc_id + 27, LocationGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Mushroom Cup Round 1":    LocData(base_id + 19, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Mushroom Cup Round 2":    LocData(base_id + 20, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Mushroom Cup Round 3":    LocData(base_id + 21, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Flower Cup Round 1":      LocData(base_id + 22, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Flower Cup Round 2":      LocData(base_id + 23, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Flower Cup Round 3":      LocData(base_id + 24, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Star Cup Round 1":        LocData(base_id + 25, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Star Cup Round 2":        LocData(base_id + 26, LocGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Beat Normal Star Cup Round 3":        LocData(base_id + 27, LocGroup.VOLLEYBALL_NORMAL_CUPS, LPT.PRIORITY),
 
     # Hockey
-    "Hockey: Beat Normal Mushroom Cup Round 1": LocationData(base_loc_id + 28, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Mushroom Cup Round 2": LocationData(base_loc_id + 29, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Mushroom Cup Round 3": LocationData(base_loc_id + 30, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Flower Cup Round 1": LocationData(base_loc_id + 31, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Flower Cup Round 2": LocationData(base_loc_id + 32, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Flower Cup Round 3": LocationData(base_loc_id + 33, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Star Cup Round 1": LocationData(base_loc_id + 34, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Star Cup Round 2": LocationData(base_loc_id + 35, LocationGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Beat Normal Star Cup Round 3": LocationData(base_loc_id + 36, LocationGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Mushroom Cup Round 1":        LocData(base_id + 28, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Mushroom Cup Round 2":        LocData(base_id + 29, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Mushroom Cup Round 3":        LocData(base_id + 30, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Flower Cup Round 1":          LocData(base_id + 31, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Flower Cup Round 2":          LocData(base_id + 32, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Flower Cup Round 3":          LocData(base_id + 33, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Star Cup Round 1":            LocData(base_id + 34, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Star Cup Round 2":            LocData(base_id + 35, LocGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Beat Normal Star Cup Round 3":            LocData(base_id + 36, LocGroup.HOCKEY_NORMAL_CUPS, LPT.PRIORITY),
 
-    # === Hard ===
+    # --- Hard ---
     # Basketball
-    "Basketball: Beat Hard Mushroom Cup Round 1": LocationData(base_loc_id + 37, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Mushroom Cup Round 2": LocationData(base_loc_id + 38, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Mushroom Cup Round 3": LocationData(base_loc_id + 39, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Flower Cup Round 1": LocationData(base_loc_id + 40, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Flower Cup Round 2": LocationData(base_loc_id + 41, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Flower Cup Round 3": LocationData(base_loc_id + 42, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Star Cup Round 1": LocationData(base_loc_id + 43, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Star Cup Round 2": LocationData(base_loc_id + 44, LocationGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Beat Hard Star Cup Round 3": LocationData(base_loc_id + 45, LocationGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Mushroom Cup Round 1":      LocData(base_id + 37, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Mushroom Cup Round 2":      LocData(base_id + 38, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Mushroom Cup Round 3":      LocData(base_id + 39, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Flower Cup Round 1":        LocData(base_id + 40, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Flower Cup Round 2":        LocData(base_id + 41, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Flower Cup Round 3":        LocData(base_id + 42, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Star Cup Round 1":          LocData(base_id + 43, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Star Cup Round 2":          LocData(base_id + 44, LocGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Beat Hard Star Cup Round 3":          LocData(base_id + 45, LocGroup.BASKETBALL_HARD_CUPS, LPT.PRIORITY),
 
     # Dodgeball
-    "Dodgeball: Beat Hard Mushroom Cup Round 1": LocationData(base_loc_id + 46, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Mushroom Cup Round 2": LocationData(base_loc_id + 47, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Mushroom Cup Round 3": LocationData(base_loc_id + 48, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Flower Cup Round 1": LocationData(base_loc_id + 49, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Flower Cup Round 2": LocationData(base_loc_id + 50, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Flower Cup Round 3": LocationData(base_loc_id + 51, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Star Cup Round 1": LocationData(base_loc_id + 52, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Star Cup Round 2": LocationData(base_loc_id + 53, LocationGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Beat Hard Star Cup Round 3": LocationData(base_loc_id + 54, LocationGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Mushroom Cup Round 1":       LocData(base_id + 46, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Mushroom Cup Round 2":       LocData(base_id + 47, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Mushroom Cup Round 3":       LocData(base_id + 48, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Flower Cup Round 1":         LocData(base_id + 49, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Flower Cup Round 2":         LocData(base_id + 50, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Flower Cup Round 3":         LocData(base_id + 51, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Star Cup Round 1":           LocData(base_id + 52, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Star Cup Round 2":           LocData(base_id + 53, LocGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Beat Hard Star Cup Round 3":           LocData(base_id + 54, LocGroup.DODGEBALL_HARD_CUPS, LPT.PRIORITY),
 
     # Volleyball
-    "Volleyball: Beat Hard Mushroom Cup Round 1": LocationData(base_loc_id + 55, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Mushroom Cup Round 2": LocationData(base_loc_id + 56, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Mushroom Cup Round 3": LocationData(base_loc_id + 57, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Flower Cup Round 1": LocationData(base_loc_id + 58, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Flower Cup Round 2": LocationData(base_loc_id + 59, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Flower Cup Round 3": LocationData(base_loc_id + 60, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Star Cup Round 1": LocationData(base_loc_id + 61, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Star Cup Round 2": LocationData(base_loc_id + 62, LocationGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Beat Hard Star Cup Round 3": LocationData(base_loc_id + 63, LocationGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Mushroom Cup Round 1":      LocData(base_id + 55, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Mushroom Cup Round 2":      LocData(base_id + 56, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Mushroom Cup Round 3":      LocData(base_id + 57, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Flower Cup Round 1":        LocData(base_id + 58, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Flower Cup Round 2":        LocData(base_id + 59, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Flower Cup Round 3":        LocData(base_id + 60, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Star Cup Round 1":          LocData(base_id + 61, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Star Cup Round 2":          LocData(base_id + 62, LocGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Beat Hard Star Cup Round 3":          LocData(base_id + 63, LocGroup.VOLLEYBALL_HARD_CUPS, LPT.PRIORITY),
 
     # Hockey
-    "Hockey: Beat Hard Mushroom Cup Round 1": LocationData(base_loc_id + 64, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Mushroom Cup Round 2": LocationData(base_loc_id + 65, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Mushroom Cup Round 3": LocationData(base_loc_id + 66, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Flower Cup Round 1": LocationData(base_loc_id + 67, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Flower Cup Round 2": LocationData(base_loc_id + 68, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Flower Cup Round 3": LocationData(base_loc_id + 69, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Star Cup Round 1": LocationData(base_loc_id + 70, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Star Cup Round 2": LocationData(base_loc_id + 71, LocationGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Beat Hard Star Cup Round 3": LocationData(base_loc_id + 72, LocationGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Mushroom Cup Round 1":          LocData(base_id + 64, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Mushroom Cup Round 2":          LocData(base_id + 65, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Mushroom Cup Round 3":          LocData(base_id + 66, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Flower Cup Round 1":            LocData(base_id + 67, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Flower Cup Round 2":            LocData(base_id + 68, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Flower Cup Round 3":            LocData(base_id + 69, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Star Cup Round 1":              LocData(base_id + 70, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Star Cup Round 2":              LocData(base_id + 71, LocGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Beat Hard Star Cup Round 3":              LocData(base_id + 72, LocGroup.HOCKEY_HARD_CUPS, LPT.PRIORITY),
 
-    # === Sports Mix Locations ===
-    "Sports Mix: Beat Mushroom Cup Round 1": LocationData(base_loc_id + 73, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Mushroom Cup Round 2": LocationData(base_loc_id + 74, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Mushroom Cup Round 3": LocationData(base_loc_id + 75, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Flower Cup Round 1": LocationData(base_loc_id + 76, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Flower Cup Round 2": LocationData(base_loc_id + 77, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Flower Cup Round 3": LocationData(base_loc_id + 78, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Star Cup Round 1": LocationData(base_loc_id + 79, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Star Cup Round 2": LocationData(base_loc_id + 80, LocationGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Beat Star Cup Round 3": LocationData(base_loc_id + 81, LocationGroup.SPORTS_MIX_CUPS),
-
-    # === Easy Exhibition Locations ===
-    # Basketball
-    "Basketball Ex: Beat Mario Stadium (Easy)": LocationData(base_loc_id + 200, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Koopa Troopa Beach (Easy)": LocationData(base_loc_id + 201, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat DK Dock (Easy)": LocationData(base_loc_id + 202, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Luigi's Mansion (Easy)": LocationData(base_loc_id + 203, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Western Junction (Easy)": LocationData(base_loc_id + 204, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Daisy Garden (Easy)": LocationData(base_loc_id + 205, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Easy)": LocationData(base_loc_id + 206, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Bowser's Castle (Easy)": LocationData(base_loc_id + 207, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Star Ship (Easy)": LocationData(base_loc_id + 208, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Peach's Castle (Easy)": LocationData(base_loc_id + 209, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Wario Factory (Easy)": LocationData(base_loc_id + 210, LocationGroup.BASKETBALL_EX_EASY),
-    "Basketball Ex: Beat Ghoulish Galleon (Easy)": LocationData(base_loc_id + 211, LocationGroup.BASKETBALL_EX_EASY),
-
-    # Dodgeball
-    "Dodgeball Ex: Beat Mario Stadium (Easy)": LocationData(base_loc_id + 212, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Easy)": LocationData(base_loc_id + 213, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Peach's Castle (Easy)": LocationData(base_loc_id + 214, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat DK Dock (Easy)": LocationData(base_loc_id + 215, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Toad Park (Easy)": LocationData(base_loc_id + 216, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Daisy Garden (Easy)": LocationData(base_loc_id + 217, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Wario Factory (Easy)": LocationData(base_loc_id + 218, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Bowser's Castle (Easy)": LocationData(base_loc_id + 219, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Star Ship (Easy)": LocationData(base_loc_id + 220, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Western Junction (Easy)": LocationData(base_loc_id + 221, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Waluigi Pinball (Easy)": LocationData(base_loc_id + 222, LocationGroup.DODGEBALL_EX_EASY),
-    "Dodgeball Ex: Beat Ghoulish Galleon (Easy)": LocationData(base_loc_id + 223, LocationGroup.DODGEBALL_EX_EASY),
-
-    # Volleyball
-    "Volleyball Ex: Beat Mario Stadium (Easy)": LocationData(base_loc_id + 224, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Koopa Troopa Beach (Easy)": LocationData(base_loc_id + 225, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Peach's Castle (Easy)": LocationData(base_loc_id + 226, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat DK Dock (Easy)": LocationData(base_loc_id + 227, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Luigi's Mansion (Easy)": LocationData(base_loc_id + 228, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Western Junction (Easy)": LocationData(base_loc_id + 229, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Bowser Jr. Blvd. (Easy)": LocationData(base_loc_id + 230, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Bowser's Castle (Easy)": LocationData(base_loc_id + 231, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Star Ship (Easy)": LocationData(base_loc_id + 232, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Wario Factory (Easy)": LocationData(base_loc_id + 233, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Waluigi Pinball (Easy)": LocationData(base_loc_id + 234, LocationGroup.VOLLEYBALL_EX_EASY),
-    "Volleyball Ex: Beat Ghoulish Galleon (Easy)": LocationData(base_loc_id + 235, LocationGroup.VOLLEYBALL_EX_EASY),
-
-    # Hockey
-    "Hockey Ex: Beat Mario Stadium (Easy)": LocationData(base_loc_id + 236, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Toad Park (Easy)": LocationData(base_loc_id + 237, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Peach's Castle (Easy)": LocationData(base_loc_id + 238, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Western Junction (Easy)": LocationData(base_loc_id + 239, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Wario Factory (Easy)": LocationData(base_loc_id + 240, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Daisy Garden (Easy)": LocationData(base_loc_id + 241, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Bowser Jr. Blvd. (Easy)": LocationData(base_loc_id + 242, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Waluigi Pinball (Easy)": LocationData(base_loc_id + 243, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Star Ship (Easy)": LocationData(base_loc_id + 244, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Koopa Troopa Beach (Easy)": LocationData(base_loc_id + 245, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Ghoulish Galleon (Easy)": LocationData(base_loc_id + 246, LocationGroup.HOCKEY_EX_EASY),
-    "Hockey Ex: Beat Bowser's Castle (Easy)": LocationData(base_loc_id + 247, LocationGroup.HOCKEY_EX_EASY),
-
-    # === Normal Exhibition Locations ===
-    # Basketball
-    "Basketball Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 300, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 301, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat DK Dock (Normal)": LocationData(base_loc_id + 302, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Luigi's Mansion (Normal)": LocationData(base_loc_id + 303, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 304, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Daisy Garden (Normal)": LocationData(base_loc_id + 305, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 306, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Bowser's Castle (Normal)": LocationData(base_loc_id + 307, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Star Ship (Normal)": LocationData(base_loc_id + 308, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 309, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Wario Factory (Normal)": LocationData(base_loc_id + 310, LocationGroup.BASKETBALL_EX_NORMAL),
-    "Basketball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 311, LocationGroup.BASKETBALL_EX_NORMAL),
-
-    # Dodgeball
-    "Dodgeball Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 312, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 313, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 314, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat DK Dock (Normal)": LocationData(base_loc_id + 315, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Toad Park (Normal)": LocationData(base_loc_id + 316, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Daisy Garden (Normal)": LocationData(base_loc_id + 317, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Wario Factory (Normal)": LocationData(base_loc_id + 318, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Bowser's Castle (Normal)": LocationData(base_loc_id + 319, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Star Ship (Normal)": LocationData(base_loc_id + 320, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 321, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Waluigi Pinball (Normal)": LocationData(base_loc_id + 322, LocationGroup.DODGEBALL_EX_NORMAL),
-    "Dodgeball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 323, LocationGroup.DODGEBALL_EX_NORMAL),
-
-    # Volleyball
-    "Volleyball Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 324, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 325, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 326, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat DK Dock (Normal)": LocationData(base_loc_id + 327, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Luigi's Mansion (Normal)": LocationData(base_loc_id + 328, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 329, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 330, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Bowser's Castle (Normal)": LocationData(base_loc_id + 331, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Star Ship (Normal)": LocationData(base_loc_id + 332, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Wario Factory (Normal)": LocationData(base_loc_id + 333, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Waluigi Pinball (Normal)": LocationData(base_loc_id + 334, LocationGroup.VOLLEYBALL_EX_NORMAL),
-    "Volleyball Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 335, LocationGroup.VOLLEYBALL_EX_NORMAL),
-
-    # Hockey
-    "Hockey Ex: Beat Mario Stadium (Normal)": LocationData(base_loc_id + 336, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Toad Park (Normal)": LocationData(base_loc_id + 337, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Peach's Castle (Normal)": LocationData(base_loc_id + 338, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Western Junction (Normal)": LocationData(base_loc_id + 339, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Wario Factory (Normal)": LocationData(base_loc_id + 340, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Daisy Garden (Normal)": LocationData(base_loc_id + 341, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Bowser Jr. Blvd. (Normal)": LocationData(base_loc_id + 342, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Waluigi Pinball (Normal)": LocationData(base_loc_id + 343, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Star Ship (Normal)": LocationData(base_loc_id + 344, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Koopa Troopa Beach (Normal)": LocationData(base_loc_id + 345, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Ghoulish Galleon (Normal)": LocationData(base_loc_id + 346, LocationGroup.HOCKEY_EX_NORMAL),
-    "Hockey Ex: Beat Bowser's Castle (Normal)": LocationData(base_loc_id + 347, LocationGroup.HOCKEY_EX_NORMAL),
-
-    # === Hard Exhibition Locations ===
-    # Basketball
-    "Basketball Ex: Beat Mario Stadium (Hard)": LocationData(base_loc_id + 400, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Koopa Troopa Beach (Hard)": LocationData(base_loc_id + 401, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat DK Dock (Hard)": LocationData(base_loc_id + 402, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Luigi's Mansion (Hard)": LocationData(base_loc_id + 403, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Western Junction (Hard)": LocationData(base_loc_id + 404, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Daisy Garden (Hard)": LocationData(base_loc_id + 405, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Hard)": LocationData(base_loc_id + 406, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Bowser's Castle (Hard)": LocationData(base_loc_id + 407, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Star Ship (Hard)": LocationData(base_loc_id + 408, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Peach's Castle (Hard)": LocationData(base_loc_id + 409, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Wario Factory (Hard)": LocationData(base_loc_id + 410, LocationGroup.BASKETBALL_EX_HARD),
-    "Basketball Ex: Beat Ghoulish Galleon (Hard)": LocationData(base_loc_id + 411, LocationGroup.BASKETBALL_EX_HARD),
-
-    # Dodgeball
-    "Dodgeball Ex: Beat Mario Stadium (Hard)": LocationData(base_loc_id + 412, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Hard)": LocationData(base_loc_id + 413, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Peach's Castle (Hard)": LocationData(base_loc_id + 414, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat DK Dock (Hard)": LocationData(base_loc_id + 415, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Toad Park (Hard)": LocationData(base_loc_id + 416, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Daisy Garden (Hard)": LocationData(base_loc_id + 417, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Wario Factory (Hard)": LocationData(base_loc_id + 418, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Bowser's Castle (Hard)": LocationData(base_loc_id + 419, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Star Ship (Hard)": LocationData(base_loc_id + 420, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Western Junction (Hard)": LocationData(base_loc_id + 421, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Waluigi Pinball (Hard)": LocationData(base_loc_id + 422, LocationGroup.DODGEBALL_EX_HARD),
-    "Dodgeball Ex: Beat Ghoulish Galleon (Hard)": LocationData(base_loc_id + 423, LocationGroup.DODGEBALL_EX_HARD),
-
-    # Volleyball
-    "Volleyball Ex: Beat Mario Stadium (Hard)": LocationData(base_loc_id + 424, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Koopa Troopa Beach (Hard)": LocationData(base_loc_id + 425, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Peach's Castle (Hard)": LocationData(base_loc_id + 426, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat DK Dock (Hard)": LocationData(base_loc_id + 427, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Luigi's Mansion (Hard)": LocationData(base_loc_id + 428, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Western Junction (Hard)": LocationData(base_loc_id + 429, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Bowser Jr. Blvd. (Hard)": LocationData(base_loc_id + 430, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Bowser's Castle (Hard)": LocationData(base_loc_id + 431, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Star Ship (Hard)": LocationData(base_loc_id + 432, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Wario Factory (Hard)": LocationData(base_loc_id + 433, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Waluigi Pinball (Hard)": LocationData(base_loc_id + 434, LocationGroup.VOLLEYBALL_EX_HARD),
-    "Volleyball Ex: Beat Ghoulish Galleon (Hard)": LocationData(base_loc_id + 435, LocationGroup.VOLLEYBALL_EX_HARD),
-
-    # Hockey
-    "Hockey Ex: Beat Mario Stadium (Hard)": LocationData(base_loc_id + 436, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Toad Park (Hard)": LocationData(base_loc_id + 437, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Peach's Castle (Hard)": LocationData(base_loc_id + 438, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Western Junction (Hard)": LocationData(base_loc_id + 439, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Wario Factory (Hard)": LocationData(base_loc_id + 440, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Daisy Garden (Hard)": LocationData(base_loc_id + 441, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Bowser Jr. Blvd. (Hard)": LocationData(base_loc_id + 442, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Waluigi Pinball (Hard)": LocationData(base_loc_id + 443, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Star Ship (Hard)": LocationData(base_loc_id + 444, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Koopa Troopa Beach (Hard)": LocationData(base_loc_id + 445, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Ghoulish Galleon (Hard)": LocationData(base_loc_id + 446, LocationGroup.HOCKEY_EX_HARD),
-    "Hockey Ex: Beat Bowser's Castle (Hard)": LocationData(base_loc_id + 447, LocationGroup.HOCKEY_EX_HARD),
-
-    # === Expert Exhibition Locations ===
-    # Basketball
-    "Basketball Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 500, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 501, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat DK Dock (Expert)": LocationData(base_loc_id + 502, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Luigi's Mansion (Expert)": LocationData(base_loc_id + 503, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 504, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Daisy Garden (Expert)": LocationData(base_loc_id + 505, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 506, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Bowser's Castle (Expert)": LocationData(base_loc_id + 507, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Star Ship (Expert)": LocationData(base_loc_id + 508, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 509, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Wario Factory (Expert)": LocationData(base_loc_id + 510, LocationGroup.BASKETBALL_EX_EXPERT),
-    "Basketball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 511, LocationGroup.BASKETBALL_EX_EXPERT),
-
-    # Dodgeball
-    "Dodgeball Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 512, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 513, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 514, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat DK Dock (Expert)": LocationData(base_loc_id + 515, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Toad Park (Expert)": LocationData(base_loc_id + 516, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Daisy Garden (Expert)": LocationData(base_loc_id + 517, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Wario Factory (Expert)": LocationData(base_loc_id + 518, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Bowser's Castle (Expert)": LocationData(base_loc_id + 519, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Star Ship (Expert)": LocationData(base_loc_id + 520, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 521, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Waluigi Pinball (Expert)": LocationData(base_loc_id + 522, LocationGroup.DODGEBALL_EX_EXPERT),
-    "Dodgeball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 523, LocationGroup.DODGEBALL_EX_EXPERT),
-
-    # Volleyball
-    "Volleyball Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 524, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 525, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 526, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat DK Dock (Expert)": LocationData(base_loc_id + 527, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Luigi's Mansion (Expert)": LocationData(base_loc_id + 528, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 529, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 530, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Bowser's Castle (Expert)": LocationData(base_loc_id + 531, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Star Ship (Expert)": LocationData(base_loc_id + 532, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Wario Factory (Expert)": LocationData(base_loc_id + 533, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Waluigi Pinball (Expert)": LocationData(base_loc_id + 534, LocationGroup.VOLLEYBALL_EX_EXPERT),
-    "Volleyball Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 535, LocationGroup.VOLLEYBALL_EX_EXPERT),
-
-    # Hockey
-    "Hockey Ex: Beat Mario Stadium (Expert)": LocationData(base_loc_id + 536, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Toad Park (Expert)": LocationData(base_loc_id + 537, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Peach's Castle (Expert)": LocationData(base_loc_id + 538, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Western Junction (Expert)": LocationData(base_loc_id + 539, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Wario Factory (Expert)": LocationData(base_loc_id + 540, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Daisy Garden (Expert)": LocationData(base_loc_id + 541, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Bowser Jr. Blvd. (Expert)": LocationData(base_loc_id + 542, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Waluigi Pinball (Expert)": LocationData(base_loc_id + 543, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Star Ship (Expert)": LocationData(base_loc_id + 544, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Koopa Troopa Beach (Expert)": LocationData(base_loc_id + 545, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Ghoulish Galleon (Expert)": LocationData(base_loc_id + 546, LocationGroup.HOCKEY_EX_EXPERT),
-    "Hockey Ex: Beat Bowser's Castle (Expert)": LocationData(base_loc_id + 547, LocationGroup.HOCKEY_EX_EXPERT),
-
-    # === Special Sanity Locations ===
-    "Use Mario's Special!": LocationData(base_loc_id + 560, LocationGroup.SPECIAL_SANITY),
-    "Use Luigi's Special!": LocationData(base_loc_id + 561, LocationGroup.SPECIAL_SANITY),
-    "Use Peach's Special!": LocationData(base_loc_id + 562, LocationGroup.SPECIAL_SANITY),
-    "Use Daisy's Special!": LocationData(base_loc_id + 563, LocationGroup.SPECIAL_SANITY),
-    "Use Yoshi's Special!": LocationData(base_loc_id + 564, LocationGroup.SPECIAL_SANITY),
-    "Use Wario's Special!": LocationData(base_loc_id + 565, LocationGroup.SPECIAL_SANITY),
-    "Use Waluigi's Special!": LocationData(base_loc_id + 566, LocationGroup.SPECIAL_SANITY),
-    "Use Donkey Kong's Special!": LocationData(base_loc_id + 567, LocationGroup.SPECIAL_SANITY),
-    "Use Diddy Kong's Special!": LocationData(base_loc_id + 568, LocationGroup.SPECIAL_SANITY),
-    "Use Toad's Special!": LocationData(base_loc_id + 569, LocationGroup.SPECIAL_SANITY),
-    "Use Bowser's Special!": LocationData(base_loc_id + 570, LocationGroup.SPECIAL_SANITY),
-    "Use Bowser Jr's Special!": LocationData(base_loc_id + 571, LocationGroup.SPECIAL_SANITY),
-    "Use Moogle's Special!": LocationData(base_loc_id + 572, LocationGroup.SPECIAL_SANITY),
-    "Use Cactuar's Special!": LocationData(base_loc_id + 573, LocationGroup.SPECIAL_SANITY),
-    "Use Ninja's Special!": LocationData(base_loc_id + 574, LocationGroup.SPECIAL_SANITY),
-    "Use White Mage's Special!": LocationData(base_loc_id + 575, LocationGroup.SPECIAL_SANITY),
-    "Use Slime's Special!": LocationData(base_loc_id + 576, LocationGroup.SPECIAL_SANITY),
-    "Use Black Mage's Special!": LocationData(base_loc_id + 577, LocationGroup.SPECIAL_SANITY),
-
-    # === Character Sanity Locations ===
-    "Win as Mario": LocationData(base_loc_id + 1001, LocationGroup.CHARACTER_SANITY),
-    "Win as Luigi": LocationData(base_loc_id + 1002, LocationGroup.CHARACTER_SANITY),
-    "Win as Peach": LocationData(base_loc_id + 1003, LocationGroup.CHARACTER_SANITY),
-    "Win as Daisy": LocationData(base_loc_id + 1004, LocationGroup.CHARACTER_SANITY),
-    "Win as Yoshi": LocationData(base_loc_id + 1005, LocationGroup.CHARACTER_SANITY),
-    "Win as Wario": LocationData(base_loc_id + 1006, LocationGroup.CHARACTER_SANITY),
-    "Win as Waluigi": LocationData(base_loc_id + 1007, LocationGroup.CHARACTER_SANITY),
-    "Win as Donkey Kong": LocationData(base_loc_id + 1008, LocationGroup.CHARACTER_SANITY),
-    "Win as Diddy Kong": LocationData(base_loc_id + 1009, LocationGroup.CHARACTER_SANITY),
-    "Win as Toad": LocationData(base_loc_id + 1010, LocationGroup.CHARACTER_SANITY),
-    "Win as Bowser": LocationData(base_loc_id + 1011, LocationGroup.CHARACTER_SANITY),
-    "Win as Bowser Jr": LocationData(base_loc_id + 1012, LocationGroup.CHARACTER_SANITY),
-    "Win as Moogle": LocationData(base_loc_id + 1013, LocationGroup.CHARACTER_SANITY),
-    "Win as Cactuar": LocationData(base_loc_id + 1014, LocationGroup.CHARACTER_SANITY),
-    "Win as Ninja": LocationData(base_loc_id + 1015, LocationGroup.CHARACTER_SANITY),
-    "Win as White Mage": LocationData(base_loc_id + 1016, LocationGroup.CHARACTER_SANITY),
-    "Win as Slime": LocationData(base_loc_id + 1017, LocationGroup.CHARACTER_SANITY),
-    "Win as Black Mage": LocationData(base_loc_id + 1018, LocationGroup.CHARACTER_SANITY),
-    "Win as Mii (Male)": LocationData(base_loc_id + 1019, LocationGroup.CHARACTER_SANITY),
-    "Win as Mii (Female)": LocationData(base_loc_id + 1020, LocationGroup.CHARACTER_SANITY),
-
-    # === Costumes ===
-    "Win as Pink Yoshi": LocationData(base_loc_id + 1021, LocationGroup.COSTUME_SANITY),
-    "Win as Light Blue Yoshi": LocationData(base_loc_id + 1022, LocationGroup.COSTUME_SANITY),
-    "Win as Yellow Yoshi": LocationData(base_loc_id + 1023, LocationGroup.COSTUME_SANITY),
-    "Win as Blue Toad": LocationData(base_loc_id + 1024, LocationGroup.COSTUME_SANITY),
-    "Win as Green Toad": LocationData(base_loc_id + 1025, LocationGroup.COSTUME_SANITY),
-    "Win as Yellow Toad": LocationData(base_loc_id + 1026, LocationGroup.COSTUME_SANITY),
-    "Win as She-Slime": LocationData(base_loc_id + 1027, LocationGroup.COSTUME_SANITY),
-    "Win as Metal Slime": LocationData(base_loc_id + 1028, LocationGroup.COSTUME_SANITY),
-    "Win as Tennis-wear Peach": LocationData(base_loc_id + 1029, LocationGroup.COSTUME_SANITY),
-    "Win as Tennis-wear Daisy": LocationData(base_loc_id + 1030, LocationGroup.COSTUME_SANITY),
-    "Win as Shadow White Ninja": LocationData(base_loc_id + 1031, LocationGroup.COSTUME_SANITY),
-    "Win as Pure White - White Mage": LocationData(base_loc_id + 1032, LocationGroup.COSTUME_SANITY),
-    "Win as Magic Red Black Mage": LocationData(base_loc_id + 1033, LocationGroup.COSTUME_SANITY),
-
-    # === Boss Locations ===
-    "Defeat Behemoth!": LocationData(base_loc_id + 2000, LocationGroup.BOSS_LOCATIONS),
-    "Defeat Behemoth King!": LocationData(base_loc_id + 2001, LocationGroup.BOSS_LOCATIONS),
 }
+
+sports_mix_locations: Dict[str, LocData] = {
+    "Sports Mix: Beat Mushroom Cup Round 1":           LocData(base_id + 73, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Mushroom Cup Round 2":           LocData(base_id + 74, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Mushroom Cup Round 3":           LocData(base_id + 75, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Flower Cup Round 1":             LocData(base_id + 76, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Flower Cup Round 2":             LocData(base_id + 77, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Flower Cup Round 3":             LocData(base_id + 78, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Star Cup Round 1":               LocData(base_id + 79, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Star Cup Round 2":               LocData(base_id + 80, LocGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Beat Star Cup Round 3":               LocData(base_id + 81, LocGroup.SPORTS_MIX_CUPS),
+
+}
+
+easy_exhibition_locations: Dict[str, LocData] = {
+    # Basketball
+    "Basketball Ex: Beat Mario Stadium (Easy)":        LocData(base_id + 200, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Koopa Troopa Beach (Easy)":   LocData(base_id + 201, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat DK Dock (Easy)":              LocData(base_id + 202, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Luigi's Mansion (Easy)":      LocData(base_id + 203, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Western Junction (Easy)":     LocData(base_id + 204, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Daisy Garden (Easy)":         LocData(base_id + 205, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Bowser Jr. Blvd. (Easy)":     LocData(base_id + 206, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Bowser's Castle (Easy)":      LocData(base_id + 207, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Star Ship (Easy)":            LocData(base_id + 208, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Peach's Castle (Easy)":       LocData(base_id + 209, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Wario Factory (Easy)":        LocData(base_id + 210, LocGroup.BASKETBALL_EX_EASY),
+    "Basketball Ex: Beat Ghoulish Galleon (Easy)":     LocData(base_id + 211, LocGroup.BASKETBALL_EX_EASY),
+
+    # Dodgeball
+    "Dodgeball Ex: Beat Mario Stadium (Easy)":         LocData(base_id + 212, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Koopa Troopa Beach (Easy)":    LocData(base_id + 213, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Peach's Castle (Easy)":        LocData(base_id + 214, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat DK Dock (Easy)":               LocData(base_id + 215, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Toad Park (Easy)":             LocData(base_id + 216, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Daisy Garden (Easy)":          LocData(base_id + 217, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Wario Factory (Easy)":         LocData(base_id + 218, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Bowser's Castle (Easy)":       LocData(base_id + 219, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Star Ship (Easy)":             LocData(base_id + 220, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Western Junction (Easy)":      LocData(base_id + 221, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Waluigi Pinball (Easy)":       LocData(base_id + 222, LocGroup.DODGEBALL_EX_EASY),
+    "Dodgeball Ex: Beat Ghoulish Galleon (Easy)":      LocData(base_id + 223, LocGroup.DODGEBALL_EX_EASY),
+
+    # Volleyball
+    "Volleyball Ex: Beat Mario Stadium (Easy)":        LocData(base_id + 224, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Koopa Troopa Beach (Easy)":   LocData(base_id + 225, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Peach's Castle (Easy)":       LocData(base_id + 226, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat DK Dock (Easy)":              LocData(base_id + 227, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Luigi's Mansion (Easy)":      LocData(base_id + 228, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Western Junction (Easy)":     LocData(base_id + 229, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Bowser Jr. Blvd. (Easy)":     LocData(base_id + 230, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Bowser's Castle (Easy)":      LocData(base_id + 231, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Star Ship (Easy)":            LocData(base_id + 232, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Wario Factory (Easy)":        LocData(base_id + 233, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Waluigi Pinball (Easy)":      LocData(base_id + 234, LocGroup.VOLLEYBALL_EX_EASY),
+    "Volleyball Ex: Beat Ghoulish Galleon (Easy)":     LocData(base_id + 235, LocGroup.VOLLEYBALL_EX_EASY),
+
+    # Hockey
+    "Hockey Ex: Beat Mario Stadium (Easy)":            LocData(base_id + 236, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Toad Park (Easy)":                LocData(base_id + 237, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Peach's Castle (Easy)":           LocData(base_id + 238, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Western Junction (Easy)":         LocData(base_id + 239, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Wario Factory (Easy)":            LocData(base_id + 240, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Daisy Garden (Easy)":             LocData(base_id + 241, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Easy)":         LocData(base_id + 242, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Waluigi Pinball (Easy)":          LocData(base_id + 243, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Star Ship (Easy)":                LocData(base_id + 244, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Koopa Troopa Beach (Easy)":       LocData(base_id + 245, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Ghoulish Galleon (Easy)":         LocData(base_id + 246, LocGroup.HOCKEY_EX_EASY),
+    "Hockey Ex: Beat Bowser's Castle (Easy)":          LocData(base_id + 247, LocGroup.HOCKEY_EX_EASY),
+}
+
+normal_exhibition_locations: Dict[str, LocData] = {
+    # Basketball
+    "Basketball Ex: Beat Mario Stadium (Normal)":      LocData(base_id + 300, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Koopa Troopa Beach (Normal)": LocData(base_id + 301, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat DK Dock (Normal)":            LocData(base_id + 302, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Luigi's Mansion (Normal)":    LocData(base_id + 303, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Western Junction (Normal)":   LocData(base_id + 304, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Daisy Garden (Normal)":       LocData(base_id + 305, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)":   LocData(base_id + 306, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Bowser's Castle (Normal)":    LocData(base_id + 307, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Star Ship (Normal)":          LocData(base_id + 308, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Peach's Castle (Normal)":     LocData(base_id + 309, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Wario Factory (Normal)":      LocData(base_id + 310, LocGroup.BASKETBALL_EX_NORMAL),
+    "Basketball Ex: Beat Ghoulish Galleon (Normal)":   LocData(base_id + 311, LocGroup.BASKETBALL_EX_NORMAL),
+
+    # Dodgeball
+    "Dodgeball Ex: Beat Mario Stadium (Normal)":       LocData(base_id + 312, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)":  LocData(base_id + 313, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Peach's Castle (Normal)":      LocData(base_id + 314, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat DK Dock (Normal)":             LocData(base_id + 315, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Toad Park (Normal)":           LocData(base_id + 316, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Daisy Garden (Normal)":        LocData(base_id + 317, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Wario Factory (Normal)":       LocData(base_id + 318, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Bowser's Castle (Normal)":     LocData(base_id + 319, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Star Ship (Normal)":           LocData(base_id + 320, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Western Junction (Normal)":    LocData(base_id + 321, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Waluigi Pinball (Normal)":     LocData(base_id + 322, LocGroup.DODGEBALL_EX_NORMAL),
+    "Dodgeball Ex: Beat Ghoulish Galleon (Normal)":    LocData(base_id + 323, LocGroup.DODGEBALL_EX_NORMAL),
+
+    # Volleyball
+    "Volleyball Ex: Beat Mario Stadium (Normal)":      LocData(base_id + 324, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Koopa Troopa Beach (Normal)": LocData(base_id + 325, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Peach's Castle (Normal)":     LocData(base_id + 326, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat DK Dock (Normal)":            LocData(base_id + 327, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Luigi's Mansion (Normal)":    LocData(base_id + 328, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Western Junction (Normal)":   LocData(base_id + 329, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Bowser Jr. Blvd. (Normal)":   LocData(base_id + 330, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Bowser's Castle (Normal)":    LocData(base_id + 331, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Star Ship (Normal)":          LocData(base_id + 332, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Wario Factory (Normal)":      LocData(base_id + 333, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Waluigi Pinball (Normal)":    LocData(base_id + 334, LocGroup.VOLLEYBALL_EX_NORMAL),
+    "Volleyball Ex: Beat Ghoulish Galleon (Normal)":   LocData(base_id + 335, LocGroup.VOLLEYBALL_EX_NORMAL),
+
+    # Hockey
+    "Hockey Ex: Beat Mario Stadium (Normal)":          LocData(base_id + 336, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Toad Park (Normal)":              LocData(base_id + 337, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Peach's Castle (Normal)":         LocData(base_id + 338, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Western Junction (Normal)":       LocData(base_id + 339, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Wario Factory (Normal)":          LocData(base_id + 340, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Daisy Garden (Normal)":           LocData(base_id + 341, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Normal)":       LocData(base_id + 342, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Waluigi Pinball (Normal)":        LocData(base_id + 343, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Star Ship (Normal)":              LocData(base_id + 344, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Koopa Troopa Beach (Normal)":     LocData(base_id + 345, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Ghoulish Galleon (Normal)":       LocData(base_id + 346, LocGroup.HOCKEY_EX_NORMAL),
+    "Hockey Ex: Beat Bowser's Castle (Normal)":        LocData(base_id + 347, LocGroup.HOCKEY_EX_NORMAL),
+}
+
+hard_exhibition_locations: Dict[str, LocData] = {
+    # Basketball
+    "Basketball Ex: Beat Mario Stadium (Hard)":        LocData(base_id + 400, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Koopa Troopa Beach (Hard)":   LocData(base_id + 401, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat DK Dock (Hard)":              LocData(base_id + 402, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Luigi's Mansion (Hard)":      LocData(base_id + 403, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Western Junction (Hard)":     LocData(base_id + 404, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Daisy Garden (Hard)":         LocData(base_id + 405, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Bowser Jr. Blvd. (Hard)":     LocData(base_id + 406, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Bowser's Castle (Hard)":      LocData(base_id + 407, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Star Ship (Hard)":            LocData(base_id + 408, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Peach's Castle (Hard)":       LocData(base_id + 409, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Wario Factory (Hard)":        LocData(base_id + 410, LocGroup.BASKETBALL_EX_HARD),
+    "Basketball Ex: Beat Ghoulish Galleon (Hard)":     LocData(base_id + 411, LocGroup.BASKETBALL_EX_HARD),
+
+    # Dodgeball
+    "Dodgeball Ex: Beat Mario Stadium (Hard)":         LocData(base_id + 412, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Koopa Troopa Beach (Hard)":    LocData(base_id + 413, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Peach's Castle (Hard)":        LocData(base_id + 414, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat DK Dock (Hard)":               LocData(base_id + 415, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Toad Park (Hard)":             LocData(base_id + 416, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Daisy Garden (Hard)":          LocData(base_id + 417, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Wario Factory (Hard)":         LocData(base_id + 418, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Bowser's Castle (Hard)":       LocData(base_id + 419, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Star Ship (Hard)":             LocData(base_id + 420, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Western Junction (Hard)":      LocData(base_id + 421, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Waluigi Pinball (Hard)":       LocData(base_id + 422, LocGroup.DODGEBALL_EX_HARD),
+    "Dodgeball Ex: Beat Ghoulish Galleon (Hard)":      LocData(base_id + 423, LocGroup.DODGEBALL_EX_HARD),
+
+    # Volleyball
+    "Volleyball Ex: Beat Mario Stadium (Hard)":        LocData(base_id + 424, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Koopa Troopa Beach (Hard)":   LocData(base_id + 425, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Peach's Castle (Hard)":       LocData(base_id + 426, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat DK Dock (Hard)":              LocData(base_id + 427, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Luigi's Mansion (Hard)":      LocData(base_id + 428, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Western Junction (Hard)":     LocData(base_id + 429, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Bowser Jr. Blvd. (Hard)":     LocData(base_id + 430, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Bowser's Castle (Hard)":      LocData(base_id + 431, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Star Ship (Hard)":            LocData(base_id + 432, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Wario Factory (Hard)":        LocData(base_id + 433, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Waluigi Pinball (Hard)":      LocData(base_id + 434, LocGroup.VOLLEYBALL_EX_HARD),
+    "Volleyball Ex: Beat Ghoulish Galleon (Hard)":     LocData(base_id + 435, LocGroup.VOLLEYBALL_EX_HARD),
+
+    # Hockey
+    "Hockey Ex: Beat Mario Stadium (Hard)":            LocData(base_id + 436, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Toad Park (Hard)":                LocData(base_id + 437, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Peach's Castle (Hard)":           LocData(base_id + 438, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Western Junction (Hard)":         LocData(base_id + 439, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Wario Factory (Hard)":            LocData(base_id + 440, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Daisy Garden (Hard)":             LocData(base_id + 441, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Hard)":         LocData(base_id + 442, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Waluigi Pinball (Hard)":          LocData(base_id + 443, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Star Ship (Hard)":                LocData(base_id + 444, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Koopa Troopa Beach (Hard)":       LocData(base_id + 445, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Ghoulish Galleon (Hard)":         LocData(base_id + 446, LocGroup.HOCKEY_EX_HARD),
+    "Hockey Ex: Beat Bowser's Castle (Hard)":          LocData(base_id + 447, LocGroup.HOCKEY_EX_HARD),
+}
+
+expert_exhibition_locations: Dict[str, LocData] = {
+    # Basketball
+    "Basketball Ex: Beat Mario Stadium (Expert)":      LocData(base_id + 500, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Koopa Troopa Beach (Expert)": LocData(base_id + 501, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat DK Dock (Expert)":            LocData(base_id + 502, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Luigi's Mansion (Expert)":    LocData(base_id + 503, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Western Junction (Expert)":   LocData(base_id + 504, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Daisy Garden (Expert)":       LocData(base_id + 505, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Bowser Jr. Blvd. (Expert)":   LocData(base_id + 506, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Bowser's Castle (Expert)":    LocData(base_id + 507, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Star Ship (Expert)":          LocData(base_id + 508, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Peach's Castle (Expert)":     LocData(base_id + 509, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Wario Factory (Expert)":      LocData(base_id + 510, LocGroup.BASKETBALL_EX_EXPERT),
+    "Basketball Ex: Beat Ghoulish Galleon (Expert)":   LocData(base_id + 511, LocGroup.BASKETBALL_EX_EXPERT),
+
+    # Dodgeball
+    "Dodgeball Ex: Beat Mario Stadium (Expert)":       LocData(base_id + 512, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)":  LocData(base_id + 513, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Peach's Castle (Expert)":      LocData(base_id + 514, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat DK Dock (Expert)":             LocData(base_id + 515, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Toad Park (Expert)":           LocData(base_id + 516, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Daisy Garden (Expert)":        LocData(base_id + 517, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Wario Factory (Expert)":       LocData(base_id + 518, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Bowser's Castle (Expert)":     LocData(base_id + 519, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Star Ship (Expert)":           LocData(base_id + 520, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Western Junction (Expert)":    LocData(base_id + 521, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Waluigi Pinball (Expert)":     LocData(base_id + 522, LocGroup.DODGEBALL_EX_EXPERT),
+    "Dodgeball Ex: Beat Ghoulish Galleon (Expert)":    LocData(base_id + 523, LocGroup.DODGEBALL_EX_EXPERT),
+
+    # Volleyball
+    "Volleyball Ex: Beat Mario Stadium (Expert)":      LocData(base_id + 524, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Koopa Troopa Beach (Expert)": LocData(base_id + 525, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Peach's Castle (Expert)":     LocData(base_id + 526, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat DK Dock (Expert)":            LocData(base_id + 527, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Luigi's Mansion (Expert)":    LocData(base_id + 528, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Western Junction (Expert)":   LocData(base_id + 529, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Bowser Jr. Blvd. (Expert)":   LocData(base_id + 530, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Bowser's Castle (Expert)":    LocData(base_id + 531, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Star Ship (Expert)":          LocData(base_id + 532, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Wario Factory (Expert)":      LocData(base_id + 533, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Waluigi Pinball (Expert)":    LocData(base_id + 534, LocGroup.VOLLEYBALL_EX_EXPERT),
+    "Volleyball Ex: Beat Ghoulish Galleon (Expert)":   LocData(base_id + 535, LocGroup.VOLLEYBALL_EX_EXPERT),
+
+    # Hockey
+    "Hockey Ex: Beat Mario Stadium (Expert)":          LocData(base_id + 536, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Toad Park (Expert)":              LocData(base_id + 537, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Peach's Castle (Expert)":         LocData(base_id + 538, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Western Junction (Expert)":       LocData(base_id + 539, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Wario Factory (Expert)":          LocData(base_id + 540, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Daisy Garden (Expert)":           LocData(base_id + 541, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Bowser Jr. Blvd. (Expert)":       LocData(base_id + 542, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Waluigi Pinball (Expert)":        LocData(base_id + 543, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Star Ship (Expert)":              LocData(base_id + 544, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Koopa Troopa Beach (Expert)":     LocData(base_id + 545, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Ghoulish Galleon (Expert)":       LocData(base_id + 546, LocGroup.HOCKEY_EX_EXPERT),
+    "Hockey Ex: Beat Bowser's Castle (Expert)":        LocData(base_id + 547, LocGroup.HOCKEY_EX_EXPERT),
+}
+
+global_exhibition_locations: Dict[str, LocData] = {
+    # Easy
+    "Exhibition: Beat Mario Stadium (Easy)":           LocData(base_id + 600, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Toad Park (Easy)":               LocData(base_id + 601, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Peach's Castle (Easy)":          LocData(base_id + 602, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Western Junction (Easy)":        LocData(base_id + 603, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Wario Factory (Easy)":           LocData(base_id + 604, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Daisy Garden (Easy)":            LocData(base_id + 605, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Bowser Jr. Blvd. (Easy)":        LocData(base_id + 606, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Waluigi Pinball (Easy)":         LocData(base_id + 607, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Star Ship (Easy)":               LocData(base_id + 608, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Koopa Troopa Beach (Easy)":      LocData(base_id + 609, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Ghoulish Galleon (Easy)":        LocData(base_id + 610, LocGroup.EXHIBITION_EASY),
+    "Exhibition: Beat Bowser's Castle (Easy)":         LocData(base_id + 611, LocGroup.EXHIBITION_EASY),
+
+    # Normal
+    "Exhibition: Beat Mario Stadium (Normal)":         LocData(base_id + 612, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Toad Park (Normal)":             LocData(base_id + 613, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Peach's Castle (Normal)":        LocData(base_id + 614, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Western Junction (Normal)":      LocData(base_id + 615, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Wario Factory (Normal)":         LocData(base_id + 616, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Daisy Garden (Normal)":          LocData(base_id + 617, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Bowser Jr. Blvd. (Normal)":      LocData(base_id + 618, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Waluigi Pinball (Normal)":       LocData(base_id + 619, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Star Ship (Normal)":             LocData(base_id + 620, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Koopa Troopa Beach (Normal)":    LocData(base_id + 621, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Ghoulish Galleon (Normal)":      LocData(base_id + 622, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Bowser's Castle (Normal)":       LocData(base_id + 623, LocGroup.EXHIBITION_NORMAL),
+
+    # Hard
+    "Exhibition: Beat Mario Stadium (Hard)":           LocData(base_id + 624, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Toad Park (Hard)":               LocData(base_id + 625, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Peach's Castle (Hard)":          LocData(base_id + 626, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Western Junction (Hard)":        LocData(base_id + 627, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Wario Factory (Hard)":           LocData(base_id + 628, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Daisy Garden (Hard)":            LocData(base_id + 629, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Bowser Jr. Blvd. (Hard)":        LocData(base_id + 630, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Waluigi Pinball (Hard)":         LocData(base_id + 631, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Star Ship (Hard)":               LocData(base_id + 632, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Koopa Troopa Beach (Hard)":      LocData(base_id + 633, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Ghoulish Galleon (Hard)":        LocData(base_id + 634, LocGroup.EXHIBITION_HARD),
+    "Exhibition: Beat Bowser's Castle (Hard)":         LocData(base_id + 635, LocGroup.EXHIBITION_HARD),
+
+    # Expert
+    "Exhibition: Beat Mario Stadium (Expert)":         LocData(base_id + 636, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Toad Park (Expert)":             LocData(base_id + 637, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Peach's Castle (Expert)":        LocData(base_id + 638, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Western Junction (Expert)":      LocData(base_id + 639, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Wario Factory (Expert)":         LocData(base_id + 640, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Daisy Garden (Expert)":          LocData(base_id + 641, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Bowser Jr. Blvd. (Expert)":      LocData(base_id + 642, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Waluigi Pinball (Expert)":       LocData(base_id + 643, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Star Ship (Expert)":             LocData(base_id + 644, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Koopa Troopa Beach (Expert)":    LocData(base_id + 645, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Ghoulish Galleon (Expert)":      LocData(base_id + 646, LocGroup.EXHIBITION_EXPERT),
+    "Exhibition: Beat Bowser's Castle (Expert)":       LocData(base_id + 647, LocGroup.EXHIBITION_EXPERT),
+}
+
+# === Party Game Locations ===
+
+feed_petey_locations: Dict[str, LocData] = {
+    "Feed Petey: Beat Daisy Garden (Apple)":           LocData(base_id + 800, LocGroup.FEED_PETEY),
+    "Feed Petey: Beat Daisy Garden (Watermelon)":      LocData(base_id + 801, LocGroup.FEED_PETEY),
+    "Feed Petey: Beat DK Dock (Apple)":                LocData(base_id + 802, LocGroup.FEED_PETEY),
+    "Feed Petey: Beat DK Dock (Watermelon)":           LocData(base_id + 803, LocGroup.FEED_PETEY),
+    "Feed Petey: Beat Wario Factory (Apple)":          LocData(base_id + 804, LocGroup.FEED_PETEY),
+    "Feed Petey: Beat Wario Factory (Watermelon)":     LocData(base_id + 805, LocGroup.FEED_PETEY),
+}
+
+harmony_hustle_locations: Dict[str, LocData] = {
+    "Harmony Hustle: Beat Classic Ocean":              LocData(base_id + 806, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Chocobo Rhythm":             LocData(base_id + 807, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Mario Athletic":             LocData(base_id + 808, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Mushroom Mix Medley":        LocData(base_id + 809, LocGroup.HARMONY_HUSTLE),
+
+    "Harmony Hustle: Beat Bloocheep Ocean":            LocData(base_id + 810, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Chocobo Pop":                LocData(base_id + 811, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Punk Athletic":              LocData(base_id + 812, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Blossom Mix Medley":         LocData(base_id + 813, LocGroup.HARMONY_HUSTLE),
+
+    "Harmony Hustle: Beat Punk Ocean":                 LocData(base_id + 814, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Chocobo Beat":               LocData(base_id + 815, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Island Athletic":            LocData(base_id + 816, LocGroup.HARMONY_HUSTLE),
+    "Harmony Hustle: Beat Star Mix Medley":            LocData(base_id + 817, LocGroup.HARMONY_HUSTLE),
+}
+
+bob_omb_dodge_locations: Dict[str, LocData] = {
+    "Bob-omb Dodge: Beat Mario Stadium (Bob-omb)":     LocData(base_id + 818, LocGroup.BOB_OMB_DODGE),
+    "Bob-omb Dodge: Beat Mario Stadium (Cannon)":      LocData(base_id + 819, LocGroup.BOB_OMB_DODGE),
+    "Bob-omb Dodge: Beat Ghoulish Galleon (Bob-omb)":  LocData(base_id + 820, LocGroup.BOB_OMB_DODGE),
+    "Bob-omb Dodge: Beat Ghoulish Galleon (Cannon)":   LocData(base_id + 821, LocGroup.BOB_OMB_DODGE),
+    "Bob-omb Dodge: Beat Western Junction (Bob-omb)":  LocData(base_id + 822, LocGroup.BOB_OMB_DODGE),
+    "Bob-omb Dodge: Beat Western Junction (Cannon)":   LocData(base_id + 823, LocGroup.BOB_OMB_DODGE),
+}
+
+smash_skate_locations: Dict[str, LocData] = {
+    "Smash Skate: Beat Sherbet Sea (Hockey Stick)":    LocData(base_id + 824, LocGroup.SMASH_SKATE),
+    "Smash Skate: Beat Sherbet Sea (Hockey Skate)":    LocData(base_id + 825, LocGroup.SMASH_SKATE),
+    "Smash Skate: Beat Rowdy Raft (Hockey Stick)":     LocData(base_id + 826, LocGroup.SMASH_SKATE),
+    "Smash Skate: Beat Rowdy Raft (Hockey Skate)":     LocData(base_id + 827, LocGroup.SMASH_SKATE),
+    "Smash Skate: Beat Fire Mountain (Hockey Stick)":  LocData(base_id + 828, LocGroup.SMASH_SKATE),
+    "Smash Skate: Beat Fire Mountain (Hockey Skate)":  LocData(base_id + 829, LocGroup.SMASH_SKATE),
+}
+
+special_sanity_locations: Dict[str, LocData] = {
+    "Use Mario's Special":                             LocData(base_id + 5000, LocGroup.SPECIAL_SANITY),
+    "Use Luigi's Special":                             LocData(base_id + 5001, LocGroup.SPECIAL_SANITY),
+    "Use Peach's Special":                             LocData(base_id + 5002, LocGroup.SPECIAL_SANITY),
+    "Use Daisy's Special":                             LocData(base_id + 5003, LocGroup.SPECIAL_SANITY),
+    "Use Yoshi's Special":                             LocData(base_id + 5004, LocGroup.SPECIAL_SANITY),
+    "Use Wario's Special":                             LocData(base_id + 5005, LocGroup.SPECIAL_SANITY),
+    "Use Waluigi's Special":                           LocData(base_id + 5006, LocGroup.SPECIAL_SANITY),
+    "Use Donkey Kong's Special":                       LocData(base_id + 5007, LocGroup.SPECIAL_SANITY),
+    "Use Diddy Kong's Special":                        LocData(base_id + 5008, LocGroup.SPECIAL_SANITY),
+    "Use Toad's Special":                              LocData(base_id + 5009, LocGroup.SPECIAL_SANITY),
+    "Use Bowser's Special":                            LocData(base_id + 5010, LocGroup.SPECIAL_SANITY),
+    "Use Bowser Jr's Special":                         LocData(base_id + 5011, LocGroup.SPECIAL_SANITY),
+    "Use Moogle's Special":                            LocData(base_id + 5012, LocGroup.SPECIAL_SANITY),
+    "Use Cactuar's Special":                           LocData(base_id + 5013, LocGroup.SPECIAL_SANITY),
+    "Use Ninja's Special":                             LocData(base_id + 5014, LocGroup.SPECIAL_SANITY),
+    "Use White Mage's Special":                        LocData(base_id + 5015, LocGroup.SPECIAL_SANITY),
+    "Use Slime's Special":                             LocData(base_id + 5016, LocGroup.SPECIAL_SANITY),
+    "Use Black Mage's Special":                        LocData(base_id + 5017, LocGroup.SPECIAL_SANITY),
+}
+
+character_sanity_locations: Dict[str, LocData] = {
+    "Win as Mario":                                    LocData(base_id + 6001, LocGroup.CHARACTER_SANITY),
+    "Win as Luigi":                                    LocData(base_id + 6002, LocGroup.CHARACTER_SANITY),
+    "Win as Peach":                                    LocData(base_id + 6003, LocGroup.CHARACTER_SANITY),
+    "Win as Daisy":                                    LocData(base_id + 6004, LocGroup.CHARACTER_SANITY),
+    "Win as Yoshi":                                    LocData(base_id + 6005, LocGroup.CHARACTER_SANITY),
+    "Win as Wario":                                    LocData(base_id + 6006, LocGroup.CHARACTER_SANITY),
+    "Win as Waluigi":                                  LocData(base_id + 6007, LocGroup.CHARACTER_SANITY),
+    "Win as Donkey Kong":                              LocData(base_id + 6008, LocGroup.CHARACTER_SANITY),
+    "Win as Diddy Kong":                               LocData(base_id + 6009, LocGroup.CHARACTER_SANITY),
+    "Win as Toad":                                     LocData(base_id + 6010, LocGroup.CHARACTER_SANITY),
+    "Win as Bowser":                                   LocData(base_id + 6011, LocGroup.CHARACTER_SANITY),
+    "Win as Bowser Jr":                                LocData(base_id + 6012, LocGroup.CHARACTER_SANITY),
+    "Win as Moogle":                                   LocData(base_id + 6013, LocGroup.CHARACTER_SANITY),
+    "Win as Cactuar":                                  LocData(base_id + 6014, LocGroup.CHARACTER_SANITY),
+    "Win as Ninja":                                    LocData(base_id + 6015, LocGroup.CHARACTER_SANITY),
+    "Win as White Mage":                               LocData(base_id + 6016, LocGroup.CHARACTER_SANITY),
+    "Win as Slime":                                    LocData(base_id + 6017, LocGroup.CHARACTER_SANITY),
+    "Win as Black Mage":                               LocData(base_id + 6018, LocGroup.CHARACTER_SANITY),
+    "Win as Mii (Male)":                               LocData(base_id + 6019, LocGroup.CHARACTER_SANITY),
+    "Win as Mii (Female)":                             LocData(base_id + 6020, LocGroup.CHARACTER_SANITY),
+}
+
+costume_char_sanity_locations: Dict[str, LocData] = {
+    "Win as Pink Yoshi":                               LocData(base_id + 6021, LocGroup.COSTUME_SANITY),
+    "Win as Light Blue Yoshi":                         LocData(base_id + 6022, LocGroup.COSTUME_SANITY),
+    "Win as Yellow Yoshi":                             LocData(base_id + 6023, LocGroup.COSTUME_SANITY),
+    "Win as Blue Toad":                                LocData(base_id + 6024, LocGroup.COSTUME_SANITY),
+    "Win as Green Toad":                               LocData(base_id + 6025, LocGroup.COSTUME_SANITY),
+    "Win as Yellow Toad":                              LocData(base_id + 6026, LocGroup.COSTUME_SANITY),
+    "Win as She-Slime":                                LocData(base_id + 6027, LocGroup.COSTUME_SANITY),
+    "Win as Metal Slime":                              LocData(base_id + 6028, LocGroup.COSTUME_SANITY),
+    "Win as Tennis-wear Peach":                        LocData(base_id + 6029, LocGroup.COSTUME_SANITY),
+    "Win as Tennis-wear Daisy":                        LocData(base_id + 6030, LocGroup.COSTUME_SANITY),
+    "Win as Shadow White Ninja":                       LocData(base_id + 6031, LocGroup.COSTUME_SANITY),
+    "Win as Pure White - White Mage":                  LocData(base_id + 6032, LocGroup.COSTUME_SANITY),
+    "Win as Magic Red Black Mage":                     LocData(base_id + 6033, LocGroup.COSTUME_SANITY),
+}
+
+court_sanity_locations: Dict[str, LocData] = {
+    "Win on Mario Stadium":                            LocData(base_id + 7000, LocGroup.COURT_SANITY),
+    "Win on Koopa Troopa Beach":                       LocData(base_id + 7001, LocGroup.COURT_SANITY),
+    "Win on Peach's Castle":                           LocData(base_id + 7002, LocGroup.COURT_SANITY),
+    "Win on Toad Park":                                LocData(base_id + 7003, LocGroup.COURT_SANITY),
+    "Win on DK Dock":                                  LocData(base_id + 7004, LocGroup.COURT_SANITY),
+    "Win on Luigi's Mansion":                          LocData(base_id + 7005, LocGroup.COURT_SANITY),
+    "Win on Daisy Garden":                             LocData(base_id + 7006, LocGroup.COURT_SANITY),
+    "Win on Wario Factory":                            LocData(base_id + 7007, LocGroup.COURT_SANITY),
+    "Win on Bowser Jr. Blvd.":                         LocData(base_id + 7008, LocGroup.COURT_SANITY),
+    "Win on Bowser's Castle":                          LocData(base_id + 7009, LocGroup.COURT_SANITY),
+    "Win on Waluigi Pinball":                          LocData(base_id + 7010, LocGroup.COURT_SANITY),
+    "Win on Ghoulish Galleon":                         LocData(base_id + 7011, LocGroup.COURT_SANITY),
+    "Win on Star Ship":                                LocData(base_id + 7012, LocGroup.COURT_SANITY),
+    "Win on Western Junction":                         LocData(base_id + 7013, LocGroup.COURT_SANITY),
+
+    "Win on Sherbet Sea":                              LocData(base_id + 7014, LocGroup.COURT_SANITY),
+    "Win on Fire Mountain":                            LocData(base_id + 7015, LocGroup.COURT_SANITY),
+    "Win on Rowdy Raft":                               LocData(base_id + 7016, LocGroup.COURT_SANITY),
+
+    "Win on Classic Ocean":                            LocData(base_id + 7017, LocGroup.COURT_SANITY),
+    "Win on Chocobo Rhythm":                           LocData(base_id + 7018, LocGroup.COURT_SANITY),
+    "Win on Mario Athletic":                           LocData(base_id + 7019, LocGroup.COURT_SANITY),
+    "Win on Bloocheep Ocean":                          LocData(base_id + 7020, LocGroup.COURT_SANITY),
+    "Win on Chocobo Pop":                              LocData(base_id + 7021, LocGroup.COURT_SANITY),
+    "Win on Punk Athletic":                            LocData(base_id + 7022, LocGroup.COURT_SANITY),
+    "Win on Punk Ocean":                               LocData(base_id + 7023, LocGroup.COURT_SANITY),
+    "Win on Chocobo Beat":                             LocData(base_id + 7024, LocGroup.COURT_SANITY),
+    "Win on Island Athletic":                          LocData(base_id + 7025, LocGroup.COURT_SANITY),
+    "Win on Mushroom Mix Medley":                      LocData(base_id + 7026, LocGroup.COURT_SANITY, LPT.PRIORITY),
+    "Win on Blossom Mix Medley":                       LocData(base_id + 7027, LocGroup.COURT_SANITY, LPT.PRIORITY),
+    "Win on Star Mix Medley":                          LocData(base_id + 7028, LocGroup.COURT_SANITY, LPT.PRIORITY),
+}
+
+boss_locations: Dict[str, LocData] = {
+    "Defeat Behemoth!":                                LocData(base_id + 20000, LocGroup.BOSS_LOCATIONS, LPT.PRIORITY),
+    "Defeat Behemoth King!":                           LocData(base_id + 20001, LocGroup.BOSS_LOCATIONS, LPT.PRIORITY),
+}
+
+location_table: Dict[str, LocData] = {
+    **cup_round_locations,
+    **sports_mix_locations,
+    **easy_exhibition_locations,
+    **normal_exhibition_locations,
+    **hard_exhibition_locations,
+    **expert_exhibition_locations,
+    **global_exhibition_locations,
+    **feed_petey_locations,
+    **harmony_hustle_locations,
+    **bob_omb_dodge_locations,
+    **smash_skate_locations,
+    **special_sanity_locations,
+    **character_sanity_locations,
+    **costume_char_sanity_locations,
+    **court_sanity_locations,
+    **boss_locations,
+}
+
 
 LOCATION_NAME_TO_ID = {location_name: data.id for location_name, data in location_table.items()}
 
@@ -528,412 +719,349 @@ def create_regular_locations(world: MSMWorld) -> None:
     h_star_cup_h = world.get_region("Hockey: Star Cup (Hard)")
     # Sports Mix
     sports_mix_mushroom = world.get_region("Sports Mix: Mushroom Cup")
-    sm_mushroom_locations = get_location_names_with_ids(["Sports Mix: Beat Mushroom Cup Round 1",
-    "Sports Mix: Beat Mushroom Cup Round 2", "Sports Mix: Beat Mushroom Cup Round 3"])
-    sports_mix_mushroom.add_locations(sm_mushroom_locations, MSMLocation)
     sports_mix_flower = world.get_region("Sports Mix: Flower Cup")
-    sm_flower_locations = get_location_names_with_ids(["Sports Mix: Beat Flower Cup Round 1",
-    "Sports Mix: Beat Flower Cup Round 2", "Sports Mix: Beat Flower Cup Round 3"])
-    sports_mix_flower.add_locations(sm_flower_locations, MSMLocation)
     sports_mix_star = world.get_region("Sports Mix: Star Cup")
-    sm_star_locations = get_location_names_with_ids(["Sports Mix: Beat Star Cup Round 1",
-    "Sports Mix: Beat Star Cup Round 2", "Sports Mix: Beat Star Cup Round 3"])
-    sports_mix_star.add_locations(sm_star_locations, MSMLocation)
+    # Party Modes
+    feed_petey = world.get_region("Feed Petey")
+    harmony_hustle = world.get_region("Harmony Hustle")
+    bob_omb_dodge = world.get_region("Bob-omb Dodge")
+    smash_skate = world.get_region("Smash Skate")
 
+    # === Tournament Locations ===
 
-    # === Exhibition Locations for each difficulty ===
+    cup_regions = {
+        "Normal": {
+            "Basketball": {
+                "Mushroom": b_mushroom_cup_n,
+                "Flower": b_flower_cup_n,
+                "Star": b_star_cup_n,
+            },
+            "Dodgeball": {
+                "Mushroom": d_mushroom_cup_n,
+                "Flower": d_flower_cup_n,
+                "Star": d_star_cup_n,
+            },
+            "Volleyball": {
+                "Mushroom": v_mushroom_cup_n,
+                "Flower": v_flower_cup_n,
+                "Star": v_star_cup_n,
+            },
+            "Hockey": {
+                "Mushroom": h_mushroom_cup_n,
+                "Flower": h_flower_cup_n,
+                "Star": h_star_cup_n,
+            },
+        },
 
-    # Normal Difficulty
-    # Basketball
-    b_mushroom_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Mushroom Cup Round 1",
-    "Basketball: Beat Normal Mushroom Cup Round 2", "Basketball: Beat Normal Mushroom Cup Round 3"])
-    b_flower_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Flower Cup Round 1",
-    "Basketball: Beat Normal Flower Cup Round 2", "Basketball: Beat Normal Flower Cup Round 3"])
-    b_star_n_locations = get_location_names_with_ids(["Basketball: Beat Normal Star Cup Round 1",
-    "Basketball: Beat Normal Star Cup Round 2", "Basketball: Beat Normal Star Cup Round 3"])
+        "Hard": {
+            "Basketball": {
+                "Mushroom": b_mushroom_cup_h,
+                "Flower": b_flower_cup_h,
+                "Star": b_star_cup_h,
+            },
+            "Dodgeball": {
+                "Mushroom": d_mushroom_cup_h,
+                "Flower": d_flower_cup_h,
+                "Star": d_star_cup_h,
+            },
+            "Volleyball": {
+                "Mushroom": v_mushroom_cup_h,
+                "Flower": v_flower_cup_h,
+                "Star": v_star_cup_h,
+            },
+            "Hockey": {
+                "Mushroom": h_mushroom_cup_h,
+                "Flower": h_flower_cup_h,
+                "Star": h_star_cup_h,
+            },
+        }
+}
 
-    b_mushroom_cup_n.add_locations(b_mushroom_n_locations, MSMLocation)
-    b_flower_cup_n.add_locations(b_flower_n_locations, MSMLocation)
-    b_star_cup_n.add_locations(b_star_n_locations, MSMLocation)
+    if world.options.include_tournaments:
+        for difficulty, sports in cup_regions.items():
+            if difficulty == "Hard" and not world.options.hard_tournament_difficulty:
+                continue
 
-    # Dodgeball
-    d_mushroom_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Mushroom Cup Round 1",
-    "Dodgeball: Beat Normal Mushroom Cup Round 2", "Dodgeball: Beat Normal Mushroom Cup Round 3"])
-    d_flower_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Flower Cup Round 1",
-    "Dodgeball: Beat Normal Flower Cup Round 2", "Dodgeball: Beat Normal Flower Cup Round 3"])
-    d_star_n_locations = get_location_names_with_ids(["Dodgeball: Beat Normal Star Cup Round 1",
-    "Dodgeball: Beat Normal Star Cup Round 2", "Dodgeball: Beat Normal Star Cup Round 3"])
+            for sport, cups in sports.items():
+                if sport not in world.options.enabled_sports:
+                    continue
 
-    d_mushroom_cup_n.add_locations(d_mushroom_n_locations, MSMLocation)
-    d_flower_cup_n.add_locations(d_flower_n_locations, MSMLocation)
-    d_star_cup_n.add_locations(d_star_n_locations, MSMLocation)
+                for cup, region in cups.items():
+                    locations = get_location_names_with_ids([
+                        f"{sport}: Beat {difficulty} {cup} Cup Round {i}"
+                        for i in range(1, 4)
+                    ])
 
-    # Volleyball
-    v_mushroom_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Mushroom Cup Round 1",
-    "Volleyball: Beat Normal Mushroom Cup Round 2", "Volleyball: Beat Normal Mushroom Cup Round 3"])
-    v_flower_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Flower Cup Round 1",
-    "Volleyball: Beat Normal Flower Cup Round 2", "Volleyball: Beat Normal Flower Cup Round 3"])
-    v_star_n_locations = get_location_names_with_ids(["Volleyball: Beat Normal Star Cup Round 1",
-    "Volleyball: Beat Normal Star Cup Round 2", "Volleyball: Beat Normal Star Cup Round 3"])
+                    region.add_locations(locations, MSMLocation)
 
-    v_mushroom_cup_n.add_locations(v_mushroom_n_locations, MSMLocation)
-    v_flower_cup_n.add_locations(v_flower_n_locations, MSMLocation)
-    v_star_cup_n.add_locations(v_star_n_locations, MSMLocation)
+        sports_mix_regions = {
+        "Mushroom": sports_mix_mushroom,
+        "Flower": sports_mix_flower,
+        "Star": sports_mix_star,
+        }
 
-    # Hockey
-    h_mushroom_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Mushroom Cup Round 1",
-    "Hockey: Beat Normal Mushroom Cup Round 2", "Hockey: Beat Normal Mushroom Cup Round 3"])
-    h_flower_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Flower Cup Round 1",
-    "Hockey: Beat Normal Flower Cup Round 2", "Hockey: Beat Normal Flower Cup Round 3"])
-    h_star_n_locations = get_location_names_with_ids(["Hockey: Beat Normal Star Cup Round 1",
-    "Hockey: Beat Normal Star Cup Round 2", "Hockey: Beat Normal Star Cup Round 3"])
+        if "Sports Mix" in world.options.enabled_sports:
+            for cup, region in sports_mix_regions.items():
+                locations = get_location_names_with_ids([
+                    f"Sports Mix: Beat {cup} Cup Round {i}"
+                    for i in range(1, 4)
+                ])
 
-    h_mushroom_cup_n.add_locations(h_mushroom_n_locations, MSMLocation)
-    h_flower_cup_n.add_locations(h_flower_n_locations, MSMLocation)
-    h_star_cup_n.add_locations(h_star_n_locations, MSMLocation)
-
-    # Hard Difficulty
-    if world.options.hard_tournament_difficulty == HardTournamentDifficulty.option_true:
-        # Basketball
-        b_mushroom_h_locations = get_location_names_with_ids(["Basketball: Beat Hard Mushroom Cup Round 1",
-    "Basketball: Beat Hard Mushroom Cup Round 2", "Basketball: Beat Hard Mushroom Cup Round 3"])
-        b_flower_h_locations = get_location_names_with_ids(["Basketball: Beat Hard Flower Cup Round 1",
-    "Basketball: Beat Hard Flower Cup Round 2", "Basketball: Beat Hard Flower Cup Round 3"])
-        b_star_h_locations = get_location_names_with_ids(["Basketball: Beat Hard Star Cup Round 1",
-    "Basketball: Beat Hard Star Cup Round 2", "Basketball: Beat Hard Star Cup Round 3"])
-
-        b_mushroom_cup_h.add_locations(b_mushroom_h_locations, MSMLocation)
-        b_flower_cup_h.add_locations(b_flower_h_locations, MSMLocation)
-        b_star_cup_h.add_locations(b_star_h_locations, MSMLocation)
-
-        # Dodgeball
-        d_mushroom_h_locations = get_location_names_with_ids(["Dodgeball: Beat Hard Mushroom Cup Round 1",
-    "Dodgeball: Beat Hard Mushroom Cup Round 2", "Dodgeball: Beat Hard Mushroom Cup Round 3"])
-        d_flower_h_locations = get_location_names_with_ids(["Dodgeball: Beat Hard Flower Cup Round 1",
-    "Dodgeball: Beat Hard Flower Cup Round 2", "Dodgeball: Beat Hard Flower Cup Round 3"])
-        d_star_h_locations = get_location_names_with_ids(["Dodgeball: Beat Hard Star Cup Round 1",
-    "Dodgeball: Beat Hard Star Cup Round 2", "Dodgeball: Beat Hard Star Cup Round 3"])
-
-        d_mushroom_cup_h.add_locations(d_mushroom_h_locations, MSMLocation)
-        d_flower_cup_h.add_locations(d_flower_h_locations, MSMLocation)
-        d_star_cup_h.add_locations(d_star_h_locations, MSMLocation)
-
-        # Volleyball
-        v_mushroom_h_locations = get_location_names_with_ids(["Volleyball: Beat Hard Mushroom Cup Round 1",
-    "Volleyball: Beat Hard Mushroom Cup Round 2", "Volleyball: Beat Hard Mushroom Cup Round 3"])
-        v_flower_h_locations = get_location_names_with_ids(["Volleyball: Beat Hard Flower Cup Round 1",
-    "Volleyball: Beat Hard Flower Cup Round 2", "Volleyball: Beat Hard Flower Cup Round 3"])
-        v_star_h_locations = get_location_names_with_ids(["Volleyball: Beat Hard Star Cup Round 1",
-    "Volleyball: Beat Hard Star Cup Round 2", "Volleyball: Beat Hard Star Cup Round 3"])
-
-        v_mushroom_cup_h.add_locations(v_mushroom_h_locations, MSMLocation)
-        v_flower_cup_h.add_locations(v_flower_h_locations, MSMLocation)
-        v_star_cup_h.add_locations(v_star_h_locations, MSMLocation)
-
-        # Hockey
-        h_mushroom_h_locations = get_location_names_with_ids(["Hockey: Beat Hard Mushroom Cup Round 1",
-    "Hockey: Beat Hard Mushroom Cup Round 2", "Hockey: Beat Hard Mushroom Cup Round 3"])
-        h_flower_h_locations = get_location_names_with_ids(["Hockey: Beat Hard Flower Cup Round 1",
-    "Hockey: Beat Hard Flower Cup Round 2", "Hockey: Beat Hard Flower Cup Round 3"])
-        h_star_h_locations = get_location_names_with_ids(["Hockey: Beat Hard Star Cup Round 1",
-    "Hockey: Beat Hard Star Cup Round 2", "Hockey: Beat Hard Star Cup Round 3"])
-
-        h_mushroom_cup_h.add_locations(h_mushroom_h_locations, MSMLocation)
-        h_flower_cup_h.add_locations(h_flower_h_locations, MSMLocation)
-        h_star_cup_h.add_locations(h_star_h_locations, MSMLocation)
+                region.add_locations(locations, MSMLocation)
 
     # === Exhibition Locations for each difficulty ===
 
-    # Easy Difficulty
-    if "Easy" in world.options.exhibition_difficulty:
-        b_exhibition_locations_e = get_location_names_with_ids([
-        "Basketball Ex: Beat Mario Stadium (Easy)",
-        "Basketball Ex: Beat Koopa Troopa Beach (Easy)",
-        "Basketball Ex: Beat DK Dock (Easy)",
-        "Basketball Ex: Beat Luigi's Mansion (Easy)",
-        "Basketball Ex: Beat Western Junction (Easy)",
-        "Basketball Ex: Beat Daisy Garden (Easy)",
-        "Basketball Ex: Beat Bowser Jr. Blvd. (Easy)",
-        "Basketball Ex: Beat Bowser's Castle (Easy)",
-        "Basketball Ex: Beat Star Ship (Easy)",
-        "Basketball Ex: Beat Peach's Castle (Easy)",
-        "Basketball Ex: Beat Wario Factory (Easy)",
-        "Basketball Ex: Beat Ghoulish Galleon (Easy)"])
-        d_exhibition_locations_e = get_location_names_with_ids([
-        "Dodgeball Ex: Beat Mario Stadium (Easy)",
-        "Dodgeball Ex: Beat Koopa Troopa Beach (Easy)",
-        "Dodgeball Ex: Beat Peach's Castle (Easy)",
-        "Dodgeball Ex: Beat DK Dock (Easy)",
-        "Dodgeball Ex: Beat Toad Park (Easy)",
-        "Dodgeball Ex: Beat Daisy Garden (Easy)",
-        "Dodgeball Ex: Beat Wario Factory (Easy)",
-        "Dodgeball Ex: Beat Bowser's Castle (Easy)",
-        "Dodgeball Ex: Beat Star Ship (Easy)",
-        "Dodgeball Ex: Beat Western Junction (Easy)",
-        "Dodgeball Ex: Beat Waluigi Pinball (Easy)",
-        "Dodgeball Ex: Beat Ghoulish Galleon (Easy)"])
-        v_exhibition_locations_e = get_location_names_with_ids([
-        "Volleyball Ex: Beat Mario Stadium (Easy)",
-        "Volleyball Ex: Beat Koopa Troopa Beach (Easy)",
-        "Volleyball Ex: Beat Peach's Castle (Easy)",
-        "Volleyball Ex: Beat DK Dock (Easy)",
-        "Volleyball Ex: Beat Luigi's Mansion (Easy)",
-        "Volleyball Ex: Beat Western Junction (Easy)",
-        "Volleyball Ex: Beat Bowser Jr. Blvd. (Easy)",
-        "Volleyball Ex: Beat Bowser's Castle (Easy)",
-        "Volleyball Ex: Beat Star Ship (Easy)",
-        "Volleyball Ex: Beat Wario Factory (Easy)",
-        "Volleyball Ex: Beat Waluigi Pinball (Easy)",
-        "Volleyball Ex: Beat Ghoulish Galleon (Easy)"])
-        h_exhibition_locations_e = get_location_names_with_ids([
-        "Hockey Ex: Beat Mario Stadium (Easy)",
-        "Hockey Ex: Beat Toad Park (Easy)",
-        "Hockey Ex: Beat Peach's Castle (Easy)",
-        "Hockey Ex: Beat Western Junction (Easy)",
-        "Hockey Ex: Beat Wario Factory (Easy)",
-        "Hockey Ex: Beat Daisy Garden (Easy)",
-        "Hockey Ex: Beat Bowser Jr. Blvd. (Easy)",
-        "Hockey Ex: Beat Waluigi Pinball (Easy)",
-        "Hockey Ex: Beat Star Ship (Easy)",
-        "Hockey Ex: Beat Koopa Troopa Beach (Easy)",
-        "Hockey Ex: Beat Ghoulish Galleon (Easy)",
-        "Hockey Ex: Beat Bowser's Castle (Easy)"])
+    exhibition_courts = {
+        "Basketball": [
+            "Mario Stadium",
+            "Koopa Troopa Beach",
+            "DK Dock",
+            "Luigi's Mansion",
+            "Western Junction",
+            "Daisy Garden",
+            "Bowser Jr. Blvd.",
+            "Bowser's Castle",
+            "Star Ship",
+            "Peach's Castle",
+            "Wario Factory",
+            "Ghoulish Galleon"
+        ],
+        "Dodgeball": [
+            "Mario Stadium",
+            "Koopa Troopa Beach",
+            "Peach's Castle",
+            "DK Dock",
+            "Toad Park",
+            "Daisy Garden",
+            "Wario Factory",
+            "Bowser's Castle",
+            "Star Ship",
+            "Western Junction",
+            "Waluigi Pinball",
+            "Ghoulish Galleon"
+        ],
+        "Volleyball": [
+            "Mario Stadium",
+            "Koopa Troopa Beach",
+            "Peach's Castle",
+            "DK Dock",
+            "Luigi's Mansion",
+            "Western Junction",
+            "Bowser Jr. Blvd.",
+            "Bowser's Castle",
+            "Star Ship",
+            "Wario Factory",
+            "Waluigi Pinball",
+            "Ghoulish Galleon"
+        ],
+        "Hockey": [
+            "Mario Stadium",
+            "Toad Park",
+            "Peach's Castle",
+            "Western Junction",
+            "Wario Factory",
+            "Daisy Garden",
+            "Bowser Jr. Blvd.",
+            "Waluigi Pinball",
+            "Star Ship",
+            "Koopa Troopa Beach",
+            "Ghoulish Galleon",
+            "Bowser's Castle"
+        ]
+    }
 
-        b_exhibition.add_locations(b_exhibition_locations_e)
-        d_exhibition.add_locations(d_exhibition_locations_e)
-        v_exhibition.add_locations(v_exhibition_locations_e)
-        h_exhibition.add_locations(h_exhibition_locations_e)
+    regions = {
+        "Basketball": b_exhibition,
+        "Dodgeball": d_exhibition,
+        "Volleyball": v_exhibition,
+        "Hockey": h_exhibition,
+    }
 
-    # Normal Difficulty
-    if "Normal" in world.options.exhibition_difficulty:
-        b_exhibition_locations_n = get_location_names_with_ids([
-        "Basketball Ex: Beat Mario Stadium (Normal)",
-        "Basketball Ex: Beat Koopa Troopa Beach (Normal)",
-        "Basketball Ex: Beat DK Dock (Normal)",
-        "Basketball Ex: Beat Luigi's Mansion (Normal)",
-        "Basketball Ex: Beat Western Junction (Normal)",
-        "Basketball Ex: Beat Daisy Garden (Normal)",
-        "Basketball Ex: Beat Bowser Jr. Blvd. (Normal)",
-        "Basketball Ex: Beat Bowser's Castle (Normal)",
-        "Basketball Ex: Beat Star Ship (Normal)",
-        "Basketball Ex: Beat Peach's Castle (Normal)",
-        "Basketball Ex: Beat Wario Factory (Normal)",
-        "Basketball Ex: Beat Ghoulish Galleon (Normal)"])
-        d_exhibition_locations_n = get_location_names_with_ids([
-        "Dodgeball Ex: Beat Mario Stadium (Normal)",
-        "Dodgeball Ex: Beat Koopa Troopa Beach (Normal)",
-        "Dodgeball Ex: Beat Peach's Castle (Normal)",
-        "Dodgeball Ex: Beat DK Dock (Normal)",
-        "Dodgeball Ex: Beat Toad Park (Normal)",
-        "Dodgeball Ex: Beat Daisy Garden (Normal)",
-        "Dodgeball Ex: Beat Wario Factory (Normal)",
-        "Dodgeball Ex: Beat Bowser's Castle (Normal)",
-        "Dodgeball Ex: Beat Star Ship (Normal)",
-        "Dodgeball Ex: Beat Western Junction (Normal)",
-        "Dodgeball Ex: Beat Waluigi Pinball (Normal)",
-        "Dodgeball Ex: Beat Ghoulish Galleon (Normal)"])
-        v_exhibition_locations_n = get_location_names_with_ids([
-        "Volleyball Ex: Beat Mario Stadium (Normal)",
-        "Volleyball Ex: Beat Koopa Troopa Beach (Normal)",
-        "Volleyball Ex: Beat Peach's Castle (Normal)",
-        "Volleyball Ex: Beat DK Dock (Normal)",
-        "Volleyball Ex: Beat Luigi's Mansion (Normal)",
-        "Volleyball Ex: Beat Western Junction (Normal)",
-        "Volleyball Ex: Beat Bowser Jr. Blvd. (Normal)",
-        "Volleyball Ex: Beat Bowser's Castle (Normal)",
-        "Volleyball Ex: Beat Star Ship (Normal)",
-        "Volleyball Ex: Beat Wario Factory (Normal)",
-        "Volleyball Ex: Beat Waluigi Pinball (Normal)",
-        "Volleyball Ex: Beat Ghoulish Galleon (Normal)"])
-        h_exhibition_locations_n = get_location_names_with_ids([
-        "Hockey Ex: Beat Mario Stadium (Normal)",
-        "Hockey Ex: Beat Toad Park (Normal)",
-        "Hockey Ex: Beat Peach's Castle (Normal)",
-        "Hockey Ex: Beat Western Junction (Normal)",
-        "Hockey Ex: Beat Wario Factory (Normal)",
-        "Hockey Ex: Beat Daisy Garden (Normal)",
-        "Hockey Ex: Beat Bowser Jr. Blvd. (Normal)",
-        "Hockey Ex: Beat Waluigi Pinball (Normal)",
-        "Hockey Ex: Beat Star Ship (Normal)",
-        "Hockey Ex: Beat Koopa Troopa Beach (Normal)",
-        "Hockey Ex: Beat Ghoulish Galleon (Normal)",
-        "Hockey Ex: Beat Bowser's Castle (Normal)"])
+    if world.options.include_exhibition:
+        for difficulty in world.options.exhibition_difficulties:
+            if difficulty not in ("Easy", "Normal", "Hard", "Expert"):
+                continue
 
-        b_exhibition.add_locations(b_exhibition_locations_n)
-        d_exhibition.add_locations(d_exhibition_locations_n)
-        v_exhibition.add_locations(v_exhibition_locations_n)
-        h_exhibition.add_locations(h_exhibition_locations_n)
+            for sport, courts in exhibition_courts.items():
+                if sport not in world.options.enabled_sports:
+                    continue
 
-    # Hard Difficulty
-    if "Hard" in world.options.exhibition_difficulty:
-        b_exhibition_locations_h = get_location_names_with_ids([
-        "Basketball Ex: Beat Mario Stadium (Hard)",
-        "Basketball Ex: Beat Koopa Troopa Beach (Hard)",
-        "Basketball Ex: Beat DK Dock (Hard)",
-        "Basketball Ex: Beat Luigi's Mansion (Hard)",
-        "Basketball Ex: Beat Western Junction (Hard)",
-        "Basketball Ex: Beat Daisy Garden (Hard)",
-        "Basketball Ex: Beat Bowser Jr. Blvd. (Hard)",
-        "Basketball Ex: Beat Bowser's Castle (Hard)",
-        "Basketball Ex: Beat Star Ship (Hard)",
-        "Basketball Ex: Beat Peach's Castle (Hard)",
-        "Basketball Ex: Beat Wario Factory (Hard)",
-        "Basketball Ex: Beat Ghoulish Galleon (Hard)"])
-        v_exhibition_locations_h = get_location_names_with_ids([
-        "Volleyball Ex: Beat Mario Stadium (Hard)",
-        "Volleyball Ex: Beat Koopa Troopa Beach (Hard)",
-        "Volleyball Ex: Beat Peach's Castle (Hard)",
-        "Volleyball Ex: Beat DK Dock (Hard)",
-        "Volleyball Ex: Beat Luigi's Mansion (Hard)",
-        "Volleyball Ex: Beat Western Junction (Hard)",
-        "Volleyball Ex: Beat Bowser Jr. Blvd. (Hard)",
-        "Volleyball Ex: Beat Bowser's Castle (Hard)",
-        "Volleyball Ex: Beat Star Ship (Hard)",
-        "Volleyball Ex: Beat Wario Factory (Hard)",
-        "Volleyball Ex: Beat Waluigi Pinball (Hard)",
-        "Volleyball Ex: Beat Ghoulish Galleon (Hard)"])
-        d_exhibition_locations_h = get_location_names_with_ids([
-        "Dodgeball Ex: Beat Mario Stadium (Hard)",
-        "Dodgeball Ex: Beat Koopa Troopa Beach (Hard)",
-        "Dodgeball Ex: Beat Peach's Castle (Hard)",
-        "Dodgeball Ex: Beat DK Dock (Hard)",
-        "Dodgeball Ex: Beat Toad Park (Hard)",
-        "Dodgeball Ex: Beat Daisy Garden (Hard)",
-        "Dodgeball Ex: Beat Wario Factory (Hard)",
-        "Dodgeball Ex: Beat Bowser's Castle (Hard)",
-        "Dodgeball Ex: Beat Star Ship (Hard)",
-        "Dodgeball Ex: Beat Western Junction (Hard)",
-        "Dodgeball Ex: Beat Waluigi Pinball (Hard)",
-        "Dodgeball Ex: Beat Ghoulish Galleon (Hard)"])
-        h_exhibition_locations_h = get_location_names_with_ids([
-        "Hockey Ex: Beat Mario Stadium (Hard)",
-        "Hockey Ex: Beat Toad Park (Hard)",
-        "Hockey Ex: Beat Peach's Castle (Hard)",
-        "Hockey Ex: Beat Western Junction (Hard)",
-        "Hockey Ex: Beat Wario Factory (Hard)",
-        "Hockey Ex: Beat Daisy Garden (Hard)",
-        "Hockey Ex: Beat Bowser Jr. Blvd. (Hard)",
-        "Hockey Ex: Beat Waluigi Pinball (Hard)",
-        "Hockey Ex: Beat Star Ship (Hard)",
-        "Hockey Ex: Beat Koopa Troopa Beach (Hard)",
-        "Hockey Ex: Beat Ghoulish Galleon (Hard)",
-        "Hockey Ex: Beat Bowser's Castle (Hard)"])
+                if world.options.exhibition_type == ExhibitionType.option_all_sports:
+                    locations = get_location_names_with_ids([
+                        f"{sport} Ex: Beat {court} ({difficulty})"
+                        for court in courts
+                    ])
 
-        b_exhibition.add_locations(b_exhibition_locations_h)
-        d_exhibition.add_locations(d_exhibition_locations_h)
-        v_exhibition.add_locations(v_exhibition_locations_h)
-        h_exhibition.add_locations(h_exhibition_locations_h)
+                else:
+                    locations = get_location_names_with_ids([
+                        f"Exhibition: Beat {court} ({difficulty})"
+                        for court in courts
+                    ])
 
-    # Expert Difficulty
-    if "Expert" in world.options.exhibition_difficulty:
-        b_exhibition_locations_ex = get_location_names_with_ids([
-        "Basketball Ex: Beat Mario Stadium (Expert)",
-        "Basketball Ex: Beat Koopa Troopa Beach (Expert)",
-        "Basketball Ex: Beat DK Dock (Expert)",
-        "Basketball Ex: Beat Luigi's Mansion (Expert)",
-        "Basketball Ex: Beat Western Junction (Expert)",
-        "Basketball Ex: Beat Daisy Garden (Expert)",
-        "Basketball Ex: Beat Bowser Jr. Blvd. (Expert)",
-        "Basketball Ex: Beat Bowser's Castle (Expert)",
-        "Basketball Ex: Beat Star Ship (Expert)",
-        "Basketball Ex: Beat Peach's Castle (Expert)",
-        "Basketball Ex: Beat Wario Factory (Expert)",
-        "Basketball Ex: Beat Ghoulish Galleon (Expert)"])
-        d_exhibition_locations_ex = get_location_names_with_ids([
-        "Dodgeball Ex: Beat Mario Stadium (Expert)",
-        "Dodgeball Ex: Beat Koopa Troopa Beach (Expert)",
-        "Dodgeball Ex: Beat Peach's Castle (Expert)",
-        "Dodgeball Ex: Beat DK Dock (Expert)",
-        "Dodgeball Ex: Beat Toad Park (Expert)",
-        "Dodgeball Ex: Beat Daisy Garden (Expert)",
-        "Dodgeball Ex: Beat Wario Factory (Expert)",
-        "Dodgeball Ex: Beat Bowser's Castle (Expert)",
-        "Dodgeball Ex: Beat Star Ship (Expert)",
-        "Dodgeball Ex: Beat Western Junction (Expert)",
-        "Dodgeball Ex: Beat Waluigi Pinball (Expert)",
-        "Dodgeball Ex: Beat Ghoulish Galleon (Expert)"])
-        v_exhibition_locations_ex = get_location_names_with_ids([
-        "Volleyball Ex: Beat Mario Stadium (Expert)",
-        "Volleyball Ex: Beat Koopa Troopa Beach (Expert)",
-        "Volleyball Ex: Beat Peach's Castle (Expert)",
-        "Volleyball Ex: Beat DK Dock (Expert)",
-        "Volleyball Ex: Beat Luigi's Mansion (Expert)",
-        "Volleyball Ex: Beat Western Junction (Expert)",
-        "Volleyball Ex: Beat Bowser Jr. Blvd. (Expert)",
-        "Volleyball Ex: Beat Bowser's Castle (Expert)",
-        "Volleyball Ex: Beat Star Ship (Expert)",
-        "Volleyball Ex: Beat Wario Factory (Expert)",
-        "Volleyball Ex: Beat Waluigi Pinball (Expert)",
-        "Volleyball Ex: Beat Ghoulish Galleon (Expert)"])
-        h_exhibition_locations_ex = get_location_names_with_ids([
-        "Hockey Ex: Beat Mario Stadium (Expert)",
-        "Hockey Ex: Beat Toad Park (Expert)",
-        "Hockey Ex: Beat Peach's Castle (Expert)",
-        "Hockey Ex: Beat Western Junction (Expert)",
-        "Hockey Ex: Beat Wario Factory (Expert)",
-        "Hockey Ex: Beat Daisy Garden (Expert)",
-        "Hockey Ex: Beat Bowser Jr. Blvd. (Expert)",
-        "Hockey Ex: Beat Waluigi Pinball (Expert)",
-        "Hockey Ex: Beat Star Ship (Expert)",
-        "Hockey Ex: Beat Koopa Troopa Beach (Expert)",
-        "Hockey Ex: Beat Ghoulish Galleon (Expert)",
-        "Hockey Ex: Beat Bowser's Castle (Expert)"])
+                regions[sport].add_locations(locations)
 
-        b_exhibition.add_locations(b_exhibition_locations_ex)
-        d_exhibition.add_locations(d_exhibition_locations_ex)
-        v_exhibition.add_locations(v_exhibition_locations_ex)
-        h_exhibition.add_locations(h_exhibition_locations_ex)
+    # === Party Mode Locations ===
+
+    party_mode_to_locations = {
+        "Feed Petey": feed_petey_locations,
+        "Harmony Hustle": harmony_hustle_locations,
+        "Bob-omb Dodge": bob_omb_dodge_locations,
+        "Smash Skate": smash_skate_locations,
+    }
+
+    party_mode_to_region = {
+        "Feed Petey": feed_petey,
+        "Harmony Hustle": harmony_hustle,
+        "Bob-omb Dodge": bob_omb_dodge,
+        "Smash Skate": smash_skate,
+    }
+
+    if world.options.party_mode:
+        for mode in world.options.party_mode:
+            locations = party_mode_to_locations[mode]
+            region = party_mode_to_region[mode]
+
+            for location in locations:
+                region.add_locations(get_location_names_with_ids([location]))
+
+    # === Sanity Locations ===
 
     # Character Sanity Locations
     if world.options.character_sanity in (CharacterSanity.option_characters, CharacterSanity.option_characters_and_costumes):
-        character_locations = get_location_names_with_ids(["Win as Mario", "Win as Luigi", "Win as Peach",
-        "Win as Daisy", "Win as Yoshi", "Win as Wario", "Win as Waluigi", "Win as Donkey Kong",
-        "Win as Diddy Kong", "Win as Toad", "Win as Bowser", "Win as Bowser Jr", "Win as Moogle",
-        "Win as Cactuar", "Win as Ninja", "Win as White Mage", "Win as Slime", "Win as Black Mage",
-        "Win as Mii (Male)", "Win as Mii (Female)"])
+        character_locations = get_location_names_with_ids([location for location in character_sanity_locations])
         main_menu.add_locations(character_locations)
 
     if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
-        costume_locations = get_location_names_with_ids(["Win as Pink Yoshi", "Win as Light Blue Yoshi",
-        "Win as Yellow Yoshi", "Win as Blue Toad", "Win as Green Toad", "Win as Yellow Toad", "Win as She-Slime",
-        "Win as Metal Slime", "Win as Tennis-wear Peach", "Win as Tennis-wear Daisy", "Win as Shadow White Ninja",
-        "Win as Pure White - White Mage", "Win as Magic Red Black Mage"])
+        costume_locations = get_location_names_with_ids([location for location in costume_char_sanity_locations])
         main_menu.add_locations(costume_locations)
 
+    # Court Sanity Locations
+    # Can this be simplified? Probably. Will I? No. THIS TOOK SO LONG TO MAKE
+    if world.options.court_sanity:
+        locations = {}
+
+        main_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
+                       "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                       "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction"]
+
+        smash_skate_courts = ["Sherbet Sea", "Fire Mountain", "Rowdy Raft"]
+
+        harmony_courts = ["Peach's Castle", "DK Dock", "Bowser Jr. Blvd."]
+
+        basket_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Daisy Garden",
+                         "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
+                         "Wario Factory", "Star Ship", "Western Junction"]
+
+        dodge_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Toad Park", "Daisy Garden",
+                        "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
+                        "Wario Factory", "Star Ship", "Western Junction"]
+
+        volley_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Toad Park", "Peach's Castle",
+                         "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
+                         "Waluigi Pinball", "Star Ship", "Western Junction"]
+
+        hockey_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "Daisy Garden",
+                         "Waluigi Pinball", "Luigi's Mansion", "Wario Factory", "Star Ship", "Ghoulish Galleon",
+                         "Bowser's Castle", "Western Junction"]
+
+        mode_to_court = {
+            "Basketball": basket_courts,
+            "Dodgeball": dodge_courts,
+            "Volleyball": volley_courts,
+            "Hockey": hockey_courts,
+            "Harmony Hustle": harmony_courts,
+            "Smash Skate": smash_skate_courts,
+        }
+
+        if world.options.include_tournaments or world.options.include_exhibition:
+
+            if world.options.enabled_sports:
+                for sport in world.options.enabled_sports:
+                    if sport != "Sports Mix":
+                        # Get the viable courts_dict for the sport
+                        court_list = mode_to_court[sport]
+
+                        for name in main_courts:
+                            # Make sure that court exists for the sport
+                            if name in court_list:
+                                location = get_location_names_with_ids([f"Win on {name}"])
+                                if f"Win on {name}" not in locations:
+                                    locations.update(location)
+
+        if world.options.party_mode:
+            for mode in world.options.party_mode:
+                if mode in mode_to_court:
+                    court_list = mode_to_court[mode]
+
+                    for name in court_list:
+                        location = get_location_names_with_ids([f"Win on {name}"])
+                        if f"Win on {name}" not in locations:
+                            locations.update(location)
+
+        main_menu.add_locations(locations)
+
+    # Special Sanity
+    if world.options.special_sanity:
+        special_locations = get_location_names_with_ids([location for location in special_sanity_locations])
+        main_menu.add_locations(special_locations)
 
 def create_events(world: "MSMWorld") -> None:
+    behemoth_boss = world.get_region("Behemoth Boss Battle")
+    behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
+    main_menu = world.get_region("Main Menu")
+
     if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
-        behemoth_boss = world.get_region("Behemoth Boss Battle")
-        behemoth_boss.add_event(
-            "Defeat Behemoth!", "Victory!", location_type=MSMLocation, item_type=items.MSMItem
-        )
-        if world.options.be_mean == BeMean.option_defeat_behemoth_king:
+        behemoth_boss.add_event("Defeat Behemoth!", "Victory!", location_type=MSMLocation,
+                                 item_type=items.MSMItem)
+
+        if world.options.boss_locations == BossLocations.option_defeat_behemoth_king:
             behemoth_king_location = get_location_names_with_ids(["Defeat Behemoth King!"])
-            behemoth_boss = world.get_region("Behemoth King Boss Battle")
             behemoth_boss.add_locations(behemoth_king_location, MSMLocation)
 
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
-        behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
-        behemoth_king_boss.add_event(
-            "Defeat Behemoth King!", "Victory!", location_type=MSMLocation,
-            item_type=items.MSMItem)
-        if world.options.be_mean == BeMean.option_defeat_behemoth:
+    elif world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+        behemoth_king_boss.add_event("Defeat Behemoth King!", "Victory!", location_type=MSMLocation,
+                                     item_type=items.MSMItem)
+
+        if world.options.boss_locations == BossLocations.option_defeat_behemoth:
             behemoth_location = get_location_names_with_ids(["Defeat Behemoth!"])
-            behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_location, MSMLocation)
 
-    if world.options.goal_condition == GoalCondition.option_win_cups:
+    elif world.options.goal_condition == GoalCondition.option_win_cups:
         win_cup_value = world.options.win_cups_amount.value
         menu = world.get_region("Main Menu")
         menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
                        item_type=items.MSMItem)
 
-        if world.options.be_mean in (BeMean.option_defeat_behemoth, BeMean.option_both):
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
-            behemoth_boss = world.get_region("Behemoth Boss Battle")
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
 
-        if world.options.be_mean in (BeMean.option_defeat_behemoth_king, BeMean.option_both):
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
-            behemoth_king = world.get_region("Behemoth King Boss Battle")
-            behemoth_king.add_locations(behemoth_king_locations, MSMLocation)
+            behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
+
+    elif world.options.goal_condition == GoalCondition.option_exhibition_tour:
+        amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
+
+        main_menu.add_event(f"Win {amount} Exhibition Matches!", "Victory!", location_type=MSMLocation,
+                            item_type=items.MSMItem)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+            behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
+
+    elif world.options.goal_condition == GoalCondition.option_party_palooza:
+        main_menu.add_event(f"Win Party Mode!", "Victory!", location_type=MSMLocation,
+                            item_type=items.MSMItem)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+            behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
+            behemoth_boss.add_locations(behemoth_locations, MSMLocation)
+
+        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+            behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
+            behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)

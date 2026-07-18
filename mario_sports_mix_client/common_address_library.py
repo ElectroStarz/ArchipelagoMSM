@@ -8,8 +8,12 @@ from .MSMFunctions import get_address
 class AddressLib:
 
     @cached_property
-    def current_stage_addr(self):
-        return get_address(MatchAddresses.current_stage)
+    def vbp_addr(self):
+        return get_address(PlayerAddresses.various_ball_pointers)
+
+    @cached_property
+    def current_court_addr(self):
+        return get_address(MatchAddresses.current_court)
 
     @cached_property
     def current_module_addr(self):
@@ -36,7 +40,7 @@ class AddressLib:
         return get_address(MatchAddresses.max_time)
 
     @cached_property
-    def current_period(self):
+    def current_period_addr(self):
         return get_address(MatchAddresses.current_period)
 
     @cached_property
@@ -50,10 +54,6 @@ class AddressLib:
     @cached_property
     def behemoth_hp_addr(self):
         return get_address(BossAddresses.behemoth_hp)
-
-    @cached_property
-    def volley_last_held_addr(self):
-        return get_address(PlayerAddresses.various_ball_pointers)
 
     @cached_property
     def basket_time_addr(self):
@@ -92,6 +92,10 @@ class AddressLib:
         return get_address(PlayerAddresses.Score.coins)
 
     @cached_property
+    def o_item_held_addr(self):
+        return get_address(OpponentAddresses.item_held)
+
+    @cached_property
     def o_coins_addr(self):
         return get_address(OpponentAddresses.Score.coins)
 
@@ -101,12 +105,12 @@ class AddressLib:
 
     address_properties = [
         "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",
-        "paused_addr", "timer_addr", "current_period", "cutscene_active_addr",
+        "paused_addr", "timer_addr", "current_period_addr", "cutscene_active_addr",
         "loading_screen_addr", "behemoth_hp_addr", "volley_last_held_addr",
         "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
         "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
         "p_pos_addr", "p_item_held_addr", "p_coins_addr",
-        "o_coins_addr", "p_special_meter_addr"
+        "o_coins_addr", "o_item_held_addr", "p_special_meter_addr"
     ]
 
     def reset_all_addresses(self, logger):

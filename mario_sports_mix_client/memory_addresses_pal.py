@@ -2,11 +2,12 @@ class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
-    current_stage = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
+    current_court = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
     current_period = 0x804D77CC # Byte | Starts at 0 | In CAL
     max_periods = 0x804D77CB # Byte | Uses normal 1, 2, 3, 4 & 5
     current_module = 0x804D1154 # Word | Has Pointers | In CAL
     special_active = 0x804D0F98 # Word | Has Pointers
+    using_special = 0x805C0CC8  # Word
     tournament_diff = 0x804D5FB8 # Byte | Mushroom Cup uses one less (0 for Normal, 1 for Hard) | In CAL
     exhibition_diff = 0x804D77D3 # Byte | In CAL
     ex_diff_on_menu = 0x902319E3  # Byte | UNRELIABLE
@@ -23,8 +24,44 @@ class MatchAddresses:
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL
 
+
+class PartyMode:
+    difficulty = 0x804D7978 # Word | Also used for HH stage
+
+    class FeedPetey:
+        difficulty = 0x804D99DC # Word
+
+        class Tabs:
+            tabs = 0x90226D74 # Byte
+            apple_tab = 0x90226D75 # Byte
+            watermelon_tab = 0x90226D76 # Byte
+
+    class HarmonyHustle:
+        stage = 0x804D7978 # Word | Used for PM difficulty
+        started = 0x80925F48
+        class Tabs:
+            tabs = 0x90226D68 # Byte
+            one_note_tab = 0x90226D69 # Byte
+            two_note_tab = 0x90226D6A # Byte
+            three_note_tab = 0x90226D6B # Byte
+
+    class BobOmbDodge:
+        difficulty = 0x804D99FC # Word
+        class Tabs:
+            tabs = 0x90226D8C # Byte
+            bob_omb_tab = 0x90226D8D # Byte
+            cannon_tab = 0x90226D8E # Byte
+
+    class SmashSkate:
+        difficulty = 0x804D9A0C # Word
+        class Tabs:
+            tabs = 0x90226D80 # Byte
+            hockey_stick_tab = 0x90226D81 # Byte
+            skate_tab = 0x90226D82 # Byte
+
 class CupsWonMultiple:
     # All are halfwords (2 bytes)
+    # These do like nothing, they're just the record book stuff
     class Basketball:
         mushroom_cup = 0x902299B0
         flower_cup = 0x902299B2
@@ -42,6 +79,15 @@ class CupsWonMultiple:
         flower_cup = 0x90229A7E
         star_cup = 0x90229A80
 
+class WonStarCups:
+    # All are byte
+    # 0 = None, 1 = Beat Normal, 2 = Beat Hard
+    # These are apparently tied to Behemoth unlocking
+    basketball = 0x90227525
+    volleyball = 0x90227D25
+    dodgeball = 0x90228525
+    hockey = 0x90228D25
+
 class GamesPlayed:
     basketball = 0x902299AC # Word
     dodgeball = 0x90229A34 # Word
@@ -51,7 +97,7 @@ class GamesPlayed:
 class PlayerAddresses:
     item_held = 0x804D789C  # Word | In CAL
     various_ball_pointers = 0x804D0F98 # Word | Has Pointers | In CAL
-    human_players = 0x804d8e14 # Byte | Is 0 in demo
+    human_players = 0x804D8E14 # Byte | Is 0 in demo
 
     special_meter = 0x804D0F8C # Float | Has Pointers | In CAL
 
@@ -256,6 +302,7 @@ class BossAddresses:
 class NTSCUAddresses:
     pass # Remove pass once an address has been added
 
+
 # Pointers are usually the same for PAL & NTSC-U
 class Pointers:
     class Match:
@@ -330,6 +377,7 @@ class Pointers:
     class Boss:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
         max_hp_offsets = [0x20, 0x34, 0x1F4]
+
 
 class GeckoCodes:
     gecko_codes_pal = {

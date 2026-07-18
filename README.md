@@ -9,6 +9,8 @@
 ### [Document d'information](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/fr_Mario%20Sports%20Mix.md)
 ### [Guide de setup](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/setup_fr.md)
 ### [Avertissements](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/bugs_fr.md)
+# Contributing
+[English](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/Contributing.md)
 ## Credits
 - Yoshmin, s0uth & Elty (Finding memory addresses)
 - Saulf (Creating Gecko Codes for AP)
