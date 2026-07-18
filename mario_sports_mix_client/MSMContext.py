@@ -16,7 +16,7 @@ try:
 except ModuleNotFoundError:
     from CommonClient import CommonContext as SuperContext, ClientCommandProcessor as SuperCommandProcessor
 
-from MSMUtils import find_num_exhibition_locs
+from .. import MSMUtils
 from MultiServer import mark_raw
 from NetUtils import ClientStatus, JSONMessagePart
 from .MSMInterface import MSMInterface, ConnectionState
@@ -30,20 +30,9 @@ from .common_address_library import AddressLib
 logger = logging.getLogger("Client")
 
 
-if not Utils.is_linux:
-    try:
-        import keyboard
-    except ImportError as ie:
-        keyboard = None
-        logger.error(f"Failed to import Keyboard library:\n{ie}")
-else:
-    keyboard = None
-    logger.info("Not importing keyboard, instead using xdotool.")
-
-
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.0.0"
-COMPATIBLE_VERSIONS = []
+CLIENT_VERSION = "2.0.1"
+COMPATIBLE_VERSIONS = ["2.0.0"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -2978,7 +2967,7 @@ class MSMContext(SuperContext):
 
     @property
     def num_ex_locations(self):
-        return find_num_exhibition_locs(
+        return MSMUtils.find_num_exhibition_locs(
             self.enabled_sports or (),
             self.exhibition_difficulties or (),
         )
