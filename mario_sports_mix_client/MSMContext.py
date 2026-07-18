@@ -306,11 +306,10 @@ class MSMCommandProcessor(SuperCommandProcessor):
 
         type_to_cmd = {
             "modes": self.unlocked_modes,
-            "courts_dict": self.unlocked_courts,
+            "courts": self.unlocked_courts,
             "cups": self.unlocked_cups,
             "exhibition": self.unlocked_ex,
             "ex": self.unlocked_ex,
-            "courts": self.unlocked_courts,
             "characters": self.unlocked_characters,
             "chars": self.unlocked_characters,
             "char": self.unlocked_characters,
@@ -386,7 +385,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
             logger.info("No unlocked cups")
 
     def unlocked_courts(self):
-        """Display what courts_dict you have unlocked."""
+        """Display what courts you have unlocked."""
         unlocked_courts = self.ctx.unlocked_courts
         final_items = []
         if unlocked_courts:
@@ -394,7 +393,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
                 final_items.append(item)
             logger.info(f"Unlocked Courts: {final_items}")
         else:
-            logger.info("No unlocked courts_dict")
+            logger.info("No unlocked courts")
 
     def unlocked_abilities(self):
         """Display what abilities you have unlocked."""
@@ -1578,22 +1577,22 @@ class MSMContext(SuperContext):
             value = 0
 
             # First Court
-            # If the first court is in unlocked courts_dict, add 1
+            # If the first court is in unlocked courts, add 1
             if court[1] in self.unlocked_courts:
                 value += 1
 
             # Second Court
-            # If the second court is in unlocked courts_dict, add 2
+            # If the second court is in unlocked courts, add 2
             if court[2] in self.unlocked_courts:
                 value += 2
 
             # Third Court
-            # If the third court is in unlocked courts_dict, add 4
+            # If the third court is in unlocked courts, add 4
             if court[3] in self.unlocked_courts:
                 value += 4
 
-            # If no courts_dict are unlocked (value is 0) or the sport isn't unlocked, set final_value to 8 which locks
-            # all courts_dict, otherwise set final value to value
+            # If no courts are unlocked (value is 0) or the sport isn't unlocked, set final_value to 8 which locks
+            # all courts, otherwise set final value to value
             if value == 0 or not self.has_unlocked_mode(court[0]):
                 final_value = 8
             else:
@@ -1605,7 +1604,7 @@ class MSMContext(SuperContext):
 
     async def handle_progressive_court_unlocks(self):
 
-        # The order the courts_dict will unlock, from first to last
+        # The order the courts will unlock, from first to last
         court_unlock_order = [
             "Mario Stadium",
             "Koopa Troopa Beach",
