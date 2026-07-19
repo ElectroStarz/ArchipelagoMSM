@@ -182,23 +182,24 @@ def sports_mix_court_rule(round_num: int):
     else:
         return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
 
-def get_all_cup_locations(hard_mode_enabled):
+def get_all_cup_locations(world):
     locations = []
 
-    # Normal Difficulty
-    for sport in main_sports:
-        for cup in cups:
-            locations.append(f"{sport}: Beat Normal {cup} Cup Round 3")
+    diffs = ["Normal"]
+    if world.options.hard_tournament_difficulty.value:
+        diffs.append("Hard")
 
-    # Hard Difficulty (if enabled)
-    if hard_mode_enabled:
-        for sport in main_sports:
-            for cup in cups:
-                locations.append(f"{sport}: Beat Hard {cup} Cup Round 3")
+    # Normal Difficulty
+    for sport in world.options.enabled_sports.value:
+        if sport != "Sports Mix":
+            for diff in diffs:
+                for cup in cups:
+                    locations.append(f"{sport}: Beat {diff} {cup} Cup Round 3")
 
     # Sports Mix
-    for cup in cups:
-        locations.append(f"Sports Mix: Beat {cup} Cup Round 3")
+    if "Sports Mix" in world.options.enabled_sports.value:
+        for cup in cups:
+            locations.append(f"Sports Mix: Beat {cup} Cup Round 3")
 
     return locations
 
@@ -305,7 +306,7 @@ class CanCupGoal(Rule["MSMWorld"], game="Mario Sports Mix"):
 
     @override
     def _instantiate(self, world: "MSMWorld") -> Rule.Resolved:
-        valid_cup_locations = get_all_cup_locations(world.options.hard_tournament_difficulty.value)
+        valid_cup_locations = get_all_cup_locations(world)
 
         # Convert the location strings into actual Rule objects
         location_rules = [CanReachLocation(loc) for loc in valid_cup_locations]

@@ -13,6 +13,7 @@ def create_and_connect_regions(world: "MSMWorld") -> None:
 
 def create_all_regions(world: "MSMWorld") -> None:
     main_menu = Region("Main Menu", world.player, world.multiworld)
+    exhibition = Region("Exhibition", world.player, world.multiworld)
     # Basketball
     basketball = Region("Basketball", world.player, world.multiworld)
     b_exhibition = Region("Basketball: Exhibition", world.player, world.multiworld)
@@ -31,7 +32,7 @@ def create_all_regions(world: "MSMWorld") -> None:
     sm_flower_cup = Region("Sports Mix: Flower Cup", world.player, world.multiworld)
     sm_star_cup = Region("Sports Mix: Star Cup", world.player, world.multiworld)
 
-    regions = [main_menu, basketball, b_exhibition, dodgeball, d_exhibition,
+    regions = [main_menu, exhibition, basketball, b_exhibition, dodgeball, d_exhibition,
                volleyball, v_exhibition, hockey, h_exhibition,
                sports_mix, sm_mushroom_cup, sm_flower_cup, sm_star_cup]
 
@@ -125,6 +126,7 @@ def create_all_regions(world: "MSMWorld") -> None:
 def connect_regions(world: MSMWorld) -> None:
     # Get all regions
     main_menu = world.get_region("Main Menu")
+    exhibition = world.get_region("Exhibition")
 
     # Basketball
     basketball = world.get_region("Basketball")
@@ -194,6 +196,7 @@ def connect_regions(world: MSMWorld) -> None:
     main_menu.connect(bob_omb_dodge, "Main Menu -> Bob-omb Dodge")
     main_menu.connect(smash_skate, "Main Menu -> Smash Skate")
 
+    main_menu.connect(exhibition, "Main Menu -> Exhibition")
 
     # Connect Basketball to everything
     basketball.connect(b_exhibition, "Basketball -> Exhibition")

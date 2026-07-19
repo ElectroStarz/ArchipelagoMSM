@@ -27,7 +27,7 @@ courts_by_sport = {
     ]
 }
 
-courts_list = ["Mario Stadium", "Koopa Troopa Beach", "Toad Park", "DK Dock", "Peach's Castle","Daisy Garden",
+courts_list = ["Mario Stadium", "Koopa Troopa Beach", "Toad Park", "DK Dock", "Peach's Castle", "Daisy Garden",
                "Luigi's Mansion", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle", "Waluigi Pinball",
                "Western Junction", "Ghoulish Galleon", "Star Ship"]
 

@@ -460,7 +460,7 @@ global_exhibition_locations: Dict[str, LocData] = {
     "Exhibition: Beat Peach's Castle (Normal)":        LocData(base_id + 616, LocGroup.EXHIBITION_NORMAL),
     "Exhibition: Beat DK Dock (Normal)":               LocData(base_id + 617, LocGroup.EXHIBITION_NORMAL),
     "Exhibition: Beat Toad Park (Normal)":             LocData(base_id + 618, LocGroup.EXHIBITION_NORMAL),
-    "Exhibition: Beat Luigi's Mansion (Normal)":       LocData(base_id + 620, LocGroup.EXHIBITION_NORMAL),
+    "Exhibition: Beat Luigi's Mansion (Normal)":       LocData(base_id + 619, LocGroup.EXHIBITION_NORMAL),
     "Exhibition: Beat Western Junction (Normal)":      LocData(base_id + 620, LocGroup.EXHIBITION_NORMAL),
     "Exhibition: Beat Daisy Garden (Normal)":          LocData(base_id + 621, LocGroup.EXHIBITION_NORMAL),
     "Exhibition: Beat Wario Factory (Normal)":         LocData(base_id + 622, LocGroup.EXHIBITION_NORMAL),
@@ -886,27 +886,29 @@ def create_regular_locations(world: MSMWorld) -> None:
     }
 
     if world.options.include_exhibition:
-        for difficulty in world.options.exhibition_difficulties:
-            if difficulty not in ("Easy", "Normal", "Hard", "Expert"):
-                continue
+        for difficulty in world.options.exhibition_difficulties.value:
 
-            for sport, courts in exhibition_courts.items():
-                if sport not in world.options.enabled_sports:
-                    continue
+            if world.options.exhibition_type == ExhibitionType.option_all_sports:
+                # Each sport has its own distinct set of "{sport} Ex: ..." locations,
+                # so these must be created and added once per enabled sport.
+                for sport, courts in exhibition_courts.items():
+                    if sport not in world.options.enabled_sports.value:
+                        continue
 
-                if world.options.exhibition_type == ExhibitionType.option_all_sports:
                     locations = get_location_names_with_ids([
                         f"{sport} Ex: Beat {court} ({difficulty})"
                         for court in courts
                     ])
 
-                else:
-                    locations = get_location_names_with_ids([
-                        f"Exhibition: Beat {court} ({difficulty})"
-                        for court in courts
-                    ])
+                    regions[sport].add_locations(locations)
 
-                regions[sport].add_locations(locations)
+            else:
+                locations = get_location_names_with_ids([
+                    f"Exhibition: Beat {court} ({difficulty})"
+                    for court in courts_list
+                ])
+
+                world.get_region("Exhibition").add_locations(locations)
 
     # === Party Mode Locations ===
 
