@@ -6,7 +6,7 @@ import asyncio
 
 GAME_VERSION = None
 
-# Process names used by the common Dolphin builds and forks.  Store names
+# Process names used by the common Dolphin builds and forks. Store names
 # without the optional Windows .exe suffix so one list works on every OS.
 STANDARD_DOLPHIN_PROCESS_NAMES = frozenset({
     "dolphin",
@@ -151,6 +151,7 @@ class DolphinClient:
             self.dme.un_hook()
         GAME_VERSION = None
         self.told_region = False
+        self.told_fork_warning = False
 
     def read_byte(self, address: Any) -> Any:
         self._assert_hooked()
