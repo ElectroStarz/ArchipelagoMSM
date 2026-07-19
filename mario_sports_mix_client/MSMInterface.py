@@ -296,7 +296,7 @@ class MSMInterface:
             return None
 
     def get_tab(self):
-        diff = self.dolphin_client.read_byte(PartyMode.difficulty)
+        diff = self.dolphin_client.read_word(PartyMode.difficulty)
             
         if self.is_in_feed_petey():
             return {0: "Apple", 1: "Watermelon"}.get(diff)

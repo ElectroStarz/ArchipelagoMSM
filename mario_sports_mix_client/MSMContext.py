@@ -31,8 +31,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.0.3"
-COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2"]
+CLIENT_VERSION = "2.0.4"
+COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -3356,9 +3356,7 @@ class MSMContext(SuperContext):
                 await asyncio.sleep(3)
 
     async def stop_stupid_unlock_notifs(self):
-        """Stop SOME of the unlock messages from appearing constantly
-        This doesn't block cups won because the game MAY need that for Behemoth tracking idk
-        """
+        """Stop SOME of the unlock messages from appearing constantly"""
         games_played_address_list = [GamesPlayed.basketball, GamesPlayed.dodgeball,
                                      GamesPlayed.volleyball, GamesPlayed.hockey]
 
