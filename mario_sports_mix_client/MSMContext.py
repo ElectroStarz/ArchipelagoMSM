@@ -36,6 +36,7 @@ COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
+# Messages that get displayed when the user does /status
 status_messages = {
     ConnectionState.IN_MATCH: "In Match",
     ConnectionState.IN_BOSS: "In Boss",
@@ -71,6 +72,7 @@ character_names = [
     "moogle", "white_mage", "black_mage", "ninja", "cactuar", "slime"
 ]
 
+# Court IDs in the order they appear in the cups
 tournament_round_stages = {
     "Basketball": {
         "Mushroom Cup": ["s01", "s02", "s05"],
@@ -109,6 +111,7 @@ id_to_char = {
     19: "Mii (Male)", 20: "Mii (Female)",
 }
 
+# Costumes linked to their ID with the character
 costume_database = {
     "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
     "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
@@ -685,12 +688,19 @@ class MSMContext(SuperContext):
                 logger.info(message)
             self._rate_log_states[key] = now
 
-    @staticmethod
-    async def delay_log(message: str, delay: int):
-        logger.info(message)
+    async def delay_log(self, message: str, delay: int, debug: bool = False):
+        """Waits the delay time before logging the message"""
+
+        if debug:
+            self.debug_log(message)
+        else:
+            logger.info(message)
+
         await asyncio.sleep(delay)
 
     def log_colour(self, text: str, colour: str):
+        """Logs the messsage in full colour"""
+
         if self.ui is not None:
             message: JSONMessagePart = {"type": "color", "text": text, "color": colour}
             self.ui.print_json([message])
@@ -701,6 +711,8 @@ class MSMContext(SuperContext):
 
     @property
     def consumable_storage_key(self) -> Optional[str]:
+        """Returns a key which is linked to the game and the slot name"""
+
         if self.seed is None or self.slot is None:
             return None
         return f"{CONSUMABLE_STORAGE_CATEGORY}_{self.slot}"
@@ -755,6 +767,9 @@ class MSMContext(SuperContext):
             self._consumables_load_event.set()
 
     async def _handle_received_items_consumables(self, args: dict) -> None:
+        """Gets called when the client receives a ReceivedItems package, handles both consumables and
+        regular items"""
+
         # Wait for storage before queuing — otherwise reconnects re-fire already-handled items.
         await self.load_handled_consumables()
 
@@ -805,6 +820,8 @@ class MSMContext(SuperContext):
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
+        """Handles the different packets sent by the Archipelago server"""
+
         super().on_package(cmd, args)
 
         if cmd == "Connected":
@@ -928,6 +945,8 @@ class MSMContext(SuperContext):
         return ui
 
     async def disconnect(self, allow_autoreconnect: bool = False):
+        """Handles the user pressing the disconnect button."""
+
         self.game_interface.dolphin_client.disconnect()
         self.reset_game_session_state(game_active= True if dc.GAME_VERSION is not None else False)
         await super().disconnect(allow_autoreconnect)
@@ -959,6 +978,8 @@ class MSMContext(SuperContext):
         self.active_game_version = dc.GAME_VERSION if game_active else None
 
     def reset_local_item_state(self, clear_received: bool = False, clear_consumed: bool = False) -> None:
+        """Resets the item state whenever the user connects to a new slot"""
+
         if clear_received:
             self.items_received.clear()
         self.items_handled.clear()
@@ -981,6 +1002,8 @@ class MSMContext(SuperContext):
             self._consumables_load_event.clear()
 
     async def mark_consumable_handled(self, item_index: Optional[int]) -> None:
+        """Mark a consumable (1 time or trap) item as handled so the client doesn't use it again"""
+
         if item_index is None:
             return
 
@@ -991,6 +1014,8 @@ class MSMContext(SuperContext):
         self.debug_log(f"Saved handled consumable index {item_index}")
 
     async def save_handled_consumables(self) -> None:
+        """Saves the handled consumables to the AP Data Storage to retrieve upon future connection"""
+
         key = self.consumable_storage_key
         if key is None:
             return
@@ -1012,26 +1037,16 @@ class MSMContext(SuperContext):
         self.last_tournament_location_name = None
 
     def current_item_func(self):
+        """Returns the ID of the item
+        0: Green Shell, 1: Red Shell, 2: Mini Mushroom, 3: Bob-omb, 4: Super Star,
+        5: Banana"""
+
         current_item = self.game_interface.dolphin_client.read_word(self.addresslib.p_item_held_addr)
 
         if current_item == self.minus_one:
-            result = -1 #"No Item"
-        elif current_item == 0:
-            result = 0 #"Green Shell"
-        elif current_item == 1:
-            result = 1 #"Red Shell"
-        elif current_item == 2:
-            result = 2 #"Mini Mushroom"
-        elif current_item == 3:
-            result = 3 #"Bob-omb"
-        elif current_item == 4:
-            result = 4 #"Super Star"
-        elif current_item == 5:
-            result = 5 #"Banana"
+            return -1 #"No Item"
         else:
-            result = -1 #"No Item"
-
-        return result
+            return current_item
 
     def ready_to_handle(self):
         """Return whether it is safe to apply received effects to the current game.
@@ -1061,9 +1076,8 @@ class MSMContext(SuperContext):
             if match_status != 0 or match_started != 1:
                 return False
             if mode == "Harmony Hustle":
-                hh_started = self.game_interface.dolphin_client.read_byte(
-                    get_address(PartyMode.HarmonyHustle.started)
-                )
+                # Harmony Hustle is stupid and therefore has its own start address
+                hh_started = self.game_interface.dolphin_client.read_byte(get_address(PartyMode.HarmonyHustle.started))
                 return hh_started == 1
             return True
 
@@ -1117,6 +1131,8 @@ class MSMContext(SuperContext):
 
 
     async def handle_received_items(self):
+        """Handles the received non-consumable items"""
+
         sport_tuple = ("Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix")
         party_tuple = ("Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate")
 
@@ -1219,6 +1235,9 @@ class MSMContext(SuperContext):
         # every connection state, if you were to receive a trap or filler in the menu it wouldn't work.
 
     def has_unlocked_mode(self, mode: str):
+        """Used to lock courts & cups when the user doesn't have the mode
+        Sports Mix always returns True as that is unlocked by items anyway, not by default"""
+
         if mode == "SM":
             return True
 
@@ -1232,6 +1251,8 @@ class MSMContext(SuperContext):
 
 
     async def handle_all_characters(self):
+        """Handles the unlocking of characters using functions for characters with costume"""
+
         for char in character_names:
             # Format character name for value
             item_name = f"{char.replace('_', ' ').title()}"
@@ -1361,6 +1382,8 @@ class MSMContext(SuperContext):
 
 
     async def handle_cup_unlocks(self):
+        """Handles the unlocking of cups"""
+
         # Basketball
         b_normal = BasketballAddresses.Tournament.normal_cups
         b_hard = BasketballAddresses.Tournament.hard_cups
@@ -1403,6 +1426,7 @@ class MSMContext(SuperContext):
 
         for address, cup in cup_mapping.items():
             value = 0
+            # Grabs the first letter of the first cup in order to pass it to has_unlocked_mode
             sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey", "S": "SM"}[cup[0][:1]]
 
             # Mushroom Cup
@@ -1432,6 +1456,9 @@ class MSMContext(SuperContext):
             await self.check_write(new_addr, "byte", final_value)
 
     async def handle_progressive_cup_unlocks(self):
+        """Handles the order and unlocking of the Progressive Cup item
+        The order changes dynamically in accordance to the user's options"""
+
         # Base Normal progression configuration (Tiers 1-3)
         cup_unlock_order = [
             {"type": "sport", "suffix": "Mushroom Cup (Normal)"},
@@ -1498,6 +1525,8 @@ class MSMContext(SuperContext):
 
 
     async def handle_sports_mix_unlock(self):
+        """Handles the unlocking of Sports Mix based on the user's option"""
+
         sports_mix_unlocked = get_address(SportsMixAddresses.sports_mix_unlocked)
         if self.sports_mix_unlock == 0:
             if "Sports Mix" in self.unlocked_modes:
@@ -1505,6 +1534,8 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 await self.check_write(sports_mix_unlocked, "byte", 11)
                 self.debug_log("Sports Mix unlocked by Sports Mix item")
+            else:
+                self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 3)
 
         elif self.sports_mix_unlock == 1:
             required_items = ["Sports Crystal: Red", "Sports Crystal: Green", "Sports Crystal: Yellow",
@@ -1515,12 +1546,16 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 await self.check_write(sports_mix_unlocked, "byte", 11)
                 self.debug_log("Sports Mix unlocked by Sports Crystals")
+            else:
+                self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 3)
 
 
     # === Exhibition Unlocks ===
 
 
     async def handle_court_unlocks(self):
+        """Handles the unlocking of courts"""
+
         # Link variables to the address in the correct class
         # Basketball
         b_mushroom = BasketballAddresses.Exhibition.mushroom_cup
@@ -1603,6 +1638,7 @@ class MSMContext(SuperContext):
             await self.check_write(new_addr, "byte", final_value)
 
     async def handle_progressive_court_unlocks(self):
+        """Handles the Progressive Court item, this order will NOT change."""
 
         # The order the courts will unlock, from first to last
         court_unlock_order = [
@@ -1669,6 +1705,8 @@ class MSMContext(SuperContext):
     # === Party Mode Unlocks ===
 
     async def handle_party_unlocks(self):
+        """Handles the unlocking of Party Mode courts, could be merged with handle_court_unlocks"""
+
         fp_apple = PartyMode.FeedPetey.Tabs.apple_tab
         fp_watermelon = PartyMode.FeedPetey.Tabs.watermelon_tab
 
@@ -1729,9 +1767,14 @@ class MSMContext(SuperContext):
 
 
     async def handle_unlocked_abilities(self):
+        """Awaits all functions to do with ability unlocking"""
+
         await self.handle_special_meter_unlock()
 
     async def handle_special_meter_unlock(self):
+        """Handles the unlocking of the special meter"""
+
+
         if not self.ready_to_handle():
             self.debug_log("Special meter lock waiting; game not ready")
             return
@@ -1752,6 +1795,8 @@ class MSMContext(SuperContext):
 
 
     async def handle_one_time_items(self):
+        """Handles the giving of filler items / items that begin with 1"""
+
         # Queue empty? Nothing to do.
         if not self.filler_to_give:
             return
@@ -1873,6 +1918,9 @@ class MSMContext(SuperContext):
             return False
 
     async def handle_question_mark_panel_items(self):
+        """Handles the replacement of ?-Panel items
+        VERY BUGGED, does kind of work but research is helping change this function to work fully"""
+
         self.update_scoring_item_suppression()
         item_data = self.current_item_func()
         self.debug_log(f"Panel check: item={item_data}, unlocked={len(self.unlocked_panel_items)},"
@@ -2167,6 +2215,8 @@ class MSMContext(SuperContext):
     # === Custom Tournament Settings Stuff ===
 
     async def handle_custom_tournament_settings(self):
+        """Awaits all functions to do with setting custom tournament settings"""
+
         await self.set_custom_timer()
         await self.set_period_amount()
         await self.has_points_win()
@@ -2641,6 +2691,125 @@ class MSMContext(SuperContext):
         await self.check_location(location)
 
 
+    # --- Sanity Location Handling ---
+
+    # --- Character Sanity ---
+    async def send_character_sanity_checks(self):
+        """Handles sending checks for Character Sanity"""
+        match_status = self.game_interface.match_status()
+
+        if self.character_sanity == 0 or match_status != 1:
+            return
+
+        char_1 = self.game_interface.get_p_character(1)
+        char_2 = self.game_interface.get_p_character(2)
+        char_3 = self.game_interface.get_p_character(3)
+
+        # Read costumes ONCE here
+        costume_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_1))
+        costume_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
+        costume_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
+
+        char_list = [char_1, char_2, char_3]
+        costume_list = [costume_1, costume_2, costume_3]
+
+        if self.send_both_character_sanity and self.character_sanity == 2:
+            await self.send_character_character_sanity(*char_list)
+            await self.send_costume_character_sanity(*char_list, *costume_list)
+
+        else:
+            if self.character_sanity == 1:
+                await self.send_character_character_sanity(*char_list)
+
+            elif self.character_sanity == 2:
+                for char, costume in zip(char_list, costume_list):
+                    if char in costume_database and costume != 0:
+                        await self.send_costume_character_sanity(*char_list, *costume_list)
+                    else:
+                        await self.send_character_character_sanity(*char_list)
+
+    async def send_character_character_sanity(self, char_1, char_2, char_3):
+        """Sends the location for the character if Character Sanity is enabled"""
+
+        if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
+            if char_1 != "None" and char_1 in self.unlocked_characters:
+                await self.check_location(f"Win as {char_1}")
+
+        if self.game_interface.check_team_amount() == 2:
+            for character in [char_1, char_2]:
+                if character != "None" and character in self.unlocked_characters:
+                    await self.check_location(f"Win as {character}")
+
+        elif self.game_interface.check_team_amount() == 3:
+            for character in [char_1, char_2, char_3]:
+                if character != "None" and character in self.unlocked_characters:
+                    await self.check_location(f"Win as {character}")
+
+    async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
+        """Sends the location for the costume if Character Sanity is enabled"""
+
+        characters_2 = [char_1, char_2]
+        costumes_2   = [costume_1, costume_2]
+        characters_3 = [char_1, char_2, char_3]
+        costumes_3   = [costume_1, costume_2, costume_3]
+
+        players = self.game_interface.check_team_amount()
+
+        if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
+            zipped = zip(char_1, costume_1)
+
+        elif players == 2:
+            zipped = zip(characters_2, costumes_2)
+
+        else:
+            zipped = zip(characters_3, costumes_3)
+
+
+        for character, costume_byte in zipped:
+
+            if character in costume_database and costume_byte not in (0, 255) and character != "None":
+                costume_db = costume_database[character]
+
+                # Fetch the string name
+                costume_name = costume_db.get(costume_byte)
+
+                if costume_name:
+                    if character in self.unlocked_characters and costume_name in self.unlocked_costumes:
+                        await self.check_location(f"Win as {costume_name}")
+
+    # --- Court Sanity ---
+    async def send_court_sanity_checks(self):
+        """Sends the location if the player has won and has the court unlocked"""
+
+        match_status = self.game_interface.match_status()
+
+        if self.court_sanity == 0 or match_status != 1:
+            return
+
+        court_id, court_name = self.game_interface.get_court()
+
+        if court_name is not None and court_name in self.unlocked_courts:
+            if court_id not in not_match_prefix:
+                await self.check_location(f"Win on {court_name}")
+
+    # --- Special Sanity ---
+    async def send_special_sanity_checks(self):
+        """Sends the location when the player has used a special and if the character is unlocked"""
+
+        special_active = self.game_interface.special_active()
+
+        if special_active:
+            character = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.using_special))
+
+            character_int = {0: 1, 2: 2, 4: 3}.get(character, None)
+
+            if character_int is not None:
+                character_name = self.game_interface.get_p_character(character_int)
+
+                if character_name in self.unlocked_characters:
+                    await self.check_location(f"Use {character_name}'s Special")
+
+
     # === Blocking Functions ===
 
 
@@ -2780,125 +2949,6 @@ class MSMContext(SuperContext):
 
         if self.is_behemoth_king:
             self.game_interface.dolphin_client.write_float(behemoth_hp, self.behemoth_king_hp)
-
-
-    # --- Sanity Location Handling ---
-
-    # --- Character Sanity ---
-    async def send_character_sanity_checks(self):
-        """Handles sending checks for Character Sanity"""
-        match_status = self.game_interface.match_status()
-
-        if self.character_sanity == 0 or match_status != 1:
-            return
-
-        char_1 = self.game_interface.get_p_character(1)
-        char_2 = self.game_interface.get_p_character(2)
-        char_3 = self.game_interface.get_p_character(3)
-
-        # Read costumes ONCE here
-        costume_1 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_1))
-        costume_2 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_2))
-        costume_3 = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.costume_3))
-
-        char_list = [char_1, char_2, char_3]
-        costume_list = [costume_1, costume_2, costume_3]
-
-        if self.send_both_character_sanity and self.character_sanity == 2:
-            await self.send_character_character_sanity(*char_list)
-            await self.send_costume_character_sanity(*char_list, *costume_list)
-
-        else:
-            if self.character_sanity == 1:
-                await self.send_character_character_sanity(*char_list)
-
-            elif self.character_sanity == 2:
-                for char, costume in zip(char_list, costume_list):
-                    if char in costume_database and costume != 0:
-                        await self.send_costume_character_sanity(*char_list, *costume_list)
-                    else:
-                        await self.send_character_character_sanity(*char_list)
-
-    async def send_character_character_sanity(self, char_1, char_2, char_3):
-        """Sends the location for the character if Character Sanity is enabled"""
-
-        if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
-            if char_1 != "None" and char_1 in self.unlocked_characters:
-                await self.check_location(f"Win as {char_1}")
-
-        if self.game_interface.check_team_amount() == 2:
-            for character in [char_1, char_2]:
-                if character != "None" and character in self.unlocked_characters:
-                    await self.check_location(f"Win as {character}")
-
-        elif self.game_interface.check_team_amount() == 3:
-            for character in [char_1, char_2, char_3]:
-                if character != "None" and character in self.unlocked_characters:
-                    await self.check_location(f"Win as {character}")
-
-    async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
-        """Sends the location for the costume if Character Sanity is enabled"""
-
-        characters_2 = [char_1, char_2]
-        costumes_2   = [costume_1, costume_2]
-        characters_3 = [char_1, char_2, char_3]
-        costumes_3   = [costume_1, costume_2, costume_3]
-
-        players = self.game_interface.check_team_amount()
-
-        if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
-            zipped = zip(char_1, costume_1)
-
-        elif players == 2:
-            zipped = zip(characters_2, costumes_2)
-
-        else:
-            zipped = zip(characters_3, costumes_3)
-
-
-        for character, costume_byte in zipped:
-
-            if character in costume_database and costume_byte not in (0, 255) and character != "None":
-                costume_db = costume_database[character]
-
-                # Fetch the string name
-                costume_name = costume_db.get(costume_byte)
-
-                if costume_name:
-                    if character in self.unlocked_characters and costume_name in self.unlocked_costumes:
-                        await self.check_location(f"Win as {costume_name}")
-
-    # --- Court Sanity ---
-    async def send_court_sanity_checks(self):
-        """Sends the location if the player has won and has the court unlocked"""
-
-        match_status = self.game_interface.match_status()
-
-        if self.court_sanity == 0 or match_status != 1:
-            return
-
-        court_id, court_name = self.game_interface.get_court()
-
-        if court_name is not None and court_name in self.unlocked_courts:
-            if court_id not in not_match_prefix:
-                await self.check_location(f"Win on {court_name}")
-
-    # --- Special Sanity ---
-    async def send_special_sanity_checks(self):
-        """Sends the location when the player has used a special and if the character is unlocked"""
-
-        special_active = self.game_interface.special_active()
-
-        if special_active:
-            character = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.using_special))
-
-            character_int = {0: 1, 2: 2, 4: 3}.get(character, None)
-
-            if character_int is not None:
-                character_name = self.game_interface.get_p_character(character_int)
-
-                if character_name in self.unlocked_characters:
-                    await self.check_location(f"Use {character_name}'s Special")
 
 
     # === Location Tracking ===
