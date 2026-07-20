@@ -96,7 +96,6 @@ class MSMWorld(World):
         "character_sanity",
         "court_sanity",
         "special_sanity",
-        "start_inventory_from_pool",
     )
 
     options_dataclass = MSMOptions
@@ -183,7 +182,6 @@ class MSMWorld(World):
                     f" off, the match will run indefinitely."
                 )
 
-
     def create_regions(self) -> None:
         regions.create_and_connect_regions(self)
         locations.create_all_locations(self)
@@ -220,7 +218,7 @@ class MSMWorld(World):
     def fill_slot_data(self) -> Mapping[str, Any]:
         slot_data = {
             "version": WORLD_VERSION,
-            # Universal Tracker uses this to generate the same MSM world without
+            # Universal Tracker uses this to generate the same MSMWorld without
             # requiring a local YAML file.
             "options": self.options.as_dict(*self.ut_generation_options),
 

@@ -77,7 +77,7 @@ class CupUnlockType(Choice):
 **Progressive Cup**: Cups are unlocked in a certain order with progressive items. (Normal -> Hard (If enabled) ->
 Sports Mix)
 Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
-    display_name = "Court Unlock Type"
+    display_name = "Cup Unlock Type"
     option_cup_item = 0
     option_progressive_cup = 1
     default = 0
