@@ -1,3 +1,6 @@
+# Before you enter this client I'd like you to know that Volleyball and Harmony Hustle are the two most stupidest things
+# to work around because 1, they don't have a timer, 2, they don't behave like any other sport and THREE THEY DON'T HAVE
+# A TIMER. Anyways, have fun going through this.
 import asyncio
 import logging
 import random
@@ -31,8 +34,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.0.5"
-COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4"]
+CLIENT_VERSION = "2.0.6"
+COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -1121,7 +1124,7 @@ class MSMContext(SuperContext):
                     else self.game_interface.get_hockey_time()
                 ready_game = timer < target_time
 
-        if timer == 0 and mode != "Volleyball":
+        if timer == 0 and self.mode_has_timer(mode):
             ready_game = False
 
         return ready_game and set_break == 0
@@ -2225,10 +2228,10 @@ class MSMContext(SuperContext):
     def get_default_time(self):
         """Gets the default option value corresponding to the default timer value for the sport"""
 
-        sport = self.game_interface.get_mode()
-        if sport == "Basketball":
+        mode = self.game_interface.get_mode()
+        if mode == "Basketball":
             return 2
-        elif sport == "Dodgeball" or sport == "Hockey":
+        elif mode == "Dodgeball" or mode == "Hockey":
             return 3
         else:
             return None
@@ -2252,13 +2255,13 @@ class MSMContext(SuperContext):
             4: 14400,
             5: 999999,
         }
-        sport = self.game_interface.get_mode()
+        mode = self.game_interface.get_mode()
 
-        if sport == "Basketball":
+        if mode == "Basketball":
             return b_option_to_timer.get(self.custom_basket_time)
-        elif sport == "Dodgeball":
+        elif mode == "Dodgeball":
             return h_d_option_to_timer.get(self.custom_dodge_time)
-        elif sport == "Hockey":
+        elif mode == "Hockey":
             return h_d_option_to_timer.get(self.custom_hockey_time)
         else:
             return 999999
@@ -2796,6 +2799,9 @@ class MSMContext(SuperContext):
     async def send_special_sanity_checks(self):
         """Sends the location when the player has used a special and if the character is unlocked"""
 
+        if self.special_sanity == 0 or not self.ready_to_handle():
+            return
+
         special_active = self.game_interface.special_active()
 
         if special_active:
@@ -3066,10 +3072,10 @@ class MSMContext(SuperContext):
 
     def timer_is_0(self):
         """Checks if the timer is 0 because volleyball is stupid"""
-        sport = self.game_interface.get_mode()
-        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+        mode = self.game_interface.get_mode()
+        timer = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
 
-        if sport == "Volleyball":
+        if mode == "Volleyball":
             return False
         else:
             if timer == 0:
@@ -3080,11 +3086,20 @@ class MSMContext(SuperContext):
     def timer_reset(self):
         """Checks if the timer has been reset"""
 
-        sport = self.game_interface.get_mode()
-        timer = self.game_interface.dolphin_client.read_byte(self.addresslib.timer_addr)
+        mode = self.game_interface.get_mode()
+        timer = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
+
+        mode_to_function = {
+            "Basketball": self.game_interface.get_basketball_time,
+            "Dodgeball": self.game_interface.get_dodgeball_time,
+            "Hockey": self.game_interface.get_hockey_time,
+            "Feed Petey": 9000,
+            "Bob-omb Dodge": 7200,
+            "Smash Skate": 5400,
+        }
 
         if self.in_tournament_match:
-            if sport != "Volleyball":
+            if self.mode_has_timer(mode):
                 if timer == self.get_custom_time():
                     return True
                 else:
@@ -3092,18 +3107,9 @@ class MSMContext(SuperContext):
             else:
                 return False
         else:
-            if sport == "Basketball":
-                if timer == self.game_interface.get_basketball_time():
-                    return True
-                else:
-                    return False
-            elif sport == "Dodgeball":
-                if timer == self.game_interface.get_dodgeball_time():
-                    return True
-                else:
-                    return False
-            elif sport == "Hockey":
-                if timer == self.game_interface.get_hockey_time():
+            default_time = mode_to_function.get(mode, None)
+            if default_time is not None:
+                if mode == default_time:
                     return True
                 else:
                     return False
@@ -3134,7 +3140,7 @@ class MSMContext(SuperContext):
                     if (self.is_behemoth or self.is_behemoth_king) and not self.has_sent_death:
                         await self.check_behemoth_deathlink()
 
-                    elif (match_status == 2 or match_status == 3) and (not self.timer_reset() or not self.timer_is_0()):
+                    elif (match_status == 2 or match_status == 3) and not self.timer_reset():
                         if not self.has_sent_death and self.slot is not None:
                             message = random.choice(possible_messages_0)  # Pick a random message to send
                             await self.send_death(f"{self.player_names[self.slot]} {message}")
@@ -3233,12 +3239,13 @@ class MSMContext(SuperContext):
     def on_deathlink(self, data: dict[str, Any]):
         super().on_deathlink(data)
         self.debug_log(f"Deathlink Received - Consequence={self.deathlink_consequence}")
-        self.received_death = True  # Required so we don't send a deathlink when we get sent one
         self.handle_received_deathlink()
+        self.received_death = True  # Required so we don't send a deathlink when we get sent one
 
     def handle_received_deathlink(self):
         """Gets called when on_deathlink goes off and acts depending on deathlink_consequence
         NOTE: Dodgeball deathlinks get handled differently to everything else since it doesn't have a normal scoring system"""
+        mode = self.game_interface.get_mode()
 
         if self.deathlink_enabled:
             if self.ready_to_handle():
@@ -3250,15 +3257,26 @@ class MSMContext(SuperContext):
                     else:
                         # Force player to lose
                         # Harmony Hustle uses 1 score since it's teamwork
-                        if not self.game_interface.is_in_harmony():                                     # 4 = 5th Period
+                        if mode != "Harmony Hustle":
+                            # Volleyball is stupid
+                            if mode == "Volleyball":
+                                for score in opponent_score_addresses:
+                                    self.game_interface.dolphin_client.write_word(get_address(score), 500)
+
+                            else:
+                                self.game_interface.dolphin_client.write_word(self.game_interface.get_opponent_score_addr
+                                                                                (self.party_mode_opponent), 500)
+
+
+                            # 4 = 5th Period
                             self.game_interface.dolphin_client.write_byte(self.addresslib.current_period_addr, 4)
-                            self.game_interface.dolphin_client.write_word(self.game_interface.get_opponent_score_addr
-                                                                (self.party_modes), 900) # Write 900 for scores
 
                         # In all modes, updating the player's score should cause them to lose
                         self.game_interface.dolphin_client.write_word(self.game_interface.get_player_score_addr(), 0)
 
-                        self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr, 0) # Set timer to 0
+                        # STUPID ASS VOLLEYBALL NEEDS TO KNOW WHEN THE TIMER IS **ONE** TO NOT SEND A DEATHLINK
+                        self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr,
+                                                                       1 if mode == "Volleyball" else 0)
 
 
                 # Opponent gains points
@@ -3323,16 +3341,20 @@ class MSMContext(SuperContext):
         # Received Deathlink
         match_status = self.game_interface.match_status()
         court_id, _ = self.game_interface.get_court()
+        mode = self.game_interface.get_mode()
+        timer = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
         # If we're not in the state where we've died to deathlink, or we're in some kind of menu/cutscene,
         # set received_death to false
-        if (match_status != 2 and match_status != 3) or court_id in not_match_prefix:
+        if (match_status == 0 and (self.timer_reset() and self.mode_has_timer(mode))) or court_id in not_match_prefix:
+            self.received_death = False
+
+        if mode == "Volleyball" and match_status == 0 and timer != 1:
             self.received_death = False
 
         # Sent Deathlink
         # If we're not in the state where we've died to deathlink, or in some kind of menu/cutscene,
         # set received_death to false
-        if self.timer_reset() or (match_status == 0 and not self.timer_is_0()):
-            self.received_death = False
+        if match_status == 0 and not self.timer_is_0():
             self.has_sent_death = False
 
 
@@ -3474,6 +3496,13 @@ class MSMContext(SuperContext):
             )
             return False
 
+    @staticmethod
+    def mode_has_timer( mode: str):
+        if mode in ["Volleyball", "Harmony Hustle"]:
+            return False
+        else:
+            return True
+
 
     # === Where to handle what ===
 
@@ -3517,6 +3546,8 @@ class MSMContext(SuperContext):
         await self.handle_traps()
         await self.handle_question_mark_panel_items()
         await self.handle_unlocked_abilities()
+
+        self.toggle_log("rth", "Ready to handle!", "Not ready to handle", self.ready_to_handle(), True)
 
         self.handled_gecko_codes = False
 
