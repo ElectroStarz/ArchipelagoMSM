@@ -180,6 +180,11 @@ characters = {
     "Black Mage":                        ItemData(base_id + 418, IC.useful, ItemGroup.CHARACTERS),
 }
 
+miis = {
+    "Mii (Male)":                        ItemData(base_id + 419, IC.useful, ItemGroup.CHARACTERS),
+    "Mii (Female)":                      ItemData(base_id + 420, IC.useful, ItemGroup.CHARACTERS),
+}
+
 # Costumes (500 range)
 character_costumes = {
     "Light Blue Yoshi":                  ItemData(base_id + 501, IC.filler, ItemGroup.COSTUMES),
@@ -302,6 +307,7 @@ item_table: Dict[str, ItemData] = {
     **individual_courts,
     **progressive_items,
     **characters,
+    **miis,
     **character_costumes,
     **unlockable_panel_items,
     **unlockable_abilities,
@@ -353,6 +359,9 @@ def create_all_items(world: "MSMWorld") -> None:
     # Unlockable abilities
     for ability in unlockable_abilities:
         itempool.append(world.create_item(ability))
+
+    for mii in miis:
+        world.push_precollected(world.create_item(mii))
 
 
     # Start with random characters option
@@ -463,8 +472,9 @@ def create_all_items(world: "MSMWorld") -> None:
 
             for item in create_dict:
                 # Create all the other items and add them to the itempool
+                item = world.create_item(item)
                 if item not in itempool:
-                    itempool.append(world.create_item(item))
+                    itempool.append(item)
 
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
 
@@ -490,8 +500,10 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    #print(itempool)
+    print(itempool)
     world.multiworld.itempool += itempool
+
+
 
 
 def create_courts(world: "MSMWorld", itempool):

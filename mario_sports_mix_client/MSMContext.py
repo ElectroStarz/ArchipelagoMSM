@@ -34,7 +34,7 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.0.6"
+CLIENT_VERSION = "2.0.7"
 COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
@@ -615,17 +615,17 @@ class MSMContext(SuperContext):
         self.handled_custom_timer = False
 
         # Lists for items
-        self.unlocked_modes = []
-        self.unlocked_cups = []
-        self.unlocked_ex_diffs = []
-        self.progressive_courts = []
-        self.progressive_cups = []
-        self.unlocked_sports_crystals = []
-        self.unlocked_courts = []
-        self.unlocked_characters = []
-        self.unlocked_costumes = []
-        self.unlocked_panel_items = []
-        self.unlocked_abilities = []
+        self.unlocked_modes: set[str] = set()
+        self.unlocked_cups: set[str] = set()
+        self.unlocked_ex_diffs: set[str] = set()
+        self.progressive_courts: set[str] = set()
+        self.progressive_cups: set[str] = set()
+        self.unlocked_sports_crystals: set[str] = set()
+        self.unlocked_courts: set[str] = set()
+        self.unlocked_characters: set[str] = set()
+        self.unlocked_costumes: set[str] = set()
+        self.unlocked_panel_items: set[str] = set()
+        self.unlocked_abilities: set[str] = set()
         self.filler_to_give = deque()
         self.traps_to_give = deque()
 
@@ -702,7 +702,7 @@ class MSMContext(SuperContext):
         await asyncio.sleep(delay)
 
     def log_colour(self, text: str, colour: str):
-        """Logs the messsage in full colour"""
+        """Logs the message in full colour"""
 
         if self.ui is not None:
             message: JSONMessagePart = {"type": "color", "text": text, "color": colour}
@@ -1140,7 +1140,8 @@ class MSMContext(SuperContext):
         party_tuple = ("Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate")
 
         characters_tuple = ("Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong",
-        "Diddy Kong", "Toad", "Bowser", "Bowser Jr", "Moogle", "Cactuar", "Ninja", "White Mage", "Slime", "Black Mage")
+        "Diddy Kong", "Toad", "Bowser", "Bowser Jr", "Moogle", "Cactuar", "Ninja", "White Mage", "Slime", "Black Mage",
+        "Mii (Male)", "Mii (Female)")
 
         costumes_tuple = ("Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad", "Yellow Toad",
         "She-Slime", "Metal Slime",  "Tennis-wear Peach", "Tennis-wear Daisy", "Shadow White Ninja",
@@ -1169,49 +1170,49 @@ class MSMContext(SuperContext):
                     continue
 
                 if item_name in sport_tuple or item_name in party_tuple:
-                    self.unlocked_modes.append(item_name)
+                    self.unlocked_modes.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_modes")
 
                 # Format to Basketball:, Dodgeball:, etc
                 for sport in sport_tuple:
                     if item_name.startswith(f"{sport}:"):
-                        self.unlocked_cups.append(item_name)
+                        self.unlocked_cups.add(item_name)
                         self.debug_log(f"Added {item_name} to unlocked_cups")
 
                 if item_name.startswith("Exhibition"):
-                    self.unlocked_ex_diffs.append(item_name)
+                    self.unlocked_ex_diffs.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_ex_diffs")
 
                 elif item_name == "Progressive Cup":
-                    self.progressive_cups.append(item_name)
+                    self.progressive_cups.add(item_name)
                     self.debug_log(f"Added {item_name} to progressive_cups")
 
                 elif item_name == "Progressive Court":
-                    self.progressive_courts.append(item_name)
+                    self.progressive_courts.add(item_name)
                     self.debug_log(f"Added {item_name} to progressive_courts")
 
                 elif item_name.startswith("Sports Crystal:"):
-                    self.unlocked_sports_crystals.append(item_name)
+                    self.unlocked_sports_crystals.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
 
                 elif item_name in courts_tuple:
-                    self.unlocked_courts.append(item_name)
+                    self.unlocked_courts.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_courts")
 
                 elif item_name in characters_tuple:
-                    self.unlocked_characters.append(item_name)
+                    self.unlocked_characters.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_characters")
 
                 elif item_name in costumes_tuple:
-                    self.unlocked_costumes.append(item_name)
+                    self.unlocked_costumes.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_costumes")
 
                 elif item_name.startswith("?"):
-                    self.unlocked_panel_items.append(item_name)
+                    self.unlocked_panel_items.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_panel_items")
 
                 elif item_name in ability_tuple:
-                    self.unlocked_abilities.append(item_name)
+                    self.unlocked_abilities.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_abilities")
 
                 self.items_handled.add(index)
@@ -1513,13 +1514,13 @@ class MSMContext(SuperContext):
                     for sport in sports_list:
                         formatted_name = f"{sport}: {rule['suffix']}"
                         if formatted_name not in self.unlocked_cups:
-                            self.unlocked_cups.append(formatted_name)
+                            self.unlocked_cups.add(formatted_name)
                             self.log_once("prog_cup",
                                           f"Progressive Cup level up! Unlocked: {rule['suffix']}", False)
 
                 elif rule["type"] == "sm":
                     if rule["value"] not in self.unlocked_cups:
-                        self.unlocked_cups.append(rule["value"])
+                        self.unlocked_cups.add(rule["value"])
                         self.log_once("prog_cup",
                                       f"Progressive Cup level up! Unlocked: {rule['value']}", False)
 
@@ -1675,7 +1676,7 @@ class MSMContext(SuperContext):
 
             # Add to unlocked_courts if it isn't already there
             if target_stage not in self.unlocked_courts:
-                self.unlocked_courts.append(target_stage)
+                self.unlocked_courts.add(target_stage)
                 logger.info(f"Progressive Court level up! Unlocked: {target_stage}")
 
     # Unstable function due to the unstable address, probably needs pointers
@@ -1975,7 +1976,7 @@ class MSMContext(SuperContext):
         }
 
         # Random Selection & Execution
-        random_item = random.choice(self.unlocked_panel_items)
+        random_item = random.choice(list(self.unlocked_panel_items))
 
         # Extract the base name (e.g., if item is "1 Banana", get "Banana")
         # This searches the keys of the map to find a match
@@ -2510,7 +2511,7 @@ class MSMContext(SuperContext):
             return
 
         if location_id in self.locations_checked:
-            self.debug_log(f"Location in locations checked!")
+            self.debug_log(f"Location: {location_name} in locations checked!")
             return
 
         await self.send_msgs([{"cmd": "LocationChecks", "locations": [location_id]}])
@@ -2735,17 +2736,17 @@ class MSMContext(SuperContext):
         """Sends the location for the character if Character Sanity is enabled"""
 
         if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
-            if char_1 != "None" and char_1 in self.unlocked_characters:
+            if char_1 != "None" and (char_1 in self.unlocked_characters or char_1 in ["Mii (Male)", "Mii (Female)"]):
                 await self.check_location(f"Win as {char_1}")
 
         if self.game_interface.check_team_amount() == 2:
             for character in [char_1, char_2]:
-                if character != "None" and character in self.unlocked_characters:
+                if character != "None" and (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]):
                     await self.check_location(f"Win as {character}")
 
         elif self.game_interface.check_team_amount() == 3:
             for character in [char_1, char_2, char_3]:
-                if character != "None" and character in self.unlocked_characters:
+                if character != "None" and (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]):
                     await self.check_location(f"Win as {character}")
 
     async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
@@ -2759,7 +2760,7 @@ class MSMContext(SuperContext):
         players = self.game_interface.check_team_amount()
 
         if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
-            zipped = zip(char_1, costume_1)
+            zipped = zip([char_1], [costume_1])
 
         elif players == 2:
             zipped = zip(characters_2, costumes_2)
@@ -2774,10 +2775,10 @@ class MSMContext(SuperContext):
                 costume_db = costume_database[character]
 
                 # Fetch the string name
-                costume_name = costume_db.get(costume_byte)
+                costume_name = costume_db.get(costume_byte, None)
 
-                if costume_name:
-                    if character in self.unlocked_characters and costume_name in self.unlocked_costumes:
+                if costume_name is not None:
+                    if (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]) and costume_name in self.unlocked_costumes:
                         await self.check_location(f"Win as {costume_name}")
 
     # --- Court Sanity ---
@@ -2798,29 +2799,33 @@ class MSMContext(SuperContext):
     # --- Special Sanity ---
     async def send_special_sanity_checks(self):
         """Sends the location when the player has used a special and if the character is unlocked"""
+        special_active = self.game_interface.special_active()
+        #print(f"Special Sanity: {self.special_sanity}")
 
-        if self.special_sanity == 0 or not self.ready_to_handle():
+        if self.special_sanity == 0 or not special_active:
             return
 
-        special_active = self.game_interface.special_active()
 
-        if special_active:
-            character = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.using_special))
+        #print(f"Special Active: {special_active}")
 
-            character_int = {0: 1, 2: 2, 4: 3}.get(character, None)
+        character = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.using_special))
 
-            if character_int is not None:
-                character_name = self.game_interface.get_p_character(character_int)
+        character_int = {0: 1, 2: 2, 4: 3}.get(character, None)
+        #print(f"Character int: {character_int}")
 
-                if character_name in self.unlocked_characters:
-                    await self.check_location(f"Use {character_name}'s Special")
+        if character_int is not None:
+            character_name = self.game_interface.get_p_character(character_int)
+            #print(f"Character Name: {character_name}")
+
+            #if character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]:
+            await self.check_location(f"Use {character_name}'s Special")
 
 
     # === Blocking Functions ===
 
 
-    async def handle_locked_tournament_stage_points(self):
-        """Locks the points in a tournament match if you don't have the required cup or stage"""
+    async def handle_locked_tournament_court_points(self):
+        """Locks the points in a tournament match if you don't have the required cup or court"""
 
         if not self.in_tournament_match or not self.ready_to_handle():
             return
@@ -2860,9 +2865,10 @@ class MSMContext(SuperContext):
             self.rate_log("locked_tournament", f"Blocked points for {sport} {cup}. Missing {required_cup}", 10, False)
 
         try:
-            await self.clear_player_score()
-            await self.lock_period_1()
-            await self.lock_special_meter()
+            if self.ready_to_handle():
+                await self.clear_player_score()
+                await self.lock_period_1()
+                await self.lock_special_meter()
         finally:
             pass
 
@@ -2882,9 +2888,10 @@ class MSMContext(SuperContext):
         self.rate_log("locked_ex", f"Blocked points for match. Missing: Exhibition {diff_name}", 10, False)
 
         try:
-            await self.clear_player_score()
-            await self.lock_period_1()
-            await self.lock_special_meter()
+            if self.ready_to_handle():
+                await self.clear_player_score()
+                await self.lock_period_1()
+                await self.lock_special_meter()
         finally:
             pass
 
@@ -2912,8 +2919,9 @@ class MSMContext(SuperContext):
         self.rate_log("locked_behemoth", f"Locked points for {boss}, you do not have {required_stage}", 10, False)
 
         try:
-            await self.lock_behemoth_hp()
-            await self.lock_special_meter()
+            if self.ready_to_handle():
+                await self.lock_behemoth_hp()
+                await self.lock_special_meter()
         finally:
             pass
 
@@ -3061,7 +3069,7 @@ class MSMContext(SuperContext):
                 added = False # Stop client spam
 
         won_count = len(self.party_won)
-        if won_count <= 30 and added and self.goal_condition == 5:
+        if won_count <= 30 and added and (self.goal_condition == 5):
             # Only show this message if the goal condition is Palooza, we've added a location, and we're logging the max
             # won so far (So it doesn't log 1 Match Won, 2, 3 all the way up to 12 or smth, only logs 12 Matches Won!)
             logger.info(f"{won_count}/30 Match{'' if won_count == 1 else 'es'} Won!")
@@ -3284,7 +3292,7 @@ class MSMContext(SuperContext):
                     if self.is_behemoth or self.is_behemoth_king:
                         self.recover_boss_hp()
                     else:
-                        if self.game_interface.get_mode() != "Dodgeball":
+                        if self.game_interface.get_mode() not in ["Dodgeball", "Bob-omb Dodge"]:
                             addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent)
                             points = self.game_interface.dolphin_client.read_word(addr)
                             new_points = points + self.deathlink_o_get_points
@@ -3529,7 +3537,7 @@ class MSMContext(SuperContext):
         await self.reset_deathlink_status()
 
         # Lock points if you don't have the stage/cup/difficulty
-        await self.handle_locked_tournament_stage_points()
+        await self.handle_locked_tournament_court_points()
         await self.handle_locked_exhibition_points()
 
         # Locations
