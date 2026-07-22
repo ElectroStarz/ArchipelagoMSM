@@ -636,7 +636,7 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     # Character Sanity (Characters)
     if (world.options.character_sanity == CharacterSanity.option_characters or
         world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
-        if name in characters:
+        if name in characters or name in miis:
             classification = IC.progression
 
     # Character Sanity (Costumes)

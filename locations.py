@@ -568,6 +568,8 @@ special_sanity_locations: Dict[str, LocData] = {
     "Use White Mage's Special":                        LocData(base_id + 5015, LocGroup.SPECIAL_SANITY),
     "Use Slime's Special":                             LocData(base_id + 5016, LocGroup.SPECIAL_SANITY),
     "Use Black Mage's Special":                        LocData(base_id + 5017, LocGroup.SPECIAL_SANITY),
+    "Use Mii (Male)'s Special":                        LocData(base_id + 5018, LocGroup.SPECIAL_SANITY),
+    "Use Mii (Female)'s Special":                      LocData(base_id + 5019, LocGroup.SPECIAL_SANITY),
 }
 
 character_sanity_locations: Dict[str, LocData] = {
