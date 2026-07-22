@@ -81,7 +81,7 @@ tournament_difficulties = ["Normal", "Hard"]
 
 character_names = [
     "Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong", "Diddy Kong", "Toad", "Bowser",
-    "Bowser Jr", "Moogle", "White Mage", "Black Mage", "Ninja", "Cactuar", "Slime"
+    "Bowser Jr", "Moogle", "White Mage", "Black Mage", "Ninja", "Cactuar", "Slime", "Mii (Male)", "Mii (Female)"
 ]
 
 costume_names = {
@@ -114,7 +114,7 @@ def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = Fa
         return sports_mix_court_rule(round_num if round_num is not None else 1)
     elif pm:
         return Has(court_name)
-    elif world.options.court_unlock_type == CourtUnlockType.option_progressive_court:
+    elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         return Has("Progressive Court", courts_dict[court_name])
     else:
         return Has(court_name)
@@ -153,7 +153,7 @@ def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
 
 def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
     """Returns either the Unified Progressive item requirement, or the Individual item requirement."""
-    if world.options.cup_unlock_type == CupUnlockType.option_progressive_cup:
+    if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
         needed_count = get_unified_cup_level(world, category, cup_name)
         return Has("Progressive Cup", needed_count)
     else:
@@ -265,11 +265,11 @@ def can_play_any_cup(world: MSMWorld) -> Rule:
                 continue
 
             # Determine cup requirement logic depending on progressive settings
-            if world.options.cup_unlock_type == CupUnlockType.option_progressive_cup:
+            if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
                 needed_normal = get_unified_cup_level(world, "Normal", cup)
                 cup_rule_cond = Has("Progressive Cup", needed_normal)
 
-                if world.options.hard_tournament_difficulty:
+                if world.options.hard_tournament_difficulty.value:
                     needed_hard = get_unified_cup_level(world, "Hard", cup)
                     cup_rule_cond |= Has("Progressive Cup", needed_hard)
             else:
@@ -373,7 +373,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
             if difficulty not in exhibition_difficulties:
                 continue
 
-            if world.options.exhibition_type == ExhibitionType.option_all_sports:
+            if world.options.exhibition_type.value == ExhibitionType.option_all_sports:
                 for sport, courts in exhibition_rules.items():
                     if sport in world.options.enabled_sports.value:
                         for court in courts:
@@ -461,19 +461,19 @@ def set_all_location_rules(world: MSMWorld) -> None:
     # === Sanity Locations ===
 
     # Character Sanity Locations
-    if world.options.character_sanity in (CharacterSanity.option_characters,
-                                          CharacterSanity.option_characters_and_costumes):
+    if world.options.character_sanity.value in (CharacterSanity.option_characters,
+                                                CharacterSanity.option_characters_and_costumes):
         for character in character_names:
             location = world.get_location(f"Win as {character}")
             world.set_rule(location, Has(character) & (can_play_any_cup(world) | can_play_any_ex()))
 
-    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+    if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         for costume, char in costume_names.items():
             location = world.get_location(f"Win as {costume}")
             world.set_rule(location, HasAll(char, costume) & (can_play_any_cup(world) | can_play_any_ex()))
 
     # Court Sanity Locations
-    if world.options.court_sanity:
+    if world.options.court_sanity.value:
         sport_court_to_cups = {
             "Basketball": {
                 "Mario Stadium": ["Mushroom Cup"],
@@ -602,7 +602,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
         apply_all_court_rules()
 
-    if world.options.special_sanity:
+    if world.options.special_sanity.value:
         for character in character_names:
             location = world.get_location(f"Use {character}'s Special")
             world.set_rule(location, Has("Special Meter") & Has(character) &
@@ -691,44 +691,44 @@ def set_goal_rules(world: MSMWorld) -> None:
              )) & CanReachLocation("Sports Mix: Beat Star Cup Round 3") & court_rule(world, "Behemoth Stage", False)
     )
 
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+    if world.options.goal_condition.value == GoalCondition.option_defeat_behemoth:
         world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
         if world.options.boss_locations == BossLocations.option_defeat_behemoth_king:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
-    elif world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+    elif world.options.goal_condition.value == GoalCondition.option_defeat_behemoth_king:
         world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
         if world.options.boss_locations == BossLocations.option_defeat_behemoth:
             world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
-    elif world.options.goal_condition == GoalCondition.option_win_cups:
+    elif world.options.goal_condition.value == GoalCondition.option_win_cups:
         win_cup_value = world.options.win_cups_amount.value
         world.set_rule(world.get_location(f"Win {win_cup_value} Cups!"), CanCupGoal().resolve(world))
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
-    elif world.options.goal_condition == GoalCondition.option_exhibition_tour:
+    elif world.options.goal_condition.value == GoalCondition.option_exhibition_tour:
         amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
 
         world.set_rule(world.get_location(f"Win {amount} Exhibition Matches!"), CanExGoal().resolve(world))
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
-    elif world.options.goal_condition == GoalCondition.option_party_palooza:
+    elif world.options.goal_condition.value == GoalCondition.option_party_palooza:
         world.set_rule(world.get_location("Win Party Mode!"), get_all_party_location_rules(world))
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
 def set_completion_condition(world: MSMWorld) -> None:

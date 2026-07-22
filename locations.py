@@ -785,13 +785,13 @@ def create_regular_locations(world: MSMWorld) -> None:
         }
 }
 
-    if world.options.include_tournaments:
+    if world.options.include_tournaments.value:
         for difficulty, sports in cup_regions.items():
-            if difficulty == "Hard" and not world.options.hard_tournament_difficulty:
+            if difficulty == "Hard" and not world.options.hard_tournament_difficulty.value:
                 continue
 
             for sport, cups in sports.items():
-                if sport not in world.options.enabled_sports:
+                if sport not in world.options.enabled_sports.value:
                     continue
 
                 for cup, region in cups.items():
@@ -808,7 +808,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Star": sports_mix_star,
         }
 
-        if "Sports Mix" in world.options.enabled_sports:
+        if "Sports Mix" in world.options.enabled_sports.value:
             for cup, region in sports_mix_regions.items():
                 locations = get_location_names_with_ids([
                     f"Sports Mix: Beat {cup} Cup Round {i}"
@@ -885,7 +885,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Hockey": h_exhibition,
     }
 
-    if world.options.include_exhibition:
+    if world.options.include_exhibition.value:
         for difficulty in world.options.exhibition_difficulties.value:
 
             if world.options.exhibition_type == ExhibitionType.option_all_sports:
@@ -927,7 +927,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     }
 
     if world.options.party_mode:
-        for mode in world.options.party_mode:
+        for mode in world.options.party_mode.value:
             locations = party_mode_to_locations[mode]
             region = party_mode_to_region[mode]
 
@@ -937,11 +937,11 @@ def create_regular_locations(world: MSMWorld) -> None:
     # === Sanity Locations ===
 
     # Character Sanity Locations
-    if world.options.character_sanity in (CharacterSanity.option_characters, CharacterSanity.option_characters_and_costumes):
+    if world.options.character_sanity.value in (CharacterSanity.option_characters, CharacterSanity.option_characters_and_costumes):
         character_locations = get_location_names_with_ids([location for location in character_sanity_locations])
         main_menu.add_locations(character_locations)
 
-    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+    if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         costume_locations = get_location_names_with_ids([location for location in costume_char_sanity_locations])
         main_menu.add_locations(costume_locations)
 
@@ -983,10 +983,10 @@ def create_regular_locations(world: MSMWorld) -> None:
             "Smash Skate": smash_skate_courts,
         }
 
-        if world.options.include_tournaments or world.options.include_exhibition:
+        if world.options.include_tournaments.value or world.options.include_exhibition.value:
 
             if world.options.enabled_sports:
-                for sport in world.options.enabled_sports:
+                for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
                         # Get the viable courts_dict for the sport
                         court_list = mode_to_court[sport]
@@ -999,7 +999,7 @@ def create_regular_locations(world: MSMWorld) -> None:
                                     locations.update(location)
 
         if world.options.party_mode:
-            for mode in world.options.party_mode:
+            for mode in world.options.party_mode.value:
                 if mode in mode_to_court:
                     court_list = mode_to_court[mode]
 
@@ -1011,7 +1011,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         main_menu.add_locations(locations)
 
     # Special Sanity
-    if world.options.special_sanity:
+    if world.options.special_sanity.value:
         special_locations = get_location_names_with_ids([location for location in special_sanity_locations])
         main_menu.add_locations(special_locations)
 
@@ -1020,58 +1020,58 @@ def create_events(world: "MSMWorld") -> None:
     behemoth_king_boss = world.get_region("Behemoth King Boss Battle")
     main_menu = world.get_region("Main Menu")
 
-    if world.options.goal_condition == GoalCondition.option_defeat_behemoth:
+    if world.options.goal_condition.value == GoalCondition.option_defeat_behemoth:
         behemoth_boss.add_event("Defeat Behemoth!", "Victory!", location_type=MSMLocation,
                                  item_type=items.MSMItem)
 
-        if world.options.boss_locations == BossLocations.option_defeat_behemoth_king:
+        if world.options.boss_locations.value == BossLocations.option_defeat_behemoth_king:
             behemoth_king_location = get_location_names_with_ids(["Defeat Behemoth King!"])
             behemoth_boss.add_locations(behemoth_king_location, MSMLocation)
 
-    elif world.options.goal_condition == GoalCondition.option_defeat_behemoth_king:
+    elif world.options.goal_condition.value == GoalCondition.option_defeat_behemoth_king:
         behemoth_king_boss.add_event("Defeat Behemoth King!", "Victory!", location_type=MSMLocation,
                                      item_type=items.MSMItem)
 
-        if world.options.boss_locations == BossLocations.option_defeat_behemoth:
+        if world.options.boss_locations.value == BossLocations.option_defeat_behemoth:
             behemoth_location = get_location_names_with_ids(["Defeat Behemoth!"])
             behemoth_boss.add_locations(behemoth_location, MSMLocation)
 
-    elif world.options.goal_condition == GoalCondition.option_win_cups:
+    elif world.options.goal_condition.value == GoalCondition.option_win_cups:
         win_cup_value = world.options.win_cups_amount.value
         menu = world.get_region("Main Menu")
         menu.add_event(f"Win {win_cup_value} Cups!", "Victory!", location_type=MSMLocation,
                        item_type=items.MSMItem)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
             behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
 
-    elif world.options.goal_condition == GoalCondition.option_exhibition_tour:
+    elif world.options.goal_condition.value == GoalCondition.option_exhibition_tour:
         amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
 
         main_menu.add_event(f"Win {amount} Exhibition Matches!", "Victory!", location_type=MSMLocation,
                             item_type=items.MSMItem)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
             behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
 
-    elif world.options.goal_condition == GoalCondition.option_party_palooza:
+    elif world.options.goal_condition.value == GoalCondition.option_party_palooza:
         main_menu.add_event(f"Win Party Mode!", "Victory!", location_type=MSMLocation,
                             item_type=items.MSMItem)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth, BossLocations.option_both):
             behemoth_locations = get_location_names_with_ids(["Defeat Behemoth!"])
             behemoth_boss.add_locations(behemoth_locations, MSMLocation)
 
-        if world.options.boss_locations in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
+        if world.options.boss_locations.value in (BossLocations.option_defeat_behemoth_king, BossLocations.option_both):
             behemoth_king_locations = get_location_names_with_ids(["Defeat Behemoth King!"])
             behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
