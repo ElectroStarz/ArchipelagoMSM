@@ -140,7 +140,7 @@ class MSMWorld(World):
 
         # Perform the comparison
         if (active_values and self.options.deathlink_opponent_scores_points.value > max(active_values)
-                and self.options.deathlink.value):
+                and self.options.deathlink.value and self.options.deathlink_consequence == 1):
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name}'s Opponent Scores Points value is bigger than one of their "
                 f"points to win values, they won't be able to send a deathlink in that sport!"
