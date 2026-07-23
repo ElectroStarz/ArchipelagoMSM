@@ -383,13 +383,17 @@ class MSMInterface:
         return {1: "Normal", 2: "Hard"}.get(difficulty)
 
     def special_active(self):
-        value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
-                                                 Pointers.Player.special_active_offsets, "word")
+        try:
+            value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
+                                                     Pointers.Player.special_active_offsets, "word")
 
-        if value == 1:
-            return True
-        else:
+            if value == 1:
+                return True
+            else:
+                return False
+        except RuntimeError:
             return False
+
 
     def get_connection_state(self):
         try:
