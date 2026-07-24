@@ -500,7 +500,7 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    print(itempool)
+    #print(itempool)
     world.multiworld.itempool += itempool
 
 

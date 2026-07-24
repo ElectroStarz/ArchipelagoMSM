@@ -273,7 +273,7 @@ class MSMInterface:
             return court_id, court_name
 
     def get_mode(self):
-        string_stage = self.dolphin_client.read_string(MatchAddresses.current_court)
+        string_stage = self.dolphin_client.read_string(get_address(MatchAddresses.current_court))
         current_sport = string_stage[-2:]
         
         if self.is_in_feed_petey():

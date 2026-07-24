@@ -34,8 +34,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.0.9"
-COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8"]
+CLIENT_VERSION = "2.1.0"
+COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -1073,6 +1073,7 @@ class MSMContext(SuperContext):
 
         if is_paused or is_cutscene or is_loading or is_demo:
             return False
+
 
         party_modes = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
         if mode in party_modes:
@@ -2321,9 +2322,10 @@ class MSMContext(SuperContext):
             "Hockey": self.h_period
         }
 
-        target_value = sport_to_var[sport if sport is not None else ""]
+        target_value = sport_to_var.get(sport, None)
 
-        self.game_interface.dolphin_client.write_byte(addr, target_value)
+        if target_value is not None:
+            self.game_interface.dolphin_client.write_byte(addr, target_value)
 
     async def has_points_win(self):
         """Check if the player has scored the required amount of points to win the period/set"""
@@ -3556,6 +3558,7 @@ class MSMContext(SuperContext):
         await self.handle_unlocked_abilities()
 
         self.toggle_log("rth", "Ready to handle!", "Not ready to handle", self.ready_to_handle(), True)
+        #print(self.ready_to_handle())
 
         self.handled_gecko_codes = False
 

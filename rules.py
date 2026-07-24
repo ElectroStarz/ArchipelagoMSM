@@ -417,12 +417,8 @@ def set_all_location_rules(world: MSMWorld) -> None:
                 base_sm_logic = cup_rule(world, "Sports Mix", cup, "Sports Mix")
 
                 for i in range(1, 4):
-                    if cup == "Star" and i == 3:
-                        location = world.get_location("Sports Mix: Beat Star Cup Round 3")
-                        rule = court_rule(world, "Star Ship", False, round_num=3) & base_sm_logic
-                    else:
-                        location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
-                        rule = court_rule(world, "Peach's Castle", True, round_num=i) & base_sm_logic
+                    location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
+                    rule = court_rule(world, "Peach's Castle", True, round_num=i) & base_sm_logic
 
                     world.set_rule(location, rule)
 
