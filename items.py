@@ -431,11 +431,21 @@ def create_all_items(world: "MSMWorld") -> None:
 
     enabled_sports = world.options.enabled_sports.value
 
-    # Start with sports option
-    if world.options.start_with_sports:
+    # Start with Sports option
+    if world.options.start_with_sports.value > 0:
+        available_sports = [s for s in enabled_sports if s != "Sports Mix"]
+
+        # Make sure we don't try to sample more Sports than available
+        sample_size = min(world.options.start_with_sports.value, len(available_sports))
+
+        given_sports: list[str] = world.random.sample(available_sports, sample_size)
+
         for sport in enabled_sports:
-            if sport != "Sports Mix":
+            if sport in given_sports:
                 world.push_precollected(world.create_item(sport))
+            else:
+                itempool.append(world.create_item(sport))
+
     else:
         for sport in enabled_sports:
             if sport != "Sports Mix":

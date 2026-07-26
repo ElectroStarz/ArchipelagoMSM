@@ -302,7 +302,7 @@ class MSMInterface:
             return {0: "Apple", 1: "Watermelon"}.get(diff)
             
         elif self.is_in_bob_omb():
-            return {0: "Bob-Omb", 1: "Cannon"}.get(diff)
+            return {0: "Bob-omb", 1: "Cannon"}.get(diff)
             
         elif self.is_in_smash():
             return {0: "Hockey Stick", 1: "Hockey Skate"}.get(diff)

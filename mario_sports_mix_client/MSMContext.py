@@ -140,10 +140,10 @@ class MSMCommandProcessor(SuperCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
-    @mark_raw
-    def _cmd_check(self, location_name: str):
-        """Check a location - Used for dev purposes, or if you're lazy ig"""
-        asyncio.create_task(self.ctx.check_location(location_name))
+    # @mark_raw
+    # def _cmd_check(self, location_name: str):
+    #     """Check a location - Used for dev purposes, or if you're lazy ig"""
+    #     asyncio.create_task(self.ctx.check_location(location_name))
 
     def _cmd_debug_mode(self):
         """Toggle client debugging on and off (Default off)"""
