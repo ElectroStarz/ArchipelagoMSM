@@ -134,7 +134,7 @@ def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = Fa
 def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
     """Returns rule for Progressive Alt Paths or Individual Alt Paths."""
 
-    logic = False_
+    logic = False_()
 
     if sport == "Global":
 
@@ -716,7 +716,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                 world.set_rule(entrance, cup_rule(world, "Sports Mix", cup, "Sports Mix"))
 
         # Alternate Path Rules
-        if world.options.include_alternate_paths:
+        if world.options.include_alt_paths:
             
             # Yeah its the same as the tournament sue me it works :P
             if world.options.alt_path_type.value == 0:
