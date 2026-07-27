@@ -1,14 +1,11 @@
 from dataclasses import dataclass
 from Options import *
 
-class StartWithSports(Range):
+class StartWithSports(DefaultOnToggle):
     """Start with random sports? HEAVILY RECOMMENDED
 Will cause immediate BK if off and you DON'T have any party modes given at the start.
 This will NOT give you Sports Mix."""
     display_name = "Start With Random Sports"
-    range_start = 0
-    range_end = 4
-    default = 2
 
 class EnabledSports(OptionSet):
     """Choose which sports to enable

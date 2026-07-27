@@ -9,7 +9,7 @@ from collections import deque
 from random import randint, uniform
 from typing import Dict, Set, Optional, Any
 import Utils
-
+import time
 
 tracker_loaded = False
 try:
@@ -34,8 +34,9 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.1.0"
-COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9"]
+CLIENT_VERSION = "2.1.1"
+COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9",
+                       "2.1.0"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -1709,6 +1710,7 @@ class MSMContext(SuperContext):
 
     # === Party Mode Unlocks ===
 
+
     async def handle_party_unlocks(self):
         """Handles the unlocking of Party Mode courts, could be merged with handle_court_unlocks"""
 
@@ -2819,8 +2821,8 @@ class MSMContext(SuperContext):
             character_name = self.game_interface.get_p_character(character_int)
             #print(f"Character Name: {character_name}")
 
-            #if character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]:
-            await self.check_location(f"Use {character_name}'s Special")
+            if character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]:
+                await self.check_location(f"Use {character_name}'s Special")
 
 
     # === Blocking Functions ===
@@ -3192,8 +3194,10 @@ class MSMContext(SuperContext):
         """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points) in
         everything but dodgeball - Used for DL-C Opponent gains points. Returns True if yes, False if no"""
 
-        current_opponent_score = sum(
-            self.game_interface.dolphin_client.read_word(get_address(addr)) for addr in opponent_score_addresses)
+        addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent)
+        current_opponent_score = self.game_interface.dolphin_client.read_word(addr)
+        mode = self.game_interface.get_mode()
+
 
         if self.previous_opponent_score is None:
             self.previous_opponent_score = current_opponent_score
@@ -3207,6 +3211,9 @@ class MSMContext(SuperContext):
 
         # Check the difference
         score_increase = current_opponent_score - self.previous_opponent_score
+
+        if mode in ["Basketball", "Volleyball", "Dodgeball", "Hockey"]:
+            needed = self.deathlink_o_scores_points
 
         # If the threshold is met, update the tracker and return True
         if score_increase >= self.deathlink_o_scores_points:
@@ -3283,6 +3290,8 @@ class MSMContext(SuperContext):
 
                         # In all modes, updating the player's score should cause them to lose
                         self.game_interface.dolphin_client.write_word(self.game_interface.get_player_score_addr(), 0)
+
+                        time.sleep(1)
 
                         # STUPID ASS VOLLEYBALL NEEDS TO KNOW WHEN THE TIMER IS **ONE** TO NOT SEND A DEATHLINK
                         self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr,
@@ -3507,7 +3516,7 @@ class MSMContext(SuperContext):
             return False
 
     @staticmethod
-    def mode_has_timer( mode: str):
+    def mode_has_timer(mode: str):
         if mode in ["Volleyball", "Harmony Hustle"]:
             return False
         else:
@@ -3558,7 +3567,6 @@ class MSMContext(SuperContext):
         await self.handle_unlocked_abilities()
 
         self.toggle_log("rth", "Ready to handle!", "Not ready to handle", self.ready_to_handle(), True)
-        #print(self.ready_to_handle())
 
         self.handled_gecko_codes = False
 
