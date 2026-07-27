@@ -71,59 +71,129 @@ ex_difficulties = {
     "Exhibition Expert":                 ItemData(base_id + 9, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
 }
 
-# Cups / Tournaments (100 range)
+# Cups / Tournaments / Alt Paths (100 range)
 basketball_items_n = {
     "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 101, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
     "Basketball: Flower Cup (Normal)":   ItemData(base_id + 102, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
     "Basketball: Star Cup (Normal)":     ItemData(base_id + 103, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Mushroom Cup Alt Paths (Normal)":   ItemData(base_id + 104, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Flower Cup Alt Paths (Normal)":     ItemData(base_id + 105, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Star Cup Alt Paths (Normal)":       ItemData(base_id + 106, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
 }
 
 basketball_items_h = {
     "Basketball: Mushroom Cup (Hard)":   ItemData(base_id + 111, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
     "Basketball: Flower Cup (Hard)":     ItemData(base_id + 112, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
     "Basketball: Star Cup (Hard)":       ItemData(base_id + 113, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Mushroom Cup Alt Paths (Hard)":     ItemData(base_id + 114, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Flower Cup Alt Paths (Hard)":       ItemData(base_id + 115, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Star Cup Alt Paths (Hard)":         ItemData(base_id + 116, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
 }
 
+basketball_items_g = {
+    "Basketball: Mushroom Cup Alt Paths":   ItemData(base_id + 117, IC.progression, ItemGroup.BASKETBALL_GLOBAL_ALT),
+    "Basketball: Flower Cup Alt Paths":     ItemData(base_id + 118, IC.progression, ItemGroup.BASKETBALL_GLOBAL_ALT),
+    "Basketball: Star Cup Alt Paths":       ItemData(base_id + 119, IC.progression, ItemGroup.BASKETBALL_GLOBAL_ALT),
+}
+# same alt path additions from basketball but for dodgeball, volleyball, and hockey
+#  
 dodgeball_items_n = {
     "Dodgeball: Mushroom Cup (Normal)":  ItemData(base_id + 121, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
     "Dodgeball: Flower Cup (Normal)":    ItemData(base_id + 122, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
     "Dodgeball: Star Cup (Normal)":      ItemData(base_id + 123, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Mushroom Cup Alt Paths (Normal)":  ItemData(base_id + 124, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Flower Cup Alt Paths (Normal)":    ItemData(base_id + 125, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Star Cup Alt Paths (Normal)":      ItemData(base_id + 126, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
 }
 
 dodgeball_items_h = {
     "Dodgeball: Mushroom Cup (Hard)":    ItemData(base_id + 131, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
     "Dodgeball: Flower Cup (Hard)":      ItemData(base_id + 132, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
     "Dodgeball: Star Cup (Hard)":        ItemData(base_id + 133, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Mushroom Cup Alt Paths (Hard)":  ItemData(base_id + 134, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Flower Cup Alt Paths (Hard)":    ItemData(base_id + 135, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Star Cup Alt Paths (Hard)":      ItemData(base_id + 136, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+}
+
+dodgeball_items_g = {
+    "Dodgeball: Mushroom Cup Alt Paths":  ItemData(base_id + 137, IC.progression, ItemGroup.DODGEBALL_GLOBAL_ALT),
+    "Dodgeball: Flower Cup Alt Paths":    ItemData(base_id + 138, IC.progression, ItemGroup.DODGEBALL_GLOBAL_ALT),
+    "Dodgeball: Star Cup Alt Paths":      ItemData(base_id + 139, IC.progression, ItemGroup.DODGEBALL_GLOBAL_ALT),
 }
 
 volleyball_items_n = {
     "Volleyball: Mushroom Cup (Normal)": ItemData(base_id + 141, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
     "Volleyball: Flower Cup (Normal)":   ItemData(base_id + 142, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
     "Volleyball: Star Cup (Normal)":     ItemData(base_id + 143, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 144, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 145, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 146, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
 }
 
 volleyball_items_h = {
     "Volleyball: Mushroom Cup (Hard)":   ItemData(base_id + 151, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
     "Volleyball: Flower Cup (Hard)":     ItemData(base_id + 152, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
     "Volleyball: Star Cup (Hard)":       ItemData(base_id + 153, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 154, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 155, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 156, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+}
+
+volleyball_items_g = {
+    "Volleyball: Mushroom Cup Alt Paths": ItemData(base_id + 147, IC.progression, ItemGroup.VOLLEYBALL_GLOBAL_ALT),
+    "Volleyball: Flower Cup Alt Paths":   ItemData(base_id + 148, IC.progression, ItemGroup.VOLLEYBALL_GLOBAL_ALT),
+    "Volleyball: Star Cup Alt Paths":     ItemData(base_id + 149, IC.progression, ItemGroup.VOLLEYBALL_GLOBAL_ALT),
 }
 
 hockey_items_n = {
     "Hockey: Mushroom Cup (Normal)":     ItemData(base_id + 161, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
     "Hockey: Flower Cup (Normal)":       ItemData(base_id + 162, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
     "Hockey: Star Cup (Normal)":         ItemData(base_id + 163, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Mushroom Cup Alt Paths (Normal)":     ItemData(base_id + 164, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Flower Cup Alt Paths (Normal)":       ItemData(base_id + 165, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Star Cup Alt Paths (Normal)":         ItemData(base_id + 166, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
 }
 
 hockey_items_h = {
     "Hockey: Mushroom Cup (Hard)":       ItemData(base_id + 171, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
     "Hockey: Flower Cup (Hard)":         ItemData(base_id + 172, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
     "Hockey: Star Cup (Hard)":           ItemData(base_id + 173, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 174, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 175, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Star Cup Alt Paths (Hard)":     ItemData(base_id + 176, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+}
+
+hockey_items_g = {
+    "Hockey: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 177, IC.progression, ItemGroup.HOCKEY_GLOBAL_ALT),
+    "Hockey: Flower Cup Alt Paths (Global)":   ItemData(base_id + 178, IC.progression, ItemGroup.HOCKEY_GLOBAL_ALT),
+    "Hockey: Star Cup Alt Paths (Global)":     ItemData(base_id + 179, IC.progression, ItemGroup.HOCKEY_GLOBAL_ALT),
 }
 
 sports_mix_cups = {
     "Sports Mix: Mushroom Cup":          ItemData(base_id + 181, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
     "Sports Mix: Flower Cup":            ItemData(base_id + 182, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
     "Sports Mix: Star Cup":              ItemData(base_id + 183, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Mushroom Cup Alt Paths":  ItemData(base_id + 184, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Flower Cup Alt Paths":    ItemData(base_id + 185, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Star Cup Alt Paths":      ItemData(base_id + 186, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+}
+
+global_alt_paths_n = {
+    "Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 190, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Flower Cup Alt Paths (Normal)":   ItemData(base_id + 191, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Star Cup Alt Paths (Normal)":     ItemData(base_id + 192, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+}
+
+global_alt_paths_h = {
+    "Mushroom Cup Alt Paths (Hard)":   ItemData(base_id + 193, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Flower Cup Alt Paths (Hard)":     ItemData(base_id + 194, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Star Cup Alt Paths (Hard)":       ItemData(base_id + 195, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+}
+
+global_alt_paths_g = {
+    "Mushroom Cup Alt Paths": ItemData(base_id + 196, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Flower Cup Alt Paths":   ItemData(base_id + 197, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Star Cup Alt Paths":     ItemData(base_id + 198, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
 }
 
 # Crystals (200 range)
