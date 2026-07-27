@@ -493,6 +493,18 @@ class MSMCommandProcessor(SuperCommandProcessor):
         else:
             logger.info("No traps in queue")
 
+    def _cmd_filler_reduce(self):
+        """Reduces the size of the filler queue by 20 if issues occur (Only if filler queue is more than 30)"""
+
+        if len(self.ctx.filler_to_give) > 30:
+            for _ in range(20):
+                self.ctx.filler_to_give.popleft()
+
+            logger.info(f"Cleared 20 items from filler queue!\n"
+                        f"Updated Queue: {self.ctx.filler_to_give}")
+        else:
+            logger.info("Filler queue is less than 30, if an issue is still occurring, ping electrostarz")
+
 
 # noinspection PyDeprecation
 class MSMContext(SuperContext):
@@ -3214,9 +3226,11 @@ class MSMContext(SuperContext):
 
         if mode in ["Basketball", "Volleyball", "Dodgeball", "Hockey"]:
             needed = self.deathlink_o_scores_points
+        else:
+            needed = self.deathlink_o_scores_points * 20
 
         # If the threshold is met, update the tracker and return True
-        if score_increase >= self.deathlink_o_scores_points:
+        if score_increase >= needed:
             # Reset the "previous" score to the current one so it can start counting up again
             self.previous_opponent_score = current_opponent_score
             return True
