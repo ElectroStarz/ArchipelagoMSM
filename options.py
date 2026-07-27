@@ -445,16 +445,13 @@ from Coins Trap, etc)"""
             case 2: return "CPU 4 (Yellow)"
             case _: return "ERROR"
 
-class IncludeAltPaths(Choice):
+class IncludeAltPaths(Toggle):
     """Include alternate paths?
     No: Alt Paths will not be included
     Yes: Alt Paths will be included
     LR Split: Alt Paths will be split between Left and Right"""
 
     display_name = "Include Alternate Paths"
-    option_no = 0
-    option_yes = 1
-    option_lr_split = 2
 
 class AltPathType(Choice):
     """What Type of Alt Path Locations do you want?
