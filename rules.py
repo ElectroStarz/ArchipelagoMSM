@@ -136,13 +136,19 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
 
     logic = False_
 
-    if world.options.alt_path_type.value >= 2:
+    if sport == "Global":
 
         for enabled_sport in world.options.enabled_sports.value:
 
             if enabled_sport != "Sports Mix":
-                cup_logic = cup_rule(world, enabled_sport, cup_name, category)
+
+                if category == "Global":
+                    cup_logic = cup_rule(world, enabled_sport, cup_name, "Normal") | cup_rule(world, enabled_sport, cup_name, "Hard")
+                else:
+                    cup_logic = cup_rule(world, enabled_sport, cup_name, category)
+                
                 court_logic = court_rule(world, tournament_rules[enabled_sport][cup_name][0], False) & court_rule(world, tournament_rules[enabled_sport][cup_name][1], False)
+
                 combined_logic = cup_logic & court_logic
                 logic = logic | combined_logic
             
@@ -150,14 +156,34 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
         sm_logic_cup = cup_rule(world, "Sports Mix", cup_name, "Sports Mix")
         sm_combined_logic = sm_logic_court & sm_logic_cup
         logic = logic | sm_combined_logic
-        
+
+        if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
+            progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
+            logic = logic & progressive_logic
+        else:
+            logic = logic & Has(f"{cup_name} Cup Alt Paths ({category})")
+
         return logic
     
     else:
 
-        cup_logic = cup_rule(world, sport, cup_name, category)
-        court_logic = court_rule(world, tournament_rules[sport][cup_name][0], False) & court_rule(world, tournament_rules[sport][cup_name][1], False)
+        if sport == "Sports Mix":
+            court_logic = sports_mix_court_rule(1) & sports_mix_court_rule(2)
+        else:
+            court_logic = court_rule(world, tournament_rules[sport][cup_name][0], False) & court_rule(world, tournament_rules[sport][cup_name][1], False)
+        
+        if category == "Global":
+            cup_logic = cup_rule(world, sport, cup_name, "Normal") | cup_rule(world, sport, cup_name, "Hard")
+        else:
+            cup_logic = cup_rule(world, sport, cup_name, category)
+
         logic = cup_logic & court_logic
+
+        if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
+            progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
+            logic = logic & progressive_logic
+        else:
+            logic = logic & Has(f"{sport}:{cup_name} Cup Alt Paths ({category})")
         
         return logic
 
@@ -691,53 +717,63 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
 
         # Alternate Path Rules
         if world.options.include_alternate_paths:
-
-            # Tournament cup rules
-            cup_difficulties = ["Normal"]
-            if world.options.hard_tournament_difficulty:
-                cup_difficulties.append("Hard")
-
-            if world.options.alt_path_type == 0:
-                for difficulty in cup_difficulties:
-                    for sport, tournament_cups in tournament_rules.items():
-                        if sport in world.options.enabled_sports.value:
-                            for cup, courts in tournament_cups.items():
-                                base_cup_logic = cup_rule(world, sport, cup, difficulty)
-
-                                for i in range(1, 4):
-                                    needed = courts[:i]
-                                    if not needed:
-                                        court_logic = Has("")
-                                    else:
-                                        court_logic = court_rule(world, needed[0], False)
-                                        for court in needed[1:]:
-                                            court_logic &= court_rule(world, court, False)
-
-                                    location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
-                                    world.set_rule(location, Has(sport) & base_cup_logic & court_logic)
-
-
-            if world.options.alt_path_type == 1:
+            
+            # Yeah its the same as the tournament sue me it works :P
+            if world.options.alt_path_type.value == 0:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
                         for cup in cup_tiers:
-                            enterance = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> {cup} Cup (Normal) Alternate Path")
-                            cup_rule = cup_rule(world, sport, cup, "Normal")
-                            court_rule = court_rule(world, tournament_rules[sport][cup][0], False)
-                            world.set_rule(entrance, {sport})
-                            for cup, courts in tournament_cups.items():
+                            entrance = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> {cup} Cup Alt Paths (Normal)")
+                            world.set_rule(entrance, alternate_path_rule(world, sport, cup, "Normal"))
 
-                                for i in range(1, 4):
-                                    needed = courts[:i]
-                                    if not needed:
-                                        court_logic = Has("")
-                                    else:
-                                        court_logic = court_rule(world, needed[0], False)
-                                        for court in needed[1:]:
-                                            court_logic &= court_rule(world, court, False)
+                if hard_enabled:
+                    for sport in world.options.enabled_sports.value:
+                        if sport != "Sports Mix":
+                            for cup in cup_tiers:
+                                entrance = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> {cup} Cup Alt Paths (Hard)")
+                                world.set_rule(entrance, alternate_path_rule(world, sport, cup, "Hard"))
 
-                                    location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
-                                    world.set_rule(location, Has(sport) & base_cup_logic & court_logic)
+                if "Sports Mix" in world.options.enabled_sports.value:
+                    for cup in cup_tiers:
+                        entrance = world.get_entrance(f"Sports Mix: {cup} Cup -> {cup} Cup Alt Paths")
+                        world.set_rule(entrance, alternate_path_rule(world, "Sports Mix", cup, "Sports Mix"))
+            
+            elif world.options.alt_path_type.value == 1:
+                for sport in world.options.enabled_sports.value:
+                    if sport != "Sports Mix":
+                        for cup in cup_tiers:
+                            entrance_n = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> {cup} Cup Alt Paths (Global)")
+                            entrance_h = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> {cup} Cup Alt Paths (Global)")
+                            world.set_rule(entrance_n, alternate_path_rule(world, sport, cup, "Global"))
+                            world.set_rule(entrance_h, alternate_path_rule(world, sport, cup, "Global"))
+                    
+                    if "Sports Mix" in world.options.enabled_sports.value:
+                        for cup in cup_tiers:
+                            entrance = world.get_entrance(f"Sports Mix: {cup} Cup -> {cup} Cup Alt Paths (Global)")
+                            world.set_rule(entrance, alternate_path_rule(world, "Sports Mix", cup, "Sports Mix"))
+            
+            elif world.options.alt_path_type.value == 2 or world.options.alt_path_type.value == 4:
+                for sport in world.options.enabled_sports.value:
+                    if sport != "Sports Mix":
+                        for cup in cup_tiers:
+                            entrance = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> Global: {cup} Cup Alt Paths (Normal)")
+                            world.set_rule(entrance, alternate_path_rule(world, "Global", cup, "Normal"))
+
+                if hard_enabled:
+                    for sport in world.options.enabled_sports.value:
+                        if sport != "Sports Mix":
+                            for cup in cup_tiers:
+                                entrance = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> Global: {cup} Cup Alt Paths (Hard)")
+                                world.set_rule(entrance, alternate_path_rule(world, sport, cup, "Hard"))
+
+            elif world.options.alt_path_type.value == 3 or world.options.alt_path_type.value == 5:    
+                for sport in world.options.enabled_sports.value:
+                    if sport != "Sports Mix":
+                        for cup in cup_tiers:
+                            entrance_n = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> Global: {cup} Cup Alt Paths (Global)")
+                            entrance_h = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> Global: {cup} Cup Alt Paths (Global)")
+                            world.set_rule(entrance_n, alternate_path_rule(world, "Global", cup, "Global"))
+                            world.set_rule(entrance_h, alternate_path_rule(world, "Global", cup, "Global"))
             
 
     # Party Mode Entrance Rules

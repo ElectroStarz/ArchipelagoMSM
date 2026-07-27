@@ -48,6 +48,7 @@ class ItemGroup(str, Enum):
 
     PROGRESSIVE_CUPS = "Progressive Cups"
     PROGRESSIVE_COURTS = "Progressive Courts"
+    PROGRESSIVE_ALTERNATE_PATHS = "Progressive Alternate Paths"
 
     EXHIBITION_DIFFICULTIES = "Exhibition Difficulties"
 
@@ -239,9 +240,9 @@ global_alt_paths_h = {
 }
 
 global_alt_paths_g = {
-    "Mushroom Cup Alt Paths": ItemData(base_id + 196, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
-    "Flower Cup Alt Paths":   ItemData(base_id + 197, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
-    "Star Cup Alt Paths":     ItemData(base_id + 198, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Mushroom Cup Alt Paths (Global)": ItemData(base_id + 196, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Flower Cup Alt Paths (Global)":   ItemData(base_id + 197, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Star Cup Alt Paths (Global)":     ItemData(base_id + 198, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
 }
 
 # Crystals (200 range)
@@ -274,6 +275,7 @@ individual_courts = {
 progressive_items = {
     "Progressive Court":                 ItemData(base_id + 316, IC.progression, ItemGroup.PROGRESSIVE_COURTS),
     "Progressive Cup":                   ItemData(base_id + 317, IC.progression, ItemGroup.PROGRESSIVE_CUPS),
+    "Progressive Alternate Path":        ItemData(base_id + 318, IC.progression, ItemGroup.PROGRESSIVE_ALTERNATE_PATHS),
 }
 
 # Characters (400 range)
@@ -710,6 +712,7 @@ def create_cups(world: "MSMWorld", itempool):
             itempool.append(world.create_item("Progressive Cup"))
 
 
+
     # --- Individual Cups ---
     else:
         all_normal_items = {
@@ -819,6 +822,7 @@ def create_alt_paths(world: "MSMWorld", itempool):
 
     prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
+    
     if world.options.alt_path_type == 0:
         for name in all_normal_items:
             sport = prefix_to_sport[name[:1]]
@@ -840,10 +844,27 @@ def create_alt_paths(world: "MSMWorld", itempool):
     elif world.options.alt_path_type == 2:
         for name in global_sport_items:
             itempool.append(world.create_item(name))
-
-    else:
+    
+    elif world.options.alt_path_type == 3:
         for name in global_alt_paths_g:
             itempool.append(world.create_item(name))
+    
+    elif world.options.alt_path_type == 4:
+        total_progressive_alt_paths = 3
+        if world.options.hard_tournament_difficulty:
+            total_progressive_alt_paths += 3
+        
+        for _ in range(total_progressive_alt_paths):
+            itempool.append(world.create_item("Progressive Alternate Path"))
+    
+    elif world.options.alt_path_type == 5:
+        # im too lazy to loop
+        itempool.append(world.create_item("Progressive Alternate Path"))
+        itempool.append(world.create_item("Progressive Alternate Path"))
+        itempool.append(world.create_item("Progressive Alternate Path"))
+        
+    else:
+        raise OptionError(f"[Mario Sports Mix] {world.player_name}'s alt path type is invalid.")
 
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
