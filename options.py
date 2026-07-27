@@ -458,13 +458,16 @@ class AltPathType(Choice):
     Full Universal: Alt Path Locations will be for **any** difficulty/sport
     Sport Universal: Alt Path Locations will be for **any** sport
     Difficulty Universal: Alt Path Locations will be for **any** difficulty
-    None: Alt Path locations will be per sport and per difficulty"""
+    None: Alt Path locations will be per sport and per difficulty
+    Progessive Options give Progressive items which unlock the Alt Paths in cup order"""
 
     display_name = "Alternate Path Type"
     option_none = 0
     option_difficulty_combine = 1
     option_sport_combine = 2
     option_full_combine = 3
+    progressive_sport_combine = 4
+    progressive_full_combine = 5
 
 class AlwaysSpawnAltPaths(Toggle):
     """Make it so the criteria to spawn Alternate Paths is always enabled"""

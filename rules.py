@@ -19,6 +19,18 @@ courts_dict = {
     "Ghoulish Galleon": 13, "Star Ship": 14, "Behemoth Stage": 15,
 }
 
+cup_dict = {
+    "Mushroom (Normal)": 1,
+    "Flower (Normal)": 2,
+    "Star (Normal)": 3,
+    "Mushroom (Hard)": 4,
+    "Flower (Hard)": 5,
+    "Star (Hard)": 6,
+    "Mushroom (Global)": 1,
+    "Flower (Global)": 2,
+    "Star (Global)": 3
+}
+
 courts_list = [
     "Mario Stadium", "Koopa Troopa Beach", "Toad Park", "DK Dock",
     "Peach's Castle", "Daisy Garden", "Luigi's Mansion", "Wario Factory",
@@ -119,6 +131,37 @@ def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = Fa
     else:
         return Has(court_name)
 
+def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
+    """Returns rule for Progressive Alt Paths or Individual Alt Paths."""
+
+    logic = False_
+
+    if world.options.alt_path_type.value >= 2:
+
+        for enabled_sport in world.options.enabled_sports.value:
+
+            if enabled_sport != "Sports Mix":
+                cup_logic = cup_rule(world, enabled_sport, cup_name, category)
+                court_logic = court_rule(world, tournament_rules[enabled_sport][cup_name][0], False) & court_rule(world, tournament_rules[enabled_sport][cup_name][1], False)
+                combined_logic = cup_logic & court_logic
+                logic = logic | combined_logic
+            
+        sm_logic_court = sports_mix_court_rule(1) & sports_mix_court_rule(2)
+        sm_logic_cup = cup_rule(world, "Sports Mix", cup_name, "Sports Mix")
+        sm_combined_logic = sm_logic_court & sm_logic_cup
+        logic = logic | sm_combined_logic
+        
+        return logic
+    
+    else:
+
+        cup_logic = cup_rule(world, sport, cup_name, category)
+        court_logic = court_rule(world, tournament_rules[sport][cup_name][0], False) & court_rule(world, tournament_rules[sport][cup_name][1], False)
+        logic = cup_logic & court_logic
+        
+        return logic
+
+     
 
 def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
     """Calculates exactly how many Progressive Cups are needed for a specific tier."""
@@ -649,14 +692,29 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
         # Alternate Path Rules
         if world.options.include_alternate_paths:
 
+            # Tournament cup rules
+            cup_difficulties = ["Normal"]
+            if world.options.hard_tournament_difficulty:
+                cup_difficulties.append("Hard")
+
             if world.options.alt_path_type == 0:
-                for sport in world.options.enabled_sports.value:
-                    if sport != "Sports Mix":
-                        for cup in cup_tiers:
-                            entrance = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> {cup} Cup (Normal) Alternate Path")
-                            cup_rule = cup_rule(world, sport, cup, "Normal")
-                            court_rule = court_rule(world, tournament_rules[sport][cup][0], False) &
-                            world.set_rule(entrance, {sport})
+                for difficulty in cup_difficulties:
+                    for sport, tournament_cups in tournament_rules.items():
+                        if sport in world.options.enabled_sports.value:
+                            for cup, courts in tournament_cups.items():
+                                base_cup_logic = cup_rule(world, sport, cup, difficulty)
+
+                                for i in range(1, 4):
+                                    needed = courts[:i]
+                                    if not needed:
+                                        court_logic = Has("")
+                                    else:
+                                        court_logic = court_rule(world, needed[0], False)
+                                        for court in needed[1:]:
+                                            court_logic &= court_rule(world, court, False)
+
+                                    location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
+                                    world.set_rule(location, Has(sport) & base_cup_logic & court_logic)
 
 
             if world.options.alt_path_type == 1:
@@ -667,7 +725,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                             cup_rule = cup_rule(world, sport, cup, "Normal")
                             court_rule = court_rule(world, tournament_rules[sport][cup][0], False)
                             world.set_rule(entrance, {sport})
-                            for cup, courts in tournament_cups.items()
+                            for cup, courts in tournament_cups.items():
 
                                 for i in range(1, 4):
                                     needed = courts[:i]
