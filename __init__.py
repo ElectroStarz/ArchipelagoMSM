@@ -5,7 +5,7 @@ from Options import OptionError
 from worlds.LauncherComponents import Component, Type, components, launch, icon_paths
 from worlds.AutoWorld import WebWorld, World
 from . import regions, rules, locations
-from .options import MSMOptions, msm_option_groups
+from .options import *
 from .items import ITEM_NAME_TO_ID, auto_item_groups
 from .locations import LOCATION_NAME_TO_ID, auto_location_groups
 import json
@@ -123,16 +123,9 @@ class MSMWorld(World):
                 setattr(self.options, option_name, option.from_any(value))
 
         # Boss Location check
-        if (self.options.goal_condition.value == self.options.boss_locations.value and
-                self.options.goal_condition.value < 3):
+        if self.options.goal_condition.value == self.options.boss_locations.value:
             raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s Boss Locations option is the same as their win condition!"
-            )
-
-        if self.options.boss_locations.value in (1, 2) and not self.options.include_tournaments:
-            raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s Boss Locations options requires tournaments but they don't"
-                f"have them enabled!"
+                f"[Mario Sports Mix] {self.player_name}'s Be Mean option is the same as their win condition!"
             )
 
         # Max points voids deathlink points check

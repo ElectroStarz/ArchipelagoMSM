@@ -2,10 +2,9 @@ from dataclasses import dataclass
 from Options import *
 
 class StartWithSports(DefaultOnToggle):
-    """Start with random sports? HEAVILY RECOMMENDED
-Will cause immediate BK if off and you DON'T have any party modes given at the start.
-This will NOT give you Sports Mix."""
-    display_name = "Start With Random Sports"
+    """Start with 4 sports? HEAVILY RECOMMENDED
+Will cause immediate BK if off and you DON'T have any party modes given at the start."""
+    display_name = "Start With Sports - READ DESCRIPTION!"
 
 class EnabledSports(OptionSet):
     """Choose which sports to enable
@@ -446,6 +445,34 @@ from Coins Trap, etc)"""
             case 2: return "CPU 4 (Yellow)"
             case _: return "ERROR"
 
+class IncludeAltPaths(Toggle):
+    """Include alternate paths?
+    No: Alt Paths will not be included
+    Yes: Alt Paths will be included
+    LR Split: Alt Paths will be split between Left and Right"""
+
+    display_name = "Include Alternate Paths"
+
+class AltPathType(Choice):
+    """What Type of Alt Path Locations do you want?
+    Full Universal: Alt Path Locations will be for **any** difficulty/sport
+    Sport Universal: Alt Path Locations will be for **any** sport
+    Difficulty Universal: Alt Path Locations will be for **any** difficulty
+    None: Alt Path locations will be per sport and per difficulty
+    Progessive Options give Progressive items which unlock the Alt Paths in cup order"""
+
+    display_name = "Alternate Path Type"
+    option_none = 0
+    option_difficulty_combine = 1
+    option_sport_combine = 2
+    option_full_combine = 3
+    progressive_sport_combine = 4
+    progressive_full_combine = 5
+
+class AlwaysSpawnAltPaths(Toggle):
+    """Make it so the criteria to spawn Alternate Paths is always enabled"""
+    display_name = "Always Spawn Alt Paths"
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
@@ -495,6 +522,11 @@ msm_option_groups = [
         StartWithParty,
         PartyModeOpponent,
     ]),
+    OptionGroup("Alternate Path Options", [
+        IncludeAltPaths,
+        AltPathType,
+        AlwaysSpawnAltPaths,
+    ]),
     OptionGroup("Deathlink Options", [
         Deathlink,
         DeathlinkAction,
@@ -535,6 +567,11 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
+
+    # Alternate Path Options
+    include_alt_paths: IncludeAltPaths
+    alt_path_type: AltPathType
+    always_spawn_alt_paths: AlwaysSpawnAltPaths
 
     # Tournament Rules
     basket_time: BasketTime

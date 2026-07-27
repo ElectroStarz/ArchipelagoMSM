@@ -9,7 +9,7 @@ from collections import deque
 from random import randint, uniform
 from typing import Dict, Set, Optional, Any
 import Utils
-import time
+
 
 tracker_loaded = False
 try:
@@ -34,9 +34,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.1.1"
-COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9",
-                       "2.1.0"]
+CLIENT_VERSION = "2.1.0"
+COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -141,10 +140,10 @@ class MSMCommandProcessor(SuperCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
-    # @mark_raw
-    # def _cmd_check(self, location_name: str):
-    #     """Check a location - Used for dev purposes, or if you're lazy ig"""
-    #     asyncio.create_task(self.ctx.check_location(location_name))
+    @mark_raw
+    def _cmd_check(self, location_name: str):
+        """Check a location - Used for dev purposes, or if you're lazy ig"""
+        asyncio.create_task(self.ctx.check_location(location_name))
 
     def _cmd_debug_mode(self):
         """Toggle client debugging on and off (Default off)"""
@@ -315,6 +314,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
             "modes": self.unlocked_modes,
             "courts": self.unlocked_courts,
             "cups": self.unlocked_cups,
+            "alt paths": self.alt_paths,
             "exhibition": self.unlocked_ex,
             "ex": self.unlocked_ex,
             "characters": self.unlocked_characters,
@@ -524,6 +524,9 @@ class MSMContext(SuperContext):
     win_cups_amount: Any = int
     exhibition_difficulties: Any = ()
     hard_tournament_difficulty: Any = bool
+    include_alt_paths: Any = bool
+    alt_path_type: Any = int
+    always_spawn_alt_paths: Any = bool
 
     # Deathlink Stuff
     deathlink_enabled: Any = False
@@ -618,6 +621,7 @@ class MSMContext(SuperContext):
         # Lists for items
         self.unlocked_modes: set[str] = set()
         self.unlocked_cups: set[str] = set()
+        self.unlocked_alt_paths: set[str] = set()
         self.unlocked_ex_diffs: set[str] = set()
         self.progressive_courts: set[str] = set()
         self.progressive_cups: set[str] = set()
@@ -868,6 +872,10 @@ class MSMContext(SuperContext):
 
 
             # Custom Tournament Settings Data
+            self.include_alt_paths = self.slot_data.get("include_alt_paths")
+            self.alt_path_type = self.slot_data.get("alt_path_type")
+            self.always_spawn_alt_paths = self.slot_data.get("always_spawn_alt_paths")
+
             self.custom_basket_time = self.slot_data.get("basket_time")
             self.enable_b_points = self.slot_data.get("enable_b_points_win")
             self.b_points_win = self.slot_data.get("b_points_win")
@@ -991,6 +999,7 @@ class MSMContext(SuperContext):
         self.unlocked_ex_diffs.clear()
         self.progressive_courts.clear()
         self.unlocked_cups.clear()
+        self.unlocked_alt_paths.clear()
         self.unlocked_sports_crystals.clear()
         self.unlocked_courts.clear()
         self.unlocked_characters.clear()
@@ -1161,6 +1170,7 @@ class MSMContext(SuperContext):
             "Sherbet Sea", "Rowdy Raft", "Fire Mountain"
         )
 
+
         ability_tuple = ("Special Meter", )
 
 
@@ -1176,10 +1186,15 @@ class MSMContext(SuperContext):
                     self.debug_log(f"Added {item_name} to unlocked_modes")
 
                 # Format to Basketball:, Dodgeball:, etc
+                # Changed for alt path names
                 for sport in sport_tuple:
                     if item_name.startswith(f"{sport}:"):
-                        self.unlocked_cups.add(item_name)
-                        self.debug_log(f"Added {item_name} to unlocked_cups")
+                            if "Alt".casefold() in item_name.casefold():
+                                self.unlocked_alt_paths.add(item_name)
+                                self.debug_log(f"Added {item_name} to unlocked_alt_paths")
+                            else:
+                                self.unlocked_cups.add(item_name)
+                                self.debug_log(f"Added {item_name} to unlocked_cups")
 
                 if item_name.startswith("Exhibition"):
                     self.unlocked_ex_diffs.add(item_name)
@@ -1555,6 +1570,9 @@ class MSMContext(SuperContext):
             else:
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 3)
 
+    # === Alt Path Unlocks ===
+
+    async def handle_alt_path_unlocks(self):
 
     # === Exhibition Unlocks ===
 
@@ -1709,7 +1727,6 @@ class MSMContext(SuperContext):
 
 
     # === Party Mode Unlocks ===
-
 
     async def handle_party_unlocks(self):
         """Handles the unlocking of Party Mode courts, could be merged with handle_court_unlocks"""
@@ -2821,8 +2838,8 @@ class MSMContext(SuperContext):
             character_name = self.game_interface.get_p_character(character_int)
             #print(f"Character Name: {character_name}")
 
-            if character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]:
-                await self.check_location(f"Use {character_name}'s Special")
+            #if character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]:
+            await self.check_location(f"Use {character_name}'s Special")
 
 
     # === Blocking Functions ===
@@ -3194,10 +3211,8 @@ class MSMContext(SuperContext):
         """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points) in
         everything but dodgeball - Used for DL-C Opponent gains points. Returns True if yes, False if no"""
 
-        addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent)
-        current_opponent_score = self.game_interface.dolphin_client.read_word(addr)
-        mode = self.game_interface.get_mode()
-
+        current_opponent_score = sum(
+            self.game_interface.dolphin_client.read_word(get_address(addr)) for addr in opponent_score_addresses)
 
         if self.previous_opponent_score is None:
             self.previous_opponent_score = current_opponent_score
@@ -3211,9 +3226,6 @@ class MSMContext(SuperContext):
 
         # Check the difference
         score_increase = current_opponent_score - self.previous_opponent_score
-
-        if mode in ["Basketball", "Volleyball", "Dodgeball", "Hockey"]:
-            needed = self.deathlink_o_scores_points
 
         # If the threshold is met, update the tracker and return True
         if score_increase >= self.deathlink_o_scores_points:
@@ -3290,8 +3302,6 @@ class MSMContext(SuperContext):
 
                         # In all modes, updating the player's score should cause them to lose
                         self.game_interface.dolphin_client.write_word(self.game_interface.get_player_score_addr(), 0)
-
-                        time.sleep(1)
 
                         # STUPID ASS VOLLEYBALL NEEDS TO KNOW WHEN THE TIMER IS **ONE** TO NOT SEND A DEATHLINK
                         self.game_interface.dolphin_client.write_float(self.addresslib.timer_addr,
@@ -3516,7 +3526,7 @@ class MSMContext(SuperContext):
             return False
 
     @staticmethod
-    def mode_has_timer(mode: str):
+    def mode_has_timer( mode: str):
         if mode in ["Volleyball", "Harmony Hustle"]:
             return False
         else:
@@ -3567,6 +3577,7 @@ class MSMContext(SuperContext):
         await self.handle_unlocked_abilities()
 
         self.toggle_log("rth", "Ready to handle!", "Not ready to handle", self.ready_to_handle(), True)
+        #print(self.ready_to_handle())
 
         self.handled_gecko_codes = False
 

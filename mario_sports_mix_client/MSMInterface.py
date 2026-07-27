@@ -296,13 +296,13 @@ class MSMInterface:
             return None
 
     def get_tab(self):
-        diff = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
+        diff = self.dolphin_client.read_word(PartyMode.difficulty)
             
         if self.is_in_feed_petey():
             return {0: "Apple", 1: "Watermelon"}.get(diff)
             
         elif self.is_in_bob_omb():
-            return {0: "Bob-omb", 1: "Cannon"}.get(diff)
+            return {0: "Bob-Omb", 1: "Cannon"}.get(diff)
             
         elif self.is_in_smash():
             return {0: "Hockey Stick", 1: "Hockey Skate"}.get(diff)
