@@ -445,6 +445,34 @@ from Coins Trap, etc)"""
             case 2: return "CPU 4 (Yellow)"
             case _: return "ERROR"
 
+class IncludeAltPaths(Choice):
+    """Include alternate paths?
+    No: Alt Paths will not be included
+    Yes: Alt Paths will be included
+    LR Split: Alt Paths will be split between Left and Right"""
+
+    display_name = "Include Alternate Paths"
+    option_no = 0
+    option_yes = 1
+    option_lr_split = 2
+
+class AltPathType(Choice):
+    """What Type of Alt Path Locations do you want?
+    Full Universal: Alt Path Locations will be for **any** difficulty/sport
+    Sport Universal: Alt Path Locations will be for **any** sport
+    Difficulty Universal: Alt Path Locations will be for **any** difficulty
+    None: Alt Path locations will be per sport and per difficulty"""
+
+    display_name = "Alternate Path Type"
+    option_none = 0
+    option_difficulty_combine = 1
+    option_sport_combine = 2
+    option_full_combine = 3
+
+class AlwaysSpawnAltPaths(Toggle):
+    """Make it so the criteria to spawn Alternate Paths is always enabled"""
+    display_name = "Always Spawn Alt Paths"
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
@@ -494,6 +522,11 @@ msm_option_groups = [
         StartWithParty,
         PartyModeOpponent,
     ]),
+    OptionGroup("Alternate Path Options", [
+        IncludeAltPaths,
+        AltPathType,
+        AlwaysSpawnAltPaths,
+    ]),
     OptionGroup("Deathlink Options", [
         Deathlink,
         DeathlinkAction,
@@ -534,6 +567,11 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
+
+    # Alternate Path Options
+    include_alt_paths: IncludeAltPaths
+    alt_path_type: AltPathType
+    always_spawn_alt_paths: AlwaysSpawnAltPaths
 
     # Tournament Rules
     basket_time: BasketTime

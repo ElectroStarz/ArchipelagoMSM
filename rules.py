@@ -646,6 +646,42 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                 entrance = world.get_entrance(f"Sports Mix -> {cup} Cup")
                 world.set_rule(entrance, cup_rule(world, "Sports Mix", cup, "Sports Mix"))
 
+        # Alternate Path Rules
+        if world.options.include_alternate_paths:
+
+            if world.options.alt_path_type == 0:
+                for sport in world.options.enabled_sports.value:
+                    if sport != "Sports Mix":
+                        for cup in cup_tiers:
+                            entrance = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> {cup} Cup (Normal) Alternate Path")
+                            cup_rule = cup_rule(world, sport, cup, "Normal")
+                            court_rule = court_rule(world, tournament_rules[sport][cup][0], False) &
+                            world.set_rule(entrance, {sport})
+
+
+            if world.options.alt_path_type == 1:
+                for sport in world.options.enabled_sports.value:
+                    if sport != "Sports Mix":
+                        for cup in cup_tiers:
+                            enterance = world.get_entrance(f"{sport}: {cup} Cup (Normal) -> {cup} Cup (Normal) Alternate Path")
+                            cup_rule = cup_rule(world, sport, cup, "Normal")
+                            court_rule = court_rule(world, tournament_rules[sport][cup][0], False)
+                            world.set_rule(entrance, {sport})
+                            for cup, courts in tournament_cups.items()
+
+                                for i in range(1, 4):
+                                    needed = courts[:i]
+                                    if not needed:
+                                        court_logic = Has("")
+                                    else:
+                                        court_logic = court_rule(world, needed[0], False)
+                                        for court in needed[1:]:
+                                            court_logic &= court_rule(world, court, False)
+
+                                    location = world.get_location(f"{sport}: Beat {difficulty} {cup} Cup Round {i}")
+                                    world.set_rule(location, Has(sport) & base_cup_logic & court_logic)
+            
+
     # Party Mode Entrance Rules
     if world.options.party_mode:
         for mode in world.options.party_mode.value:

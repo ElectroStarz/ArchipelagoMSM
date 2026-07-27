@@ -314,6 +314,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
             "modes": self.unlocked_modes,
             "courts": self.unlocked_courts,
             "cups": self.unlocked_cups,
+            "alt paths": self.alt_paths,
             "exhibition": self.unlocked_ex,
             "ex": self.unlocked_ex,
             "characters": self.unlocked_characters,
@@ -523,6 +524,9 @@ class MSMContext(SuperContext):
     win_cups_amount: Any = int
     exhibition_difficulties: Any = ()
     hard_tournament_difficulty: Any = bool
+    include_alt_paths: Any = bool
+    alt_path_type: Any = int
+    always_spawn_alt_paths: Any = bool
 
     # Deathlink Stuff
     deathlink_enabled: Any = False
@@ -617,6 +621,7 @@ class MSMContext(SuperContext):
         # Lists for items
         self.unlocked_modes: set[str] = set()
         self.unlocked_cups: set[str] = set()
+        self.unlocked_alt_paths: set[str] = set()
         self.unlocked_ex_diffs: set[str] = set()
         self.progressive_courts: set[str] = set()
         self.progressive_cups: set[str] = set()
@@ -867,6 +872,10 @@ class MSMContext(SuperContext):
 
 
             # Custom Tournament Settings Data
+            self.include_alt_paths = self.slot_data.get("include_alt_paths")
+            self.alt_path_type = self.slot_data.get("alt_path_type")
+            self.always_spawn_alt_paths = self.slot_data.get("always_spawn_alt_paths")
+
             self.custom_basket_time = self.slot_data.get("basket_time")
             self.enable_b_points = self.slot_data.get("enable_b_points_win")
             self.b_points_win = self.slot_data.get("b_points_win")
@@ -990,6 +999,7 @@ class MSMContext(SuperContext):
         self.unlocked_ex_diffs.clear()
         self.progressive_courts.clear()
         self.unlocked_cups.clear()
+        self.unlocked_alt_paths.clear()
         self.unlocked_sports_crystals.clear()
         self.unlocked_courts.clear()
         self.unlocked_characters.clear()
@@ -1160,6 +1170,7 @@ class MSMContext(SuperContext):
             "Sherbet Sea", "Rowdy Raft", "Fire Mountain"
         )
 
+
         ability_tuple = ("Special Meter", )
 
 
@@ -1175,10 +1186,15 @@ class MSMContext(SuperContext):
                     self.debug_log(f"Added {item_name} to unlocked_modes")
 
                 # Format to Basketball:, Dodgeball:, etc
+                # Changed for alt path names
                 for sport in sport_tuple:
                     if item_name.startswith(f"{sport}:"):
-                        self.unlocked_cups.add(item_name)
-                        self.debug_log(f"Added {item_name} to unlocked_cups")
+                            if "Alt".casefold() in item_name.casefold():
+                                self.unlocked_alt_paths.add(item_name)
+                                self.debug_log(f"Added {item_name} to unlocked_alt_paths")
+                            else:
+                                self.unlocked_cups.add(item_name)
+                                self.debug_log(f"Added {item_name} to unlocked_cups")
 
                 if item_name.startswith("Exhibition"):
                     self.unlocked_ex_diffs.add(item_name)
@@ -1554,6 +1570,9 @@ class MSMContext(SuperContext):
             else:
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 3)
 
+    # === Alt Path Unlocks ===
+
+    async def handle_alt_path_unlocks(self):
 
     # === Exhibition Unlocks ===
 

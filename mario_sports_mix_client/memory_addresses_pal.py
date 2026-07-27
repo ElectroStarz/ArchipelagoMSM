@@ -24,6 +24,19 @@ class MatchAddresses:
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL
 
+class GlobalTournament:
+
+    current_node = 0x804D5D1F # Byte
+
+    alt_path_condition_fufilled = 0x804D6FBC # Byte | Also checks for winning Alt Path missions
+
+    mushroom_alt_paths_unlocked = 0x804D6FFD # Byte | Bit 0 = Normal | Bit 1 = Hard
+    flower_alt_paths_unlocked = 0x804D701D # Byte
+    star_alt_paths_unlocked = 0x804D703D # Byte | Also controls Final Fantasy Character Spawns
+
+    flower_inner_bridges_toggle = 0x804D701E # Byte
+    flower_outer_bridges_toggle = 0x804D701F # Byte
+
 
 class PartyMode:
     difficulty = 0x804D7978 # Word | Also used for HH stage
