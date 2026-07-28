@@ -858,10 +858,9 @@ def create_alt_paths(world: "MSMWorld", itempool):
             itempool.append(world.create_item("Progressive Alternate Path"))
     
     elif world.options.alt_path_type == 5:
-        # im too lazy to loop
-        itempool.append(world.create_item("Progressive Alternate Path"))
-        itempool.append(world.create_item("Progressive Alternate Path"))
-        itempool.append(world.create_item("Progressive Alternate Path"))
+        # im no longer too lazy to loop
+        for _ in range(3):
+            itempool.append(world.create_item("Progressive Alternate Path"))
         
     else:
         raise OptionError(f"[Mario Sports Mix] {world.player_name}'s alt path type is invalid.")

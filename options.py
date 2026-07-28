@@ -469,8 +469,8 @@ class AltPathType(Choice):
     option_difficulty_combine = 1
     option_sport_combine = 2
     option_full_combine = 3
-    progressive_sport_combine = 4
-    progressive_full_combine = 5
+    option_progressive_sport_combine = 4
+    option_progressive_full_combine = 5
     default = 0
 
 class AlwaysSpawnAltPaths(Toggle):

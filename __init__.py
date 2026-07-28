@@ -135,6 +135,13 @@ class MSMWorld(World):
             "v_points": {"value": self.options.v_points_win.value, "enabled": True}, # Volleyball always has win points
         }
 
+        # Alt Path should only be enable with Tournaments
+        if self.options.alt_path.value and not self.options.include_tournaments.value:
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name} has Alt Paths enabled but they don't have Tournaments enabled!"
+                f"How are you expecting to access them?!"
+            )
+
         # Filter to get values only if 'enabled' is True
         active_values = [item["value"] for item in points_to_win.values() if item["enabled"]]
 
