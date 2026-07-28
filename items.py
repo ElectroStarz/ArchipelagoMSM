@@ -509,7 +509,7 @@ def create_all_items(world: "MSMWorld") -> None:
     row_3 = ["Yoshi", "Waluigi", "Bowser",      "Toad"]
     all_rows = [row_1, row_2, row_3]
 
-    if world.options.start_with_characters == StartWithCharacters.option_2_characters:
+    if world.options.start_with_characters.value == StartWithCharacters.option_2_characters:
         # Pick 2 random rows
         selected_1, selected_2 = world.random.sample(all_rows, 2)
         # Select random characters from said rows
@@ -522,7 +522,7 @@ def create_all_items(world: "MSMWorld") -> None:
             if character not in (character_1, character_2):
                 itempool.append(world.create_item(character))
 
-    elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
+    elif world.options.start_with_characters.value == StartWithCharacters.option_3_characters:
         character_1 = world.random.choice(row_1)
         character_2 = world.random.choice(row_2)
         character_3 = world.random.choice(row_3)
@@ -580,10 +580,10 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(world.create_item(sport))
 
     if "Sports Mix" in enabled_sports:
-        if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
+        if world.options.sports_mix_unlock.value == SportsMixUnlock.option_sports_mix_item:
             itempool.append(world.create_item("Sports Mix"))
 
-        elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
+        elif world.options.sports_mix_unlock.value == SportsMixUnlock.option_sports_crystals:
             for crystal_name in sports_crystals:
                 itempool.append(world.create_item(crystal_name))
 
@@ -645,7 +645,7 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
 def create_courts(world: "MSMWorld", itempool):
-    if world.options.court_unlock_type == CourtUnlockType.option_court_item:
+    if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
         if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
             mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
             for court in mush_courts:
@@ -660,7 +660,7 @@ def create_courts(world: "MSMWorld", itempool):
             for court in individual_courts:
                 itempool.append(world.create_item(court))
 
-    elif world.options.court_unlock_type == CourtUnlockType.option_progressive_court:
+    elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         total_stages = 15
 
         if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
@@ -680,18 +680,18 @@ def create_cups(world: "MSMWorld", itempool):
     enabled_sports = world.options.enabled_sports.value
 
     # --- Progressive Cups ---
-    if world.options.cup_unlock_type == CupUnlockType.option_progressive_cup:
+    if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
         # Base: 3 Standard Cups (Mushroom, Flower, Star)
         total_progressive_cups = 3
 
         # If Hard mode is enabled, add 3 more for the Hard Tournament tiers
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             total_progressive_cups += 3  # 6 items
 
         if "Sports Mix" in enabled_sports:
             total_progressive_cups += 3 # 9 items max
 
-        start_option = world.options.start_with_mushroom_cup
+        start_option = world.options.start_with_mushroom_cup.value
 
         # Determine how many starting levels the player gets for free
         precollected_count = 0
@@ -723,7 +723,7 @@ def create_cups(world: "MSMWorld", itempool):
         }
 
         precollect_names = set()
-        start_option = world.options.start_with_mushroom_cup
+        start_option = world.options.start_with_mushroom_cup.value
 
         if start_option in (StartWithMushroomCup.option_normal_difficulty, StartWithMushroomCup.option_both):
             precollect_names.update([
@@ -769,7 +769,7 @@ def create_cups(world: "MSMWorld", itempool):
                 itempool.append(world.create_item(name))'''
 
         # Add Hard Cups to the pool (if enabled)
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             for name in all_hard_items:
                 sport = prefix_to_sport[name[:1]]
                 if sport in enabled_sports:
@@ -802,6 +802,7 @@ def create_cups(world: "MSMWorld", itempool):
 
 def create_alt_paths(world: "MSMWorld", itempool):
     enabled_sports = world.options.enabled_sports.value
+    alt_path_type = world.options.alt_path_type.value
 
     all_normal_items = {
             **basketball_alt_paths_n, **dodgeball_alt_paths_n, **volleyball_alt_paths_n, **hockey_alt_paths_n
@@ -818,7 +819,7 @@ def create_alt_paths(world: "MSMWorld", itempool):
     prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
     
-    if world.options.alt_path_type == 0:
+    if alt_path_type == 0:
         for name in all_normal_items:
             sport = prefix_to_sport[name[:1]]
             if sport in enabled_sports:
@@ -828,39 +829,39 @@ def create_alt_paths(world: "MSMWorld", itempool):
             for name in sports_mix_alt_paths:
                 itempool.append(world.create_item(name))
 
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             for name in all_hard_items:
                 sport = prefix_to_sport[name[:1]]
                 if sport in enabled_sports:
                     itempool.append(world.create_item(name))
 
-    elif world.options.alt_path_type == 1:
+    elif alt_path_type == 1:
         for name in all_global_items:
             sport = prefix_to_sport[name[:1]]
             if sport in enabled_sports:
                 itempool.append(world.create_item(name))
     
-    elif world.options.alt_path_type == 2:
+    elif alt_path_type == 2:
         for name in global_alt_paths_n:
             itempool.append(world.create_item(name))
         
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             for name in global_alt_paths_h:
                 itempool.append(world.create_item(name))
     
-    elif world.options.alt_path_type == 3:
+    elif alt_path_type == 3:
         for name in global_alt_paths_g:
             itempool.append(world.create_item(name))
     
-    elif world.options.alt_path_type == 4:
+    elif alt_path_type == 4:
         total_progressive_alt_paths = 3
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             total_progressive_alt_paths += 3
         
         for _ in range(total_progressive_alt_paths):
             itempool.append(world.create_item("Progressive Alternate Path"))
     
-    elif world.options.alt_path_type == 5:
+    elif alt_path_type == 5:
         # im no longer too lazy to loop
         for _ in range(3):
             itempool.append(world.create_item("Progressive Alternate Path"))

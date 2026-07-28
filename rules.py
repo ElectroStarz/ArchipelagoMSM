@@ -158,7 +158,7 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
         logic = logic | sm_combined_logic
 
         if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
-            progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
+            progressive_logic = Has("Progressive Alternate Path", cup_dict[f"{cup_name} ({category})"])
             logic &= progressive_logic
         else:
             logic &= Has(f"{cup_name} Cup Alt Paths ({category})")
@@ -180,7 +180,7 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
         logic = cup_logic & court_logic
 
         if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
-            progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
+            progressive_logic = Has("Progressive Alternate Path", cup_dict[f"{cup_name} ({category})"])
             logic &= progressive_logic
         else:
             if sport == "Sports Mix":
