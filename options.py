@@ -456,10 +456,10 @@ class IncludeAltPaths(Toggle):
 
 class AltPathType(Choice):
     """What Type of Alt Path Locations do you want?
-    Full Universal: Alt Path Locations will be for **any** difficulty/sport
-    Sport Universal: Alt Path Locations will be for **any** sport
-    Difficulty Universal: Alt Path Locations will be for **any** difficulty
     All Paths: Alt Path locations will be per sport and per difficulty
+    Difficulty Universal: Alt Path Locations will be for **any** difficulty
+    Sport Universal: Alt Path Locations will be for **any** sport
+    Full Universal: Alt Path Locations will be for **any** difficulty/sport
     Progessive Options give Progressive items which unlock the Alt Paths in cup order
     
     IMPORTANT NOTE: Sports Mix will NOT send any alt path checks if alt paths are combined"""
@@ -475,8 +475,10 @@ class AltPathType(Choice):
 
 class AlwaysSpawnAltPaths(Toggle):
     """Make it so the criteria to spawn Alternate Paths is always enabled
-    WARNING: Certain Conditions require Special Meter. Logic does not account
-    for this, and you may need to reset tournaments for a different condition."""
+
+    NOTE: Certain conditions require Special Meter, you can reset to get a better
+    position for most of them except the Dodgeball Star Cup Round 2 condition,
+    though this is covered in logic."""
     display_name = "Always Spawn Alt Paths"
     default = True
 
