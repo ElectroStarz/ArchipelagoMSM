@@ -134,7 +134,7 @@ def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = Fa
 def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
     """Returns rule for Progressive Alt Paths or Individual Alt Paths."""
 
-    logic = False_
+    logic = False_()
 
     if sport == "Global":
 
@@ -159,9 +159,9 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
 
         if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
             progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
-            logic = logic & progressive_logic
+            logic &= progressive_logic
         else:
-            logic = logic & Has(f"{cup_name} Cup Alt Paths ({category})")
+            logic &= Has(f"{cup_name} Cup Alt Paths ({category})")
 
         return logic
     
@@ -181,9 +181,9 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
 
         if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
             progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
-            logic = logic & progressive_logic
+            logic &= progressive_logic
         else:
-            logic = logic & Has(f"{sport}:{cup_name} Cup Alt Paths ({category})")
+            logic &= Has(f"{sport}:{cup_name} Cup Alt Paths ({category})")
         
         return logic
 
@@ -717,9 +717,11 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
 
         # Alternate Path Rules
         if world.options.include_alternate_paths:
+
+            alt_path_type = world.options.alt_path_type.value
             
             # Yeah its the same as the tournament sue me it works :P
-            if world.options.alt_path_type.value == 0:
+            if alt_path_type == 0:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
                         for cup in cup_tiers:
@@ -738,7 +740,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                         entrance = world.get_entrance(f"Sports Mix: {cup} Cup -> {cup} Cup Alt Paths")
                         world.set_rule(entrance, alternate_path_rule(world, "Sports Mix", cup, "Sports Mix"))
             
-            elif world.options.alt_path_type.value == 1:
+            elif alt_path_type == 1:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
                         for cup in cup_tiers:
@@ -746,13 +748,8 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                             entrance_h = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> {cup} Cup Alt Paths (Global)")
                             world.set_rule(entrance_n, alternate_path_rule(world, sport, cup, "Global"))
                             world.set_rule(entrance_h, alternate_path_rule(world, sport, cup, "Global"))
-                    
-                    if "Sports Mix" in world.options.enabled_sports.value:
-                        for cup in cup_tiers:
-                            entrance = world.get_entrance(f"Sports Mix: {cup} Cup -> {cup} Cup Alt Paths (Global)")
-                            world.set_rule(entrance, alternate_path_rule(world, "Sports Mix", cup, "Sports Mix"))
             
-            elif world.options.alt_path_type.value == 2 or world.options.alt_path_type.value == 4:
+            elif alt_path_type == 2 or alt_path_type == 4:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
                         for cup in cup_tiers:
@@ -764,9 +761,9 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                         if sport != "Sports Mix":
                             for cup in cup_tiers:
                                 entrance = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> Global: {cup} Cup Alt Paths (Hard)")
-                                world.set_rule(entrance, alternate_path_rule(world, sport, cup, "Hard"))
+                                world.set_rule(entrance, alternate_path_rule(world, "Global", cup, "Hard"))
 
-            elif world.options.alt_path_type.value == 3 or world.options.alt_path_type.value == 5:    
+            elif alt_path_type == 3 or alt_path_type == 5:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
                         for cup in cup_tiers:

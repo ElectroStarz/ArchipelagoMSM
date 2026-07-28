@@ -668,9 +668,7 @@ boss_locations: Dict[str, LocData] = {
     "Defeat Behemoth King!":                           LocData(base_id + 20001, LocGroup.BOSS_LOCATIONS, LPT.PRIORITY),
 }
 
-basketball_alternate_path_locations: Dict[str, LocData] = {
-
-    # === MUSHROOM NORMAL DIFFICULTY ===
+basketball_alternate_path_normal_locations: Dict[str, LocData] = {
     "Basketball Mushroom Cup Alt Path Normal Node 21":                LocData(base_id + 30000, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal Node 2B":                LocData(base_id + 30001, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal Node 31":                LocData(base_id + 30002, LocGroup.BASKETBALL_ALT_NORMAL),
@@ -687,44 +685,6 @@ basketball_alternate_path_locations: Dict[str, LocData] = {
     "Basketball Mushroom Cup Alt Path Normal Node 25":                LocData(base_id + 30013, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal Node 39":                LocData(base_id + 30014, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal Node 32":                LocData(base_id + 30015, LocGroup.BASKETBALL_ALT_NORMAL),
-
-    # === MUSHROOM HARD DIFFICULTY ===
-    "Basketball Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30016, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30017, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30018, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30019, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30020, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30021, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30022, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30023, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30024, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30025, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30026, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30027, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30028, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30029, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30030, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30031, LocGroup.BASKETBALL_ALT_HARD),
-
-    # === MUSHROOM UNIVERSAL DIFFICULTY ===
-    "Basketball Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30032, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30033, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30034, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30035, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30036, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30037, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30038, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30039, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30040, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30041, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30042, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30043, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30044, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30045, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30046, LocGroup.BASKETBALL_ALT),
-    "Basketball Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30047, LocGroup.BASKETBALL_ALT),
-
-    # === FLOWER NORMAL DIFFICULTY ===
     "Basketball Flower Cup Alt Path Normal Node 26":         LocData(base_id + 30048, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Flower Cup Alt Path Normal Node 52":         LocData(base_id + 30049, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Flower Cup Alt Path Normal Node 50":         LocData(base_id + 30050, LocGroup.BASKETBALL_ALT_NORMAL),
@@ -744,50 +704,6 @@ basketball_alternate_path_locations: Dict[str, LocData] = {
     "Basketball Flower Cup Alt Path Normal Node 47":         LocData(base_id + 30064, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Flower Cup Alt Path Normal Node 49":         LocData(base_id + 30065, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Flower Cup Alt Path Normal Node 3E":         LocData(base_id + 30066, LocGroup.BASKETBALL_ALT_NORMAL),
-
-    # === FLOWER HARD DIFFICULTY ===
-    "Basketball Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30067, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30068, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30069, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30070, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30071, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30072, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30073, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30074, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30075, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30076, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30077, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30078, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30079, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30080, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30081, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30082, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30083, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30084, LocGroup.BASKETBALL_ALT_HARD),
-    "Basketball Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30085, LocGroup.BASKETBALL_ALT_HARD),
-
-    # === FLOWER UNIVERSAL DIFFICULTY ===
-    "Basketball Flower Cup Alt Path Node 26":                LocData(base_id + 30086, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 52":                LocData(base_id + 30087, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 50":                LocData(base_id + 30088, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 2D":                LocData(base_id + 30089, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 36":                LocData(base_id + 30090, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 39":                LocData(base_id + 30091, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 4E":                LocData(base_id + 30092, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 3D":                LocData(base_id + 30093, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 4B":                LocData(base_id + 30094, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 2A":                LocData(base_id + 30095, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 32":                LocData(base_id + 30096, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 55":                LocData(base_id + 30097, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 57":                LocData(base_id + 30098, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 44":                LocData(base_id + 30099, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 43":                LocData(base_id + 30100, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 46":                LocData(base_id + 30101, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 47":                LocData(base_id + 30102, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 49":                LocData(base_id + 30103, LocGroup.BASKETBALL_ALT),
-    "Basketball Flower Cup Alt Path Node 3E":                LocData(base_id + 30104, LocGroup.BASKETBALL_ALT),
-
-    # === STAR NORMAL DIFFICULTY ===
     "Basketball Star Cup Alt Path Normal Node 2E":           LocData(base_id + 30105, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Star Cup Alt Path Normal Node 32":           LocData(base_id + 30106, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Star Cup Alt Path Normal Node 3E":           LocData(base_id + 30107, LocGroup.BASKETBALL_ALT_NORMAL),
@@ -813,8 +729,44 @@ basketball_alternate_path_locations: Dict[str, LocData] = {
     "Basketball Star Cup Alt Path Normal Node 4B":           LocData(base_id + 30127, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Star Cup Alt Path Normal Node 48":           LocData(base_id + 30128, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Star Cup Alt Path Normal Node 45":           LocData(base_id + 30129, LocGroup.BASKETBALL_ALT_NORMAL),
+}
 
-    # === STAR HARD DIFFICULTY ===
+basketball_alternate_path_hard_locations: Dict[str, LocData] = {
+    "Basketball Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30016, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30017, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30018, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30019, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30020, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30021, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30022, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30023, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30024, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30025, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30026, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30027, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30028, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30029, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30030, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30031, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30067, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30068, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30069, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30070, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30071, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30072, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30073, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30074, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30075, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30076, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30077, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30078, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30079, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30080, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30081, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30082, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30083, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30084, LocGroup.BASKETBALL_ALT_HARD),
+    "Basketball Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30085, LocGroup.BASKETBALL_ALT_HARD),
     "Basketball Star Cup Alt Path Hard Node 2E":             LocData(base_id + 30130, LocGroup.BASKETBALL_ALT_HARD),
     "Basketball Star Cup Alt Path Hard Node 32":             LocData(base_id + 30131, LocGroup.BASKETBALL_ALT_HARD),
     "Basketball Star Cup Alt Path Hard Node 3E":             LocData(base_id + 30132, LocGroup.BASKETBALL_ALT_HARD),
@@ -840,8 +792,44 @@ basketball_alternate_path_locations: Dict[str, LocData] = {
     "Basketball Star Cup Alt Path Hard Node 4B":             LocData(base_id + 30152, LocGroup.BASKETBALL_ALT_HARD),
     "Basketball Star Cup Alt Path Hard Node 48":             LocData(base_id + 30153, LocGroup.BASKETBALL_ALT_HARD),
     "Basketball Star Cup Alt Path Hard Node 45":             LocData(base_id + 30154, LocGroup.BASKETBALL_ALT_HARD),
+}
 
-    # === STAR UNIVERSAL DIFFICULTY ===
+basketball_alternate_path_global_locations: Dict[str, LocData] = {
+    "Basketball Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30032, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30033, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30034, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30035, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30036, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30037, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30038, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30039, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30040, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30041, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30042, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30043, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30044, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30045, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30046, LocGroup.BASKETBALL_ALT),
+    "Basketball Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30047, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 26":                LocData(base_id + 30086, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 52":                LocData(base_id + 30087, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 50":                LocData(base_id + 30088, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 2D":                LocData(base_id + 30089, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 36":                LocData(base_id + 30090, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 39":                LocData(base_id + 30091, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 4E":                LocData(base_id + 30092, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 3D":                LocData(base_id + 30093, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 4B":                LocData(base_id + 30094, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 2A":                LocData(base_id + 30095, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 32":                LocData(base_id + 30096, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 55":                LocData(base_id + 30097, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 57":                LocData(base_id + 30098, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 44":                LocData(base_id + 30099, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 43":                LocData(base_id + 30100, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 46":                LocData(base_id + 30101, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 47":                LocData(base_id + 30102, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 49":                LocData(base_id + 30103, LocGroup.BASKETBALL_ALT),
+    "Basketball Flower Cup Alt Path Node 3E":                LocData(base_id + 30104, LocGroup.BASKETBALL_ALT),
     "Basketball Star Cup Alt Path Node 2E":                  LocData(base_id + 30155, LocGroup.BASKETBALL_ALT),
     "Basketball Star Cup Alt Path Node 32":                  LocData(base_id + 30156, LocGroup.BASKETBALL_ALT),
     "Basketball Star Cup Alt Path Node 3E":                  LocData(base_id + 30157, LocGroup.BASKETBALL_ALT),
@@ -867,12 +855,10 @@ basketball_alternate_path_locations: Dict[str, LocData] = {
     "Basketball Star Cup Alt Path Node 4B":                  LocData(base_id + 30177, LocGroup.BASKETBALL_ALT),
     "Basketball Star Cup Alt Path Node 48":                  LocData(base_id + 30178, LocGroup.BASKETBALL_ALT),
     "Basketball Star Cup Alt Path Node 45":                  LocData(base_id + 30179, LocGroup.BASKETBALL_ALT),
-    
 }
 
-dodgeball_alternate_path_locations: Dict[str, LocData] = {
 
-    # === MUSHROOM NORMAL DIFFICULTY ===
+dodgeball_alternate_path_normal_locations: Dict[str, LocData] = {
     "Dodgeball Mushroom Cup Alt Path Normal Node 21":                LocData(base_id + 30180, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Mushroom Cup Alt Path Normal Node 2B":                LocData(base_id + 30181, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Mushroom Cup Alt Path Normal Node 31":                LocData(base_id + 30182, LocGroup.DODGEBALL_ALT_NORMAL),
@@ -889,44 +875,6 @@ dodgeball_alternate_path_locations: Dict[str, LocData] = {
     "Dodgeball Mushroom Cup Alt Path Normal Node 25":                LocData(base_id + 30193, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Mushroom Cup Alt Path Normal Node 39":                LocData(base_id + 30194, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Mushroom Cup Alt Path Normal Node 32":                LocData(base_id + 30195, LocGroup.DODGEBALL_ALT_NORMAL),
-
-    # === MUSHROOM HARD DIFFICULTY ===
-    "Dodgeball Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30196, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30197, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30198, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30199, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30200, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30201, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30202, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30203, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30204, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30205, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30206, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30207, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30208, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30209, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30210, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30211, LocGroup.DODGEBALL_ALT_HARD),
-
-    # === MUSHROOM UNIVERSAL DIFFICULTY ===
-    "Dodgeball Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30212, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30213, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30214, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30215, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30216, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30217, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30218, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30219, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30220, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30221, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30222, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30223, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30224, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30225, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30226, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30227, LocGroup.DODGEBALL_ALT),
-
-    # === FLOWER NORMAL DIFFICULTY ===
     "Dodgeball Flower Cup Alt Path Normal Node 26":         LocData(base_id + 30228, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Flower Cup Alt Path Normal Node 52":         LocData(base_id + 30229, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Flower Cup Alt Path Normal Node 50":         LocData(base_id + 30230, LocGroup.DODGEBALL_ALT_NORMAL),
@@ -946,50 +894,6 @@ dodgeball_alternate_path_locations: Dict[str, LocData] = {
     "Dodgeball Flower Cup Alt Path Normal Node 47":         LocData(base_id + 30244, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Flower Cup Alt Path Normal Node 49":         LocData(base_id + 30245, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Flower Cup Alt Path Normal Node 3E":         LocData(base_id + 30246, LocGroup.DODGEBALL_ALT_NORMAL),
-
-    # === FLOWER HARD DIFFICULTY ===
-    "Dodgeball Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30247, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30248, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30249, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30250, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30251, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30252, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30253, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30254, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30255, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30256, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30257, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30258, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30259, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30260, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30261, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30262, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30263, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30264, LocGroup.DODGEBALL_ALT_HARD),
-    "Dodgeball Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30265, LocGroup.DODGEBALL_ALT_HARD),
-
-    # === FLOWER UNIVERSAL DIFFICULTY ===
-    "Dodgeball Flower Cup Alt Path Node 26":                LocData(base_id + 30266, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 52":                LocData(base_id + 30267, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 50":                LocData(base_id + 30268, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 2D":                LocData(base_id + 30269, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 36":                LocData(base_id + 30270, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 39":                LocData(base_id + 30271, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 4E":                LocData(base_id + 30272, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 3D":                LocData(base_id + 30273, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 4B":                LocData(base_id + 30274, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 2A":                LocData(base_id + 30275, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 32":                LocData(base_id + 30276, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 55":                LocData(base_id + 30277, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 57":                LocData(base_id + 30278, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 44":                LocData(base_id + 30279, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 43":                LocData(base_id + 30280, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 46":                LocData(base_id + 30281, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 47":                LocData(base_id + 30282, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 49":                LocData(base_id + 30283, LocGroup.DODGEBALL_ALT),
-    "Dodgeball Flower Cup Alt Path Node 3E":                LocData(base_id + 30284, LocGroup.DODGEBALL_ALT),
-
-    # === STAR NORMAL DIFFICULTY ===
     "Dodgeball Star Cup Alt Path Normal Node 2E":           LocData(base_id + 30285, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Star Cup Alt Path Normal Node 32":           LocData(base_id + 30286, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Star Cup Alt Path Normal Node 3E":           LocData(base_id + 30287, LocGroup.DODGEBALL_ALT_NORMAL),
@@ -1015,8 +919,44 @@ dodgeball_alternate_path_locations: Dict[str, LocData] = {
     "Dodgeball Star Cup Alt Path Normal Node 4B":           LocData(base_id + 30307, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Star Cup Alt Path Normal Node 48":           LocData(base_id + 30308, LocGroup.DODGEBALL_ALT_NORMAL),
     "Dodgeball Star Cup Alt Path Normal Node 45":           LocData(base_id + 30309, LocGroup.DODGEBALL_ALT_NORMAL),
+}
 
-    # === STAR HARD DIFFICULTY ===
+dodgeball_alternate_path_hard_locations: Dict[str, LocData] = {
+    "Dodgeball Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30196, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30197, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30198, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30199, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30200, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30201, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30202, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30203, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30204, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30205, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30206, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30207, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30208, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30209, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30210, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30211, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30247, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30248, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30249, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30250, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30251, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30252, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30253, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30254, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30255, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30256, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30257, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30258, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30259, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30260, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30261, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30262, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30263, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30264, LocGroup.DODGEBALL_ALT_HARD),
+    "Dodgeball Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30265, LocGroup.DODGEBALL_ALT_HARD),
     "Dodgeball Star Cup Alt Path Hard Node 2E":             LocData(base_id + 30310, LocGroup.DODGEBALL_ALT_HARD),
     "Dodgeball Star Cup Alt Path Hard Node 32":             LocData(base_id + 30311, LocGroup.DODGEBALL_ALT_HARD),
     "Dodgeball Star Cup Alt Path Hard Node 3E":             LocData(base_id + 30312, LocGroup.DODGEBALL_ALT_HARD),
@@ -1042,8 +982,44 @@ dodgeball_alternate_path_locations: Dict[str, LocData] = {
     "Dodgeball Star Cup Alt Path Hard Node 4B":             LocData(base_id + 30332, LocGroup.DODGEBALL_ALT_HARD),
     "Dodgeball Star Cup Alt Path Hard Node 48":             LocData(base_id + 30333, LocGroup.DODGEBALL_ALT_HARD),
     "Dodgeball Star Cup Alt Path Hard Node 45":             LocData(base_id + 30334, LocGroup.DODGEBALL_ALT_HARD),
+}
 
-    # === STAR UNIVERSAL DIFFICULTY ===
+dodgeball_alternate_path_global_locations: Dict[str, LocData] = {
+    "Dodgeball Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30212, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30213, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30214, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30215, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30216, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30217, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30218, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30219, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30220, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30221, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30222, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30223, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30224, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30225, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30226, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30227, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 26":                LocData(base_id + 30266, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 52":                LocData(base_id + 30267, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 50":                LocData(base_id + 30268, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 2D":                LocData(base_id + 30269, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 36":                LocData(base_id + 30270, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 39":                LocData(base_id + 30271, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 4E":                LocData(base_id + 30272, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 3D":                LocData(base_id + 30273, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 4B":                LocData(base_id + 30274, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 2A":                LocData(base_id + 30275, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 32":                LocData(base_id + 30276, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 55":                LocData(base_id + 30277, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 57":                LocData(base_id + 30278, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 44":                LocData(base_id + 30279, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 43":                LocData(base_id + 30280, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 46":                LocData(base_id + 30281, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 47":                LocData(base_id + 30282, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 49":                LocData(base_id + 30283, LocGroup.DODGEBALL_ALT),
+    "Dodgeball Flower Cup Alt Path Node 3E":                LocData(base_id + 30284, LocGroup.DODGEBALL_ALT),
     "Dodgeball Star Cup Alt Path Node 2E":                  LocData(base_id + 30335, LocGroup.DODGEBALL_ALT),
     "Dodgeball Star Cup Alt Path Node 32":                  LocData(base_id + 30336, LocGroup.DODGEBALL_ALT),
     "Dodgeball Star Cup Alt Path Node 3E":                  LocData(base_id + 30337, LocGroup.DODGEBALL_ALT),
@@ -1071,9 +1047,8 @@ dodgeball_alternate_path_locations: Dict[str, LocData] = {
     "Dodgeball Star Cup Alt Path Node 45":                  LocData(base_id + 30359, LocGroup.DODGEBALL_ALT),
 }
 
-volleyball_alternate_path_locations: Dict[str, LocData] = {
 
-    # === MUSHROOM NORMAL DIFFICULTY ===
+volleyball_alternate_path_normal_locations: Dict[str, LocData] = {
     "Volleyball Mushroom Cup Alt Path Normal Node 21":                LocData(base_id + 30360, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Mushroom Cup Alt Path Normal Node 2B":                LocData(base_id + 30361, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Mushroom Cup Alt Path Normal Node 31":                LocData(base_id + 30362, LocGroup.VOLLEYBALL_ALT_NORMAL),
@@ -1090,44 +1065,6 @@ volleyball_alternate_path_locations: Dict[str, LocData] = {
     "Volleyball Mushroom Cup Alt Path Normal Node 25":                LocData(base_id + 30373, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Mushroom Cup Alt Path Normal Node 39":                LocData(base_id + 30374, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Mushroom Cup Alt Path Normal Node 32":                LocData(base_id + 30375, LocGroup.VOLLEYBALL_ALT_NORMAL),
-
-    # === MUSHROOM HARD DIFFICULTY ===
-    "Volleyball Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30376, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30377, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30378, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30379, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30380, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30381, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30382, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30383, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30384, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30385, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30386, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30387, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30388, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30389, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30390, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30391, LocGroup.VOLLEYBALL_ALT_HARD),
-
-    # === MUSHROOM UNIVERSAL DIFFICULTY ===
-    "Volleyball Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30392, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30393, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30394, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30395, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30396, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30397, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30398, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30399, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30400, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30401, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30402, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30403, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30404, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30405, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30406, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30407, LocGroup.VOLLEYBALL_ALT),
-
-    # === FLOWER NORMAL DIFFICULTY ===
     "Volleyball Flower Cup Alt Path Normal Node 26":         LocData(base_id + 30408, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Flower Cup Alt Path Normal Node 52":         LocData(base_id + 30409, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Flower Cup Alt Path Normal Node 50":         LocData(base_id + 30410, LocGroup.VOLLEYBALL_ALT_NORMAL),
@@ -1147,50 +1084,6 @@ volleyball_alternate_path_locations: Dict[str, LocData] = {
     "Volleyball Flower Cup Alt Path Normal Node 47":         LocData(base_id + 30424, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Flower Cup Alt Path Normal Node 49":         LocData(base_id + 30425, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Flower Cup Alt Path Normal Node 3E":         LocData(base_id + 30426, LocGroup.VOLLEYBALL_ALT_NORMAL),
-
-    # === FLOWER HARD DIFFICULTY ===
-    "Volleyball Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30427, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30428, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30429, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30430, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30431, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30432, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30433, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30434, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30435, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30436, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30437, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30438, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30439, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30440, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30441, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30442, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30443, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30444, LocGroup.VOLLEYBALL_ALT_HARD),
-    "Volleyball Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30445, LocGroup.VOLLEYBALL_ALT_HARD),
-
-    # === FLOWER UNIVERSAL DIFFICULTY ===
-    "Volleyball Flower Cup Alt Path Node 26":                LocData(base_id + 30446, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 52":                LocData(base_id + 30447, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 50":                LocData(base_id + 30448, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 2D":                LocData(base_id + 30449, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 36":                LocData(base_id + 30450, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 39":                LocData(base_id + 30451, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 4E":                LocData(base_id + 30452, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 3D":                LocData(base_id + 30453, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 4B":                LocData(base_id + 30454, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 2A":                LocData(base_id + 30455, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 32":                LocData(base_id + 30456, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 55":                LocData(base_id + 30457, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 57":                LocData(base_id + 30458, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 44":                LocData(base_id + 30459, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 43":                LocData(base_id + 30460, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 46":                LocData(base_id + 30461, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 47":                LocData(base_id + 30462, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 49":                LocData(base_id + 30463, LocGroup.VOLLEYBALL_ALT),
-    "Volleyball Flower Cup Alt Path Node 3E":                LocData(base_id + 30464, LocGroup.VOLLEYBALL_ALT),
-
-    # === STAR NORMAL DIFFICULTY ===
     "Volleyball Star Cup Alt Path Normal Node 2E":           LocData(base_id + 30465, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Star Cup Alt Path Normal Node 32":           LocData(base_id + 30466, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Star Cup Alt Path Normal Node 3E":           LocData(base_id + 30467, LocGroup.VOLLEYBALL_ALT_NORMAL),
@@ -1216,8 +1109,44 @@ volleyball_alternate_path_locations: Dict[str, LocData] = {
     "Volleyball Star Cup Alt Path Normal Node 4B":           LocData(base_id + 30487, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Star Cup Alt Path Normal Node 48":           LocData(base_id + 30488, LocGroup.VOLLEYBALL_ALT_NORMAL),
     "Volleyball Star Cup Alt Path Normal Node 45":           LocData(base_id + 30489, LocGroup.VOLLEYBALL_ALT_NORMAL),
+}
 
-    # === STAR HARD DIFFICULTY ===
+volleyball_alternate_path_hard_locations: Dict[str, LocData] = {
+    "Volleyball Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30376, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30377, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30378, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30379, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30380, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30381, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30382, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30383, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30384, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30385, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30386, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30387, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30388, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30389, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30390, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30391, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30427, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30428, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30429, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30430, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30431, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30432, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30433, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30434, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30435, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30436, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30437, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30438, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30439, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30440, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30441, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30442, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30443, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30444, LocGroup.VOLLEYBALL_ALT_HARD),
+    "Volleyball Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30445, LocGroup.VOLLEYBALL_ALT_HARD),
     "Volleyball Star Cup Alt Path Hard Node 2E":             LocData(base_id + 30490, LocGroup.VOLLEYBALL_ALT_HARD),
     "Volleyball Star Cup Alt Path Hard Node 32":             LocData(base_id + 30491, LocGroup.VOLLEYBALL_ALT_HARD),
     "Volleyball Star Cup Alt Path Hard Node 3E":             LocData(base_id + 30492, LocGroup.VOLLEYBALL_ALT_HARD),
@@ -1243,8 +1172,44 @@ volleyball_alternate_path_locations: Dict[str, LocData] = {
     "Volleyball Star Cup Alt Path Hard Node 4B":             LocData(base_id + 30512, LocGroup.VOLLEYBALL_ALT_HARD),
     "Volleyball Star Cup Alt Path Hard Node 48":             LocData(base_id + 30513, LocGroup.VOLLEYBALL_ALT_HARD),
     "Volleyball Star Cup Alt Path Hard Node 45":             LocData(base_id + 30514, LocGroup.VOLLEYBALL_ALT_HARD),
+}
 
-    # === STAR UNIVERSAL DIFFICULTY ===
+volleyball_alternate_path_global_locations: Dict[str, LocData] = {
+    "Volleyball Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30392, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30393, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30394, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30395, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30396, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30397, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30398, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30399, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30400, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30401, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30402, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30403, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30404, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30405, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30406, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30407, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 26":                LocData(base_id + 30446, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 52":                LocData(base_id + 30447, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 50":                LocData(base_id + 30448, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 2D":                LocData(base_id + 30449, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 36":                LocData(base_id + 30450, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 39":                LocData(base_id + 30451, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 4E":                LocData(base_id + 30452, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 3D":                LocData(base_id + 30453, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 4B":                LocData(base_id + 30454, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 2A":                LocData(base_id + 30455, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 32":                LocData(base_id + 30456, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 55":                LocData(base_id + 30457, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 57":                LocData(base_id + 30458, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 44":                LocData(base_id + 30459, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 43":                LocData(base_id + 30460, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 46":                LocData(base_id + 30461, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 47":                LocData(base_id + 30462, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 49":                LocData(base_id + 30463, LocGroup.VOLLEYBALL_ALT),
+    "Volleyball Flower Cup Alt Path Node 3E":                LocData(base_id + 30464, LocGroup.VOLLEYBALL_ALT),
     "Volleyball Star Cup Alt Path Node 2E":                  LocData(base_id + 30515, LocGroup.VOLLEYBALL_ALT),
     "Volleyball Star Cup Alt Path Node 32":                  LocData(base_id + 30516, LocGroup.VOLLEYBALL_ALT),
     "Volleyball Star Cup Alt Path Node 3E":                  LocData(base_id + 30517, LocGroup.VOLLEYBALL_ALT),
@@ -1272,9 +1237,8 @@ volleyball_alternate_path_locations: Dict[str, LocData] = {
     "Volleyball Star Cup Alt Path Node 45":                  LocData(base_id + 30539, LocGroup.VOLLEYBALL_ALT),
 }
 
-hockey_alternate_path_locations: Dict[str, LocData] = {
 
-    # === MUSHROOM NORMAL DIFFICULTY ===
+hockey_alternate_path_normal_locations: Dict[str, LocData] = {
     "Hockey Mushroom Cup Alt Path Normal Node 21":                LocData(base_id + 30540, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Mushroom Cup Alt Path Normal Node 2B":                LocData(base_id + 30541, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Mushroom Cup Alt Path Normal Node 31":                LocData(base_id + 30542, LocGroup.HOCKEY_ALT_NORMAL),
@@ -1291,44 +1255,6 @@ hockey_alternate_path_locations: Dict[str, LocData] = {
     "Hockey Mushroom Cup Alt Path Normal Node 25":                LocData(base_id + 30553, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Mushroom Cup Alt Path Normal Node 39":                LocData(base_id + 30554, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Mushroom Cup Alt Path Normal Node 32":                LocData(base_id + 30555, LocGroup.HOCKEY_ALT_NORMAL),
-
-    # === MUSHROOM HARD DIFFICULTY ===
-    "Hockey Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30556, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30557, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30558, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30559, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30560, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30561, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30562, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30563, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30564, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30565, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30566, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30567, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30568, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30569, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30570, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30571, LocGroup.HOCKEY_ALT_HARD),
-
-    # === MUSHROOM UNIVERSAL DIFFICULTY ===
-    "Hockey Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30572, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30573, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30574, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30575, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30576, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30577, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30578, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30579, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30580, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30581, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30582, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30583, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30584, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30585, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30586, LocGroup.HOCKEY_ALT),
-    "Hockey Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30587, LocGroup.HOCKEY_ALT),
-
-    # === FLOWER NORMAL DIFFICULTY ===
     "Hockey Flower Cup Alt Path Normal Node 26":         LocData(base_id + 30588, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Flower Cup Alt Path Normal Node 52":         LocData(base_id + 30589, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Flower Cup Alt Path Normal Node 50":         LocData(base_id + 30590, LocGroup.HOCKEY_ALT_NORMAL),
@@ -1348,50 +1274,6 @@ hockey_alternate_path_locations: Dict[str, LocData] = {
     "Hockey Flower Cup Alt Path Normal Node 47":         LocData(base_id + 30604, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Flower Cup Alt Path Normal Node 49":         LocData(base_id + 30605, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Flower Cup Alt Path Normal Node 3E":         LocData(base_id + 30606, LocGroup.HOCKEY_ALT_NORMAL),
-
-    # === FLOWER HARD DIFFICULTY ===
-    "Hockey Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30607, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30608, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30609, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30610, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30611, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30612, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30613, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30614, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30615, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30616, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30617, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30618, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30619, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30620, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30621, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30622, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30623, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30624, LocGroup.HOCKEY_ALT_HARD),
-    "Hockey Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30625, LocGroup.HOCKEY_ALT_HARD),
-
-    # === FLOWER UNIVERSAL DIFFICULTY ===
-    "Hockey Flower Cup Alt Path Node 26":                LocData(base_id + 30626, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 52":                LocData(base_id + 30627, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 50":                LocData(base_id + 30628, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 2D":                LocData(base_id + 30629, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 36":                LocData(base_id + 30630, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 39":                LocData(base_id + 30631, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 4E":                LocData(base_id + 30632, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 3D":                LocData(base_id + 30633, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 4B":                LocData(base_id + 30634, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 2A":                LocData(base_id + 30635, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 32":                LocData(base_id + 30636, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 55":                LocData(base_id + 30637, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 57":                LocData(base_id + 30638, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 44":                LocData(base_id + 30639, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 43":                LocData(base_id + 30640, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 46":                LocData(base_id + 30641, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 47":                LocData(base_id + 30642, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 49":                LocData(base_id + 30643, LocGroup.HOCKEY_ALT),
-    "Hockey Flower Cup Alt Path Node 3E":                LocData(base_id + 30644, LocGroup.HOCKEY_ALT),
-
-    # === STAR NORMAL DIFFICULTY ===
     "Hockey Star Cup Alt Path Normal Node 2E":           LocData(base_id + 30645, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Star Cup Alt Path Normal Node 32":           LocData(base_id + 30646, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Star Cup Alt Path Normal Node 3E":           LocData(base_id + 30647, LocGroup.HOCKEY_ALT_NORMAL),
@@ -1417,8 +1299,44 @@ hockey_alternate_path_locations: Dict[str, LocData] = {
     "Hockey Star Cup Alt Path Normal Node 4B":           LocData(base_id + 30667, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Star Cup Alt Path Normal Node 48":           LocData(base_id + 30668, LocGroup.HOCKEY_ALT_NORMAL),
     "Hockey Star Cup Alt Path Normal Node 45":           LocData(base_id + 30669, LocGroup.HOCKEY_ALT_NORMAL),
+}
 
-    # === STAR HARD DIFFICULTY ===
+hockey_alternate_path_hard_locations: Dict[str, LocData] = {
+    "Hockey Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30556, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30557, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30558, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30559, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30560, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30561, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30562, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30563, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30564, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30565, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30566, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30567, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30568, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30569, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30570, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30571, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30607, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30608, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30609, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30610, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30611, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30612, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30613, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30614, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30615, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30616, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30617, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30618, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30619, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30620, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30621, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30622, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30623, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30624, LocGroup.HOCKEY_ALT_HARD),
+    "Hockey Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30625, LocGroup.HOCKEY_ALT_HARD),
     "Hockey Star Cup Alt Path Hard Node 2E":             LocData(base_id + 30670, LocGroup.HOCKEY_ALT_HARD),
     "Hockey Star Cup Alt Path Hard Node 32":             LocData(base_id + 30671, LocGroup.HOCKEY_ALT_HARD),
     "Hockey Star Cup Alt Path Hard Node 3E":             LocData(base_id + 30672, LocGroup.HOCKEY_ALT_HARD),
@@ -1444,8 +1362,44 @@ hockey_alternate_path_locations: Dict[str, LocData] = {
     "Hockey Star Cup Alt Path Hard Node 4B":             LocData(base_id + 30692, LocGroup.HOCKEY_ALT_HARD),
     "Hockey Star Cup Alt Path Hard Node 48":             LocData(base_id + 30693, LocGroup.HOCKEY_ALT_HARD),
     "Hockey Star Cup Alt Path Hard Node 45":             LocData(base_id + 30694, LocGroup.HOCKEY_ALT_HARD),
+}
 
-    # === STAR UNIVERSAL DIFFICULTY ===
+hockey_alternate_path_global_locations: Dict[str, LocData] = {
+    "Hockey Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30572, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30573, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30574, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30575, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30576, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30577, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30578, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30579, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30580, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30581, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30582, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30583, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30584, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30585, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30586, LocGroup.HOCKEY_ALT),
+    "Hockey Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30587, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 26":                LocData(base_id + 30626, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 52":                LocData(base_id + 30627, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 50":                LocData(base_id + 30628, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 2D":                LocData(base_id + 30629, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 36":                LocData(base_id + 30630, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 39":                LocData(base_id + 30631, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 4E":                LocData(base_id + 30632, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 3D":                LocData(base_id + 30633, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 4B":                LocData(base_id + 30634, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 2A":                LocData(base_id + 30635, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 32":                LocData(base_id + 30636, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 55":                LocData(base_id + 30637, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 57":                LocData(base_id + 30638, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 44":                LocData(base_id + 30639, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 43":                LocData(base_id + 30640, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 46":                LocData(base_id + 30641, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 47":                LocData(base_id + 30642, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 49":                LocData(base_id + 30643, LocGroup.HOCKEY_ALT),
+    "Hockey Flower Cup Alt Path Node 3E":                LocData(base_id + 30644, LocGroup.HOCKEY_ALT),
     "Hockey Star Cup Alt Path Node 2E":                  LocData(base_id + 30695, LocGroup.HOCKEY_ALT),
     "Hockey Star Cup Alt Path Node 32":                  LocData(base_id + 30696, LocGroup.HOCKEY_ALT),
     "Hockey Star Cup Alt Path Node 3E":                  LocData(base_id + 30697, LocGroup.HOCKEY_ALT),
@@ -1474,8 +1428,6 @@ hockey_alternate_path_locations: Dict[str, LocData] = {
 }
 
 sports_mix_alternate_path_locations: Dict[str, LocData] = {
-
-    # === MUSHROOM ===
     "Sports Mix Mushroom Cup Alt Path Node 21":                LocData(base_id + 30720, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Mushroom Cup Alt Path Node 2B":                LocData(base_id + 30721, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Mushroom Cup Alt Path Node 31":                LocData(base_id + 30722, LocGroup.SPORTS_MIX_ALT),
@@ -1492,8 +1444,6 @@ sports_mix_alternate_path_locations: Dict[str, LocData] = {
     "Sports Mix Mushroom Cup Alt Path Node 25":                LocData(base_id + 30733, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Mushroom Cup Alt Path Node 39":                LocData(base_id + 30734, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Mushroom Cup Alt Path Node 32":                LocData(base_id + 30735, LocGroup.SPORTS_MIX_ALT),
-
-    # === FLOWER ===
     "Sports Mix Flower Cup Alt Path Node 26":         LocData(base_id + 30736, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Flower Cup Alt Path Node 52":         LocData(base_id + 30737, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Flower Cup Alt Path Node 50":         LocData(base_id + 30738, LocGroup.SPORTS_MIX_ALT),
@@ -1513,8 +1463,6 @@ sports_mix_alternate_path_locations: Dict[str, LocData] = {
     "Sports Mix Flower Cup Alt Path Node 47":         LocData(base_id + 30752, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Flower Cup Alt Path Node 49":         LocData(base_id + 30753, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Flower Cup Alt Path Node 3E":         LocData(base_id + 30754, LocGroup.SPORTS_MIX_ALT),
-
-    # === STAR ===
     "Sports Mix Star Cup Alt Path Node 2E":           LocData(base_id + 30755, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Star Cup Alt Path Node 32":           LocData(base_id + 30756, LocGroup.SPORTS_MIX_ALT),
     "Sports Mix Star Cup Alt Path Node 3E":           LocData(base_id + 30757, LocGroup.SPORTS_MIX_ALT),
@@ -1542,9 +1490,7 @@ sports_mix_alternate_path_locations: Dict[str, LocData] = {
     "Sports Mix Star Cup Alt Path Node 45":           LocData(base_id + 30779, LocGroup.SPORTS_MIX_ALT),
 }
 
-global_alternate_path_locations: Dict[str, LocData] = {
-
-    # === MUSHROOM NORMAL DIFFICULTY ===
+global_alternate_path_normal_locations: Dict[str, LocData] = {
     "Mushroom Cup Alt Path Normal Node 21":                LocData(base_id + 30540, LocGroup.ALT_NORMAL),
     "Mushroom Cup Alt Path Normal Node 2B":                LocData(base_id + 30541, LocGroup.ALT_NORMAL),
     "Mushroom Cup Alt Path Normal Node 31":                LocData(base_id + 30542, LocGroup.ALT_NORMAL),
@@ -1561,44 +1507,6 @@ global_alternate_path_locations: Dict[str, LocData] = {
     "Mushroom Cup Alt Path Normal Node 25":                LocData(base_id + 30553, LocGroup.ALT_NORMAL),
     "Mushroom Cup Alt Path Normal Node 39":                LocData(base_id + 30554, LocGroup.ALT_NORMAL),
     "Mushroom Cup Alt Path Normal Node 32":                LocData(base_id + 30555, LocGroup.ALT_NORMAL),
-
-    # === MUSHROOM HARD DIFFICULTY ===
-    "Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30556, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30557, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30558, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30559, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30560, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30561, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30562, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30563, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30564, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30565, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30566, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30567, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30568, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30569, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30570, LocGroup.ALT_HARD),
-    "Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30571, LocGroup.ALT_HARD),
-
-    # === MUSHROOM UNIVERSAL DIFFICULTY ===
-    "Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30572, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30573, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30574, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30575, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30576, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30577, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30578, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30579, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30580, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30581, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30582, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30583, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30584, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30585, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30586, LocGroup.ALT),
-    "Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30587, LocGroup.ALT),
-
-    # === FLOWER NORMAL DIFFICULTY ===
     "Flower Cup Alt Path Normal Node 26":         LocData(base_id + 30588, LocGroup.ALT_NORMAL),
     "Flower Cup Alt Path Normal Node 52":         LocData(base_id + 30589, LocGroup.ALT_NORMAL),
     "Flower Cup Alt Path Normal Node 50":         LocData(base_id + 30590, LocGroup.ALT_NORMAL),
@@ -1618,50 +1526,6 @@ global_alternate_path_locations: Dict[str, LocData] = {
     "Flower Cup Alt Path Normal Node 47":         LocData(base_id + 30604, LocGroup.ALT_NORMAL),
     "Flower Cup Alt Path Normal Node 49":         LocData(base_id + 30605, LocGroup.ALT_NORMAL),
     "Flower Cup Alt Path Normal Node 3E":         LocData(base_id + 30606, LocGroup.ALT_NORMAL),
-
-    # === FLOWER HARD DIFFICULTY ===
-    "Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30607, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30608, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30609, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30610, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30611, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30612, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30613, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30614, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30615, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30616, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30617, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30618, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30619, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30620, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30621, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30622, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30623, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30624, LocGroup.ALT_HARD),
-    "Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30625, LocGroup.ALT_HARD),
-
-    # === FLOWER UNIVERSAL DIFFICULTY ===
-    "Flower Cup Alt Path Node 26":                LocData(base_id + 30626, LocGroup.ALT),
-    "Flower Cup Alt Path Node 52":                LocData(base_id + 30627, LocGroup.ALT),
-    "Flower Cup Alt Path Node 50":                LocData(base_id + 30628, LocGroup.ALT),
-    "Flower Cup Alt Path Node 2D":                LocData(base_id + 30629, LocGroup.ALT),
-    "Flower Cup Alt Path Node 36":                LocData(base_id + 30630, LocGroup.ALT),
-    "Flower Cup Alt Path Node 39":                LocData(base_id + 30631, LocGroup.ALT),
-    "Flower Cup Alt Path Node 4E":                LocData(base_id + 30632, LocGroup.ALT),
-    "Flower Cup Alt Path Node 3D":                LocData(base_id + 30633, LocGroup.ALT),
-    "Flower Cup Alt Path Node 4B":                LocData(base_id + 30634, LocGroup.ALT),
-    "Flower Cup Alt Path Node 2A":                LocData(base_id + 30635, LocGroup.ALT),
-    "Flower Cup Alt Path Node 32":                LocData(base_id + 30636, LocGroup.ALT),
-    "Flower Cup Alt Path Node 55":                LocData(base_id + 30637, LocGroup.ALT),
-    "Flower Cup Alt Path Node 57":                LocData(base_id + 30638, LocGroup.ALT),
-    "Flower Cup Alt Path Node 44":                LocData(base_id + 30639, LocGroup.ALT),
-    "Flower Cup Alt Path Node 43":                LocData(base_id + 30640, LocGroup.ALT),
-    "Flower Cup Alt Path Node 46":                LocData(base_id + 30641, LocGroup.ALT),
-    "Flower Cup Alt Path Node 47":                LocData(base_id + 30642, LocGroup.ALT),
-    "Flower Cup Alt Path Node 49":                LocData(base_id + 30643, LocGroup.ALT),
-    "Flower Cup Alt Path Node 3E":                LocData(base_id + 30644, LocGroup.ALT),
-
-    # === STAR NORMAL DIFFICULTY ===
     "Star Cup Alt Path Normal Node 2E":           LocData(base_id + 30645, LocGroup.ALT_NORMAL),
     "Star Cup Alt Path Normal Node 32":           LocData(base_id + 30646, LocGroup.ALT_NORMAL),
     "Star Cup Alt Path Normal Node 3E":           LocData(base_id + 30647, LocGroup.ALT_NORMAL),
@@ -1687,8 +1551,44 @@ global_alternate_path_locations: Dict[str, LocData] = {
     "Star Cup Alt Path Normal Node 4B":           LocData(base_id + 30667, LocGroup.ALT_NORMAL),
     "Star Cup Alt Path Normal Node 48":           LocData(base_id + 30668, LocGroup.ALT_NORMAL),
     "Star Cup Alt Path Normal Node 45":           LocData(base_id + 30669, LocGroup.ALT_NORMAL),
+}
 
-    # === STAR HARD DIFFICULTY ===
+global_alternate_path_hard_locations: Dict[str, LocData] = {
+    "Mushroom Cup Alt Path Hard Node 21":                  LocData(base_id + 30556, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 2B":                  LocData(base_id + 30557, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 31":                  LocData(base_id + 30558, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 28":                  LocData(base_id + 30559, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 38":                  LocData(base_id + 30560, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 3B":                  LocData(base_id + 30561, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 24":                  LocData(base_id + 30562, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 30":                  LocData(base_id + 30563, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 36":                  LocData(base_id + 30564, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 35":                  LocData(base_id + 30565, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 34":                  LocData(base_id + 30566, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 37":                  LocData(base_id + 30567, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 29":                  LocData(base_id + 30568, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 25":                  LocData(base_id + 30569, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 39":                  LocData(base_id + 30570, LocGroup.ALT_HARD),
+    "Mushroom Cup Alt Path Hard Node 32":                  LocData(base_id + 30571, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 26":           LocData(base_id + 30607, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 52":           LocData(base_id + 30608, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 50":           LocData(base_id + 30609, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 2D":           LocData(base_id + 30610, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 36":           LocData(base_id + 30611, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 39":           LocData(base_id + 30612, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 4E":           LocData(base_id + 30613, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 3D":           LocData(base_id + 30614, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 4B":           LocData(base_id + 30615, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 2A":           LocData(base_id + 30616, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 32":           LocData(base_id + 30617, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 55":           LocData(base_id + 30618, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 57":           LocData(base_id + 30619, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 44":           LocData(base_id + 30620, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 43":           LocData(base_id + 30621, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 46":           LocData(base_id + 30622, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 47":           LocData(base_id + 30623, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 49":           LocData(base_id + 30624, LocGroup.ALT_HARD),
+    "Flower Cup Alt Path Hard Node 3E":           LocData(base_id + 30625, LocGroup.ALT_HARD),
     "Star Cup Alt Path Hard Node 2E":             LocData(base_id + 30670, LocGroup.ALT_HARD),
     "Star Cup Alt Path Hard Node 32":             LocData(base_id + 30671, LocGroup.ALT_HARD),
     "Star Cup Alt Path Hard Node 3E":             LocData(base_id + 30672, LocGroup.ALT_HARD),
@@ -1714,8 +1614,44 @@ global_alternate_path_locations: Dict[str, LocData] = {
     "Star Cup Alt Path Hard Node 4B":             LocData(base_id + 30692, LocGroup.ALT_HARD),
     "Star Cup Alt Path Hard Node 48":             LocData(base_id + 30693, LocGroup.ALT_HARD),
     "Star Cup Alt Path Hard Node 45":             LocData(base_id + 30694, LocGroup.ALT_HARD),
+}
 
-    # === STAR UNIVERSAL DIFFICULTY ===
+global_alternate_path_global_locations: Dict[str, LocData] = {
+    "Mushroom Cup Alt Path Node 21":                       LocData(base_id + 30572, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 2B":                       LocData(base_id + 30573, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 31":                       LocData(base_id + 30574, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 28":                       LocData(base_id + 30575, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 38":                       LocData(base_id + 30576, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 3B":                       LocData(base_id + 30577, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 24":                       LocData(base_id + 30578, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 30":                       LocData(base_id + 30579, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 36":                       LocData(base_id + 30580, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 35":                       LocData(base_id + 30581, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 34":                       LocData(base_id + 30582, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 37":                       LocData(base_id + 30583, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 29":                       LocData(base_id + 30584, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 25":                       LocData(base_id + 30585, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 39":                       LocData(base_id + 30586, LocGroup.ALT),
+    "Mushroom Cup Alt Path Node 32":                       LocData(base_id + 30587, LocGroup.ALT),
+    "Flower Cup Alt Path Node 26":                LocData(base_id + 30626, LocGroup.ALT),
+    "Flower Cup Alt Path Node 52":                LocData(base_id + 30627, LocGroup.ALT),
+    "Flower Cup Alt Path Node 50":                LocData(base_id + 30628, LocGroup.ALT),
+    "Flower Cup Alt Path Node 2D":                LocData(base_id + 30629, LocGroup.ALT),
+    "Flower Cup Alt Path Node 36":                LocData(base_id + 30630, LocGroup.ALT),
+    "Flower Cup Alt Path Node 39":                LocData(base_id + 30631, LocGroup.ALT),
+    "Flower Cup Alt Path Node 4E":                LocData(base_id + 30632, LocGroup.ALT),
+    "Flower Cup Alt Path Node 3D":                LocData(base_id + 30633, LocGroup.ALT),
+    "Flower Cup Alt Path Node 4B":                LocData(base_id + 30634, LocGroup.ALT),
+    "Flower Cup Alt Path Node 2A":                LocData(base_id + 30635, LocGroup.ALT),
+    "Flower Cup Alt Path Node 32":                LocData(base_id + 30636, LocGroup.ALT),
+    "Flower Cup Alt Path Node 55":                LocData(base_id + 30637, LocGroup.ALT),
+    "Flower Cup Alt Path Node 57":                LocData(base_id + 30638, LocGroup.ALT),
+    "Flower Cup Alt Path Node 44":                LocData(base_id + 30639, LocGroup.ALT),
+    "Flower Cup Alt Path Node 43":                LocData(base_id + 30640, LocGroup.ALT),
+    "Flower Cup Alt Path Node 46":                LocData(base_id + 30641, LocGroup.ALT),
+    "Flower Cup Alt Path Node 47":                LocData(base_id + 30642, LocGroup.ALT),
+    "Flower Cup Alt Path Node 49":                LocData(base_id + 30643, LocGroup.ALT),
+    "Flower Cup Alt Path Node 3E":                LocData(base_id + 30644, LocGroup.ALT),
     "Star Cup Alt Path Node 2E":                  LocData(base_id + 30695, LocGroup.ALT),
     "Star Cup Alt Path Node 32":                  LocData(base_id + 30696, LocGroup.ALT),
     "Star Cup Alt Path Node 3E":                  LocData(base_id + 30697, LocGroup.ALT),
@@ -1743,15 +1679,26 @@ global_alternate_path_locations: Dict[str, LocData] = {
     "Star Cup Alt Path Node 45":                  LocData(base_id + 30719, LocGroup.ALT),
 }
 
+
 location_table: Dict[str, LocData] = {
     **cup_round_locations,
     **sports_mix_locations,
-    **basketball_alternate_path_locations,
-    **dodgeball_alternate_path_locations,
-    **volleyball_alternate_path_locations,
-    **hockey_alternate_path_locations,
+    **basketball_alternate_path_normal_locations,
+    **basketball_alternate_path_hard_locations,
+    **basketball_alternate_path_global_locations,
+    **dodgeball_alternate_path_normal_locations,
+    **dodgeball_alternate_path_hard_locations,
+    **dodgeball_alternate_path_global_locations,
+    **volleyball_alternate_path_normal_locations,
+    **volleyball_alternate_path_hard_locations,
+    **volleyball_alternate_path_global_locations,
+    **hockey_alternate_path_normal_locations,
+    **hockey_alternate_path_hard_locations,
+    **hockey_alternate_path_global_locations,
     **sports_mix_alternate_path_locations,
-    **global_alternate_path_locations,
+    **global_alternate_path_normal_locations,
+    **global_alternate_path_hard_locations,
+    **global_alternate_path_global_locations,
     **easy_exhibition_locations,
     **normal_exhibition_locations,
     **hard_exhibition_locations,
@@ -1799,37 +1746,92 @@ def create_regular_locations(world: MSMWorld) -> None:
     b_mushroom_cup_n = world.get_region("Basketball: Mushroom Cup (Normal)")
     b_flower_cup_n = world.get_region("Basketball: Flower Cup (Normal)")
     b_star_cup_n = world.get_region("Basketball: Star Cup (Normal)")
+    b_mushroom_alt_n = world.get_region("Basketball: Mushroom Cup Alt Paths (Normal)")
+    b_flower_alt_n = world.get_region("Basketball: Flower Cup Alt Paths (Normal)")
+    b_star_alt_n = world.get_region("Basketball: Star Cup Alt Paths (Normal)")
     b_mushroom_cup_h = world.get_region("Basketball: Mushroom Cup (Hard)")
     b_flower_cup_h = world.get_region("Basketball: Flower Cup (Hard)")
     b_star_cup_h = world.get_region("Basketball: Star Cup (Hard)")
+    b_mushroom_alt_h = world.get_region("Basketball: Mushroom Cup Alt Paths (Hard)")
+    b_flower_alt_h = world.get_region("Basketball: Flower Cup Alt Paths (Hard)")
+    b_star_alt_h = world.get_region("Basketball: Star Cup Alt Paths (Hard)")
+    b_mushroom_alt_g = world.get_region("Basketball: Mushroom Cup Alt Paths (Global)")
+    b_flower_alt_g = world.get_region("Basketball: Flower Cup Alt Paths (Global)")
+    b_star_alt_g = world.get_region("Basketball: Star Cup Alt Paths (Global)")
+
     # Dodgeball
     d_exhibition = world.get_region("Dodgeball: Exhibition")
     d_mushroom_cup_n = world.get_region("Dodgeball: Mushroom Cup (Normal)")
     d_flower_cup_n = world.get_region("Dodgeball: Flower Cup (Normal)")
     d_star_cup_n = world.get_region("Dodgeball: Star Cup (Normal)")
+    d_mushroom_alt_n = world.get_region("Dodgeball: Mushroom Cup Alt Paths (Normal)")
+    d_flower_alt_n = world.get_region("Dodgeball: Flower Cup Alt Paths (Normal)")
+    d_star_alt_n = world.get_region("Dodgeball: Star Cup Alt Paths (Normal)")
     d_mushroom_cup_h = world.get_region("Dodgeball: Mushroom Cup (Hard)")
     d_flower_cup_h = world.get_region("Dodgeball: Flower Cup (Hard)")
     d_star_cup_h = world.get_region("Dodgeball: Star Cup (Hard)")
+    d_mushroom_alt_h = world.get_region("Dodgeball: Mushroom Cup Alt Paths (Hard)")
+    d_flower_alt_h = world.get_region("Dodgeball: Flower Cup Alt Paths (Hard)")
+    d_star_alt_h = world.get_region("Dodgeball: Star Cup Alt Paths (Hard)")
+    d_mushroom_alt_g = world.get_region("Dodgeball: Mushroom Cup Alt Paths (Global)")
+    d_flower_alt_g = world.get_region("Dodgeball: Flower Cup Alt Paths (Global)")
+    d_star_alt_g = world.get_region("Dodgeball: Star Cup Alt Paths (Global)")
+
     # Volleyball
     v_exhibition = world.get_region("Volleyball: Exhibition")
     v_mushroom_cup_n = world.get_region("Volleyball: Mushroom Cup (Normal)")
     v_flower_cup_n = world.get_region("Volleyball: Flower Cup (Normal)")
     v_star_cup_n = world.get_region("Volleyball: Star Cup (Normal)")
+    v_mushroom_alt_n = world.get_region("Volleyball: Mushroom Cup Alt Paths (Normal)")
+    v_flower_alt_n = world.get_region("Volleyball: Flower Cup Alt Paths (Normal)")
+    v_star_alt_n = world.get_region("Volleyball: Star Cup Alt Paths (Normal)")
     v_mushroom_cup_h = world.get_region("Volleyball: Mushroom Cup (Hard)")
     v_flower_cup_h = world.get_region("Volleyball: Flower Cup (Hard)")
     v_star_cup_h = world.get_region("Volleyball: Star Cup (Hard)")
+    v_mushroom_alt_h = world.get_region("Volleyball: Mushroom Cup Alt Paths (Hard)")
+    v_flower_alt_h = world.get_region("Volleyball: Flower Cup Alt Paths (Hard)")
+    v_star_alt_h = world.get_region("Volleyball: Star Cup Alt Paths (Hard)")
+    v_mushroom_alt_g = world.get_region("Volleyball: Mushroom Cup Alt Paths (Global)")
+    v_flower_alt_g = world.get_region("Volleyball: Flower Cup Alt Paths (Global)")
+    v_star_alt_g = world.get_region("Volleyball: Star Cup Alt Paths (Global)")
+
     # Hockey
     h_exhibition = world.get_region("Hockey: Exhibition")
     h_mushroom_cup_n = world.get_region("Hockey: Mushroom Cup (Normal)")
     h_flower_cup_n = world.get_region("Hockey: Flower Cup (Normal)")
     h_star_cup_n = world.get_region("Hockey: Star Cup (Normal)")
+    h_mushroom_alt_n = world.get_region("Hockey: Mushroom Cup Alt Paths (Normal)")
+    h_flower_alt_n = world.get_region("Hockey: Flower Cup Alt Paths (Normal)")
+    h_star_alt_n = world.get_region("Hockey: Star Cup Alt Paths (Normal)")
     h_mushroom_cup_h = world.get_region("Hockey: Mushroom Cup (Hard)")
     h_flower_cup_h = world.get_region("Hockey: Flower Cup (Hard)")
     h_star_cup_h = world.get_region("Hockey: Star Cup (Hard)")
+    h_mushroom_alt_h = world.get_region("Hockey: Mushroom Cup Alt Paths (Hard)")
+    h_flower_alt_h = world.get_region("Hockey: Flower Cup Alt Paths (Hard)")
+    h_star_alt_h = world.get_region("Hockey: Star Cup Alt Paths (Hard)")
+    h_mushroom_alt_g = world.get_region("Hockey: Mushroom Cup Alt Paths (Global)")
+    h_flower_alt_g = world.get_region("Hockey: Flower Cup Alt Paths (Global)")
+    h_star_alt_g = world.get_region("Hockey: Star Cup Alt Paths (Global)")
+
     # Sports Mix
     sports_mix_mushroom = world.get_region("Sports Mix: Mushroom Cup")
     sports_mix_flower = world.get_region("Sports Mix: Flower Cup")
     sports_mix_star = world.get_region("Sports Mix: Star Cup")
+    sports_mix_mushroom_alt = world.get_region("Sports Mix: Mushroom Cup Alt Paths")
+    sports_mix_flower_alt = world.get_region("Sports Mix: Flower Cup Alt Paths")
+    sports_mix_star_alt = world.get_region("Sports Mix: Star Cup Alt Paths")
+
+    # Global Sports
+    g_mushroom_alt_n = world.get_region("Global: Mushroom Cup Alt Paths (Normal)")
+    g_flower_alt_n = world.get_region("Global: Flower Cup Alt Paths (Normal)")
+    g_star_alt_n = world.get_region("Global: Star Cup Alt Paths (Normal)")
+    g_mushroom_alt_h = world.get_region("Global: Mushroom Cup Alt Paths (Hard)")
+    g_flower_alt_h = world.get_region("Global: Flower Cup Alt Paths (Hard)")
+    g_star_alt_h = world.get_region("Global: Star Cup Alt Paths (Hard)")
+    g_mushroom_alt_g = world.get_region("Global: Mushroom Cup Alt Paths (Global)")
+    g_flower_alt_g = world.get_region("Global: Flower Cup Alt Paths (Global)")
+    g_star_alt_g = world.get_region("Global: Star Cup Alt Paths (Global)")
+
     # Party Modes
     feed_petey = world.get_region("Feed Petey")
     harmony_hustle = world.get_region("Harmony Hustle")
@@ -1884,7 +1886,120 @@ def create_regular_locations(world: MSMWorld) -> None:
                 "Star": h_star_cup_h,
             },
         }
-}
+    }
+
+    alt_path_regions = {"Normal": {
+                "Basketball": {
+                    "Mushroom": b_mushroom_alt_n,
+                    "Flower": b_flower_alt_n,
+                    "Star": b_star_alt_n,
+                },
+                "Dodgeball": {
+                    "Mushroom": d_mushroom_alt_n,
+                    "Flower": d_flower_alt_n,
+                    "Star": d_star_alt_n,
+                },
+                "Volleyball": {
+                    "Mushroom": v_mushroom_alt_n,
+                    "Flower": v_flower_alt_n,
+                    "Star": v_star_alt_n,
+                },
+                "Hockey": {
+                    "Mushroom": h_mushroom_alt_n,
+                    "Flower": h_flower_alt_n,
+                    "Star": h_star_alt_n,
+                },
+                "Global": {
+                    "Mushroom": g_mushroom_alt_n,
+                    "Flower": g_flower_alt_n,
+                    "Star": g_star_alt_n,
+                }
+            },
+    
+            "Hard": {
+                "Basketball": {
+                    "Mushroom": b_mushroom_alt_h,
+                    "Flower": b_flower_alt_h,
+                    "Star": b_star_alt_h,
+                },
+                "Dodgeball": {
+                    "Mushroom": d_mushroom_alt_h,
+                    "Flower": d_flower_alt_h,
+                    "Star": d_star_alt_h,
+                },
+                "Volleyball": {
+                    "Mushroom": v_mushroom_alt_h,
+                    "Flower": v_flower_alt_h,
+                    "Star": v_star_alt_h,
+                },
+                "Hockey": {
+                    "Mushroom": h_mushroom_alt_h,
+                    "Flower": h_flower_alt_h,
+                    "Star": h_star_alt_h,
+                },
+                "Global": {
+                    "Mushroom": g_mushroom_alt_h,
+                    "Flower": g_flower_alt_h,
+                    "Star": g_star_alt_h,
+                }
+            },
+
+            "Global": {
+                "Basketball": {
+                    "Mushroom": b_mushroom_alt_g,
+                    "Flower": b_flower_alt_g,
+                    "Star": b_star_alt_g,
+                },
+                "Dodgeball": {
+                    "Mushroom": d_mushroom_alt_g,
+                    "Flower": d_flower_alt_g,
+                    "Star": d_star_alt_g,
+                },
+                "Volleyball": {
+                    "Mushroom": v_mushroom_alt_g,
+                    "Flower": v_flower_alt_g,
+                    "Star": v_star_alt_g,
+                },
+                "Hockey": {
+                    "Mushroom": h_mushroom_alt_g,
+                    "Flower": h_flower_alt_g,
+                    "Star": h_star_alt_g,
+                },
+                "Global": {
+                    "Mushroom": g_mushroom_alt_g,
+                    "Flower": g_flower_alt_g,
+                    "Star": g_star_alt_g,
+                }
+            }
+    }
+
+    alt_path_tables = {
+        "Basketball": {
+            "Normal": basketball_alternate_path_normal_locations,
+            "Hard": basketball_alternate_path_hard_locations,
+            "Global": basketball_alternate_path_global_locations,
+        },
+        "Dodgeball": {
+            "Normal": dodgeball_alternate_path_normal_locations,
+            "Hard": dodgeball_alternate_path_hard_locations,
+            "Global": dodgeball_alternate_path_global_locations,
+        },
+        "Volleyball": {
+            "Normal": volleyball_alternate_path_normal_locations,
+            "Hard": volleyball_alternate_path_hard_locations,
+            "Global": volleyball_alternate_path_global_locations,
+        },
+        "Hockey": {
+            "Normal": hockey_alternate_path_normal_locations,
+            "Hard": hockey_alternate_path_hard_locations,
+            "Global": hockey_alternate_path_global_locations,
+        },
+        "Global": {
+            "Normal": global_alternate_path_normal_locations,
+            "Hard": global_alternate_path_hard_locations,
+            "Global": global_alternate_path_global_locations,
+        },
+    }
 
     if world.options.include_tournaments.value:
         for difficulty, sports in cup_regions.items():
@@ -1917,6 +2032,90 @@ def create_regular_locations(world: MSMWorld) -> None:
                 ])
 
                 region.add_locations(locations, MSMLocation)
+
+        if world.options.include_alt_paths.value:
+            alt_path_type = world.options.alt_path_type.value
+
+            sports_mix_alt_regions = {
+                "Mushroom": sports_mix_mushroom_alt,
+                "Flower": sports_mix_flower_alt,
+                "Star": sports_mix_star_alt,
+            }
+
+            if alt_path_type == 0:
+                for difficulty, sports in alt_path_regions.items():
+                    if difficulty == "Global" or (difficulty == "Hard" and not world.options.hard_tournament_difficulty.value):
+                        continue
+                
+                    for sport, cups in sports.items():
+                        if sport == "Global" or (sport not in world.options.enabled_sports.value):
+                            continue
+                
+                        for cup, region in cups.items():
+                                        
+                            location_names = [
+                                name for name in alt_path_tables[sport][difficulty]
+                                if cup.casefold() in name.casefold()
+                            ]
+
+                            locations = get_location_names_with_ids(location_names)
+                            region.add_locations(locations, MSMLocation)
+
+                if "Sports Mix" in world.options.enabled_sports.value:
+                    for cup, region in sports_mix_alt_regions.items():
+                        location_names = [
+                            name for name in sports_mix_alternate_path_locations
+                            if cup.casefold() in name.casefold()
+                        ]
+                        locations = get_location_names_with_ids(location_names)
+                        region.add_locations(locations, MSMLocation)
+
+            elif alt_path_type == 1:
+                for sport, cups in alt_path_regions["Global"].items():
+                    if sport == "Global" or (sport not in world.options.enabled_sports.value):
+                        continue
+                                    
+                    for cup, region in cups.items():
+                                                        
+                        location_names = [
+                            name for name in alt_path_tables[sport]["Global"]
+                            if cup.casefold() in name.casefold()
+                        ]
+                    
+                        locations = get_location_names_with_ids(location_names)
+                        region.add_locations(locations, MSMLocation)
+
+            elif alt_path_type == 2 or alt_path_type == 4:
+                for difficulty, sports in alt_path_regions.items():
+
+                    if difficulty == "Global" or (difficulty == "Hard" and not world.options.hard_tournament_difficulty.value):
+                        continue
+
+                    for sport, cups in sports["Global"].items():
+
+                        for cup, region in cups.items():
+                                                            
+                            location_names = [
+                                name for name in alt_path_tables["Global"][difficulty]
+                                if cup.casefold() in name.casefold()
+                            ]
+                        
+                            locations = get_location_names_with_ids(location_names)
+                            region.add_locations(locations, MSMLocation)
+            
+            elif alt_path_type == 3 or alt_path_type == 5:
+                for cup, region in alt_path_regions["Global"]["Global"].items():
+
+                    location_names = [
+                        name for name in alt_path_tables["Global"]["Global"]
+                        if cup.casefold() in name.casefold()
+                    ]
+
+                    locations = get_location_names_with_ids(location_names)
+                    region.add_locations(locations, MSMLocation)
+                        
+
+
 
     # === Exhibition Locations for each difficulty ===
 
