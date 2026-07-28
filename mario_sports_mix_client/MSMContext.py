@@ -140,10 +140,10 @@ class MSMCommandProcessor(SuperCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
-    # @mark_raw
-    # def _cmd_check(self, location_name: str):
-    #     """Check a location - Used for dev purposes, or if you're lazy ig"""
-    #     asyncio.create_task(self.ctx.check_location(location_name))
+    @mark_raw
+    def _cmd_check(self, location_name: str):
+        """Check a location - Used for dev purposes, or if you're lazy ig"""
+        asyncio.create_task(self.ctx.check_location(location_name))
 
     def _cmd_debug_mode(self):
         """Toggle client debugging on and off (Default off)"""
@@ -1851,7 +1851,9 @@ class MSMContext(SuperContext):
         
         if filler == "Special Meter Charge":
             if "Special Meter" in self.unlocked_abilities:
-                self.game_interface.dolphin_client.write_float(self.addresslib.p_special_meter_addr, 1.0)
+                self.game_interface.dolphin_client.write_pointer(self.addresslib.p_special_meter_addr,
+                                                                 Pointers.Player.special_meter_offsets,
+                                                                 "float", 1.0)
                 await self.mark_consumable_handled(item_index)
                 return
             else:
