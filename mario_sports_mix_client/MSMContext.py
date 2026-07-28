@@ -34,9 +34,9 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.1.1"
+CLIENT_VERSION = "2.1.2"
 COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9",
-                       "2.1.0"]
+                       "2.1.0", "2.1.1"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -1836,7 +1836,9 @@ class MSMContext(SuperContext):
 
         # Player already has an item? Don't overwrite it.
         current_item = self.current_item_func()
-        special_charge = self.game_interface.dolphin_client.read_float(self.addresslib.p_special_meter_addr)
+        special_charge = self.game_interface.dolphin_client.read_pointer(self.addresslib.p_special_meter_addr,
+                                                                         Pointers.Player.special_meter_offsets,
+                                                                         "float")
         if filler != "1 Coin" and current_item != -1:
             self.debug_log(f"Waiting to give {filler}; player already has item={current_item}")
         elif filler == "Special Meter Charge" and special_charge == 1.0:
@@ -1868,7 +1870,9 @@ class MSMContext(SuperContext):
         
         if filler == "Special Meter Charge":
             if "Special Meter" in self.unlocked_abilities:
-                self.game_interface.dolphin_client.write_float(self.addresslib.p_special_meter_addr, 1.0)
+                self.game_interface.dolphin_client.write_pointer(self.addresslib.p_special_meter_addr,
+                                                                 Pointers.Player.special_meter_offsets,
+                                                                 "float", 1.0)
                 logger.info("Special Meter fully charged!")
                 await self.mark_consumable_handled(item_index)
                 return
