@@ -2091,17 +2091,15 @@ def create_regular_locations(world: MSMWorld) -> None:
                     if difficulty == "Global" or (difficulty == "Hard" and not world.options.hard_tournament_difficulty.value):
                         continue
 
-                    for sport, cups in sports["Global"].items():
+                    for cup, region in sports["Global"].items():
 
-                        for cup, region in cups.items():
-                                                            
-                            location_names = [
-                                name for name in alt_path_tables["Global"][difficulty]
-                                if cup.casefold() in name.casefold()
-                            ]
-                        
-                            locations = get_location_names_with_ids(location_names)
-                            region.add_locations(locations, MSMLocation)
+                        location_names = [
+                            name for name in alt_path_tables["Global"][difficulty]
+                            if cup.casefold() in name.casefold()
+                        ]
+
+                        locations = get_location_names_with_ids(location_names)
+                        region.add_locations(locations, MSMLocation)
             
             elif alt_path_type == 3 or alt_path_type == 5:
                 for cup, region in alt_path_regions["Global"]["Global"].items():

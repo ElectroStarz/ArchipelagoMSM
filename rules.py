@@ -183,7 +183,10 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
             progressive_logic = Has("Progressive Alt Path", cup_dict[f"{cup_name} ({category})"])
             logic &= progressive_logic
         else:
-            logic &= Has(f"{sport}:{cup_name} Cup Alt Paths ({category})")
+            if sport == "Sports Mix":
+                logic &= Has(f"Sports Mix: {cup_name} Cup Alt Paths")
+            else:
+                logic &= Has(f"{sport}: {cup_name} Cup Alt Paths ({category})")
         
         return logic
 
@@ -716,7 +719,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                 world.set_rule(entrance, cup_rule(world, "Sports Mix", cup, "Sports Mix"))
 
         # Alternate Path Rules
-        if world.options.include_alternate_paths:
+        if world.options.include_alt_paths:
 
             alt_path_type = world.options.alt_path_type.value
             
