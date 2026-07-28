@@ -136,7 +136,7 @@ class MSMWorld(World):
         }
 
         # Alt Path should only be enable with Tournaments
-        if self.options.alt_path.value and not self.options.include_tournaments.value:
+        if self.options.include_alt_paths.value and not self.options.include_tournaments.value:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name} has Alt Paths enabled but they don't have Tournaments enabled!"
                 f"How are you expecting to access them?!"
