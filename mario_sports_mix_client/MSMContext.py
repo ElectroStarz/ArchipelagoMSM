@@ -1836,8 +1836,11 @@ class MSMContext(SuperContext):
 
         # Player already has an item? Don't overwrite it.
         current_item = self.current_item_func()
+        special_charge = self.game_interface.dolphin_client.read_float(self.addresslib.p_special_meter_addr)
         if filler != "1 Coin" and current_item != -1:
             self.debug_log(f"Waiting to give {filler}; player already has item={current_item}")
+        elif filler == "Special Meter Charge" and special_charge == 1.0:
+            self.debug_log("Waiting to give Special Meter Charge; player has a full special meter")
             return
 
         # Prevent question mark panel replacement while giving item
@@ -1866,6 +1869,7 @@ class MSMContext(SuperContext):
         if filler == "Special Meter Charge":
             if "Special Meter" in self.unlocked_abilities:
                 self.game_interface.dolphin_client.write_float(self.addresslib.p_special_meter_addr, 1.0)
+                logger.info("Special Meter fully charged!")
                 await self.mark_consumable_handled(item_index)
                 return
             else:
