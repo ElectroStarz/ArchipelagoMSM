@@ -515,7 +515,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                                     location = world.get_location(f"{sport} {cup} Cup Alt Path {difficulty} {node}")
 
                                     # Apparantely Dodgeball is the only sport to have a node locked off by special meter and its literally just this one im crine
-                                    if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_path.value:
+                                    if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_paths.value:
                                         world.set_rules(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
                                     else:    
                                         world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
@@ -529,7 +529,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                         for cup in cups:
                             for node in alt_path_r2_nodes[cup]:
                                 location = world.get_location(f"{sport} {cup} Cup Alt Path {node}")
-                                if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_path.value:
+                                if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_paths.value:
                                     world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
                                 else:    
                                     world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
@@ -540,7 +540,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                         for node in alt_path_r2_nodes[cup]:
                             location = world.get_location(f"{cup} Cup Alt Path {difficulty} {node}")
                             # Just to be on the safe side
-                            if cup == "Star" and not world.options.always_spawn_alt_path.value:
+                            if cup == "Star" and not world.options.always_spawn_alt_paths.value:
                                 world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
                             else:    
                                 world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
@@ -549,7 +549,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                 for cup in cups:
                     for node in alt_path_r2_nodes[cup]:
                         location = world.get_location(f"{cup} Cup Alt Path {node}")
-                        if cup == "Star" and not world.options.always_spawn_alt_path.value:
+                        if cup == "Star" and not world.options.always_spawn_alt_paths.value:
                             world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
                         else:    
                             world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
