@@ -646,12 +646,15 @@ def create_all_items(world: "MSMWorld") -> None:
 
 def create_courts(world: "MSMWorld", itempool):
     if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
+
+        the_awesome_edge_case = world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court
+        
         mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
 
         other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
                         "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
         
-        if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups):
+        if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups) or the_awesome_edge_case:
             for court in mush_courts:
                 world.push_precollected(world.create_item(court))
 
@@ -687,6 +690,7 @@ def create_cups(world: "MSMWorld", itempool):
 
     # --- Progressive Cups ---
     if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
+
         # Base: 3 Standard Cups (Mushroom, Flower, Star)
         total_progressive_cups = 3
 
@@ -781,7 +785,7 @@ def create_cups(world: "MSMWorld", itempool):
                     mushroom_cups.remove(random_cup)
 
             precollect_names.update(starting_cups)
-            
+
             if not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
                 starting_courts = []
                 precollect_names_courts = set()
@@ -814,6 +818,7 @@ def create_cups(world: "MSMWorld", itempool):
 
                 for name in courts_in_pool:
                     itempool.append(world.create_item(name))
+
 
            
         prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
