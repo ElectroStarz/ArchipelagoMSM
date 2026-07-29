@@ -26,7 +26,26 @@ class MatchAddresses:
 
 class GlobalTournament:
 
-    current_node = 0x804D5D1F # Byte
+    player_current_node = 0x804D5D1F # Byte
+    player_character = 0x804D5D18 # Byte
+    player_teammate_1 = 0x804D5D19 # Byte
+    player_teammate_2 = 0x804D5D1A # Byte
+
+    current_tournament_sport_variation = 0x804D7094
+    current_tournament_cup = 0x804D7095 # Byte
+    current_tournament_map = 0x804D7096 # Byte
+    current_tournament_song = 0x804D7097 # Byte
+    current_tournament_round = 0x804D70A3 # Byte
+
+    round_1_match_1_stage = 0x804D5F5A # Byte
+    round_1_match_2_stage = 0x804D5F6A # Byte
+    round_1_match_3_stage = 0x804D5F7A # Byte
+    round_1_match_4_stage = 0x804D5F8A # Byte
+    round_2_match_1_stage = 0x804D5F9A # Byte
+    round_2_match_2_stage = 0x804D5FAA # Byte
+    round_3_stage = 0x804D5FBA # Byte
+    node_17_stage = 0x804D5FCA # Byte
+    alt_path_stage = 0x804D5FDA # Byte
 
     alt_path_condition_fufilled = 0x804D6FBC # Byte | Also checks for winning Alt Path missions
 
@@ -36,6 +55,52 @@ class GlobalTournament:
 
     flower_inner_bridges_toggle = 0x804D701E # Byte
     flower_outer_bridges_toggle = 0x804D701F # Byte
+
+    # +0x24 offset between players
+    cpu_1_current_node = player_current_node + 0x24 # Byte
+    cpu_2_current_node = player_current_node + 0x48 # Byte
+    cpu_3_current_node = player_current_node + 0x6C # Byte
+    cpu_4_current_node = player_current_node + 0x90 # Byte
+    cpu_5_current_node = player_current_node + 0xB4 # Byte
+    cpu_6_current_node = player_current_node + 0xD8 # Byte
+    cpu_7_current_node = player_current_node + 0xFC # Byte
+
+    cpu_1_character = player_character + 0x24 # Byte
+    cpu_1_teammate_1 = player_teammate_1 + 0x24 # Byte
+    cpu_1_teammate_2 = player_teammate_2 + 0x24 # Byte
+
+    cpu_2_character = player_character + 0x48 # Byte
+    cpu_2_teammate_1 = player_teammate_1 + 0x48 # Byte
+    cpu_2_teammate_2 = player_teammate_2 + 0x48 # Byte
+
+    cpu_3_character = player_character + 0x6C # Byte
+    cpu_3_teammate_1 = player_teammate_1 + 0x6C # Byte
+    cpu_3_teammate_2 = player_teammate_2 + 0x6C # Byte
+
+    cpu_4_character = player_character + 0x90 # Byte
+    cpu_4_teammate_1 = player_teammate_1 + 0x90 # Byte
+    cpu_4_teammate_2 = player_teammate_2 + 0x90 # Byte
+
+    cpu_5_character = player_character + 0xB4 # Byte
+    cpu_5_teammate_1 = player_teammate_1 + 0xB4 # Byte
+    cpu_5_teammate_2 = player_teammate_2 + 0xB4 # Byte
+
+    cpu_6_character = player_character + 0xD8 # Byte
+    cpu_6_teammate_1 = player_teammate_1 + 0xD8 # Byte
+    cpu_6_teammate_2 = player_teammate_2 + 0xD8 # Byte
+
+    cpu_7_character = player_character + 0xFC # Byte
+    cpu_7_teammate_1 = player_teammate_1 + 0xFC # Byte
+    cpu_7_teammate_2 = player_teammate_2 + 0xFC # Byte
+
+    ff_team_character_1 = 0x804D7809 # Byte
+    ff_team_character_2 = 0x804D780B # Byte
+    ff_team_character_3 = 0x804D780D # Byte
+    
+
+
+
+
 
 
 class PartyMode:

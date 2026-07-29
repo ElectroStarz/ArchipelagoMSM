@@ -494,6 +494,28 @@ class AlwaysSpawnAltPaths(Toggle):
     display_name = "Always Spawn Alt Paths"
     default = True
 
+class OopsAllCharacter(Choice):
+    """Meme Option, Makes it so all Opponents are a Single Character"""
+    option_off = 0
+    option_mario = 1
+    option_luigi = 2
+    option_peach = 3
+    option_daisy = 4
+    option_yoshi = 5
+    option_wario = 6
+    option_waluigi = 7
+    option_donkey_kong = 8
+    option_diddy_kong = 9
+    option_toad = 10
+    option_bowser = 11
+    option_bowser_jr = 12
+    option_moogle = 13
+    option_cactuar = 14
+    option_ninja = 15
+    option_white_mage = 16
+    option_slime = 17
+    option_black_mage = 18
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
@@ -567,6 +589,9 @@ msm_option_groups = [
         # ScoreSanityPoints,
         # ScoreSanityMax,
     ]),
+    OptionGroup("Meme Options", [
+        OopsAllCharacter,
+    ]),
 ]
 
 @dataclass
@@ -636,5 +661,8 @@ class MSMOptions(PerGameCommonOptions):
     score_sanity: ScoreSanity
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
+
+    # Meme Stuff
+    oops_all_character: OopsAllCharacter
 
     start_inventory_from_pool: StartInventoryPool
