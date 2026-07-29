@@ -648,7 +648,7 @@ def create_courts(world: "MSMWorld", itempool):
     if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
 
         the_awesome_edge_case = world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court
-        
+
         mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
 
         other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",

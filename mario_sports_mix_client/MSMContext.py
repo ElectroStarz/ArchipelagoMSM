@@ -622,6 +622,7 @@ class MSMContext(SuperContext):
         self.unlocked_modes: set[str] = set()
         self.unlocked_cups: set[str] = set()
         self.unlocked_alt_paths: set[str] = set()
+        self.progressive_alt_paths: set[str] = set()
         self.unlocked_ex_diffs: set[str] = set()
         self.progressive_courts: set[str] = set()
         self.progressive_cups: set[str] = set()
@@ -1000,6 +1001,7 @@ class MSMContext(SuperContext):
         self.progressive_courts.clear()
         self.unlocked_cups.clear()
         self.unlocked_alt_paths.clear()
+        self.progressive_alt_paths.clear()
         self.unlocked_sports_crystals.clear()
         self.unlocked_courts.clear()
         self.unlocked_characters.clear()
@@ -1189,12 +1191,17 @@ class MSMContext(SuperContext):
                 # Changed for alt path names
                 for sport in sport_tuple:
                     if item_name.startswith(f"{sport}:"):
-                            if "Alt".casefold() in item_name.casefold():
-                                self.unlocked_alt_paths.add(item_name)
-                                self.debug_log(f"Added {item_name} to unlocked_alt_paths")
-                            else:
+                            if not "Alt".casefold() in item_name.casefold():
                                 self.unlocked_cups.add(item_name)
                                 self.debug_log(f"Added {item_name} to unlocked_cups")
+
+                if "Alt".casefold() in item_name.casefold():
+                    if "Progressive".casefold() in item_name.casefold():
+                        self.progressive_alt_paths.add(item_name)
+                        self.debug_log(f"Added {item_name} to progressive_alt_paths")
+                    else:
+                        self.unlocked_alt_paths.add(item_name)
+                        self.debug_log(f"Added {item_name} to unlocked_alt_paths")
 
                 if item_name.startswith("Exhibition"):
                     self.unlocked_ex_diffs.add(item_name)
@@ -1573,6 +1580,176 @@ class MSMContext(SuperContext):
     # === Alt Path Unlocks ===
 
     async def handle_alt_path_unlocks(self):
+        """Handles unlocking Alt Paths"""
+
+        mushroom_alt_paths_unlocked = get_address(GlobalTournament.mushroom_alt_paths_unlocked)
+        flower_alt_paths_unlocked = get_address(GlobalTournament.flower_alt_paths_unlocked)
+        star_alt_paths_unlocked = get_address(GlobalTournament.star_alt_paths_unlocked)
+        current_sport = get_address(GlobalTournament.current_tournament_sport_variation)
+        current_cup = get_address(GlobalTournament.current_tournament_cup)
+
+
+
+        if self.include_alt_paths:
+
+            cups = ["Mushroom", "Flower", "Star"]
+            sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
+            
+            # Values for Mushroom, Flower, and Star Cup
+            basketball_values = [0, 0, 0]
+            dodgeball_values = [0, 0, 0]
+            volleyball_values = [0, 0, 0]
+            hockey_values = [0, 0, 0]
+            sports_mix_values = [0, 0, 0]
+            global_values = [0, 0, 0]
+
+            if self.alt_path_type == 0:
+
+                for sport in sports:
+                    for cup in cups:
+                        if f"{sport}: {cup} Cup (Normal)" in self.unlocked_alt_paths:
+                            if sport == "Basketball":
+                                basketball_values[cups.index(cup)] += 1
+                            elif sport == "Dodgeball":
+                                dodgeball_values[cups.index(cup)] += 1
+                            elif sport == "Volleyball":
+                                volleyball_values[cups.index(cup)] += 1
+                            elif sport == "Hockey":
+                                hockey_values[cups.index(cup)] += 1
+
+                for sport in sports:
+                    for cup in cups:
+                        if f"{sport}: {cup} Cup (Hard)" in self.unlocked_alt_paths:
+                            if sport == "Basketball":
+                                basketball_values[cups.index(cup)] += 2
+                            elif sport == "Dodgeball":
+                                dodgeball_values[cups.index(cup)] += 2
+                            elif sport == "Volleyball":
+                                volleyball_values[cups.index(cup)] += 2
+                            elif sport == "Hockey":
+                                hockey_values[cups.index(cup)] += 2
+
+                for cup in cups:
+                    if f"Sports Mix: {cup} Cup" in self.unlocked_alt_paths:
+                        sports_mix_values[cups.index(cup)] = 3
+
+                if current_sport == 0:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
+
+                elif current_sport == 1:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, volleyball_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, volleyball_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, volleyball_values[2])
+
+                elif current_sport == 2:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, dodgeball_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, dodgeball_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, dodgeball_values[2])
+
+                elif current_sport == 3:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, hockey_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, hockey_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, hockey_values[2])
+
+                elif current_sport == 5:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, sports_mix_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
+
+            if self.alt_path_type == 1:
+                    
+                for sport in sports:
+                    for cup in cups:
+                        if f"{sport}: {cup} Cup (Global)" in self.unlocked_alt_paths:
+                            if sport == "Basketball":
+                                basketball_values[cups.index(cup)] = 3
+                            elif sport == "Dodgeball":
+                                dodgeball_values[cups.index(cup)] = 3
+                            elif sport == "Volleyball":
+                                volleyball_values[cups.index(cup)] = 3
+                            elif sport == "Hockey":
+                                hockey_values[cups.index(cup)] = 3
+
+                if current_sport == 0:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
+                if current_sport == 1:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, volleyball_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, volleyball_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, volleyball_values[2])
+                if current_sport == 2:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, dodgeball_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, dodgeball_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, dodgeball_values[2])
+                if current_sport == 3:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, hockey_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, hockey_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, hockey_values[2])
+                if current_sport == 5:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, sports_mix_values[0])
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
+
+            if self.alt_path_type == 2:
+
+                for cup in cups:
+                    if f"{cup} Alt Paths (Normal)" in self.unlocked_alt_paths:
+                        global_values[cups.index(cup)] += 1
+
+                for cup in cups:
+                    if f"{cup} Alt Paths (Hard)" in self.unlocked_alt_paths:
+                        global_values[cups.index(cup)] += 2
+
+                self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, global_values[0])
+                self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, global_values[1])
+                self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, global_values[2])
+
+            if self.alt_path_type == 3:
+
+                for cup in cups:
+                    if f"{cup} Alt Paths (Global)" in self.unlocked_alt_paths:
+                        global_values[cups.index(cup)] = 3
+
+                self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, global_values[0])
+                self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, global_values[1])
+                self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, global_values[2])
+
+            if self.alt_path_type == 4:
+
+                progressive_alt_path_count = len(self.progressive_alt_paths)
+
+                if progressive_alt_path_count >= 1:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 1)
+                if progressive_alt_path_count >= 2:
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 1)
+                if progressive_alt_path_count >= 3:
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 1)
+                if progressive_alt_path_count >= 4:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 3)
+                if progressive_alt_path_count >= 5:
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 3)
+                if progressive_alt_path_count >= 6:
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
+
+            if self.alt_path_type == 5:
+
+                progressive_alt_path_count = len(self.progressive_alt_paths)
+
+                if progressive_alt_path_count >= 1:
+                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 3)
+                if progressive_alt_path_count >= 2:
+                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 3)
+                if progressive_alt_path_count >= 3:
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
+                
+        else:
+            self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 0)
+            self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 0)
+            self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 0)
+
 
     # === Exhibition Unlocks ===
 
