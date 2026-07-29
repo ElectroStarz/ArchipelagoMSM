@@ -501,29 +501,29 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    print(itempool)
+    #print(itempool)
     world.multiworld.itempool += itempool
 
-    # Create a state with ALL items in the multiworld
-    all_state = world.multiworld.get_all_state(False, False, True, True)
-    any_cup_rule = can_play_any_cup(world)
-    any_ex_rule = can_play_any_ex()
-
-    # 2. Get the current inventory state
-
-    print("--- Special Sanity Debug ---")
-    print(f"Has Special Meter? {all_state.has('Special Meter', world.player)}")
-
-    print(f"Can play any cup? {any_cup_rule.resolve(world)(all_state)}")
-    print(f"Can play any EX? {any_ex_rule.resolve(world)(all_state)}")
-
-    for character in characters:
-        loc = world.get_location(f"Use {character}'s Special")
-        print(f"Has {character}? {all_state.has(character, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
-
-    for mii in miis:
-        loc = world.get_location(f"Use {mii}'s Special")
-        print(f"Has {mii}? {all_state.has(mii, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
+    # # Create a state with ALL items in the multiworld
+    # all_state = world.multiworld.get_all_state(False, False, True, True)
+    # any_cup_rule = can_play_any_cup(world)
+    # any_ex_rule = can_play_any_ex()
+    #
+    # # 2. Get the current inventory state
+    #
+    # print("--- Special Sanity Debug ---")
+    # print(f"Has Special Meter? {all_state.has('Special Meter', world.player)}")
+    #
+    # print(f"Can play any cup? {any_cup_rule.resolve(world)(all_state)}")
+    # print(f"Can play any EX? {any_ex_rule.resolve(world)(all_state)}")
+    #
+    # for character in characters:
+    #     loc = world.get_location(f"Use {character}'s Special")
+    #     print(f"Has {character}? {all_state.has(character, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
+    #
+    # for mii in miis:
+    #     loc = world.get_location(f"Use {mii}'s Special")
+    #     print(f"Has {mii}? {all_state.has(mii, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
 
 
 
@@ -656,18 +656,18 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     # access rules.
 
     # Character Sanity (Characters)
-    if (world.options.character_sanity == CharacterSanity.option_characters or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+    if (world.options.character_sanity.value == CharacterSanity.option_characters or
+        world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes):
         if name in characters or name in miis:
             classification = IC.progression
 
     # Character Sanity (Costumes)
-    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+    if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         if name in character_costumes:
             classification = IC.progression
 
     # Special Sanity
-    if name == "Special Meter" and world.options.special_sanity:
+    if (name == "Special Meter" or name in characters or name in miis) and world.options.special_sanity.value:
         classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
