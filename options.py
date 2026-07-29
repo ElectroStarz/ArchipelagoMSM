@@ -35,12 +35,24 @@ class ExhibitionType(Choice):
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
-(Also unlocks related courts) - Recommended if you don't have party games on!"""
+(Also unlocks related courts) - Recommended if you don't have party games on!
+
+Random option pulls from both Normal and Hard Cups 
+and defaults to both if Progressive Cups are enabled.
+Gives all Mushroom Cup Stages as well if Progressive Courts are enabled."""
     display_name = "Start with Mushroom Cup (+Courts)"
     option_none = 0
     option_normal_difficulty = 1
     option_hard_difficulty = 2
     option_both = 3
+    option_random_cups = 4
+    default = 1
+
+class StartWithRandomMushroomCups(Range):
+    """How many random Mushroom Cups should you start with? (1-7)"""
+    display_name = "Start with Random Mushroom Cups"
+    range_start = 1
+    range_end = 7
     default = 1
 
 class StartWithCharacters(Choice):
@@ -489,6 +501,7 @@ msm_option_groups = [
         IncludeTournaments,
         StartWithSports,
         StartWithMushroomCup,
+        StartWithRandomMushroomCups,
         CupUnlockType,
         CourtUnlockType,
         StartWithCharacters,
@@ -563,6 +576,7 @@ class MSMOptions(PerGameCommonOptions):
     include_exhibition: IncludeExhibition
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
+    start_with_random_mushroom_cups: StartWithRandomMushroomCups
     cup_unlock_type: CupUnlockType
     court_unlock_type: CourtUnlockType
     start_with_characters: StartWithCharacters

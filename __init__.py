@@ -93,6 +93,7 @@ class MSMWorld(World):
         "win_cups_amount",
         "boss_locations",
         "party_mode",
+        "start_with_random_mushroom_cups",
         "character_sanity",
         "court_sanity",
         "special_sanity",

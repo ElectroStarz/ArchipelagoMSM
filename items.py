@@ -228,21 +228,21 @@ sports_mix_alt_paths = {
 }
 
 global_alt_paths_n = {
-    "Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 190, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_N),
-    "Flower Cup Alt Paths (Normal)":   ItemData(base_id + 191, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_N),
-    "Star Cup Alt Paths (Normal)":     ItemData(base_id + 192, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 190, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Flower Cup Alt Paths (Normal)":   ItemData(base_id + 191, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Star Cup Alt Paths (Normal)":     ItemData(base_id + 192, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
 }
 
 global_alt_paths_h = {
-    "Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 193, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_H),
-    "Flower Cup Alt Paths (Hard)":   ItemData(base_id + 194, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_H),
-    "Star Cup Alt Paths (Hard)":     ItemData(base_id + 195, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 193, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Flower Cup Alt Paths (Hard)":   ItemData(base_id + 194, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Star Cup Alt Paths (Hard)":     ItemData(base_id + 195, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
 }
 
 global_alt_paths_g = {
-    "Mushroom Cup Alt Paths (Global)": ItemData(base_id + 196, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
-    "Flower Cup Alt Paths (Global)":   ItemData(base_id + 197, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
-    "Star Cup Alt Paths (Global)":     ItemData(base_id + 198, IC.progression_skip_balancing, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Mushroom Cup Alt Paths (Global)": ItemData(base_id + 196, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Flower Cup Alt Paths (Global)":   ItemData(base_id + 197, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Star Cup Alt Paths (Global)":     ItemData(base_id + 198, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
 }
 
 # Crystals (200 range)
@@ -646,19 +646,24 @@ def create_all_items(world: "MSMWorld") -> None:
 
 def create_courts(world: "MSMWorld", itempool):
     if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
-        if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
-            mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+        mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+
+        other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
+        
+        if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups):
             for court in mush_courts:
                 world.push_precollected(world.create_item(court))
-
-            other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
-                            "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
 
             for court in other_courts:
                 itempool.append(world.create_item(court))
         else:
-            for court in individual_courts:
-                itempool.append(world.create_item(court))
+            if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups:
+                for court in other_courts:
+                    itempool.append(world.create_item(court))
+            else:
+                for court in individual_courts:
+                    itempool.append(world.create_item(court))
 
     elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         total_stages = 15
@@ -676,6 +681,7 @@ def create_courts(world: "MSMWorld", itempool):
             for _ in range(total_stages):
                 itempool.append(world.create_item("Progressive Court"))
 
+# Random mushroom cup start handled in cups to avoid giving courts to locked cups
 def create_cups(world: "MSMWorld", itempool):
     enabled_sports = world.options.enabled_sports.value
 
@@ -699,7 +705,7 @@ def create_cups(world: "MSMWorld", itempool):
             precollected_count = 1  # Starts with Tier 1
         elif start_option == StartWithMushroomCup.option_hard_difficulty:
             precollected_count = 1  # Starts with Tier 1
-        elif start_option == StartWithMushroomCup.option_both:
+        elif start_option in (StartWithMushroomCup.option_both, StartWithMushroomCup.option_random_cups):
             precollected_count = 2  # Starts with Tier 1 and Tier 2 equivalent
 
         # Push free starting levels to inventory
@@ -737,6 +743,79 @@ def create_cups(world: "MSMWorld", itempool):
                 "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"
             ])
 
+        if start_option == StartWithMushroomCup.option_random_cups:
+
+            starting_cups = []
+
+            mushroom_cups = []
+
+            for sport in enabled_sports:
+                if sport == "Basketball":
+                    mushroom_cups.append("Basketball: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Basketball: Mushroom Cup (Hard)")
+                elif sport == "Dodgeball":
+                    mushroom_cups.append("Dodgeball: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Dodgeball: Mushroom Cup (Hard)")
+                elif sport == "Volleyball":
+                    mushroom_cups.append("Volleyball: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Volleyball: Mushroom Cup (Hard)")
+                elif sport == "Hockey":
+                    mushroom_cups.append("Hockey: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Hockey: Mushroom Cup (Hard)")
+
+
+            basketball_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock"]
+            dodgeball_stages = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"]
+            volleyball_stages = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"]
+            hockey_stages = ["Mario Stadium", "Toad Park", "Peach's Castle"]
+            courts_in_pool = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+
+            for _ in range(world.options.start_with_random_mushroom_cups.value):
+                if mushroom_cups:
+                    random_cup = world.random.choice(mushroom_cups)
+                    starting_cups.append(random_cup)
+                    mushroom_cups.remove(random_cup)
+
+            precollect_names.update(starting_cups)
+            
+            if not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+                starting_courts = []
+                precollect_names_courts = set()
+
+                for name in starting_cups:
+                    if name.startswith("Basketball"):
+                        for court in basketball_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+                    elif name.startswith("Dodgeball"):
+                        for court in dodgeball_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+                    elif name.startswith("Volleyball"):
+                        for court in volleyball_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+                    elif name.startswith("Hockey"):
+                        for court in hockey_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+
+                precollect_names_courts.update(starting_courts)
+                for name in precollect_names_courts:
+                    world.push_precollected(world.create_item(name))
+
+                for name in courts_in_pool:
+                    itempool.append(world.create_item(name))
+
+           
         prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
         # Push free individual starting items

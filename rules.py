@@ -120,10 +120,10 @@ smash_skate_courts = ["Sherbet Sea", "Rowdy Raft", "Fire Mountain"]
 
 # --- NEW HELPER ENGINE ---
 
-def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = False, round_num: int | None = 1):
+def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = False, round_num: int | None = 1, cup_name: str | None = None):
     """Dynamically returns Progressive Court or Individual Court."""
     if sm:
-        return sports_mix_court_rule(round_num if round_num is not None else 1)
+        return sports_mix_court_rule(world, cup_name if cup_name is not None else "Mushroom", round_num if round_num is not None else 1)
     elif pm:
         return Has(court_name)
     elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
@@ -131,31 +131,29 @@ def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = Fa
     else:
         return Has(court_name)
 
-def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
+def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: str, round_num: int | None = 1):
     """Returns rule for Progressive Alt Paths or Individual Alt Paths."""
 
     logic = False_()
 
     if sport == "Global":
-
         for enabled_sport in world.options.enabled_sports.value:
 
             if enabled_sport != "Sports Mix":
+
+                court_logic = True_()
 
                 if category == "Global":
                     cup_logic = cup_rule(world, enabled_sport, cup_name, "Normal") | cup_rule(world, enabled_sport, cup_name, "Hard")
                 else:
                     cup_logic = cup_rule(world, enabled_sport, cup_name, category)
+
                 
-                court_logic = court_rule(world, tournament_rules[enabled_sport][cup_name][0], False)
+                for i in range(round_num if round_num is not None else 1):
+                    court_logic &= court_rule(world, tournament_rules[enabled_sport][cup_name][i], False)
 
                 combined_logic = cup_logic & court_logic
                 logic = logic | combined_logic
-            
-        sm_logic_court = sports_mix_court_rule(1)
-        sm_logic_cup = cup_rule(world, "Sports Mix", cup_name, "Sports Mix")
-        sm_combined_logic = sm_logic_court & sm_logic_cup
-        logic = logic | sm_combined_logic
 
         if world.options.alt_path_type.value == 4 or world.options.alt_path_type.value == 5:
             progressive_logic = Has("Progressive Alternate Path", cup_dict[f"{cup_name} ({category})"])
@@ -167,10 +165,14 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
     
     else:
 
+        court_logic = True_()
         if sport == "Sports Mix":
-            court_logic = sports_mix_court_rule(1)
+            
+            for i in range(round_num if round_num is not None else 1):
+                court_logic &= sports_mix_court_rule(world, cup_name, i + 1)
         else:
-            court_logic = court_rule(world, tournament_rules[sport][cup_name][0], False)
+            for i in range(round_num if round_num is not None else 1):
+                court_logic &= court_rule(world, tournament_rules[sport][cup_name][i], False)
         
         if category == "Global":
             cup_logic = cup_rule(world, sport, cup_name, "Normal") | cup_rule(world, sport, cup_name, "Hard")
@@ -236,23 +238,51 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
         return Has(f"{sport}: {cup_name} Cup ({category})")
 
 
-def sports_mix_court_rule(round_num: int):
-    round_1_courts = ["Mario Stadium", "DK Dock", "Luigi's Mansion", "Western Junction", "Bowser Jr. Blvd.",
-                      "Wario Factory"]
+# Completely rewritten since the original did not account for Progressive Courts
+def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
 
-    round_2_courts = ["Koopa Troopa Beach", "Western Junction", "Luigi's Mansion", "Toad Park", "Bowser's Castle",
-                      "Wario Factory", "Waluigi Pinball"]
+    round_1_courts = {
+        "Mushroom": ["Mario Stadium"],
+        "Flower": ["Luigi's Mansion", "DK Dock", "Western Junction"],
+        "Star": ["Bowser Jr. Blvd.", "Wario Factory"]
+    }
 
-    round_3_courts = ["DK Dock", "Peach's Castle", "Daisy Garden", "Western Junction", "Star Ship"]
+    round_2_courts = {
+        "Mushroom": ["Koopa Troopa Beach", "Toad Park"],
+        "Flower": ["Wario Factory", "Toad Park", "Luigi's Mansion", "Western Junction"],
+        "Star": ["Bowser's Castle", "Waluigi Pinball"]
+    }
+
+    round_3_courts = {
+        "Mushroom": ["Peach's Castle", "DK Dock"],
+        "Flower": ["Daisy Garden", "Western Junction"],
+        "Star": ["Star Ship"]
+    }
+
+    required_courts = []
 
     if round_num == 1:
-        return HasAll(*round_1_courts)
+        required_courts = round_1_courts.get(cup_name, [])
     elif round_num == 2:
-        return HasAll(*round_2_courts) & HasAll(*round_1_courts)
+        required_courts = round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
     elif round_num == 3:
-        return HasAll(*round_3_courts) & HasAll(*round_1_courts) & HasAll(*round_2_courts)
+        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
     else:
-        return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
+        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
+        return HasAny(*required_courts)
+
+
+    if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+        needed_count = 0
+        for court in required_courts:
+            if courts_dict[court] > needed_count:
+                needed_count = courts_dict[court]
+        
+        return Has("Progressive Court", needed_count)
+    
+    else:
+        return HasAll(*required_courts)
+
 
 def get_all_cup_locations(world):
     locations = []
@@ -490,7 +520,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
                 for i in range(1, 4):
                     location = world.get_location(f"Sports Mix: Beat {cup} Cup Round {i}")
-                    rule = court_rule(world, "Peach's Castle", True, round_num=i) & base_sm_logic
+                    rule = court_rule(world, "Peach's Castle", True, round_num=i, cup_name=cup) & base_sm_logic
 
                     world.set_rule(location, rule)
 
@@ -516,12 +546,15 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
                                     # Apparantely Dodgeball is the only sport to have a node locked off by special meter and its literally just this one im crine
                                     if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_paths.value:
-                                        world.set_rules(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
+                                        world.set_rule(location, alternate_path_rule(world, "Dodgeball", "Star", difficulty, round_num=2) & Has("Special Meter"))
                                     else:    
-                                        world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
-                                else:
-                                    location = world.get_location(f"Sports Mix {cup} Cup Alt Path {node}")
-                                    world.set_rule(location, court_rule(world, "Waluigi Pinball", True, round_num=2))
+                                        world.set_rule(location, alternate_path_rule(world, sport, cup, difficulty, round_num=2))
+
+                if "Sports Mix" in world.options.enabled_sports.value:
+                    for cup in cups:
+                        for node in alt_path_r2_nodes[cup]:
+                            location = world.get_location(f"Sports Mix {cup} Cup Alt Path {node}")
+                            world.set_rule(location, court_rule(world, "Waluigi Pinball", True, round_num=2, cup_name=cup))
 
             if alt_path_type == 1:
                 for sport in world.options.enabled_sports.value:
@@ -530,9 +563,9 @@ def set_all_location_rules(world: MSMWorld) -> None:
                             for node in alt_path_r2_nodes[cup]:
                                 location = world.get_location(f"{sport} {cup} Cup Alt Path {node}")
                                 if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_paths.value:
-                                    world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
+                                    world.set_rule(location, alternate_path_rule(world, "Dodgeball", "Star", "Global", round_num=2) & Has("Special Meter"))
                                 else:    
-                                    world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
+                                    world.set_rule(location, alternate_path_rule(world, sport, cup, "Global", round_num=2))
 
             if alt_path_type == 2 or alt_path_type == 4:
                 for difficulty in cup_difficulties:
@@ -541,18 +574,18 @@ def set_all_location_rules(world: MSMWorld) -> None:
                             location = world.get_location(f"{cup} Cup Alt Path {difficulty} {node}")
                             # Just to be on the safe side
                             if cup == "Star" and not world.options.always_spawn_alt_paths.value:
-                                world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
-                            else:    
-                                world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
+                                world.set_rule(location, alternate_path_rule(world, "Global", "Star", difficulty, round_num=2) & Has("Special Meter"))
+                            else:
+                                world.set_rule(location, alternate_path_rule(world, "Global", cup, difficulty, round_num=2))
 
             if alt_path_type == 3 or alt_path_type == 5:
                 for cup in cups:
                     for node in alt_path_r2_nodes[cup]:
                         location = world.get_location(f"{cup} Cup Alt Path {node}")
                         if cup == "Star" and not world.options.always_spawn_alt_paths.value:
-                            world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1] & Has("Special Meter"), True, round_num=2))
+                            world.set_rule(location, alternate_path_rule(world, "Global", "Star", "Global", round_num=2) & Has("Special Meter"))
                         else:    
-                            world.set_rule(location, court_rule(world, tournament_rules[sport][cup][1], False))
+                            world.set_rule(location, alternate_path_rule(world, "Global", cup, "Global", round_num=2))
 
 
 
@@ -687,7 +720,12 @@ def set_all_location_rules(world: MSMWorld) -> None:
                         has_exhibition_match = court_name in exhibition_rules.get(sport_name, [])
 
                         if tournament_cups or has_exhibition_match:
-                            base_sport_rule = Has(sport_name) & Has(court_name)
+                            if court_name in courts_dict:
+                                court_access_rule = court_rule(world, court_name, False)
+                            else:
+                                court_access_rule = Has(court_name)
+
+                            base_sport_rule = Has(sport_name) & court_access_rule
 
                             formatted_cups = [f"{sport_name}: {cup_name} ({diff})" for cup_name in tournament_cups
                                               for diff in cup_difficulties]
@@ -714,18 +752,23 @@ def set_all_location_rules(world: MSMWorld) -> None:
 
                 for party_name in world.options.party_mode.value:
                     if party_name in mode_to_court and court_name in mode_to_court[party_name]:
+                        if court_name in courts_dict:
+                            court_access_rule = court_rule(world, court_name, False)
+                        else:
+                            court_access_rule = Has(court_name)
+
                         if party_name == "Harmony Hustle":
                             hh_court_list = hh_court_to_song[court_name]
-                            party_rule = Has(party_name) & Has(court_name) & HasAny(*hh_court_list)
+                            party_rule = Has(party_name) & court_access_rule & HasAny(*hh_court_list)
                         else:
-                            party_rule = Has(party_name) & Has(court_name)
+                            party_rule = Has(party_name) & court_access_rule
 
                         court_valid_rules.append(party_rule)
 
                 if court_valid_rules:
                     final_court_rule = court_valid_rules[0]
-                    for court_rule in court_valid_rules[1:]:
-                        final_court_rule |= court_rule
+                    for valid_rule in court_valid_rules[1:]:
+                        final_court_rule |= valid_rule
                     world.set_rule(win_location, final_court_rule)
                 else:
                     world.set_rule(win_location, False_())
