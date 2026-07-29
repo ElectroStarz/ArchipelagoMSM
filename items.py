@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Dict, NamedTuple, TYPE_CHECKING
 from BaseClasses import Item, ItemClassification as IC
 from .options import *
+from .rules import can_play_any_cup, can_play_any_ex
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -365,7 +366,7 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
     # Start with random characters option
-    # This only uses the main roster as getting characters outside
+    # This only uses the main mario roster as getting characters outside
     # the main roster before getting characters in the roster can bug
     # the game and make them not appear
     row_1 = ["Mario", "Peach",   "Wario",       "Diddy Kong"]
@@ -500,8 +501,29 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    #print(itempool)
+    print(itempool)
     world.multiworld.itempool += itempool
+
+    # Create a state with ALL items in the multiworld
+    all_state = world.multiworld.get_all_state(False, False, True, True)
+    any_cup_rule = can_play_any_cup(world)
+    any_ex_rule = can_play_any_ex()
+
+    # 2. Get the current inventory state
+
+    print("--- Special Sanity Debug ---")
+    print(f"Has Special Meter? {all_state.has('Special Meter', world.player)}")
+
+    print(f"Can play any cup? {any_cup_rule.resolve(world)(all_state)}")
+    print(f"Can play any EX? {any_ex_rule.resolve(world)(all_state)}")
+
+    for character in characters:
+        loc = world.get_location(f"Use {character}'s Special")
+        print(f"Has {character}? {all_state.has(character, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
+
+    for mii in miis:
+        loc = world.get_location(f"Use {mii}'s Special")
+        print(f"Has {mii}? {all_state.has(mii, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
 
 
 

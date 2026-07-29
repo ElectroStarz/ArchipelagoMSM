@@ -11,13 +11,17 @@ from .MSMUtils import *
 if TYPE_CHECKING:
     from . import MSMWorld
 
-characters = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong"
+characters = ["Mario", "Luigi", "Peach", "Daisy", "Yoshi", "Wario", "Waluigi", "Donkey Kong",
               "Diddy Kong", "Toad", "Bowser", "Bowser Jr", "Moogle", "Cactuar", "Ninja",
               "White Mage", "Slime", "Black Mage", "Mii (Male)", "Mii (Female)"]
 
 costumes = ["Pink Yoshi", "Light Blue Yoshi", "Yellow Yoshi", "Blue Toad", "Green Toad",
             "Yellow Toad", "She-Slime", "Metal Slime", "Tennis-wear Peach", "Tennis-wear Daisy",
             "Shadow White Ninja", "Pure White - White Mage", "Magic Red Black Mage"]
+
+courts_list = ["Mario Stadium", "Koopa Troopa Beach", "Toad Park", "DK Dock", "Peach's Castle", "Daisy Garden",
+               "Luigi's Mansion", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle", "Waluigi Pinball",
+               "Western Junction", "Ghoulish Galleon", "Star Ship"]
 
 class MSMLocation(Location):
     game = "Mario Sports Mix"
@@ -902,7 +906,7 @@ def create_regular_locations(world: MSMWorld) -> None:
                         for court in courts
                     ])
 
-                    regions[sport].add_locations(locations)
+                    regions[sport].add_locations(locations, MSMLocation)
 
             else:
                 locations = get_location_names_with_ids([
@@ -910,7 +914,7 @@ def create_regular_locations(world: MSMWorld) -> None:
                     for court in courts_list
                 ])
 
-                world.get_region("Exhibition").add_locations(locations)
+                world.get_region("Exhibition").add_locations(locations, MSMLocation)
 
     # === Party Mode Locations ===
 
@@ -934,7 +938,7 @@ def create_regular_locations(world: MSMWorld) -> None:
             region = party_mode_to_region[mode]
 
             for location in locations:
-                region.add_locations(get_location_names_with_ids([location]))
+                region.add_locations(get_location_names_with_ids([location]), MSMLocation)
 
     # === Sanity Locations ===
 
@@ -1010,12 +1014,12 @@ def create_regular_locations(world: MSMWorld) -> None:
                         if f"Win on {name}" not in locations:
                             locations.update(location)
 
-        main_menu.add_locations(locations)
+        main_menu.add_locations(locations, MSMLocation)
 
     # Special Sanity
     if world.options.special_sanity.value:
         special_locations = get_location_names_with_ids([location for location in special_sanity_locations])
-        main_menu.add_locations(special_locations)
+        main_menu.add_locations(special_locations, MSMLocation)
 
 def create_events(world: "MSMWorld") -> None:
     behemoth_boss = world.get_region("Behemoth Boss Battle")

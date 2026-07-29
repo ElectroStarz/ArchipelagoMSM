@@ -108,10 +108,10 @@ smash_skate_courts = ["Sherbet Sea", "Rowdy Raft", "Fire Mountain"]
 
 # --- NEW HELPER ENGINE ---
 
-def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = False, round_num: int | None = 1):
+def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: bool = False, round_num: int | None = 1, cup_name: str | None = None):
     """Dynamically returns Progressive Court or Individual Court."""
     if sm:
-        return sports_mix_court_rule(round_num if round_num is not None else 1)
+        return sports_mix_court_rule(world, cup_name if cup_name is not None else "Mushroom", round_num if round_num is not None else 1)
     elif pm:
         return Has(court_name)
     elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
@@ -163,24 +163,48 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
         # If Main Sport
         return Has(f"{sport}: {cup_name} Cup ({category})")
 
+# Credit to Puffy for adding Progressive Court compatibility!!
+def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
+    round_1_courts = {
+        "Mushroom": ["Mario Stadium"],
+        "Flower": ["Luigi's Mansion", "DK Dock", "Western Junction"],
+        "Star": ["Bowser Jr. Blvd.", "Wario Factory"]
+    }
 
-def sports_mix_court_rule(round_num: int):
-    round_1_courts = ["Mario Stadium", "DK Dock", "Luigi's Mansion", "Western Junction", "Bowser Jr. Blvd.",
-                      "Wario Factory"]
+    round_2_courts = {
+        "Mushroom": ["Koopa Troopa Beach", "Toad Park"],
+        "Flower": ["Wario Factory", "Toad Park", "Luigi's Mansion", "Western Junction"],
+        "Star": ["Bowser's Castle", "Waluigi Pinball"]
+    }
 
-    round_2_courts = ["Koopa Troopa Beach", "Western Junction", "Luigi's Mansion", "Toad Park", "Bowser's Castle",
-                      "Wario Factory", "Waluigi Pinball"]
-
-    round_3_courts = ["DK Dock", "Peach's Castle", "Daisy Garden", "Western Junction", "Star Ship"]
+    round_3_courts = {
+        "Mushroom": ["Peach's Castle", "DK Dock"],
+        "Flower": ["Daisy Garden", "Western Junction"],
+        "Star": ["Star Ship"]
+    }
 
     if round_num == 1:
-        return HasAll(*round_1_courts)
+        required_courts = round_1_courts.get(cup_name, [])
     elif round_num == 2:
-        return HasAll(*round_2_courts) & HasAll(*round_1_courts)
+        required_courts = round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
     elif round_num == 3:
-        return HasAll(*round_3_courts) & HasAll(*round_1_courts) & HasAll(*round_2_courts)
+        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(
+            cup_name, [])
     else:
-        return HasAny(*round_1_courts, *round_2_courts, *round_3_courts)
+        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(
+            cup_name, [])
+        return HasAny(*required_courts)
+
+    if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+        needed_count = 0
+        for court in required_courts:
+            if courts_dict[court] > needed_count:
+                needed_count = courts_dict[court]
+
+        return Has("Progressive Court", needed_count)
+
+    else:
+        return HasAll(*required_courts)
 
 def get_all_cup_locations(world):
     locations = []
@@ -298,7 +322,7 @@ def can_play_any_ex() -> Rule:
     """Returns if the player has any main sport, ex diff and any court"""
 
     ex_diffs = ["Exhibition Easy", "Exhibition Normal", "Exhibition Hard", "Exhibition Expert"]
-    return HasAny(*main_sports) & HasAny(*ex_diffs) & HasAny(*courts_list)
+    return HasAny(*main_sports) & HasAny(*ex_diffs) & (HasAny(*courts_list) | Has("Progressive Court"))
 
 
 @dataclasses.dataclass()
@@ -361,6 +385,7 @@ class CanExGoal(Rule["MSMWorld"], game="Mario Sports Mix"):
 
 def set_all_rules(world: MSMWorld) -> None:
     set_all_location_rules(world)
+
     set_all_entrance_rules(world)
     set_goal_rules(world)
     set_completion_condition(world)
