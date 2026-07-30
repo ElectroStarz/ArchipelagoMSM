@@ -31,11 +31,13 @@ class GlobalTournament:
     player_teammate_1 = 0x804D5D19 # Byte
     player_teammate_2 = 0x804D5D1A # Byte
 
-    current_tournament_sport_variation = 0x804D7094
+    current_tournament_sport_variation = 0x804D7094 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey, 5 = Sports Mix
     current_tournament_cup = 0x804D7095 # Byte
     current_tournament_map = 0x804D7096 # Byte
     current_tournament_song = 0x804D7097 # Byte
     current_tournament_round = 0x804D70A3 # Byte
+
+    current_sport = 0x804D77C4 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey
 
     round_1_match_1_stage = 0x804D5F5A # Byte
     round_1_match_2_stage = 0x804D5F6A # Byte

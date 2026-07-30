@@ -314,7 +314,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
             "modes": self.unlocked_modes,
             "courts": self.unlocked_courts,
             "cups": self.unlocked_cups,
-            "alt paths": self.alt_paths,
+            "alt paths": self.unlocked_alt_paths,
             "exhibition": self.unlocked_ex,
             "ex": self.unlocked_ex,
             "characters": self.unlocked_characters,
@@ -401,6 +401,17 @@ class MSMCommandProcessor(SuperCommandProcessor):
             logger.info(f"Unlocked Courts: {final_items}")
         else:
             logger.info("No unlocked courts")
+    
+    def unlocked_alt_paths(self):
+        """Display what alt paths you have unlocked."""
+        unlocked_alt_paths = self.ctx.unlocked_alt_paths
+        final_items = []
+        if unlocked_alt_paths:
+            for item in unlocked_alt_paths:
+                final_items.append(item)
+            logger.info(f"Unlocked Alt Paths: {final_items}")
+        else:
+            logger.info("No unlocked alt paths")
 
     def unlocked_abilities(self):
         """Display what abilities you have unlocked."""
@@ -1252,6 +1263,8 @@ class MSMContext(SuperContext):
 
         await self.handle_sports_mix_unlock()
 
+        # Alternate Paths
+        await self.handle_alt_path_unlocks()
 
         if self.court_unlock_type == 1:
             await self.handle_progressive_court_unlocks()
@@ -1585,8 +1598,8 @@ class MSMContext(SuperContext):
         mushroom_alt_paths_unlocked = get_address(GlobalTournament.mushroom_alt_paths_unlocked)
         flower_alt_paths_unlocked = get_address(GlobalTournament.flower_alt_paths_unlocked)
         star_alt_paths_unlocked = get_address(GlobalTournament.star_alt_paths_unlocked)
-        current_sport = get_address(GlobalTournament.current_tournament_sport_variation)
-        current_cup = get_address(GlobalTournament.current_tournament_cup)
+        current_sport_addr = get_address(GlobalTournament.current_tournament_sport_variation)
+        current_sport = self.game_interface.dolphin_client.read_byte(current_sport_addr)
 
 
 
@@ -1607,7 +1620,7 @@ class MSMContext(SuperContext):
 
                 for sport in sports:
                     for cup in cups:
-                        if f"{sport}: {cup} Cup (Normal)" in self.unlocked_alt_paths:
+                        if f"{sport}: {cup} Cup Alt Paths (Normal)" in self.unlocked_alt_paths:
                             if sport == "Basketball":
                                 basketball_values[cups.index(cup)] += 1
                             elif sport == "Dodgeball":
@@ -1619,7 +1632,7 @@ class MSMContext(SuperContext):
 
                 for sport in sports:
                     for cup in cups:
-                        if f"{sport}: {cup} Cup (Hard)" in self.unlocked_alt_paths:
+                        if f"{sport}: {cup} Cup Alt Paths (Hard)" in self.unlocked_alt_paths:
                             if sport == "Basketball":
                                 basketball_values[cups.index(cup)] += 2
                             elif sport == "Dodgeball":
@@ -1630,39 +1643,54 @@ class MSMContext(SuperContext):
                                 hockey_values[cups.index(cup)] += 2
 
                 for cup in cups:
-                    if f"Sports Mix: {cup} Cup" in self.unlocked_alt_paths:
+                    if f"Sports Mix: {cup} Cup Alt Paths" in self.unlocked_alt_paths:
                         sports_mix_values[cups.index(cup)] = 3
 
                 if current_sport == 0:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
+                    await self.check_write(mushroom_alt_paths_unlocked, "byte", basketball_values[0])
+                    await self.check_write(flower_alt_paths_unlocked, "byte", basketball_values[1])
+                    await self.check_write(star_alt_paths_unlocked, "byte", basketball_values[2])
 
                 elif current_sport == 1:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, volleyball_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, volleyball_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, volleyball_values[2])
+                    await self.check_write(mushroom_alt_paths_unlocked, "byte", volleyball_values[0])
+                    await self.check_write(flower_alt_paths_unlocked, "byte", volleyball_values[1])
+                    await self.check_write(star_alt_paths_unlocked, "byte", volleyball_values[2])
 
                 elif current_sport == 2:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, dodgeball_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, dodgeball_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, dodgeball_values[2])
+                    await self.check_write(mushroom_alt_paths_unlocked, "byte", dodgeball_values[0])
+                    await self.check_write(flower_alt_paths_unlocked, "byte", dodgeball_values[1])
+                    await self.check_write(star_alt_paths_unlocked, "byte", dodgeball_values[2])
 
                 elif current_sport == 3:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, hockey_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, hockey_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, hockey_values[2])
+                    await self.check_write(mushroom_alt_paths_unlocked, "byte", hockey_values[0])
+                    await self.check_write(flower_alt_paths_unlocked, "byte", hockey_values[1])
+                    await self.check_write(star_alt_paths_unlocked, "byte", hockey_values[2])
 
                 elif current_sport == 5:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, sports_mix_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
+                    await self.check_write(mushroom_alt_paths_unlocked, "byte", sports_mix_values[0])
+                    await self.check_write(flower_alt_paths_unlocked, "byte", sports_mix_values[1])
+                    await self.check_write(star_alt_paths_unlocked, "byte", sports_mix_values[2])
 
             if self.alt_path_type == 1:
                     
                 for sport in sports:
                     for cup in cups:
-                        if f"{sport}: {cup} Cup (Global)" in self.unlocked_alt_paths:
+                        if f"{sport}: {cup} Cup Alt Paths (Global)" in self.unlocked_alt_paths:
                             if sport == "Basketball":
                                 basketball_values[cups.index(cup)] = 3
                             elif sport == "Dodgeball":
@@ -1696,11 +1724,11 @@ class MSMContext(SuperContext):
             if self.alt_path_type == 2:
 
                 for cup in cups:
-                    if f"{cup} Alt Paths (Normal)" in self.unlocked_alt_paths:
+                    if f"{cup} Cup Alt Paths (Normal)" in self.unlocked_alt_paths:
                         global_values[cups.index(cup)] += 1
 
                 for cup in cups:
-                    if f"{cup} Alt Paths (Hard)" in self.unlocked_alt_paths:
+                    if f"{cup} Cup Alt Paths (Hard)" in self.unlocked_alt_paths:
                         global_values[cups.index(cup)] += 2
 
                 self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, global_values[0])
@@ -1710,7 +1738,7 @@ class MSMContext(SuperContext):
             if self.alt_path_type == 3:
 
                 for cup in cups:
-                    if f"{cup} Alt Paths (Global)" in self.unlocked_alt_paths:
+                    if f"{cup} Cup Alt Paths (Global)" in self.unlocked_alt_paths:
                         global_values[cups.index(cup)] = 3
 
                 self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, global_values[0])
@@ -1750,6 +1778,7 @@ class MSMContext(SuperContext):
             self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 0)
             self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 0)
 
+        
 
     # === Exhibition Unlocks ===
 
@@ -3729,6 +3758,7 @@ class MSMContext(SuperContext):
         # Custom Tournament Settings
         if self.in_tournament_match:
             await self.handle_custom_tournament_settings()
+            await self.handle_alt_path_unlocks()
 
         # Deathlink
         await self.handle_send_deathlink()
@@ -3787,6 +3817,7 @@ class MSMContext(SuperContext):
         """What functions should be handled in a tournament map"""
 
         await self.check_current_cup()
+        await self.handle_alt_path_unlocks()
         await self.check_pending_tournament_location()
         await self.unlock_behemoth()
 

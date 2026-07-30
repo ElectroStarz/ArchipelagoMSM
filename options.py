@@ -515,6 +515,7 @@ class OopsAllCharacter(Choice):
     option_white_mage = 16
     option_slime = 17
     option_black_mage = 18
+    default = 0
 
 msm_option_groups = [
     OptionGroup("Game Options", [
