@@ -884,9 +884,9 @@ class MSMContext(SuperContext):
 
 
             # Custom Tournament Settings Data
-            self.include_alt_paths = self.slot_data.get("include_alt_paths")
-            self.alt_path_type = self.slot_data.get("alt_path_type")
-            self.always_spawn_alt_paths = self.slot_data.get("always_spawn_alt_paths")
+            self.alt_paths_enabled = self.slot_data.get("include_alt_paths")
+            self.alt_paths_unlock_type = self.slot_data.get("alt_path_type")
+            self.alt_paths_always_spawn = self.slot_data.get("always_spawn_alt_paths")
 
             self.custom_basket_time = self.slot_data.get("basket_time")
             self.enable_b_points = self.slot_data.get("enable_b_points_win")
@@ -1601,9 +1601,43 @@ class MSMContext(SuperContext):
         current_sport_addr = get_address(GlobalTournament.current_tournament_sport_variation)
         current_sport = self.game_interface.dolphin_client.read_byte(current_sport_addr)
 
+        alt_path_spawn = get_address(GlobalTournament.alt_path_condition_fufilled)
+        current_node_addr = get_address(GlobalTournament.player_current_node)
+        current_node = self.game_interface.dolphin_client.read_byte(current_node_addr)
+        outer_bridge_addr = get_address(GlobalTournament.flower_outer_bridges_toggle)
+        inner_bridge_addr = get_address(GlobalTournament.flower_outer_bridges_toggle)
+        
+
+        """self.log_once(
+            "alt_paths",
+            f"AltPath state: include={self.alt_paths_enabled}, type={self.alt_paths_unlock_type}, "
+            f"sport_var={current_sport}, "
+            f"unlocked={len(self.unlocked_alt_paths)}, progressive={len(self.progressive_alt_paths)}",
+            True
+        )"""
 
 
-        if self.include_alt_paths:
+        if self.alt_paths_always_spawn and current_node <= 17:
+            self.game_interface.dolphin_client.write_byte(alt_path_spawn, 1)
+            await self.check_write(alt_path_spawn, "byte", 1)
+
+        # Flower Cup Bridges always accessible
+        if current_node == 55:
+            self.game_interface.dolphin_client.write_byte(outer_bridge_addr, 1)
+            await self.check_write(outer_bridge_addr, "byte", 1)
+        else:
+            self.game_interface.dolphin_client.write_byte(outer_bridge_addr, 0)
+            await self.check_write(outer_bridge_addr, "byte", 0)
+
+        if current_node == 26:
+            self.game_interface.dolphin_client.write_byte(inner_bridge_addr, 0)
+            await self.check_write(inner_bridge_addr, "byte", 0)
+        else:
+            self.game_interface.dolphin_client.write_byte(inner_bridge_addr, 1)
+            await self.check_write(inner_bridge_addr, "byte", 1)
+
+
+        if self.alt_paths_enabled:
 
             cups = ["Mushroom", "Flower", "Star"]
             sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
@@ -1616,7 +1650,7 @@ class MSMContext(SuperContext):
             sports_mix_values = [0, 0, 0]
             global_values = [0, 0, 0]
 
-            if self.alt_path_type == 0:
+            if self.alt_paths_unlock_type == 0:
 
                 for sport in sports:
                     for cup in cups:
@@ -1686,7 +1720,7 @@ class MSMContext(SuperContext):
                     await self.check_write(flower_alt_paths_unlocked, "byte", sports_mix_values[1])
                     await self.check_write(star_alt_paths_unlocked, "byte", sports_mix_values[2])
 
-            if self.alt_path_type == 1:
+            if self.alt_paths_unlock_type == 1:
                     
                 for sport in sports:
                     for cup in cups:
@@ -1721,7 +1755,7 @@ class MSMContext(SuperContext):
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
 
-            if self.alt_path_type == 2:
+            if self.alt_paths_unlock_type == 2:
 
                 for cup in cups:
                     if f"{cup} Cup Alt Paths (Normal)" in self.unlocked_alt_paths:
@@ -1735,7 +1769,7 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, global_values[1])
                 self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, global_values[2])
 
-            if self.alt_path_type == 3:
+            if self.alt_paths_unlock_type == 3:
 
                 for cup in cups:
                     if f"{cup} Cup Alt Paths (Global)" in self.unlocked_alt_paths:
@@ -1745,7 +1779,7 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, global_values[1])
                 self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, global_values[2])
 
-            if self.alt_path_type == 4:
+            if self.alt_paths_unlock_type == 4:
 
                 progressive_alt_path_count = len(self.progressive_alt_paths)
 
@@ -1762,7 +1796,7 @@ class MSMContext(SuperContext):
                 if progressive_alt_path_count >= 6:
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
 
-            if self.alt_path_type == 5:
+            if self.alt_paths_unlock_type == 5:
 
                 progressive_alt_path_count = len(self.progressive_alt_paths)
 

@@ -83,6 +83,9 @@ class MSMWorld(World):
         "enabled_sports",
         "include_tournaments",
         "include_exhibition",
+        "include_alt_paths",
+        "alt_path_type",
+        "always_spawn_alt_paths",
         "cup_unlock_type",
         "court_unlock_type",
         "exhibition_type",
@@ -278,6 +281,11 @@ class MSMWorld(World):
             "enable_h_points_win": self.options.enable_h_points_win.value,
             "h_points_win": self.options.h_points_win.value,
             "h_period": self.options.h_period.value,
+
+            # Alt Path Stuff
+            "include_alt_paths": self.options.include_alt_paths.value,
+            "alt_path_type": self.options.alt_path_type.value,
+            "always_spawn_alt_paths": self.options.always_spawn_alt_paths.value,
 
             # Party Mode Stuff
             "party_mode": self.options.party_mode.value,
