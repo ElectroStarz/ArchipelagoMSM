@@ -1598,14 +1598,14 @@ class MSMContext(SuperContext):
         mushroom_alt_paths_unlocked = get_address(GlobalTournament.mushroom_alt_paths_unlocked)
         flower_alt_paths_unlocked = get_address(GlobalTournament.flower_alt_paths_unlocked)
         star_alt_paths_unlocked = get_address(GlobalTournament.star_alt_paths_unlocked)
-        current_sport_addr = get_address(GlobalTournament.current_tournament_sport_variation)
-        current_sport = self.game_interface.dolphin_client.read_byte(current_sport_addr)
-
+        current_sport = self.game_interface.get_tournament_sport()
+        
         alt_path_spawn = get_address(GlobalTournament.alt_path_condition_fufilled)
-        current_node_addr = get_address(GlobalTournament.player_current_node)
-        current_node = self.game_interface.dolphin_client.read_byte(current_node_addr)
+        current_node = self.game_interface.get_player_current_node()
         outer_bridge_addr = get_address(GlobalTournament.flower_outer_bridges_toggle)
-        inner_bridge_addr = get_address(GlobalTournament.flower_outer_bridges_toggle)
+        inner_bridge_addr = get_address(GlobalTournament.flower_inner_bridges_toggle)
+
+        current_cup = self.game_interface.get_tournament_cup()
         
 
         """self.log_once(
@@ -1680,7 +1680,19 @@ class MSMContext(SuperContext):
                     if f"Sports Mix: {cup} Cup Alt Paths" in self.unlocked_alt_paths:
                         sports_mix_values[cups.index(cup)] = 3
 
-                if current_sport == 0:
+                if current_sport != "Sports Mix":
+                    values_to_insert = globals()[current_sport.lower() + "_values"]
+                else:
+                    values_to_insert = sports_mix_values
+                
+                self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, values_to_insert[0])
+                self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, values_to_insert[1])
+                self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, values_to_insert[2])
+                await self.check_write(mushroom_alt_paths_unlocked, "byte", values_to_insert[0])
+                await self.check_write(flower_alt_paths_unlocked, "byte", values_to_insert[1])
+                await self.check_write(star_alt_paths_unlocked, "byte", values_to_insert[2])
+
+                """if current_sport == 0:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
@@ -1718,7 +1730,7 @@ class MSMContext(SuperContext):
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
                     await self.check_write(mushroom_alt_paths_unlocked, "byte", sports_mix_values[0])
                     await self.check_write(flower_alt_paths_unlocked, "byte", sports_mix_values[1])
-                    await self.check_write(star_alt_paths_unlocked, "byte", sports_mix_values[2])
+                    await self.check_write(star_alt_paths_unlocked, "byte", sports_mix_values[2])"""
 
             if self.alt_paths_unlock_type == 1:
                     
@@ -1733,8 +1745,20 @@ class MSMContext(SuperContext):
                                 volleyball_values[cups.index(cup)] = 3
                             elif sport == "Hockey":
                                 hockey_values[cups.index(cup)] = 3
+                
+                if current_sport != "Sports Mix":
+                    values_to_insert = globals()[current_sport.lower() + "_values"]
+                else:
+                    values_to_insert = sports_mix_values
+                
+                self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, values_to_insert[0])
+                self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, values_to_insert[1])
+                self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, values_to_insert[2])
+                await self.check_write(mushroom_alt_paths_unlocked, "byte", values_to_insert[0])
+                await self.check_write(flower_alt_paths_unlocked, "byte", values_to_insert[1])
+                await self.check_write(star_alt_paths_unlocked, "byte", values_to_insert[2])                
 
-                if current_sport == 0:
+                """if current_sport == 0:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
@@ -1753,7 +1777,7 @@ class MSMContext(SuperContext):
                 if current_sport == 5:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, sports_mix_values[0])
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
+                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])"""
 
             if self.alt_paths_unlock_type == 2:
 
@@ -1806,7 +1830,18 @@ class MSMContext(SuperContext):
                     self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 3)
                 if progressive_alt_path_count >= 3:
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
-                
+
+            # Handles those Final Fantasy Characters block paths that I hate
+            if current_cup in ["Mushroom", "Flower"]:
+                self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
+                if current_cup == "Flower":
+                    for sport in sports:
+                        if sport != "Sports Mix":
+                            sport_class = globals()[sport + "Addresses"]
+                            addr = getattr(sport_class.Characters, "white_mage")
+                            new_addr = get_address(addr)
+                            self.game_interface.dolphin_client.write_byte(new_addr, 1)
+                            await self.check_write(new_addr, "byte", 1)
         else:
             self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 0)
             self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 0)
