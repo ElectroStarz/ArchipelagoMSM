@@ -387,7 +387,7 @@ class MSMInterface:
         cup = self.dolphin_client.read_byte(get_address(GlobalTournament.current_tournament_cup))
 
         if cup not in [1, 2, 3]:
-            return None
+            return "Not in Tournament"
         else:
             return {1: "Mushroom", 2: "Flower", 3: "Star"}.get(cup)
 
@@ -395,7 +395,7 @@ class MSMInterface:
         round = self.dolphin_client.read_byte(get_address(GlobalTournament.current_tournament_round))
 
         if round not in [1, 2, 3]:
-            return None
+            return "Not in Tournament"
         else:
             return {1: "Round 1", 2: "Round 2", 3: "Round 3"}.get(round)
 
@@ -403,17 +403,14 @@ class MSMInterface:
         sport = self.dolphin_client.read_byte(get_address(GlobalTournament.current_tournament_sport_variation))
 
         if sport not in [0, 1, 2, 3, 5]:
-            return None
+            return "Not in Tournament"
         else:
             return {0: "Basketball", 1: "Volleyball", 2: "Dodgeball", 3: "Hockey", 5: "Sports Mix"}.get(sport)
 
     def get_player_current_node(self):
         node = self.dolphin_client.read_byte(get_address(GlobalTournament.player_current_node))
 
-        if node == 0xFF:
-            return None
-        else:
-            return node
+        return node
     
     def special_active(self):
         try:

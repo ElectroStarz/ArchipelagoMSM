@@ -1617,10 +1617,6 @@ class MSMContext(SuperContext):
         )"""
 
 
-        if self.alt_paths_always_spawn and current_node <= 17:
-            self.game_interface.dolphin_client.write_byte(alt_path_spawn, 1)
-            await self.check_write(alt_path_spawn, "byte", 1)
-
         # Flower Cup Bridges always accessible
         if current_node == 55:
             self.game_interface.dolphin_client.write_byte(outer_bridge_addr, 1)
@@ -1639,6 +1635,10 @@ class MSMContext(SuperContext):
 
         if self.alt_paths_enabled:
 
+            if self.alt_paths_always_spawn and current_node <= 17:
+                self.game_interface.dolphin_client.write_byte(alt_path_spawn, 1)
+                await self.check_write(alt_path_spawn, "byte", 1)
+
             cups = ["Mushroom", "Flower", "Star"]
             sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
             
@@ -1649,6 +1649,21 @@ class MSMContext(SuperContext):
             hockey_values = [0, 0, 0]
             sports_mix_values = [0, 0, 0]
             global_values = [0, 0, 0]
+
+            # I wish I didnt have to do this maaan
+            sport_values = {
+                                "Basketball": basketball_values,
+                                "Dodgeball": dodgeball_values,
+                                "Volleyball": volleyball_values,
+                                "Hockey": hockey_values,
+                                "Sports Mix": sports_mix_values
+                            }
+            sport_addresses = {
+                                "Basketball": BasketballAddresses,
+                                "Dodgeball": DodgeballAddresses,
+                                "Volleyball": VolleyballAddresses,
+                                "Hockey": HockeyAddresses,
+                            }        
 
             if self.alt_paths_unlock_type == 0:
 
@@ -1680,10 +1695,7 @@ class MSMContext(SuperContext):
                     if f"Sports Mix: {cup} Cup Alt Paths" in self.unlocked_alt_paths:
                         sports_mix_values[cups.index(cup)] = 3
 
-                if current_sport != "Sports Mix":
-                    values_to_insert = globals()[current_sport.lower() + "_values"]
-                else:
-                    values_to_insert = sports_mix_values
+                values_to_insert = sport_values[current_sport]
                 
                 self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, values_to_insert[0])
                 self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, values_to_insert[1])
@@ -1746,10 +1758,7 @@ class MSMContext(SuperContext):
                             elif sport == "Hockey":
                                 hockey_values[cups.index(cup)] = 3
                 
-                if current_sport != "Sports Mix":
-                    values_to_insert = globals()[current_sport.lower() + "_values"]
-                else:
-                    values_to_insert = sports_mix_values
+                values_to_insert = sport_values[current_sport]
                 
                 self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, values_to_insert[0])
                 self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, values_to_insert[1])
@@ -1837,7 +1846,7 @@ class MSMContext(SuperContext):
                 if current_cup == "Flower":
                     for sport in sports:
                         if sport != "Sports Mix":
-                            sport_class = globals()[sport + "Addresses"]
+                            sport_class = sport_addresses[sport]
                             addr = getattr(sport_class.Characters, "white_mage")
                             new_addr = get_address(addr)
                             self.game_interface.dolphin_client.write_byte(new_addr, 1)
