@@ -374,10 +374,11 @@ class MSMInterface:
 
         return difficulty_int, name
 
-    def get_tournament_difficulty(self, cup: str) -> Optional[str]:
+    def get_tournament_difficulty(self) -> Optional[str]:
         difficulty = self.dolphin_client.read_byte(self.addresslib.tournament_diff_addr)
+        cup = self.get_tournament_cup()
 
-        if cup == "Mushroom Cup":
+        if cup == "Mushroom":
             return {0: "Normal", 1: "Hard"}.get(difficulty)
 
         return {1: "Normal", 2: "Hard"}.get(difficulty)

@@ -615,6 +615,7 @@ class MSMContext(SuperContext):
 
         self.in_tournament_match = False
         self.last_tournament_location_name: Optional[str] = None
+        self.last_alt_path_location_name: Optional[str] = None
         self.cups_won: set[str] = set()
         self.exhibitions_won: set[str] = set()
         self.party_won: set[str] = set()
@@ -994,6 +995,7 @@ class MSMContext(SuperContext):
         self.boss_defeat_handled = False
         self.in_tournament_match = False
         self.last_tournament_location_name = None
+        self.last_alt_path_location_name = None
         self.has_sent_death = True
         self.received_death = True
         self.previous_opponent_score = None
@@ -1061,6 +1063,7 @@ class MSMContext(SuperContext):
         self.locations_checked.clear()
         self.checked_locations.clear()
         self.last_tournament_location_name = None
+        self.last_alt_path_location_name = None
 
     def current_item_func(self):
         """Returns the ID of the item
@@ -2823,14 +2826,6 @@ class MSMContext(SuperContext):
         self.locations_checked.add(location_id)
         self.debug_log(f"Checked location: name={location_name}, id={location_id}")
 
-    def get_tournament_cup_and_round(self):
-        """Gets the current cup and round (if applicable)"""
-
-        current_cup = self.game_interface.get_tournament_cup()
-        current_round = self.game_interface.get_tournament_round()
-
-        return current_cup, current_round
-
     def get_current_cup_location_name(self) -> Optional[str]:
         """Get the correct location name for the sport, cup and round"""
 
@@ -2851,13 +2846,14 @@ class MSMContext(SuperContext):
             self.debug_log(f"Could not build cup location from court={court_name}, sport={sport}")
             return None
 
-        cup, round_number = self.get_tournament_cup_and_round()
+        cup = self.game_interface.get_tournament_cup()
+        round_number = self.game_interface.get_tournament_round()
 
         if cup is None or round_number is None:
             self.debug_log(f"Could not find tournament cup/round for sport={sport}, court_code={court_code}")
             return None
 
-        difficulty = self.game_interface.get_tournament_difficulty(cup)
+        difficulty = self.game_interface.get_tournament_difficulty()
 
         if difficulty is None and not sports_mix_activated:
             self.debug_log(f"Could not find tournament difficulty for cup={cup}")
@@ -2873,7 +2869,7 @@ class MSMContext(SuperContext):
 
         current_node = self.game_interface.get_player_current_node()
         current_cup = self.game_interface.get_tournament_cup()
-        current_difficulty = self.game_interface.get_tournament_difficulty(current_cup)
+        current_difficulty = self.game_interface.get_tournament_difficulty()
         current_sport = self.game_interface.get_tournament_sport()
 
         if self.alt_paths_unlock_type == 0:
@@ -2894,6 +2890,15 @@ class MSMContext(SuperContext):
 
         location_name = self.last_tournament_location_name
         self.last_tournament_location_name = None
+        self.debug_log(f"Sending pending tournament location: {location_name}")
+        await self.check_location(location_name)
+
+    async def check_pending_alt_path_location(self):
+        if self.last_alt_path_location_name is None:
+            return
+
+        location_name = self.last_alt_path_location_name
+        self.last_alt_path_location_name = None
         self.debug_log(f"Sending pending tournament location: {location_name}")
         await self.check_location(location_name)
 
@@ -2948,11 +2953,9 @@ class MSMContext(SuperContext):
         current_cup = self.game_interface.get_tournament_cup()
 
         if current_cup is not "Not in Tournament":
-            self.current_tournament = current_cup
             self.in_tournament_match = True
-        else:
-            self.current_tournament = None
-            self.in_tournament_match = False
+
+
 
     async def handle_cup_round_win(self):
         """Handles sending the checks for winning a round of a cup"""
@@ -2961,6 +2964,7 @@ class MSMContext(SuperContext):
             return
 
         location_name = self.get_current_cup_location_name()
+
         if location_name is None:
             return
 
@@ -2976,10 +2980,18 @@ class MSMContext(SuperContext):
     async def handle_alt_path_win(self):
 
         match_status = self.game_interface.match_status()
-        current_node = self.game_interface.get_player_current_node()
-        current_cup = self.game_interface.get_tournament_cup()
-        current_difficulty = self.game_interface.get_tournament_difficulty(current_cup)
 
+        if not self.in_tournament_match:
+            return
+
+        location_name = self.get_current_alt_path_location_name()
+        self.log_once("alt_path",f"Current Alt Path Location: {location_name}", False)
+        if match_status != 1:
+            return
+
+        self.last_alt_path_location_name = location_name
+        await self.check_location(location_name)
+        self.last_alt_path_location_name = None
 
     async def handle_party_wins(self):
         """Handles sending party mode wins"""
@@ -2987,7 +2999,7 @@ class MSMContext(SuperContext):
         _, court_name = self.game_interface.get_court()
         mode = self.game_interface.get_mode()
         
-        if match_status != 1 or mode is None:
+        if self.in_tournament_match or match_status != 1 or mode is None:
             return
         
         if mode in ["Feed Petey", "Bob-omb Dodge", "Smash Skate"]:
@@ -3144,13 +3156,14 @@ class MSMContext(SuperContext):
             self.debug_log(f"Could not check tournament stage unlock for court_name={court_name}")
             return
 
-        cup, round_number = self.get_tournament_cup_and_round()
+        cup = self.game_interface.get_tournament_cup() + " Cup"
+        round_number = self.game_interface.get_tournament_round()
 
         if cup is None or round_number is None:
             self.debug_log(f"Could not check locked tournament points for sport={sport}, court_code={court_code}")
             return
 
-        difficulty = self.game_interface.get_tournament_difficulty(cup)
+        difficulty = self.game_interface.get_tournament_difficulty()
         required_court = f"{court_name}"
         if sports_mix_activated:
             required_cup = f"Sports Mix: {cup}"
@@ -3832,6 +3845,7 @@ class MSMContext(SuperContext):
             await self.has_ex_goaled()
 
 
+        await self.check_current_cup()
         # Custom Tournament Settings
         if self.in_tournament_match:
             await self.handle_custom_tournament_settings()
@@ -3848,6 +3862,7 @@ class MSMContext(SuperContext):
         # Locations
         await self.handle_exhibition_win()
         await self.handle_cup_round_win()
+        await self.handle_alt_path_win()
         await self.send_character_sanity_checks()
         await self.send_court_sanity_checks()
         await self.send_special_sanity_checks()
@@ -3912,9 +3927,11 @@ class MSMContext(SuperContext):
 
         # Deathlink
         await self.handle_send_deathlink()
+        await self.handle_alt_path_unlocks()
 
         # Locations
         await self.handle_party_wins()
+        await self.handle_alt_path_win()
         await self.send_character_sanity_checks()
         await self.send_court_sanity_checks()
 
