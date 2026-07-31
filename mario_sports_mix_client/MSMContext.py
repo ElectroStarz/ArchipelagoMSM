@@ -2823,24 +2823,13 @@ class MSMContext(SuperContext):
         self.locations_checked.add(location_id)
         self.debug_log(f"Checked location: name={location_name}, id={location_id}")
 
-    def get_tournament_cup_and_round(self, sport: str, stage_code: str):
+    def get_tournament_cup_and_round(self):
         """Gets the current cup and round (if applicable)"""
 
-        current_cup = self.game_interface.current_tournament
+        current_cup = self.game_interface.get_tournament_cup()
+        current_round = self.game_interface.get_tournament_round()
 
-        if current_cup in tournament_round_stages.get(sport, {}) and current_cup is not None:
-            stages = tournament_round_stages[sport][current_cup]
-            if stage_code in stages:
-                return current_cup, stages.index(stage_code) + 1
-
-            self.debug_log(f"Stage {stage_code} was not found in current tournament cup {current_cup}")
-            return None, None
-
-        for cup, stages in tournament_round_stages.get(sport, {}).items():
-            if stage_code in stages:
-                return cup, stages.index(stage_code) + 1
-
-        return None, None
+        return current_cup, current_round
 
     def get_current_cup_location_name(self) -> Optional[str]:
         """Get the correct location name for the sport, cup and round"""
@@ -2862,7 +2851,7 @@ class MSMContext(SuperContext):
             self.debug_log(f"Could not build cup location from court={court_name}, sport={sport}")
             return None
 
-        cup, round_number = self.get_tournament_cup_and_round(sport, court_code)
+        cup, round_number = self.get_tournament_cup_and_round()
 
         if cup is None or round_number is None:
             self.debug_log(f"Could not find tournament cup/round for sport={sport}, court_code={court_code}")
@@ -2878,6 +2867,26 @@ class MSMContext(SuperContext):
             return f"Sports Mix: Beat {cup} Round {round_number}"
         else:
             return f"{sport}: Beat {difficulty} {cup} Round {round_number}"
+
+    def get_current_alt_path_location_name(self) -> Optional[str]:
+        """Same as above, but for alt paths"""
+
+        current_node = self.game_interface.get_player_current_node()
+        current_cup = self.game_interface.get_tournament_cup()
+        current_difficulty = self.game_interface.get_tournament_difficulty(current_cup)
+        current_sport = self.game_interface.get_tournament_sport()
+
+        if self.alt_paths_unlock_type == 0:
+            if current_sport != "Sports Mix":
+                return f"{current_sport} {current_cup} Cup Alt Path {current_difficulty} Node {current_node:X}"
+            else:
+                return f"Sports Mix {current_cup} Cup Alt Path Node {current_node:X}"
+        if self.alt_paths_unlock_type == 1:
+            return f"{current_sport} {current_cup} Cup Alt Path Node {current_node:X}"
+        if self.alt_paths_unlock_type == 2 or self.alt_paths.unlock_type == 4:
+            return f"{current_cup} Alt Path {current_difficulty} Node {current_node:X}"
+        if self.alt_paths_unlock_type == 3 or self.alt_paths.unlock_type == 5:
+            return f"{current_cup} Alt Path Node {current_node:X}"
 
     async def check_pending_tournament_location(self):
         if self.last_tournament_location_name is None:
@@ -2936,32 +2945,14 @@ class MSMContext(SuperContext):
 
     async def check_current_cup(self):
         """Checks what cup we are in via the tournament map"""
+        current_cup = self.game_interface.get_tournament_cup()
 
-        current_stage = self.game_interface.dolphin_client.read_string(self.addresslib.current_court_addr)
-        stage_code = current_stage[:3]
-
-        # Check standard bracket maps first
-        cup = tournament_map_cups.get(stage_code)
-        if cup is not None:
-            self.game_interface.current_tournament = cup
+        if current_cup is not "Not in Tournament":
+            self.current_tournament = current_cup
             self.in_tournament_match = True
-            self.debug_log(f"Current tournament cup set to {cup} via map screen.")
-            return
-
-        # Sports Mix Override
-        sports_mix_activated = self.game_interface.is_sports_mix()
-        sport = self.game_interface.get_mode()
-
-        if sports_mix_activated and sport:
-            # If we are actively playing a court that belongs to a tournament path,
-            # lock the script into Tournament Mode so Exhibition logic cannot hijack it.
-            for possible_cup, stages in tournament_round_stages.get(sport, {}).items():
-                if stage_code in stages:
-                    self.game_interface.current_tournament = possible_cup
-                    self.in_tournament_match = True  # <--- FORCED TRUE
-                    self.debug_log(
-                        f"Sports Mix Match Detected! Locking tournament mode. Cup: {possible_cup}, Stage: {stage_code}")
-                    return
+        else:
+            self.current_tournament = None
+            self.in_tournament_match = False
 
     async def handle_cup_round_win(self):
         """Handles sending the checks for winning a round of a cup"""
@@ -2981,6 +2972,14 @@ class MSMContext(SuperContext):
         self.last_tournament_location_name = location_name
         await self.check_location(location_name)
         self.last_tournament_location_name = None
+
+    async def handle_alt_path_win(self):
+
+        match_status = self.game_interface.match_status()
+        current_node = self.game_interface.get_player_current_node()
+        current_cup = self.game_interface.get_tournament_cup()
+        current_difficulty = self.game_interface.get_tournament_difficulty(current_cup)
+
 
     async def handle_party_wins(self):
         """Handles sending party mode wins"""
@@ -3145,7 +3144,7 @@ class MSMContext(SuperContext):
             self.debug_log(f"Could not check tournament stage unlock for court_name={court_name}")
             return
 
-        cup, round_number = self.get_tournament_cup_and_round(sport, court_code)
+        cup, round_number = self.get_tournament_cup_and_round()
 
         if cup is None or round_number is None:
             self.debug_log(f"Could not check locked tournament points for sport={sport}, court_code={court_code}")
