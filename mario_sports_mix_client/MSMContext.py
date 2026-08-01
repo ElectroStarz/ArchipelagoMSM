@@ -34,9 +34,9 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.1.2"
+CLIENT_VERSION = "2.1.3"
 COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9",
-                       "2.1.0", "2.1.1"]
+                       "2.1.0", "2.1.1", "2.1.2"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -631,8 +631,8 @@ class MSMContext(SuperContext):
         self.unlocked_modes: set[str] = set()
         self.unlocked_cups: set[str] = set()
         self.unlocked_ex_diffs: set[str] = set()
-        self.progressive_courts: set[str] = set()
-        self.progressive_cups: set[str] = set()
+        self.progressive_courts: int = 0
+        self.progressive_cups: int = 0
         self.unlocked_sports_crystals: set[str] = set()
         self.unlocked_courts: set[str] = set()
         self.unlocked_characters: set[str] = set()
@@ -1001,7 +1001,8 @@ class MSMContext(SuperContext):
         self.items_handled.clear()
         self.unlocked_modes.clear()
         self.unlocked_ex_diffs.clear()
-        self.progressive_courts.clear()
+        self.progressive_courts = 0
+        self.progressive_cups = 0
         self.unlocked_cups.clear()
         self.unlocked_sports_crystals.clear()
         self.unlocked_courts.clear()
@@ -1198,11 +1199,11 @@ class MSMContext(SuperContext):
                     self.debug_log(f"Added {item_name} to unlocked_ex_diffs")
 
                 elif item_name == "Progressive Cup":
-                    self.progressive_cups.add(item_name)
+                    self.progressive_cups += 1
                     self.debug_log(f"Added {item_name} to progressive_cups")
 
                 elif item_name == "Progressive Court":
-                    self.progressive_courts.add(item_name)
+                    self.progressive_courts += 1
                     self.debug_log(f"Added {item_name} to progressive_courts")
 
                 elif item_name.startswith("Sports Crystal:"):
@@ -1517,7 +1518,7 @@ class MSMContext(SuperContext):
             ])
 
         sports_list = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
-        progressive_count = len(self.progressive_cups)
+        progressive_count = self.progressive_cups
 
         # Iterate up to the current total of items held
         for index in range(progressive_count):
@@ -1678,7 +1679,7 @@ class MSMContext(SuperContext):
         ]
 
         # Count how many total Progressive Stage items the server has sent us
-        progressive_count = len(self.progressive_courts)
+        progressive_count = self.progressive_courts
 
         # Iterate through ordered list up to the number of stages we have unlocked
         for index in range(progressive_count):
