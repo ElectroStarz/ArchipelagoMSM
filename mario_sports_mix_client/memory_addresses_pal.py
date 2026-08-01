@@ -1,3 +1,119 @@
+class MusicFiles:
+
+    class MenuSongs:
+
+        base_addr = 0x80DC678F # String
+        offset = 0x38
+
+        title_theme = base_addr # String
+        exhibition_settings = base_addr + offset # String
+        wifi_menu = base_addr + offset * 2 # String
+        records_menu = base_addr + offset * 3 # String
+
+    class StageSongs:
+
+        base_addr = 0x80DC686F # String
+        offset = 0x38
+
+        mario_stadium = base_addr # String
+        mario_stadium_fast = base_addr + offset # String
+        koopa_troopa_beach = base_addr + offset * 2 # String
+        koopa_troopa_beach_fast = base_addr + offset * 3 # String
+        peachs_castle = base_addr + offset * 4 # String
+        peachs_castle_fast = base_addr + offset * 5 # String
+        toad_park = base_addr + offset * 6 # String
+        toad_park_fast = base_addr + offset * 7 # String
+        dk_dock = base_addr + offset * 8 # String
+        dk_dock_fast = base_addr + offset * 9 # String
+        luigis_mansion = base_addr + offset * 10 # String
+        luigis_mansion_fast = base_addr + offset * 11 # String
+        daisy_garden = base_addr + offset * 12 # String
+        daisy_garden_fast = base_addr + offset * 13 # String
+        wario_factory = base_addr + offset * 14 # String
+        wario_factory_fast = base_addr + offset * 15 # String
+        bowser_jr_blvd = base_addr + offset * 16 # String
+        bowser_jr_blvd_fast = base_addr + offset * 17 # String
+        bowsers_castle = base_addr + offset * 18 # String
+        bowsers_castle_fast = base_addr + offset * 19 # String
+        waluigi_pinball = base_addr + offset * 20 # String
+        waluigi_pinball_fast = base_addr + offset * 21 # String
+        ghoulish_galleon = base_addr + offset * 22 # String
+        ghoulish_galleon_fast = base_addr + offset * 23 # String
+        star_ship = base_addr + offset * 24 # String
+        star_ship_fast = base_addr + offset * 25 # String
+        western_junction = base_addr + offset * 26 # String
+        western_junction_fast = base_addr + offset * 27 # String
+        behemoth_battle = base_addr + offset * 28 # String
+        behemoth_battle_fast = base_addr + offset * 29 # String
+
+    class PartySongs:
+
+        base_addr = 0x80DC6FBF # String
+        offset = 0x38
+
+        smash_skate_normal = base_addr # String
+        smash_skate_normal_fast = base_addr + offset # String
+        feed_petey_normal = base_addr + offset * 2 # String
+        feed_petey_bonus_time = base_addr + offset * 3 # String
+        feed_petey_normal_fast = base_addr + offset * 4 # String
+        bob_omb_dodge_normal = base_addr + offset * 5 # String
+        bob_omb_dodge_normal_fast = base_addr + offset * 6 # String
+        harmony_hustle_normal = base_addr + offset * 7 # String
+        harmony_hustle_normal_fast = base_addr + offset * 8 # String
+        smash_skate_hard = base_addr + offset * 9 # String
+        smash_skate_hard_fast = base_addr + offset * 10 # String
+        feed_petey_hard = base_addr + offset * 11 # String
+        feed_petey_hard_fast = base_addr + offset * 12 # String
+        bob_omb_dodge_hard = base_addr + offset * 13 # String
+        bob_omb_dodge_hard_fast = base_addr + offset * 14 # String
+
+    class TournamentSongs:
+
+        base_addr = 0x80DC7347 # String
+        offset = 0x38
+
+        tournament_opening = base_addr # String
+        mushroom_cup = base_addr + offset # String
+        flower_cup = base_addr + offset * 2 # String
+        star_cup = base_addr + offset * 3 # String
+        tournament_victory = base_addr + offset * 4 # String
+
+    class MiscSongs:
+
+        base_addr = 0x80DC7487 # String
+        offset = 0x38
+
+        win_1 = base_addr # String
+        lose_1 = base_addr + offset # String
+        win_2 = base_addr + offset * 2 # String
+        lose_2 = base_addr + offset * 3 # String
+        results = base_addr + offset * 4 # String
+        get_item = base_addr + offset * 5 # String
+        starman = base_addr + offset * 6 # String
+        star_road_complete = base_addr + offset * 7 # String
+
+    class HarmonyHustlePreviews:
+
+        base_addr = 0x80DC7F83 # String
+        offset = 0x44
+
+        classic_ocean = base_addr # String
+        chocobo_rhythym = base_addr + offset # String
+        mario_athletic = base_addr + offset * 2 # String
+        bloocheep_ocean = base_addr + offset * 3 # String
+        chcocobo_pop = base_addr + offset * 4 # String
+        punk_athletic = base_addr + offset * 5 # String
+        punk_ocean = base_addr + offset * 6 # String
+        chocobo_beat = base_addr + offset * 7 # String
+        island_athletic = base_addr + offset * 8 # String
+        mushroom_mix_medley = base_addr + offset * 9 # String
+        flower_mix_medley = base_addr + offset * 10 # String
+        star_mix_medley = base_addr + offset * 11 # String
+
+
+        
+    
+
 class MatchAddresses:
     game_code = 0x800000 # String
     match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
