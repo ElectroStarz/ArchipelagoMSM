@@ -100,7 +100,6 @@ class MSMWorld(World):
         "character_sanity",
         "court_sanity",
         "special_sanity",
-        "shuffle_music",
     )
 
     options_dataclass = MSMOptions

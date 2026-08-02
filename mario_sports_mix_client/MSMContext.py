@@ -642,10 +642,10 @@ class MSMContext(SuperContext):
         self.unlocked_modes: set[str] = set()
         self.unlocked_cups: set[str] = set()
         self.unlocked_alt_paths: set[str] = set()
-        self.progressive_alt_paths: set[str] = set()
+        self.progressive_alt_paths: int = 0
         self.unlocked_ex_diffs: set[str] = set()
-        self.progressive_courts: set[str] = set()
-        self.progressive_cups: set[str] = set()
+        self.progressive_courts: int = 0
+        self.progressive_cups: int = 0
         self.unlocked_sports_crystals: set[str] = set()
         self.unlocked_courts: set[str] = set()
         self.unlocked_characters: set[str] = set()
@@ -1091,10 +1091,11 @@ class MSMContext(SuperContext):
         self.items_handled.clear()
         self.unlocked_modes.clear()
         self.unlocked_ex_diffs.clear()
-        self.progressive_courts.clear()
+        self.progressive_courts = 0
+        self.progressive_cups = 0
         self.unlocked_cups.clear()
         self.unlocked_alt_paths.clear()
-        self.progressive_alt_paths.clear()
+        self.progressive_alt_paths = 0
         self.unlocked_sports_crystals.clear()
         self.unlocked_courts.clear()
         self.unlocked_characters.clear()
@@ -1307,7 +1308,7 @@ class MSMContext(SuperContext):
 
                 if "Alt".casefold() in item_name.casefold():
                     if "Progressive".casefold() in item_name.casefold():
-                        self.progressive_alt_paths.add(item_name)
+                        self.progressive_alt_paths += 1
                         self.debug_log(f"Added {item_name} to progressive_alt_paths")
                     else:
                         self.unlocked_alt_paths.add(item_name)
@@ -1318,11 +1319,11 @@ class MSMContext(SuperContext):
                     self.debug_log(f"Added {item_name} to unlocked_ex_diffs")
 
                 elif item_name == "Progressive Cup":
-                    self.progressive_cups.add(item_name)
+                    self.progressive_cups += 1
                     self.debug_log(f"Added {item_name} to progressive_cups")
 
                 elif item_name == "Progressive Court":
-                    self.progressive_courts.add(item_name)
+                    self.progressive_courts += 1
                     self.debug_log(f"Added {item_name} to progressive_courts")
 
                 elif item_name.startswith("Sports Crystal:"):
@@ -1639,7 +1640,7 @@ class MSMContext(SuperContext):
             ])
 
         sports_list = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
-        progressive_count = len(self.progressive_cups)
+        progressive_count = self.progressive_cups
 
         # Iterate up to the current total of items held
         for index in range(progressive_count):
@@ -1803,45 +1804,6 @@ class MSMContext(SuperContext):
                 await self.check_write(flower_alt_paths_unlocked, "byte", values_to_insert[1])
                 await self.check_write(star_alt_paths_unlocked, "byte", values_to_insert[2])
 
-                """if current_sport == 0:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
-                    await self.check_write(mushroom_alt_paths_unlocked, "byte", basketball_values[0])
-                    await self.check_write(flower_alt_paths_unlocked, "byte", basketball_values[1])
-                    await self.check_write(star_alt_paths_unlocked, "byte", basketball_values[2])
-
-                elif current_sport == 1:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, volleyball_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, volleyball_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, volleyball_values[2])
-                    await self.check_write(mushroom_alt_paths_unlocked, "byte", volleyball_values[0])
-                    await self.check_write(flower_alt_paths_unlocked, "byte", volleyball_values[1])
-                    await self.check_write(star_alt_paths_unlocked, "byte", volleyball_values[2])
-
-                elif current_sport == 2:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, dodgeball_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, dodgeball_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, dodgeball_values[2])
-                    await self.check_write(mushroom_alt_paths_unlocked, "byte", dodgeball_values[0])
-                    await self.check_write(flower_alt_paths_unlocked, "byte", dodgeball_values[1])
-                    await self.check_write(star_alt_paths_unlocked, "byte", dodgeball_values[2])
-
-                elif current_sport == 3:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, hockey_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, hockey_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, hockey_values[2])
-                    await self.check_write(mushroom_alt_paths_unlocked, "byte", hockey_values[0])
-                    await self.check_write(flower_alt_paths_unlocked, "byte", hockey_values[1])
-                    await self.check_write(star_alt_paths_unlocked, "byte", hockey_values[2])
-
-                elif current_sport == 5:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, sports_mix_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])
-                    await self.check_write(mushroom_alt_paths_unlocked, "byte", sports_mix_values[0])
-                    await self.check_write(flower_alt_paths_unlocked, "byte", sports_mix_values[1])
-                    await self.check_write(star_alt_paths_unlocked, "byte", sports_mix_values[2])"""
 
             if self.alt_paths_unlock_type == 1:
                     
@@ -1866,26 +1828,6 @@ class MSMContext(SuperContext):
                 await self.check_write(flower_alt_paths_unlocked, "byte", values_to_insert[1])
                 await self.check_write(star_alt_paths_unlocked, "byte", values_to_insert[2])                
 
-                """if current_sport == 0:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, basketball_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, basketball_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, basketball_values[2])
-                if current_sport == 1:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, volleyball_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, volleyball_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, volleyball_values[2])
-                if current_sport == 2:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, dodgeball_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, dodgeball_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, dodgeball_values[2])
-                if current_sport == 3:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, hockey_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, hockey_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, hockey_values[2])
-                if current_sport == 5:
-                    self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, sports_mix_values[0])
-                    self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, sports_mix_values[1])
-                    self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, sports_mix_values[2])"""
 
             if self.alt_paths_unlock_type == 2:
 
@@ -1913,7 +1855,7 @@ class MSMContext(SuperContext):
 
             if self.alt_paths_unlock_type == 4:
 
-                progressive_alt_path_count = len(self.progressive_alt_paths)
+                progressive_alt_path_count = self.progressive_alt_paths
 
                 if progressive_alt_path_count >= 1:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 1)
@@ -1930,7 +1872,7 @@ class MSMContext(SuperContext):
 
             if self.alt_paths_unlock_type == 5:
 
-                progressive_alt_path_count = len(self.progressive_alt_paths)
+                progressive_alt_path_count = self.progressive_alt_paths
 
                 if progressive_alt_path_count >= 1:
                     self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 3)
@@ -2067,7 +2009,7 @@ class MSMContext(SuperContext):
         ]
 
         # Count how many total Progressive Stage items the server has sent us
-        progressive_count = len(self.progressive_courts)
+        progressive_count = self.progressive_courts
 
         # Iterate through ordered list up to the number of stages we have unlocked
         for index in range(progressive_count):
