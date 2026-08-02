@@ -100,6 +100,7 @@ class MSMWorld(World):
         "character_sanity",
         "court_sanity",
         "special_sanity",
+        "shuffle_music",
     )
 
     options_dataclass = MSMOptions
@@ -290,6 +291,10 @@ class MSMWorld(World):
             # Party Mode Stuff
             "party_mode": self.options.party_mode.value,
             "party_mode_opponent": self.options.party_mode_opponent.value,
+
+            # Meme Stuff
+            "oops_all_character": self.options.oops_all_character.value,
+            "shuffle_music": self.options.shuffle_music.value,
         }
 
         return slot_data

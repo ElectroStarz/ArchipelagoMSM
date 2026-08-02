@@ -130,6 +130,7 @@ costume_database = {
 # AP server storage is room-wide, so filler/trap save keys need seed + slot in the name.
 CONSUMABLE_STORAGE_CATEGORY = "msm_consumables"
 LOCATION_STORAGE_CATEGORY = "msm_locations"
+MUSIC_STORAGE_CATEGORY = "msm_music"
 # Build the reverse lookup once so persisted AP location IDs can be shown as local names.
 LOCATION_ID_TO_NAME = {location_id: name for name, location_id in LOCATION_NAME_TO_ID.items()}
 
@@ -308,7 +309,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
     @mark_raw
     def _cmd_unlocked(self, type: str):
         """See what type of item you have unlocked.
-        :param type: Any from Modes, Ex/Exhibition, Courts, Cups, Characters/Chars/Char, Costumes/Costs/Cost, Abilities, Panel, Crystals"""
+        :param type: Any from Modes, Ex/Exhibition, Courts, Cups, Characters/Chars/Char, Costumes/Costs/Cost, Abilities, Panel, Crystals, Alt Paths"""
 
         type_to_cmd = {
             "modes": self.unlocked_modes,
@@ -578,6 +579,11 @@ class MSMContext(SuperContext):
     score_sanity_max: Any
     score_sanity_points_req: Any
 
+    # Meme Options
+    oops_all_character: Any = int
+    shuffle_music: Any = int
+    
+
     def __init__(self, server_address: str, password: str):
         super().__init__(server_address, password)
         self.game_interface = MSMInterface(logger)
@@ -593,6 +599,8 @@ class MSMContext(SuperContext):
         self.handled_consumable_indices: Set[int] = set()
         # Set when a Get/SetReply for handled consumables has been applied this session.
         self._consumables_load_event = asyncio.Event()
+        # Set when a Get/SetReply for handled music data has been applied this session.
+        self._music_data_load_event = asyncio.Event()
         self.start_process = True
         self.handled_gecko_codes = False
         self.game_session_active = False
@@ -646,6 +654,10 @@ class MSMContext(SuperContext):
         self.unlocked_abilities: set[str] = set()
         self.filler_to_give = deque()
         self.traps_to_give = deque()
+
+        # Music shuffle
+        self.music_data: Dict[str, str] = {}
+        self.music_randomization_applied = False
 
         # Address Library
         self.addresslib = AddressLib()
@@ -738,6 +750,14 @@ class MSMContext(SuperContext):
             return None
         return f"{CONSUMABLE_STORAGE_CATEGORY}_{self.slot}"
 
+    @property
+    def music_storage_key(self) -> Optional[str]:
+        """Returns a key which is linked to the game and the slot name"""
+
+        if self.seed is None or self.slot is None:
+            return None
+        return f"{MUSIC_STORAGE_CATEGORY}_{self.slot}"
+
     def _on_consumables_storage_update(self, value: Any) -> None:
         """Apply server storage for handled filler/trap indices and drop any stale queue entries."""
         if value is None:
@@ -760,6 +780,21 @@ class MSMContext(SuperContext):
         self.queued_consumable_indices -= handled
         self._consumables_load_event.set()
         self.debug_log(f"Loaded {len(self.handled_consumable_indices)} handled consumables")
+
+    def _on_music_storage_update(self, value: Any) -> None:
+        """Apply server storage for handled music data."""
+        if value is None:
+            self.music_data = {}
+        elif isinstance(value, dict):
+            self.music_data = {str(song): str(new_song) for song, new_song in value.items()}
+        elif isinstance(value, list):
+            self.music_data = {str(song): str(new_song) for song, new_song in value}
+        else:
+            logger.warning(f"Unexpected music data value type: {type(value)}")
+            return
+
+        self._music_data_load_event.set()
+        self.debug_log(f"Loaded {len(self.music_data)} music data entries")
 
     async def load_handled_consumables(self, initialise: bool = False) -> None:
         """Load handled filler/trap indices from AP storage before queuing ReceivedItems."""
@@ -786,6 +821,32 @@ class MSMContext(SuperContext):
         except asyncio.TimeoutError:
             logger.warning("Timed out loading handled consumables from server storage")
             self._consumables_load_event.set()
+
+    async def load_music_data(self, initialise: bool = False) -> None:
+        """Load handled filler/trap indices from AP storage before queuing ReceivedItems."""
+        key = self.music_storage_key
+        if key is None:
+            return
+
+        self._music_data_load_event.clear()
+
+        if initialise:
+            await self.send_msgs([{
+                "cmd": "Set",
+                "key": key,
+                "default": {},
+                "want_reply": False,
+                "operations": [{"operation": "default", "value": {}}],
+            }])
+            self.set_notify(key)
+        else:
+            await self.send_msgs([{"cmd": "Get", "keys": [key]}])
+
+        try:
+            await asyncio.wait_for(self._music_data_load_event.wait(), timeout=10.0)
+        except asyncio.TimeoutError:
+            logger.warning("Timed out loading music data from server storage")
+            self._music_data_load_event.set()
 
     async def _handle_received_items_consumables(self, args: dict) -> None:
         """Gets called when the client receives a ReceivedItems package, handles both consumables and
@@ -916,11 +977,19 @@ class MSMContext(SuperContext):
             self.send_both_character_sanity = self.slot_data.get("send_both_character_sanity")
             self.court_sanity = self.slot_data.get("court_sanity")
             self.special_sanity = self.slot_data.get("special_sanity")
+
+            # Meme option data
+            self.all_one_opponent = self.slot_data.get("oops_all_character")
+            self.music_shuffle = self.slot_data.get("shuffle_music")
+
+            self.music_data = {}
+            self.music_randomization_applied = False
             
 
             asyncio.create_task(self.update_death_link(self.deathlink_enabled))
             # Slot is known now — load/create the per-slot consumable save before items arrive.
             asyncio.create_task(self.load_handled_consumables(initialise=True))
+            asyncio.create_task(self.load_music_data(initialise=True))
             if self.locations_checked:
                 asyncio.create_task(
                     self.send_msgs([{"cmd": "LocationChecks", "locations": sorted(self.locations_checked)}])
@@ -957,12 +1026,20 @@ class MSMContext(SuperContext):
             asyncio.create_task(self._handle_received_items_consumables(args))
 
         elif cmd in ("Retrieved", "SetReply"):
-            key = self.consumable_storage_key
-            if key:
-                if cmd == "Retrieved" and key in args.get("keys", {}):
-                    self._on_consumables_storage_update(args["keys"][key])
-                elif cmd == "SetReply" and args.get("key") == key:
+            consumable_key = self.consumable_storage_key
+            music_key = self.music_storage_key
+
+            if cmd == "Retrieved":
+                if consumable_key and consumable_key in args.get("keys", {}):
+                    self._on_consumables_storage_update(args["keys"][consumable_key])
+                if music_key and music_key in args.get("keys", {}):
+                    self._on_music_storage_update(args["keys"][music_key])
+
+            elif cmd == "SetReply":
+                if consumable_key and args.get("key") == consumable_key:
                     self._on_consumables_storage_update(args.get("value"))
+                if music_key and args.get("key") == music_key:
+                    self._on_music_storage_update(args.get("value"))
 
     def make_gui(self):
         ui = super().make_gui()
@@ -1002,6 +1079,9 @@ class MSMContext(SuperContext):
         self.game_interface.current_tournament = None if not game_active else self.game_interface.current_tournament
         self.game_session_active = game_active
         self.active_game_version = dc.GAME_VERSION if game_active else None
+        self.music_randomization_applied = False
+        self.music_data = {}
+        self._music_data_load_event.clear()
 
     def reset_local_item_state(self, clear_received: bool = False, clear_consumed: bool = False) -> None:
         """Resets the item state whenever the user connects to a new slot"""
@@ -1058,6 +1138,22 @@ class MSMContext(SuperContext):
             }]
         }])
         self.debug_log(f"Saving handled consumables: {sorted(self.handled_consumable_indices)}")
+
+    async def save_music_data(self) -> None:
+        key = self.music_storage_key
+        if key is None:
+            return
+        await self.send_msgs([{
+            "cmd": "Set",
+            "key": key,
+            "default": {},
+            "want_reply": True,
+            "operations": [{
+                "operation": "replace",
+                "value": self.music_data
+            }]
+        }])
+        self.debug_log(f"Saving music data: {self.music_data}")
 
     def reset_location_state(self) -> None:
         self.locations_checked.clear()
@@ -2952,8 +3048,10 @@ class MSMContext(SuperContext):
         """Checks what cup we are in via the tournament map"""
         current_cup = self.game_interface.get_tournament_cup()
 
-        if current_cup is not "Not in Tournament":
+        if current_cup.casefold() != "not in tournament":
             self.in_tournament_match = True
+        else:
+            self.in_tournament_match = False
 
 
 
@@ -3683,6 +3781,70 @@ class MSMContext(SuperContext):
             self.has_sent_death = False
 
 
+    # === Meme Options ===
+
+    async def randomize_music(self):
+
+        shuffle_mode = self.music_shuffle
+        if self.music_randomization_applied:
+            return
+
+        if shuffle_mode == 0:
+            return
+
+        await self.load_music_data()
+
+        classes = [
+            MusicFiles.MenuSongs,
+            MusicFiles.StageSongs,
+            MusicFiles.PartySongs,
+            MusicFiles.TournamentSongs,
+            MusicFiles.MiscSongs,
+            MusicFiles.HarmonyHustlePreviews,
+        ]
+        
+        if self.music_data:
+            for song, new_song in self.music_data.items():
+                self.game_interface.replace_music_file(song, new_song)
+            self.music_randomization_applied = True
+            return
+
+        if shuffle_mode == 1:
+            for cls in classes:
+                class_songs = self.game_interface.get_songs_from_class(cls)
+                class_pool = list(class_songs)
+                for song in class_songs:
+                    new_song = random.choice(class_pool)
+                    self.music_data[song] = new_song
+                    self.game_interface.replace_music_file(song, new_song)
+                    # self.log_once("music", f"Replaced {song} with {new_song}", False)
+                    class_pool.remove(new_song)
+                await self.save_music_data()
+                self.music_randomization_applied = True
+
+        elif shuffle_mode == 2:
+
+            songs_to_replace = []
+
+            for cls in classes:
+                for song in self.game_interface.get_songs_from_class(cls):
+                    if song not in songs_to_replace:
+                        songs_to_replace.append(song)
+            
+            song_pool = list(songs_to_replace)
+
+            for song in songs_to_replace:
+                new_song = random.choice(song_pool)
+                self.music_data[song] = new_song
+                self.game_interface.replace_music_file(song, new_song)
+                # self.log_once("music", f"Replaced {song} with {new_song}", False)
+                song_pool.remove(new_song)
+            await self.save_music_data()
+            self.music_randomization_applied = True
+
+
+   
+
     # === Misc stuff idk where to put ===
 
 
@@ -3834,6 +3996,9 @@ class MSMContext(SuperContext):
 
     async def handle_in_match(self):
         """What functions should be handled during a match"""
+        # Music Randomizer
+        await self.randomize_music()
+
         # Cup Goal
         await self.track_cups_won()
         if self.goal_condition == 3:
@@ -3885,6 +4050,8 @@ class MSMContext(SuperContext):
 
     async def handle_in_boss(self):
         """What functions should be handled in the boss"""
+        # Music Randomizer
+        await self.randomize_music()
 
         # Boss stuff
         await self.handle_boss_hp()
@@ -3908,6 +4075,9 @@ class MSMContext(SuperContext):
     async def handle_in_tournament_map(self):
         """What functions should be handled in a tournament map"""
 
+        # Music Randomizer
+        await self.randomize_music()
+
         await self.check_current_cup()
         await self.handle_alt_path_unlocks()
         await self.check_pending_tournament_location()
@@ -3920,6 +4090,9 @@ class MSMContext(SuperContext):
 
 
     async def handle_in_party_modes(self):
+        # Music Randomizer
+        await self.randomize_music()
+
         # Party Goal
         if self.goal_condition == 5:
             await self.track_party_won()
@@ -3943,6 +4116,9 @@ class MSMContext(SuperContext):
 
     async def handle_in_main_menu(self):
         """What functions should be handled in the main menu"""
+        # Music Randomizer
+        await self.randomize_music()
+
         # Cup Goal
         await self.track_cups_won()
         if self.goal_condition == 3:

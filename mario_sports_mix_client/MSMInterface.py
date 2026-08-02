@@ -426,6 +426,131 @@ class MSMInterface:
             return False
 
 
+    def get_music_file_name(self, music_name: str):
+        # the big evil dictionary of doooooom
+        music_to_file = {
+            "title_theme": "BGM_MENU_01",
+            "exhibition_settings": "BGM_MENU_04",
+            "wifi_menu": "BGM_MENU_05",
+            "records_menu": "BGM_MENU_06",
+            "mario_stadium": "BGM_STAGE_01",
+            "mario_stadium_fast": "BGM_STAGE_H01",
+            "koopa_troopa_beach": "BGM_STAGE_02",
+            "koopa_troopa_beach_fast": "BGM_STAGE_H02",
+            "peachs_castle": "BGM_STAGE_03",
+            "peachs_castle_fast": "BGM_STAGE_H03",
+            "toad_park": "BGM_STAGE_04",
+            "toad_park_fast": "BGM_STAGE_H04",
+            "dk_dock": "BGM_STAGE_05",
+            "dk_dock_fast": "BGM_STAGE_H05",
+            "luigis_mansion": "BGM_STAGE_06",
+            "luigis_mansion_fast": "BGM_STAGE_H06",
+            "daisy_garden": "BGM_STAGE_07",
+            "daisy_garden_fast": "BGM_STAGE_H07",
+            "wario_factory": "BGM_STAGE_09",
+            "wario_factory_fast": "BGM_STAGE_H09",
+            "bowser_jr_blvd": "BGM_STAGE_10",
+            "bowser_jr_blvd_fast": "BGM_STAGE_H10",
+            "bowsers_castle": "BGM_STAGE_11",
+            "bowsers_castle_fast": "BGM_STAGE_H11",
+            "waluigi_pinball": "BGM_STAGE_12",
+            "waluigi_pinball_fast": "BGM_STAGE_H12",
+            "ghoulish_galleon": "BGM_STAGE_15",
+            "ghoulish_galleon_fast": "BGM_STAGE_H15",
+            "star_ship": "BGM_STAGE_16",
+            "star_ship_fast": "BGM_STAGE_H16",
+            "western_junction": "BGM_STAGE_17",
+            "western_junction_fast": "BGM_STAGE_H17",
+            "behemoth_stage": "BGM_STAGE_20",
+            "behemoth_stage_fast": "BGM_STAGE_H20",
+            "behemoth_battle": "BGM_STAGE_20",
+            "behemoth_battle_fast": "BGM_STAGE_H20",
+            "smash_skate_normal": "BGM_PARTY_01",
+            "smash_skate_normal_fast": "BGM_PARTY_H01",
+            "feed_petey_normal": "BGM_PARTY_02",
+            "feed_petey_bonus_time": "BGM_PARTY_02_ARR",
+            "feed_petey_normal_fast": "BGM_PARTY_H02",
+            "bob_omb_dodge_normal": "BGM_PARTY_03",
+            "bob_omb_dodge_normal_fast": "BGM_PARTY_H03",
+            "harmony_hustle_normal": "BGM_PARTY_04",
+            "harmony_hustle_normal_fast": "BGM_PARTY_H04",
+            "smash_skate_hard": "BGM_PARTY_05",
+            "smash_skate_hard_fast": "BGM_PARTY_H05",
+            "feed_petey_hard": "BGM_PARTY_06",
+            "feed_petey_hard_fast": "BGM_PARTY_H06",
+            "bob_omb_dodge_hard": "BGM_PARTY_07",
+            "bob_omb_dodge_hard_fast": "BGM_PARTY_H07",
+            "tournament_opening": "BGM_TOURNAMENT_00",
+            "mushroom_cup": "BGM_TOURNAMENT_01",
+            "flower_cup": "BGM_TOURNAMENT_02",
+            "star_cup": "BGM_TOURNAMENT_03",
+            "tournament_victory": "FANFARE_01_SEmix",
+            "win_1": "BGM_WIN_01",
+            "lose_1": "BGM_LOSE_01",
+            "win_2": "BGM_WIN_02",
+            "lose_2": "BGM_LOSE_02",
+            "matching": "BGM_MATCHING",
+            "results": "BGM_RESULT",
+            "get_item": "BGM_GETITEM",
+            "starman": "BGM_STAR_01",
+            "star_road_complete": "BGM_STAR_02",
+            "classic_ocean": "OTOGAME_00_PREVIEW_LP",
+            "chocobo_rhythm": "OTOGAME_01_PREVIEW_LP",
+            "mario_athletic": "OTOGAME_02_PREVIEW_LP",
+            "bloocheep_ocean": "OTOGAME_03_PREVIEW_LP",
+            "chocobo_pop": "OTOGAME_04_PREVIEW_LP",
+            "chcocobo_pop": "OTOGAME_04_PREVIEW_LP",
+            "punk_athletic": "OTOGAME_05_PREVIEW_LP",
+            "punk_ocean": "OTOGAME_06_PREVIEW_LP",
+            "chocobo_beat": "OTOGAME_07_PREVIEW_LP",
+            "island_athletic": "OTOGAME_08_PREVIEW_LP",
+            "mushroom_mix_medley": "OTOGAME_09_PREVIEW_LP",
+            "flower_mix_medley": "OTOGAME_10_PREVIEW_LP",
+            "star_mix_medley": "OTOGAME_11_PREVIEW_LP",
+        }
+
+        file_name = music_to_file.get(music_name)
+
+        if file_name is None:
+            self.logger.warning(f"No file for {music_name}")
+        return None
+    
+        return file_name + ".brstm"
+
+    def replace_music_file(self, music_to_be_replaced: str, music_to_replace_with: str) -> bool:
+        classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs, MusicFiles.TournamentSongs, MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
+        address = None
+
+        for cls in classes:
+            songs = self.get_songs_from_class(cls)
+            if music_to_be_replaced in songs:
+                address = get_address(cls.__dict__[music_to_be_replaced])
+                break
+
+        original_length = len(self.get_music_file_name(music_to_be_replaced)) 
+        new_length = len(self.get_music_file_name(music_to_replace_with))
+        new_song = self.get_music_file_name(music_to_replace_with)
+
+
+        self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
+        self.dolphin_client.write_string(address, new_song)
+
+        # Clearing in case stale stuff gets in the way
+        for _ in range(original_length - new_length - 2):
+            self.dolphin_client.write_byte(address + new_length, 0x00)
+            new_length += 1
+        self.dolphin_client.write_byte(address + new_length, 0x00)
+        new_length += 1
+        self.dolphin_client.write_byte(address + new_length, 0x00)
+        
+            
+    def get_songs_from_class(self, cls):
+        songs = []
+        for attr in dir(cls):
+            if not attr.startswith("__") and not attr.startswith("base") and not attr.startswith("offset"):
+                songs.append(attr)
+        return songs
+
     def get_connection_state(self):
         try:
             if not self.dolphin_client.is_hooked():

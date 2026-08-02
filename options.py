@@ -517,6 +517,13 @@ class OopsAllCharacter(Choice):
     option_black_mage = 18
     default = 0
 
+class ShuffleMusic(Choice):
+    """Meme Option, Shuffles the music in the game"""
+    option_off = 0
+    option_shuffle_within_groups = 1
+    option_full_shuffle = 2
+    default = 0
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
@@ -592,6 +599,7 @@ msm_option_groups = [
     ]),
     OptionGroup("Meme Options", [
         OopsAllCharacter,
+        ShuffleMusic,
     ]),
 ]
 
@@ -665,5 +673,6 @@ class MSMOptions(PerGameCommonOptions):
 
     # Meme Stuff
     oops_all_character: OopsAllCharacter
+    shuffle_music: ShuffleMusic
 
     start_inventory_from_pool: StartInventoryPool

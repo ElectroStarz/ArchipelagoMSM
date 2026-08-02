@@ -1,8 +1,9 @@
+# Need someone with PAL copy to verify these
 class MusicFiles:
 
     class MenuSongs:
 
-        base_addr = 0x80DC678F # String
+        base_addr = 0x80DC770F # String
         offset = 0x38
 
         title_theme = base_addr # String
@@ -12,8 +13,8 @@ class MusicFiles:
 
     class StageSongs:
 
-        base_addr = 0x80DC686F # String
-        offset = 0x38
+        base_addr = 0x80DC77EF # String
+        offset = 0x3C
 
         mario_stadium = base_addr # String
         mario_stadium_fast = base_addr + offset # String
@@ -43,13 +44,13 @@ class MusicFiles:
         star_ship_fast = base_addr + offset * 25 # String
         western_junction = base_addr + offset * 26 # String
         western_junction_fast = base_addr + offset * 27 # String
-        behemoth_battle = base_addr + offset * 28 # String
-        behemoth_battle_fast = base_addr + offset * 29 # String
+        behemoth_stage = base_addr + offset * 28 # String
+        behemoth_stage_fast = base_addr + offset * 29 # String
 
     class PartySongs:
 
-        base_addr = 0x80DC6FBF # String
-        offset = 0x38
+        base_addr = 0x80DC7F3F # String
+        offset = 0x3C
 
         smash_skate_normal = base_addr # String
         smash_skate_normal_fast = base_addr + offset # String
@@ -69,8 +70,8 @@ class MusicFiles:
 
     class TournamentSongs:
 
-        base_addr = 0x80DC7347 # String
-        offset = 0x38
+        base_addr = 0x80DC82C7 # String
+        offset = 0x40
 
         tournament_opening = base_addr # String
         mushroom_cup = base_addr + offset # String
@@ -80,28 +81,26 @@ class MusicFiles:
 
     class MiscSongs:
 
-        base_addr = 0x80DC7487 # String
-        offset = 0x38
-
-        win_1 = base_addr # String
-        lose_1 = base_addr + offset # String
-        win_2 = base_addr + offset * 2 # String
-        lose_2 = base_addr + offset * 3 # String
-        results = base_addr + offset * 4 # String
-        get_item = base_addr + offset * 5 # String
-        starman = base_addr + offset * 6 # String
-        star_road_complete = base_addr + offset * 7 # String
+        win_1 = 0x80DC8407 # String
+        lose_1 = 0x80DC843F # String
+        win_2 = 0x80DC8477 # String
+        lose_2 = 0x80DC84AF # String
+        matching = 0x80DC84E7 # String
+        results = 0x80DC8523 # String
+        get_item = 0x80DC855B # String
+        starman = 0x80DC8593 # String
+        star_road_complete = 0x80DC85CB # String
 
     class HarmonyHustlePreviews:
 
-        base_addr = 0x80DC7F83 # String
+        base_addr = 0x80DC8F03 # String
         offset = 0x44
 
         classic_ocean = base_addr # String
-        chocobo_rhythym = base_addr + offset # String
+        chocobo_rhythm = base_addr + offset # String
         mario_athletic = base_addr + offset * 2 # String
         bloocheep_ocean = base_addr + offset * 3 # String
-        chcocobo_pop = base_addr + offset * 4 # String
+        chocobo_pop = base_addr + offset * 4 # String
         punk_athletic = base_addr + offset * 5 # String
         punk_ocean = base_addr + offset * 6 # String
         chocobo_beat = base_addr + offset * 7 # String
