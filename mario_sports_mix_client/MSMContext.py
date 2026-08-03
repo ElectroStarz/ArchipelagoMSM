@@ -34,9 +34,9 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.1.3"
+CLIENT_VERSION = "2.1.4"
 COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9",
-                       "2.1.0", "2.1.1", "2.1.2"]
+                       "2.1.0", "2.1.1", "2.1.2", "2.1.3"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -607,11 +607,11 @@ class MSMContext(SuperContext):
         self.pending_panel_replacement = False
         self.suppress_panel_until = 0.0
 
-        self.boss_hp_handled = False
-        self.boss_defeat_handled = False
-        self.goal_handled = False
+        self.boss_hp_handled: bool = False
+        self.boss_defeat_handled: bool = False
+        self.goal_handled: bool = False
 
-        self.in_tournament_match = False
+        self.in_tournament_match: bool = False
         self.last_tournament_location_name: Optional[str] = None
         self.cups_won: set[str] = set()
         self.exhibitions_won: set[str] = set()
@@ -620,12 +620,12 @@ class MSMContext(SuperContext):
         self.minus_one = 0xFFFFFFFF
 
         # Deathlink Stuff
-        self.has_sent_death = True
-        self.received_death = True
-        self.previous_opponent_score = None
+        self.has_sent_death: bool = True
+        self.received_death: bool = True
+        self.previous_opponent_score: int | None = None
 
         # Custom Tournament Settings Stuff
-        self.handled_custom_timer = False
+        self.handled_custom_timer: bool = False
 
         # Lists for items
         self.unlocked_modes: set[str] = set()
@@ -1307,7 +1307,7 @@ class MSMContext(SuperContext):
 
             for sport in sports_classes:
                 try:
-                    # Getting a character unlocks it for all main_sports, write it to all main_sports
+                    # Getting a character unlocks it for all sports, write it to all sports
                     addr = getattr(sport.Characters, char)
                     new_addr = get_address(addr)
                     self.game_interface.dolphin_client.write_byte(new_addr, value)
@@ -1322,12 +1322,12 @@ class MSMContext(SuperContext):
         if "Yoshi" not in self.unlocked_characters:
             value = 0
             return value
-        else:
 
-            value = 1
-            if "Pink Yoshi" in self.unlocked_costumes: value += 4
-            if "Light Blue Yoshi" in self.unlocked_costumes: value += 16
-            if "Yellow Yoshi" in self.unlocked_costumes: value += 64
+
+        value = 1
+        if "Pink Yoshi" in self.unlocked_costumes: value += 4
+        if "Light Blue Yoshi" in self.unlocked_costumes: value += 16
+        if "Yellow Yoshi" in self.unlocked_costumes: value += 64
         return value
 
     def peach_unlocks_value(self):
@@ -1552,7 +1552,7 @@ class MSMContext(SuperContext):
                 self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 await self.check_write(sports_mix_unlocked, "byte", 11)
-                self.debug_log("Sports Mix unlocked by Sports Mix item")
+                self.log_once("sm_unlock", "Sports Mix unlocked by Sports Mix item", True)
             else:
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 3)
 
@@ -1564,7 +1564,7 @@ class MSMContext(SuperContext):
                 self.unlocked_sports_mix = True
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 11)
                 await self.check_write(sports_mix_unlocked, "byte", 11)
-                self.debug_log("Sports Mix unlocked by Sports Crystals")
+                self.log_once("sm_unlock", "Sports Mix unlocked by Sports Crystals", True)
             else:
                 self.game_interface.dolphin_client.write_byte(sports_mix_unlocked, 3)
 
@@ -2761,18 +2761,17 @@ class MSMContext(SuperContext):
         """Sends the location for the character if Character Sanity is enabled"""
 
         if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
-            if char_1 != "None" and (char_1 in self.unlocked_characters or char_1 in ["Mii (Male)", "Mii (Female)"]):
-                await self.check_location(f"Win as {char_1}")
-
-        if self.game_interface.check_team_amount() == 2:
-            for character in [char_1, char_2]:
-                if character != "None" and (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]):
-                    await self.check_location(f"Win as {character}")
-
+            characters_to_check = [char_1]
+        elif self.game_interface.check_team_amount() == 2:
+            characters_to_check = [char_1, char_2]
         elif self.game_interface.check_team_amount() == 3:
-            for character in [char_1, char_2, char_3]:
-                if character != "None" and (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]):
-                    await self.check_location(f"Win as {character}")
+            characters_to_check = [char_1, char_2, char_3]
+        else:
+            return
+
+        for character in characters_to_check:
+            if character != "None" and (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]):
+                await self.check_location(f"Win as {character}")
 
     async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
         """Sends the location for the costume if Character Sanity is enabled"""
@@ -2825,24 +2824,20 @@ class MSMContext(SuperContext):
     async def send_special_sanity_checks(self):
         """Sends the location when the player has used a special and if the character is unlocked"""
         special_active = self.game_interface.special_active()
-        #print(f"Special Sanity: {self.special_sanity}")
 
         if self.special_sanity == 0 or not special_active:
             return
 
 
-        #print(f"Special Active: {special_active}")
+        character_word = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.using_special))
 
-        character = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.using_special))
-
-        character_int = {0: 1, 2: 2, 4: 3}.get(character, None)
-        #print(f"Character int: {character_int}")
+        # Only check for Blue Team
+        character_int = {0: 1, 2: 2, 4: 3}.get(character_word, None)
 
         if character_int is not None:
             character_name = self.game_interface.get_p_character(character_int)
-            #print(f"Character Name: {character_name}")
 
-            if character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]:
+            if character_name in self.unlocked_characters or character_name in ["Mii (Male)", "Mii (Female)"]:
                 await self.check_location(f"Use {character_name}'s Special")
 
 
