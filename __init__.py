@@ -294,6 +294,7 @@ class MSMWorld(World):
             # Meme Stuff
             "oops_all_character": self.options.oops_all_character.value,
             "shuffle_music": self.options.shuffle_music.value,
+            "random_tint": self.options.random_tint.value,
         }
 
         return slot_data

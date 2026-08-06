@@ -131,10 +131,17 @@ class MatchAddresses:
     loading_screen_active = 0x804D8354  # Word | In CAL
     set_break = 0x804D1178 # Word | Has Pointers
     game_speed = 0x804D77F4 # Float
+    stage_tint = 0x805C1C64 # Word | In RGBA format, though Alpha Channel is unnused.
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float | In CAL
     max_time = 0x804D77E0 # Float | In CAL
+
+    # Opposing Team Characters
+    red_character_1 = 0x804D7809 # Byte
+    red_character_2 = 0x804D780B # Byte
+    red_character_3 = 0x804D780D # Byte
+    red_character_4 = 0x804D780F # Byte
 
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL

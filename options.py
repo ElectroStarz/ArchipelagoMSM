@@ -524,6 +524,11 @@ class ShuffleMusic(Choice):
     option_full_shuffle = 2
     default = 0
 
+class TintStages(Toggle):
+    """Randomly tints each stage. Colors are limited to avoid any eye straining colors."""
+    display_name = "Tint Stages"
+    default = False
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
@@ -600,6 +605,7 @@ msm_option_groups = [
     OptionGroup("Meme Options", [
         OopsAllCharacter,
         ShuffleMusic,
+        TintStages,
     ]),
 ]
 
@@ -674,5 +680,6 @@ class MSMOptions(PerGameCommonOptions):
     # Meme Stuff
     oops_all_character: OopsAllCharacter
     shuffle_music: ShuffleMusic
+    random_tint: TintStages
 
     start_inventory_from_pool: StartInventoryPool

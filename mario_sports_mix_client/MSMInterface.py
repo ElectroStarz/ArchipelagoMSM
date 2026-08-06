@@ -66,6 +66,10 @@ court_names = {
     "s85": "Sherbet Sea",
     "s86": "Fire Mountain",
     "s87": "Rowdy Raft",
+
+    # Misc
+    "s34": "Opening Cutscene",
+    "s21": "Tournament Cutscene",
 }
 
 harmony_mapping = {
@@ -273,8 +277,8 @@ class MSMInterface:
             return court_id, court_name
 
     def get_mode(self):
-        string_stage = self.dolphin_client.read_string(get_address(MatchAddresses.current_court))
-        current_sport = string_stage[-2:]
+        current_sport_value = self.dolphin_client.read_byte(get_address(GlobalTournament.current_sport))
+        current_sport = {0: "BA", 1: "VO", 2: "DO", 3: "HO", 5: "SM"}.get(current_sport_value)
         
         if self.is_in_feed_petey():
             return "Feed Petey"
@@ -292,6 +296,8 @@ class MSMInterface:
             return "Volleyball"
         elif current_sport == "HO":
             return "Hockey"
+        elif current_sport == "SM":
+            return "Sports Mix"
         else:
             return None
 
@@ -513,7 +519,7 @@ class MSMInterface:
 
         if file_name is None:
             self.logger.warning(f"No file for {music_name}")
-        return None
+            return None
     
         return file_name + ".brstm"
 

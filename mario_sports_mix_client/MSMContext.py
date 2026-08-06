@@ -130,7 +130,7 @@ costume_database = {
 # AP server storage is room-wide, so filler/trap save keys need seed + slot in the name.
 CONSUMABLE_STORAGE_CATEGORY = "msm_consumables"
 LOCATION_STORAGE_CATEGORY = "msm_locations"
-MUSIC_STORAGE_CATEGORY = "msm_music"
+CUSTOM_STORAGE_CATEGORY = "msm_customization"
 # Build the reverse lookup once so persisted AP location IDs can be shown as local names.
 LOCATION_ID_TO_NAME = {location_id: name for name, location_id in LOCATION_NAME_TO_ID.items()}
 
@@ -599,8 +599,8 @@ class MSMContext(SuperContext):
         self.handled_consumable_indices: Set[int] = set()
         # Set when a Get/SetReply for handled consumables has been applied this session.
         self._consumables_load_event = asyncio.Event()
-        # Set when a Get/SetReply for handled music data has been applied this session.
-        self._music_data_load_event = asyncio.Event()
+        # Set when a Get/SetReply for handled customization data has been applied this session.
+        self._custom_data_load_event = asyncio.Event()
         self.start_process = True
         self.handled_gecko_codes = False
         self.game_session_active = False
@@ -655,8 +655,8 @@ class MSMContext(SuperContext):
         self.filler_to_give = deque()
         self.traps_to_give = deque()
 
+        self.custom_data: Dict[str, Dict[str, Any]] = {"music": {}, "tints": {}}
         # Music shuffle
-        self.music_data: Dict[str, str] = {}
         self.music_randomization_applied = False
 
         # Address Library
@@ -751,12 +751,12 @@ class MSMContext(SuperContext):
         return f"{CONSUMABLE_STORAGE_CATEGORY}_{self.slot}"
 
     @property
-    def music_storage_key(self) -> Optional[str]:
+    def custom_storage_key(self) -> Optional[str]:
         """Returns a key which is linked to the game and the slot name"""
 
         if self.seed is None or self.slot is None:
             return None
-        return f"{MUSIC_STORAGE_CATEGORY}_{self.slot}"
+        return f"{CUSTOM_STORAGE_CATEGORY}_{self.slot}"
 
     def _on_consumables_storage_update(self, value: Any) -> None:
         """Apply server storage for handled filler/trap indices and drop any stale queue entries."""
@@ -781,20 +781,38 @@ class MSMContext(SuperContext):
         self._consumables_load_event.set()
         self.debug_log(f"Loaded {len(self.handled_consumable_indices)} handled consumables")
 
-    def _on_music_storage_update(self, value: Any) -> None:
-        """Apply server storage for handled music data."""
+    def _on_custom_storage_update(self, value: Any) -> None:
+        """Apply server storage for handled customization data."""
         if value is None:
-            self.music_data = {}
+            self.custom_data = {"music": {}, "tints": {}}
         elif isinstance(value, dict):
-            self.music_data = {str(song): str(new_song) for song, new_song in value.items()}
+            if "music" in value or "tints" in value:
+                custom_music_data = value.get("music", {})
+                custom_tint_data = value.get("tints", {})
+
+                if isinstance(custom_music_data, dict):
+                    music_data = {str(song): str(new_song) for song, new_song in custom_music_data.items()}
+                elif isinstance(custom_music_data, list):
+                    music_data = {str(song): str(new_song) for song, new_song in custom_music_data}
+                else:
+                    music_data = {}
+                    
+                if isinstance(custom_tint_data, dict):
+                    tint_data = {str(stage): [int(tint[0]), int(tint[1]), int(tint[2])] for stage, tint in custom_tint_data.items()}
+                elif isinstance(custom_tint_data, list):
+                    tint_data = {str(stage): [int(tint[0]), int(tint[1]), int(tint[2])] for stage, tint in custom_tint_data}
+                else:
+                    tint_data = {}
+
+                self.custom_data = {"music": music_data, "tints": tint_data}
         elif isinstance(value, list):
-            self.music_data = {str(song): str(new_song) for song, new_song in value}
+            self.custom_data = {"music": {str(song): str(new_song) for song, new_song in value}, "tints": {}}
         else:
-            logger.warning(f"Unexpected music data value type: {type(value)}")
+            logger.warning(f"Unexpected customization data value type: {type(value)}")
             return
 
-        self._music_data_load_event.set()
-        self.debug_log(f"Loaded {len(self.music_data)} music data entries")
+        self._custom_data_load_event.set()
+        self.log_once("load",f"Loaded {len(self.custom_data)} customization data entries",False)
 
     async def load_handled_consumables(self, initialise: bool = False) -> None:
         """Load handled filler/trap indices from AP storage before queuing ReceivedItems."""
@@ -822,13 +840,13 @@ class MSMContext(SuperContext):
             logger.warning("Timed out loading handled consumables from server storage")
             self._consumables_load_event.set()
 
-    async def load_music_data(self, initialise: bool = False) -> None:
-        """Load handled filler/trap indices from AP storage before queuing ReceivedItems."""
-        key = self.music_storage_key
+    async def load_custom_data(self, initialise: bool = False) -> None:
+        """Load handled customization data from AP storage"""
+        key = self.custom_storage_key
         if key is None:
             return
 
-        self._music_data_load_event.clear()
+        self._custom_data_load_event.clear()
 
         if initialise:
             await self.send_msgs([{
@@ -843,10 +861,10 @@ class MSMContext(SuperContext):
             await self.send_msgs([{"cmd": "Get", "keys": [key]}])
 
         try:
-            await asyncio.wait_for(self._music_data_load_event.wait(), timeout=10.0)
+            await asyncio.wait_for(self._custom_data_load_event.wait(), timeout=10.0)
         except asyncio.TimeoutError:
-            logger.warning("Timed out loading music data from server storage")
-            self._music_data_load_event.set()
+            logger.warning("Timed out loading customization data from server storage")
+            self._custom_data_load_event.set()
 
     async def _handle_received_items_consumables(self, args: dict) -> None:
         """Gets called when the client receives a ReceivedItems package, handles both consumables and
@@ -981,15 +999,17 @@ class MSMContext(SuperContext):
             # Meme option data
             self.all_one_opponent = self.slot_data.get("oops_all_character")
             self.music_shuffle = self.slot_data.get("shuffle_music")
+            self.random_tint = self.slot_data.get("random_tint")
+            self.previous_stage = None
 
-            self.music_data = {}
+            self.custom_data = {"music": {}, "tints": {}}
             self.music_randomization_applied = False
             
 
             asyncio.create_task(self.update_death_link(self.deathlink_enabled))
             # Slot is known now — load/create the per-slot consumable save before items arrive.
             asyncio.create_task(self.load_handled_consumables(initialise=True))
-            asyncio.create_task(self.load_music_data(initialise=True))
+            asyncio.create_task(self.load_custom_data(initialise=True))
             if self.locations_checked:
                 asyncio.create_task(
                     self.send_msgs([{"cmd": "LocationChecks", "locations": sorted(self.locations_checked)}])
@@ -1027,19 +1047,19 @@ class MSMContext(SuperContext):
 
         elif cmd in ("Retrieved", "SetReply"):
             consumable_key = self.consumable_storage_key
-            music_key = self.music_storage_key
+            custom_key = self.custom_storage_key
 
             if cmd == "Retrieved":
                 if consumable_key and consumable_key in args.get("keys", {}):
                     self._on_consumables_storage_update(args["keys"][consumable_key])
-                if music_key and music_key in args.get("keys", {}):
-                    self._on_music_storage_update(args["keys"][music_key])
+                if custom_key and custom_key in args.get("keys", {}):
+                    self._on_custom_storage_update(args["keys"][custom_key])
 
             elif cmd == "SetReply":
                 if consumable_key and args.get("key") == consumable_key:
                     self._on_consumables_storage_update(args.get("value"))
-                if music_key and args.get("key") == music_key:
-                    self._on_music_storage_update(args.get("value"))
+                if custom_key and args.get("key") == custom_key:
+                    self._on_custom_storage_update(args.get("value"))
 
     def make_gui(self):
         ui = super().make_gui()
@@ -1080,8 +1100,8 @@ class MSMContext(SuperContext):
         self.game_session_active = game_active
         self.active_game_version = dc.GAME_VERSION if game_active else None
         self.music_randomization_applied = False
-        self.music_data = {}
-        self._music_data_load_event.clear()
+        self.custom_data = {"music": {}, "tints": {}}
+        self._custom_data_load_event.clear()
 
     def reset_local_item_state(self, clear_received: bool = False, clear_consumed: bool = False) -> None:
         """Resets the item state whenever the user connects to a new slot"""
@@ -1140,8 +1160,8 @@ class MSMContext(SuperContext):
         }])
         self.debug_log(f"Saving handled consumables: {sorted(self.handled_consumable_indices)}")
 
-    async def save_music_data(self) -> None:
-        key = self.music_storage_key
+    async def save_custom_data(self) -> None:
+        key = self.custom_storage_key
         if key is None:
             return
         await self.send_msgs([{
@@ -1151,10 +1171,10 @@ class MSMContext(SuperContext):
             "want_reply": True,
             "operations": [{
                 "operation": "replace",
-                "value": self.music_data
+                "value": self.custom_data
             }]
         }])
-        self.debug_log(f"Saving music data: {self.music_data}")
+        self.debug_log(f"Saving customization data: {self.custom_data}")
 
     def reset_location_state(self) -> None:
         self.locations_checked.clear()
@@ -1805,7 +1825,7 @@ class MSMContext(SuperContext):
                 await self.check_write(star_alt_paths_unlocked, "byte", values_to_insert[2])
 
 
-            if self.alt_paths_unlock_type == 1:
+            elif self.alt_paths_unlock_type == 1:
                     
                 for sport in sports:
                     for cup in cups:
@@ -1829,7 +1849,7 @@ class MSMContext(SuperContext):
                 await self.check_write(star_alt_paths_unlocked, "byte", values_to_insert[2])                
 
 
-            if self.alt_paths_unlock_type == 2:
+            elif self.alt_paths_unlock_type == 2:
 
                 for cup in cups:
                     if f"{cup} Cup Alt Paths (Normal)" in self.unlocked_alt_paths:
@@ -1843,7 +1863,7 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, global_values[1])
                 self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, global_values[2])
 
-            if self.alt_paths_unlock_type == 3:
+            elif self.alt_paths_unlock_type == 3:
 
                 for cup in cups:
                     if f"{cup} Cup Alt Paths (Global)" in self.unlocked_alt_paths:
@@ -1853,7 +1873,7 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, global_values[1])
                 self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, global_values[2])
 
-            if self.alt_paths_unlock_type == 4:
+            elif self.alt_paths_unlock_type == 4:
 
                 progressive_alt_path_count = self.progressive_alt_paths
 
@@ -1870,7 +1890,7 @@ class MSMContext(SuperContext):
                 if progressive_alt_path_count >= 6:
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
 
-            if self.alt_paths_unlock_type == 5:
+            elif self.alt_paths_unlock_type == 5:
 
                 progressive_alt_path_count = self.progressive_alt_paths
 
@@ -3734,7 +3754,7 @@ class MSMContext(SuperContext):
         if shuffle_mode == 0:
             return
 
-        await self.load_music_data()
+        await self.load_custom_data()
 
         classes = [
             MusicFiles.MenuSongs,
@@ -3744,9 +3764,11 @@ class MSMContext(SuperContext):
             MusicFiles.MiscSongs,
             MusicFiles.HarmonyHustlePreviews,
         ]
+
+        music_data = self.custom_data.get("music", {})
         
-        if self.music_data:
-            for song, new_song in self.music_data.items():
+        if music_data:
+            for song, new_song in music_data.items():
                 self.game_interface.replace_music_file(song, new_song)
             self.music_randomization_applied = True
             return
@@ -3757,11 +3779,11 @@ class MSMContext(SuperContext):
                 class_pool = list(class_songs)
                 for song in class_songs:
                     new_song = random.choice(class_pool)
-                    self.music_data[song] = new_song
+                    self.custom_data["music"][song] = new_song
                     self.game_interface.replace_music_file(song, new_song)
                     # self.log_once("music", f"Replaced {song} with {new_song}", False)
                     class_pool.remove(new_song)
-                await self.save_music_data()
+                await self.save_custom_data()
                 self.music_randomization_applied = True
 
         elif shuffle_mode == 2:
@@ -3777,15 +3799,99 @@ class MSMContext(SuperContext):
 
             for song in songs_to_replace:
                 new_song = random.choice(song_pool)
-                self.music_data[song] = new_song
+                self.custom_data["music"][song] = new_song
                 self.game_interface.replace_music_file(song, new_song)
                 # self.log_once("music", f"Replaced {song} with {new_song}", False)
                 song_pool.remove(new_song)
-            await self.save_music_data()
+            await self.save_custom_data()
             self.music_randomization_applied = True
 
 
-   
+    async def replace_all_opponent_characters(self):
+
+        if self.all_one_opponent != 0:
+            for i in range(7):
+                character_attr = getattr(GlobalTournament, f"cpu_{i+1}_character")
+                teammate_1_attr = getattr(GlobalTournament, f"cpu_{i+1}_teammate_1")
+                teammate_2_attr = getattr(GlobalTournament, f"cpu_{i+1}_teammate_2")
+                
+                cpu_main_char = get_address(character_attr)
+                cpu_teammate_1 = get_address(teammate_1_attr)
+                cpu_teammate_2 = get_address(teammate_2_attr)
+
+                self.game_interface.dolphin_client.write_byte(cpu_main_char, self.all_one_opponent - 1)
+                self.game_interface.dolphin_client.write_byte(cpu_teammate_1, self.all_one_opponent - 1)
+                self.game_interface.dolphin_client.write_byte(cpu_teammate_2, self.all_one_opponent - 1)
+
+            red_team_to_replace = 2
+
+            if self.game_interface.check_team_amount() == 3:
+                red_team_to_replace += 1
+            if self.game_interface.get_mode() in ["Dodgeball", "Hockey"]:
+                red_team_to_replace += 1
+            
+            for i in range(red_team_to_replace):
+                character_attr = getattr(MatchAddresses, f"red_character_{i+1}")
+                character_addr = get_address(character_attr)
+                self.game_interface.dolphin_client.write_byte(character_addr, self.all_one_opponent - 1)
+
+            if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
+                self.game_interface.dolphin_client.write_byte(get_address(PlayerAddresses.character_2), self.all_one_opponent - 1)
+
+    async def randomize_tints(self):
+        # self.log_once("tints", f"{self.random_tint}", False)
+        if not self.random_tint:
+            return
+
+        stages = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s09", "s10",
+                  "s11", "s12", "s15", "s16", "s17", "s20", "s21", "s31", "s32", 
+                  "s33", "s34", "s39", "s40", "s41", "s42", "s55", "s56", "s57",
+                  "s70", "s71", "s72", "s85", "s86", "s87"
+                  ]
+
+        await self.load_custom_data()
+
+        tint_data = self.custom_data.get("tints", {})
+
+        if not tint_data:
+            for stage in stages:
+                
+                red_value = random.randint(0x40, 0xFF)
+                green_value = random.randint(0x40, 0xFF)
+                blue_value = random.randint(0x40, 0xFF)
+                self.custom_data["tints"][stage] = [red_value, green_value, blue_value]
+            await self.save_custom_data()
+            tint_data = self.custom_data["tints"]
+
+        current_stage = self.game_interface.get_court()[0]
+
+        if current_stage not in stages:
+            return
+
+        stage_tint = tint_data.get(current_stage)
+
+        red_value = int(stage_tint[0])
+        green_value = int(stage_tint[1])
+        blue_value = int(stage_tint[2])
+        rgba_value = red_value * 0x1000000 + green_value * 0x10000 + blue_value * 0x100 + 0xFF
+
+        current_tint = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.stage_tint))
+
+        if not self.previous_stage:
+            self.previous_stage = current_stage
+
+        if self.previous_stage != current_stage:
+            self.previous_stage = current_stage
+            current_tint = 0xFFFFFFFF
+
+        # self.log_once("tints", f"Current tint is {hex(current_tint)} for stage {current_stage}", False)
+        if current_tint == 0xFFFFFFFF:
+            self.game_interface.dolphin_client.write_word(get_address(MatchAddresses.stage_tint), rgba_value)
+            self.log_once("tints", f"Tint for stage {current_stage} applied: {hex(rgba_value)}", False)
+
+        
+
+
 
     # === Misc stuff idk where to put ===
 
@@ -3940,6 +4046,11 @@ class MSMContext(SuperContext):
         """What functions should be handled during a match"""
         # Music Randomizer
         await self.randomize_music()
+        await self.randomize_tints()
+        await self.replace_all_opponent_characters()
+
+        # Opponents Setter
+        await self.replace_all_opponent_characters()
 
         # Cup Goal
         await self.track_cups_won()
@@ -3994,6 +4105,9 @@ class MSMContext(SuperContext):
         """What functions should be handled in the boss"""
         # Music Randomizer
         await self.randomize_music()
+        await self.randomize_tints()
+        await self.replace_all_opponent_characters()
+        
 
         # Boss stuff
         await self.handle_boss_hp()
@@ -4019,6 +4133,12 @@ class MSMContext(SuperContext):
 
         # Music Randomizer
         await self.randomize_music()
+        await self.randomize_tints()
+        await self.replace_all_opponent_characters()
+        
+
+        # Opponents Setter
+        await self.replace_all_opponent_characters()
 
         await self.check_current_cup()
         await self.handle_alt_path_unlocks()
@@ -4034,6 +4154,12 @@ class MSMContext(SuperContext):
     async def handle_in_party_modes(self):
         # Music Randomizer
         await self.randomize_music()
+        await self.randomize_tints()
+        await self.replace_all_opponent_characters()
+        
+
+        # Opponents Setter
+        await self.replace_all_opponent_characters()
 
         # Party Goal
         if self.goal_condition == 5:
@@ -4060,6 +4186,8 @@ class MSMContext(SuperContext):
         """What functions should be handled in the main menu"""
         # Music Randomizer
         await self.randomize_music()
+        await self.randomize_tints()
+        await self.replace_all_opponent_characters()
 
         # Cup Goal
         await self.track_cups_won()
