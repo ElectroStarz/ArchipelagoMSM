@@ -278,15 +278,16 @@ class MSMInterface:
 
     def get_mode(self):
         current_sport_value = self.dolphin_client.read_byte(get_address(GlobalTournament.current_sport))
+        is_party_mode = self.dolphin_client.read_byte(get_address(GlobalTournament.is_party_mode))
         current_sport = {0: "BA", 1: "VO", 2: "DO", 3: "HO", 5: "SM"}.get(current_sport_value)
         
-        if self.is_in_feed_petey():
+        if current_sport == "BA" and is_party_mode == 2:
             return "Feed Petey"
-        elif self.is_in_harmony():
+        elif current_sport == "VO" and is_party_mode == 2:
             return "Harmony Hustle"
-        elif self.is_in_bob_omb():
+        elif current_sport == "DO" and is_party_mode == 2:
             return "Bob-omb Dodge"
-        elif self.is_in_smash():
+        elif current_sport == "HO" and is_party_mode == 2:
             return "Smash Skate"
         elif current_sport == "BA":
             return "Basketball"

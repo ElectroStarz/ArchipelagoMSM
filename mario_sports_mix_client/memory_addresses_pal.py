@@ -160,6 +160,7 @@ class GlobalTournament:
     current_tournament_round = 0x804D70A3 # Byte
 
     current_sport = 0x804D77C4 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey
+    is_party_mode = 0x804D77C5 # Byte | 0 = Regular Sport, 2 = Party Mode
 
     round_1_match_1_stage = 0x804D5F5A # Byte
     round_1_match_2_stage = 0x804D5F6A # Byte
