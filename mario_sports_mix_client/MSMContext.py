@@ -34,9 +34,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.1.4"
-COMPATIBLE_VERSIONS = ["2.0.0", "2.0.1", "2.0.2", "2.0.3", "2.0.4", "2.0.5", "2.0.6", "2.0.7", "2.0.8", "2.0.9",
-                       "2.1.0", "2.1.1", "2.1.2", "2.1.3"]
+CLIENT_VERSION = "2.2.0"
+COMPATIBLE_VERSIONS = []
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -141,10 +140,10 @@ class MSMCommandProcessor(SuperCommandProcessor):
     def __init__(self, ctx: "MSMContext"):
         super().__init__(ctx)
 
-    # @mark_raw
-    # def _cmd_check(self, location_name: str):
-    #     """Check a location - Used for dev purposes, or if you're lazy ig"""
-    #     asyncio.create_task(self.ctx.check_location(location_name))
+    @mark_raw
+    def _cmd_check(self, location_name: str):
+        """Check a location - Used for dev purposes, or if you're lazy ig"""
+        asyncio.create_task(self.ctx.check_location(location_name))
 
     def _cmd_debug_mode(self):
         """Toggle client debugging on and off (Default off)"""
@@ -231,13 +230,13 @@ class MSMCommandProcessor(SuperCommandProcessor):
 
         # Format final_address with hex() makes it easier to read back.
         if dc.GAME_VERSION == "PAL":
-            log_message = f"[Memory Read - PAL] {addr_type} at {hex(final_address)}. Result: {result}"
+            log_message = f"[Memory Read - PAL] {addr_type.title()} at {hex(final_address)}. Result: {result}"
         elif dc.GAME_VERSION == "NTSC-U" and is_save_addr(address):
-            log_message = f"[Memory Read - NTSC-U] {addr_type} at {hex(final_address)} (In Exceptions). Result: {result}"
+            log_message = f"[Memory Read - NTSC-U] {addr_type.title()} at {hex(final_address)} (In Exceptions). Result: {result}"
         elif dc.GAME_VERSION == "NTSC-U":
-            log_message = f"[Memory Read - NTSC-U] {addr_type} at {hex(final_address)} (Original Address: {address}). Result: {result}"
+            log_message = f"[Memory Read - NTSC-U] {addr_type.title()} at {hex(final_address)} (Original Address: {address}). Result: {result}"
         else:
-            log_message = None
+            log_message = "Invalid Region"
 
         logger.info(log_message)
         return log_message
@@ -493,17 +492,17 @@ class MSMCommandProcessor(SuperCommandProcessor):
         else:
             logger.info("No traps in queue")
 
-    def _cmd_filler_reduce(self):
-        """Reduces the size of the filler queue by 20 if issues occur (Only if filler queue is more than 30)"""
-
-        if len(self.ctx.filler_to_give) > 30:
-            for _ in range(20):
-                self.ctx.filler_to_give.popleft()
-
-            logger.info(f"Cleared 20 items from filler queue!\n"
-                        f"Updated Queue: {self.ctx.filler_to_give}")
-        else:
-            logger.info("Filler queue is less than 30, if an issue is still occurring, ping electrostarz")
+    # def _cmd_filler_reduce(self):
+    #     """Reduces the size of the filler queue by 20 if issues occur (Only if filler queue is more than 30)"""
+    #
+    #     if len(self.ctx.filler_to_give) > 30:
+    #         for _ in range(20):
+    #             self.ctx.filler_to_give.popleft()
+    #
+    #         logger.info(f"Cleared 20 items from filler queue!\n"
+    #                     f"Updated Queue: {self.ctx.filler_to_give}")
+    #     else:
+    #         logger.info("Filler queue is less than 30, if an issue is still occurring, ping electrostarz")
 
 
 # noinspection PyDeprecation
@@ -522,59 +521,7 @@ class MSMContext(SuperContext):
 
     # Here as placeholders, most will be replaced upon connection by slot data
 
-    enabled_sports: Any = ()
-    start_with_mushroom: Any = int
-    sports_mix_unlock: Any = int
-    court_unlock_type: Any = int
-    cup_unlock_type: Any = int
-    exhibition_type: Any = int
-    behemoth_hp: Any = float
-    behemoth_king_hp: Any = float
-    is_behemoth = False
-    is_behemoth_king = False
-    goal_condition: Any = int
-    win_cups_amount: Any = int
-    exhibition_difficulties: Any = ()
-    hard_tournament_difficulty: Any = bool
 
-    # Deathlink Stuff
-    deathlink_enabled: Any = False
-    deathlink_action: Any
-    deathlink_consequence: Any
-    deathlink_o_get_points: Any
-    deathlink_o_scores_points: Any
-    deathlink_boss_recovered: Any
-    deathlink_dodge_health_lost: Any
-
-    # Custom Tournament Settings
-    custom_basket_time: Any
-    enable_b_points: Any
-    b_points_win: Any
-    b_period: Any
-
-    custom_dodge_time: Any
-    d_period: Any
-    d_max_health: Any
-
-    v_points_win: Any
-    v_period: Any
-
-    custom_hockey_time: Any
-    enable_h_points: Any
-    h_points_win: Any
-    h_period: Any
-
-    party_modes: Any
-    party_mode_opponent: Any
-
-    # Sanity stuff
-    character_sanity: Any
-    send_both_character_sanity: Any = False
-    special_sanity: Any
-    court_sanity: Any
-    score_sanity: Any
-    score_sanity_max: Any
-    score_sanity_points_req: Any
 
     def __init__(self, server_address: str, password: str):
         super().__init__(server_address, password)
@@ -582,6 +529,63 @@ class MSMContext(SuperContext):
         self.items_received = []
         self.items_handled = set()
         self.seed: Optional[str] = None
+
+
+        self.goal_condition: int = 0
+        self.behemoth_hp: float = 0.0
+        self.behemoth_king_hp: float = 0.0
+        self.win_cups_amount: int = 0
+
+        self.enabled_sports: tuple = ()
+        self.start_with_mushroom: int = 0
+        self.exhibition_difficulties: tuple = ()
+        self.hard_tournament_difficulty: bool = False
+        self.sports_mix_unlock: int = 0
+        self.court_unlock_type: int = 0
+        self.cup_unlock_type: int = 0
+        self.exhibition_type: int = 0
+
+        self.is_behemoth: bool = False
+        self.is_behemoth_king: bool = False
+
+        # Deathlink Stuff
+        self.deathlink_enabled: bool = False
+        self.deathlink_action: int = 0
+        self.deathlink_consequence: int = 0
+        self.deathlink_o_get_points: int = 0
+        self.deathlink_o_scores_points: int = 0
+        self.deathlink_boss_recovered: float = 0.0
+        self.deathlink_dodge_health_lost: int = 0
+
+        # Custom Tournament Settings
+        self.custom_basket_time: int = 0
+        self.enable_b_points: bool = False
+        self.b_points_win: int = 0
+        self.b_period: int = 0
+
+        self.custom_dodge_time: int = 0
+        self.d_period: int = 0
+        self.d_max_health: int = 0
+
+        self.v_points_win: int = 0
+        self.v_period: int = 0
+
+        self.custom_hockey_time: int = 0
+        self.enable_h_points: bool = False
+        self.h_points_win: int = 0
+        self.h_period: int = 0
+
+        self.party_modes: tuple = ()
+        self.party_mode_opponent: int = 0
+
+        # Sanity stuff
+        self.character_sanity: int = 0
+        self.send_both_character_sanity: bool = False
+        self.special_sanity: int = 0
+        self.court_sanity: int = 0
+        self.score_sanity: int = 0
+        self.score_sanity_max: int = 0
+        self.score_sanity_points_req: int = 0
 
         # AP gives every received item a position/index in the received item list.
         # Use that index, not the item name, so duplicate filler items are handled separately.
@@ -597,6 +601,7 @@ class MSMContext(SuperContext):
         self.active_game_version = None
         self.unlocked_sports_mix = False
         self.locking_period = False
+        self.trap_running = False
 
         self.one_time_running = False
         self.item_processed = False
@@ -854,59 +859,59 @@ class MSMContext(SuperContext):
             self.slot_data = args.get("slot_data", {})
 
             # Goal Data
-            self.goal_condition = self.slot_data.get("goal_condition")
-            self.behemoth_hp = self.slot_data.get("behemoth_hp")
-            self.behemoth_king_hp = self.slot_data.get("behemoth_king_hp")
-            self.win_cups_amount = self.slot_data.get("win_cups_amount")
+            self.goal_condition = self.slot_data.get("goal_condition", 1) # Only default to 1 or 2
+            self.behemoth_hp = self.slot_data.get("behemoth_hp", 2400) # 2400 = Default
+            self.behemoth_king_hp = self.slot_data.get("behemoth_king_hp", 3000) # 3000 = Default
+            self.win_cups_amount = self.slot_data.get("win_cups_amount", 15) # Default in options.py
 
-            # Unlock Data
-            self.enabled_sports = self.slot_data.get("enabled_sports")
-            self.start_with_mushroom = self.slot_data.get("start_with_mushroom_cup")
-            self.exhibition_difficulties = self.slot_data.get("exhibition_difficulties")
-            self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty")
-            self.sports_mix_unlock = self.slot_data.get("sports_mix_unlock")
-            self.court_unlock_type = self.slot_data.get("court_unlock_type")
-            self.cup_unlock_type = self.slot_data.get("cup_unlock_type")
-            self.exhibition_type = self.slot_data.get("exhibition_type")
+            # Enabled/Unlock Data
+            self.enabled_sports = self.slot_data.get("enabled_sports", ())
+            self.start_with_mushroom = self.slot_data.get("start_with_mushroom_cup", 0)
+            self.exhibition_difficulties = self.slot_data.get("exhibition_difficulties", ())
+            self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty", 1)
+            self.sports_mix_unlock = self.slot_data.get("sports_mix_unlock", 0)
+            self.court_unlock_type = self.slot_data.get("court_unlock_type",0)
+            self.cup_unlock_type = self.slot_data.get("cup_unlock_type", 0)
+            self.exhibition_type = self.slot_data.get("exhibition_type", 0)
 
             # Deathlink Data
-            self.deathlink_enabled = self.slot_data.get("deathlink")
-            self.deathlink_action = self.slot_data.get("deathlink_action")
-            self.deathlink_consequence = self.slot_data.get("deathlink_consequence")
-            self.deathlink_o_get_points = self.slot_data.get("deathlink_opponent_get_points")
-            self.deathlink_o_scores_points = self.slot_data.get("deathlink_opponent_scores_points")
-            self.deathlink_boss_recovered = self.slot_data.get("deathlink_boss_health_recovered")
-            self.deathlink_dodge_health_lost = self.slot_data.get("deathlink_dodgeball_health_lost")
+            self.deathlink_enabled = self.slot_data.get("deathlink", False)
+            self.deathlink_action = self.slot_data.get("deathlink_action", 0)
+            self.deathlink_consequence = self.slot_data.get("deathlink_consequence", 0)
+            self.deathlink_o_get_points = self.slot_data.get("deathlink_opponent_get_points", 3)
+            self.deathlink_o_scores_points = self.slot_data.get("deathlink_opponent_scores_points", 15)
+            self.deathlink_boss_recovered = self.slot_data.get("deathlink_boss_health_recovered", 20)
+            self.deathlink_dodge_health_lost = self.slot_data.get("deathlink_dodgeball_health_lost", 20)
 
 
             # Custom Tournament Settings Data
-            self.custom_basket_time = self.slot_data.get("basket_time")
-            self.enable_b_points = self.slot_data.get("enable_b_points_win")
-            self.b_points_win = self.slot_data.get("b_points_win")
-            self.b_period = self.slot_data.get("b_period")
+            self.custom_basket_time = self.slot_data.get("basket_time", 2)
+            self.enable_b_points = self.slot_data.get("enable_b_points_win", False)
+            self.b_points_win = self.slot_data.get("b_points_win", 15)
+            self.b_period = self.slot_data.get("b_period", 2)
 
-            self.custom_dodge_time = self.slot_data.get("dodge_time")
-            self.d_period = self.slot_data.get("d_period")
-            self.d_max_health = self.slot_data.get("d_max_health")
+            self.custom_dodge_time = self.slot_data.get("dodge_time", 3)
+            self.d_period = self.slot_data.get("d_period", 2)
+            self.d_max_health = self.slot_data.get("d_max_health", 100)
 
 
-            self.v_points_win = self.slot_data.get("v_points_win")
-            self.v_period = self.slot_data.get("v_period")
+            self.v_points_win = self.slot_data.get("v_points_win", 15)
+            self.v_period = self.slot_data.get("v_period", 2)
 
-            self.custom_hockey_time = self.slot_data.get("hockey_time")
-            self.enable_h_points = self.slot_data.get("enable_h_points_win")
-            self.h_points_win = self.slot_data.get("h_points_win")
-            self.h_period = self.slot_data.get("h_period")
+            self.custom_hockey_time = self.slot_data.get("hockey_time", 3)
+            self.enable_h_points = self.slot_data.get("enable_h_points_win", False)
+            self.h_points_win = self.slot_data.get("h_points_win", 15)
+            self.h_period = self.slot_data.get("h_period", 2)
 
             # Party Mode Data
-            self.party_modes = self.slot_data.get("party_mode")
-            self.party_mode_opponent = self.slot_data.get("party_mode_opponent")
+            self.party_modes = self.slot_data.get("party_mode", ())
+            self.party_mode_opponent = self.slot_data.get("party_mode_opponent", 1)
 
             # Sanity Data
-            self.character_sanity = self.slot_data.get("character_sanity")
-            self.send_both_character_sanity = self.slot_data.get("send_both_character_sanity")
-            self.court_sanity = self.slot_data.get("court_sanity")
-            self.special_sanity = self.slot_data.get("special_sanity")
+            self.character_sanity = self.slot_data.get("character_sanity", 0)
+            self.send_both_character_sanity = self.slot_data.get("send_both_character_sanity", False)
+            self.court_sanity = self.slot_data.get("court_sanity", False)
+            self.special_sanity = self.slot_data.get("special_sanity", False)
             
 
             asyncio.create_task(self.update_death_link(self.deathlink_enabled))
@@ -1077,7 +1082,6 @@ class MSMContext(SuperContext):
         cutscene_active = self.game_interface.dolphin_client.read_byte(self.addresslib.cutscene_active_addr)
         loading_screen_active = self.game_interface.dolphin_client.read_word(self.addresslib.loading_screen_addr)
         human_players = self.game_interface.dolphin_client.read_byte(get_address(PlayerAddresses.human_players))
-        match_started = self.game_interface.dolphin_client.read_byte(get_address(MatchAddresses.match_started))
 
         is_paused = paused != 0
         is_cutscene = cutscene_active != 0
@@ -1086,12 +1090,13 @@ class MSMContext(SuperContext):
         is_demo = human_players == 0
 
         if is_paused or is_cutscene or is_loading or is_demo:
+            #print(f"P {is_paused}, C {is_cutscene}, L {is_loading}, D {is_demo}")
             return False
 
 
         party_modes = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
         if mode in party_modes:
-            if match_status != 0 or match_started != 1:
+            if match_status != 0:
                 return False
             if mode == "Harmony Hustle":
                 # Harmony Hustle is stupid and therefore has its own start address
@@ -1101,24 +1106,17 @@ class MSMContext(SuperContext):
 
         court_id, _ = self.game_interface.get_court()
         timer = self.game_interface.dolphin_client.read_float(self.addresslib.timer_addr)
-        custom_time = self.get_custom_time()
+        max_time = self.game_interface.dolphin_client.read_float(self.addresslib.max_time_addr)
         set_break = self.game_interface.dolphin_client.read_pointer(
             get_address(MatchAddresses.set_break), Pointers.Match.set_break_offsets, "word"
         )
+
         ready_game = False
 
-        if match_status == 0 and court_id not in not_match_prefix and custom_time is not None:
-            if mode == "Basketball":
-                target_time = custom_time if self.game_interface.current_tournament is not None \
-                    else self.game_interface.get_basketball_time()
-                ready_game = timer < target_time
-
-            elif mode == "Dodgeball":
-                target_time = custom_time if self.game_interface.current_tournament is not None \
-                    else self.game_interface.get_dodgeball_time()
-                ready_game = target_time == "Off" or timer < target_time
-
-            elif mode == "Volleyball":
+        if match_status == 0 and court_id not in not_match_prefix:
+            if mode in ["Basketball", "Dodgeball", "Hockey"]:
+                ready_game = timer < max_time
+            else:
                 if court_id == "s20":
                     try:
                         self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
@@ -1134,13 +1132,42 @@ class MSMContext(SuperContext):
                         ready_game = True
                     except RuntimeError:
                         ready_game = False
-            elif mode == "Hockey":
-                target_time = custom_time if self.game_interface.current_tournament is not None \
-                    else self.game_interface.get_hockey_time()
-                ready_game = timer < target_time
+
+            # if mode == "Basketball":
+            #     target_time = custom_time if self.game_interface.current_tournament is not None \
+            #         else self.game_interface.get_basketball_time()
+            #     ready_game = timer < target_time
+            #
+            # elif mode == "Dodgeball":
+            #     target_time = custom_time if self.game_interface.current_tournament is not None \
+            #         else self.game_interface.get_dodgeball_time()
+            #     ready_game = target_time == "Off" or timer < target_time
+            #
+            # elif mode == "Volleyball":
+            #     if court_id == "s20":
+            #         try:
+            #             self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
+            #                                                 Pointers.Boss.behemoth_hp_offsets)
+            #             ready_game = True
+            #         except RuntimeError:
+            #             ready_game = False
+            #     else:
+            #         try:
+            #             # Check if you can follow pointers to the address, if so, then ready
+            #             self.game_interface.dolphin_client.follow_pointers(self.addresslib.vbp_addr,
+            #                                                 Pointers.VBP.v_last_held_offsets)
+            #             ready_game = True
+            #         except RuntimeError:
+            #             ready_game = False
+            # elif mode == "Hockey":
+            #     target_time = custom_time if self.game_interface.current_tournament is not None \
+            #         else self.game_interface.get_hockey_time()
+            #     ready_game = timer < target_time
 
         if timer == 0 and self.mode_has_timer(mode):
             ready_game = False
+
+        #print(f"RG {ready_game}, SB {set_break}, MTCH {match_started}")
 
         return ready_game and set_break == 0
 
@@ -1840,8 +1867,10 @@ class MSMContext(SuperContext):
         special_charge = self.game_interface.dolphin_client.read_pointer(self.addresslib.p_special_meter_addr,
                                                                          Pointers.Player.special_meter_offsets,
                                                                          "float")
+
         if filler != "1 Coin" and current_item != -1:
             self.debug_log(f"Waiting to give {filler}; player already has item={current_item}")
+            return
         elif filler == "Special Meter Charge" and special_charge == 1.0:
             self.debug_log("Waiting to give Special Meter Charge; player has a full special meter")
             return
@@ -2031,7 +2060,7 @@ class MSMContext(SuperContext):
         if not self.traps_to_give:
             return
 
-        if not self.ready_to_handle():
+        if not self.ready_to_handle() or self.trap_running:
             self.debug_log(f"Waiting to trigger trap; game not ready. Queue size: {len(self.traps_to_give)}")
             return
 
@@ -2063,31 +2092,32 @@ class MSMContext(SuperContext):
 
         # Handle Function-based traps
         if trap in trap_mapping:
-            # If the trap is to freeze character 3, but we're only playing 2-on-2, send trap to either char 1 or 2
+            # If the trap is for character 3, but we're only playing 2-on-2, send trap to either char 1 or 2
             if trap == "Freeze Character 3 Trap" and self.game_interface.check_team_amount() == 2:
                 random_int = randint(1, 2)
                 logger.info(f"2-on-2 detected! Sending trap to character {random_int}")
-                redirected_trap = f"Freeze Character {random_int} Trap"
+                trap_to_send = f"Freeze Character {random_int} Trap"
 
-                # Execute the lambda wrapper function inside the task creation
-                asyncio.create_task(trap_mapping[redirected_trap]())
                 self.debug_log(f"Redirected Freeze Character 3 to character {random_int}")
-                await self.mark_consumable_handled(item_index)
+
             elif trap == "Teleport Character 3 Trap" and self.game_interface.check_team_amount() == 2:
                 random_int = randint(1, 2)
                 logger.info(f"2-on-2 detected! Sending trap to character {random_int}")
-                redirected_trap = f"Teleport Character {random_int} Trap"
+                trap_to_send = f"Teleport Character {random_int} Trap"
 
-                # Execute the lambda wrapper function inside the task creation
-                asyncio.create_task(trap_mapping[redirected_trap]())
                 self.debug_log(f"Redirected Teleport Character 3 to character {random_int}")
-                await self.mark_consumable_handled(item_index)
             else:
-                # For standalone methods, this runs them. For lambdas, it resolves the underlying coroutine.
-                asyncio.create_task(trap_mapping[trap]())
+                trap_to_send = trap
 
-                self.debug_log(f"Started trap task for {trap}")
-                await self.mark_consumable_handled(item_index)
+
+            # For standalone methods, this runs them. For lambdas, it resolves the underlying coroutine.
+            self.trap_running = True
+            task = asyncio.create_task(trap_mapping[trap_to_send]())
+            task.add_done_callback(self._on_trap_task_done)
+
+            self.debug_log(f"Started trap task for {trap_to_send}")
+            await self.mark_consumable_handled(item_index)
+
         else:
             logger.warning(f"Unknown trap item: {trap}")
             self.debug_log(f"Unknown trap {trap} consumed so it does not loop forever")
@@ -2095,6 +2125,13 @@ class MSMContext(SuperContext):
 
         # Prevents multiple traps from firing at the exact same millisecond
         await asyncio.sleep(0.1)
+
+    def _on_trap_task_done(self, task):
+        """Sets trap_running to false when the trap task is done"""
+
+        if task.exception():
+            logger.exception("Trap task failed", exc_info=task.exception())
+        self.trap_running = False
 
     async def run_freeze_trap(self, char_id: int):
         """Freezes the character in place for 5 seconds"""
@@ -2155,7 +2192,7 @@ class MSMContext(SuperContext):
         # Set timer
         end_time = asyncio.get_event_loop().time() + 5
 
-        # Freeze Loop
+        # Sometimes the game can set the value, keep it constant
         while asyncio.get_event_loop().time() < end_time:
             self.game_interface.dolphin_client.write_float(addr, speed)
             await asyncio.sleep(0.1)
@@ -2173,7 +2210,7 @@ class MSMContext(SuperContext):
         # Set timer
         end_time = asyncio.get_event_loop().time() + 5
 
-        # Freeze Loop
+        # Sometimes the game can set the value, keep it constant
         while asyncio.get_event_loop().time() < end_time:
             self.game_interface.dolphin_client.write_float(addr, speed)
             await asyncio.sleep(0.1)
@@ -2245,7 +2282,7 @@ class MSMContext(SuperContext):
     async def handle_custom_tournament_settings(self):
         """Awaits all functions to do with setting custom tournament settings"""
 
-        await self.set_custom_timer()
+        await self.set_custom_tournament_timer()
         await self.set_period_amount()
         await self.has_points_win()
         await self.set_custom_dodge_health()
@@ -2291,7 +2328,7 @@ class MSMContext(SuperContext):
         else:
             return 999999
 
-    async def set_custom_timer(self):
+    async def set_custom_tournament_timer(self):
         """Sets the custom timer depending on the sport and player's option.
         Volleyball doesn't have a timer."""
         new_time = None
@@ -2456,7 +2493,6 @@ class MSMContext(SuperContext):
 
         is_sports_mix = self.game_interface.is_sports_mix()
         _, court_name = self.game_interface.get_court()
-        match_status = self.game_interface.match_status()
 
         if court_name == "Behemoth Stage":
             if is_sports_mix:
@@ -2468,11 +2504,13 @@ class MSMContext(SuperContext):
                 self.is_behemoth = True
                 self.debug_log("Behemoth Found")
 
-            if match_status == 2:
-                self.boss_hp_handled = False
 
     async def handle_boss_hp(self):
         """Change the boss' HP depending on what boss it is and their custom health set"""
+
+        match_status = self.game_interface.match_status()
+        if match_status == 2:
+            self.boss_hp_handled = False
 
         if not self.boss_hp_handled and self.ready_to_handle():
             max_behemoth_hp = self.game_interface.dolphin_client.follow_pointers(self.addresslib.behemoth_hp_addr,
@@ -2811,7 +2849,7 @@ class MSMContext(SuperContext):
 
         match_status = self.game_interface.match_status()
 
-        if self.court_sanity == 0 or match_status != 1:
+        if not self.court_sanity or match_status != 1:
             return
 
         court_id, court_name = self.game_interface.get_court()
@@ -2825,7 +2863,7 @@ class MSMContext(SuperContext):
         """Sends the location when the player has used a special and if the character is unlocked"""
         special_active = self.game_interface.special_active()
 
-        if self.special_sanity == 0 or not special_active:
+        if not self.special_sanity or not special_active:
             return
 
 
@@ -3496,7 +3534,7 @@ class MSMContext(SuperContext):
             self.debug_log("Gecko Codes Handled")
             self.handled_gecko_codes = True
 
-    async def check_write(self, addr: int, type: str, correct_value: Any, string_length: int = 32) -> bool:
+    async def check_write(self, addr: int, type: str, correct_value: Any) -> bool:
         """Checks if the address has the correct value to it"""
         read = None
         match type.lower().strip():
@@ -3513,7 +3551,7 @@ class MSMContext(SuperContext):
 
         if read is not None:
             if type.lower().strip() == "string":
-                read_value = read(addr, string_length)
+                read_value = read(addr)
             else:
                 read_value = read(addr)
 
@@ -3527,9 +3565,10 @@ class MSMContext(SuperContext):
                             f"addr={hex(addr)}, type={type}, read_val={read_value}, corr_val={correct_value}")
                 return False
         else:
-            await self.delay_log(
-                f"Uh oh, I'm stupid! This read type doesn't exist! Please ping @electrostarz\n"
-                f"type={type}", 10
+
+            self.rate_log(
+                "check_write", f"Uh oh, I'm stupid! This read type doesn't exist! Please ping @electrostarz\n"
+                f"type={type}", 10, False
             )
             return False
 
@@ -3546,6 +3585,11 @@ class MSMContext(SuperContext):
 
     async def handle_in_match(self):
         """What functions should be handled during a match"""
+        # Custom Tournament Settings
+        if self.in_tournament_match:
+            await self.handle_custom_tournament_settings()
+
+
         # Cup Goal
         await self.track_cups_won()
         if self.goal_condition == 3:
@@ -3555,11 +3599,6 @@ class MSMContext(SuperContext):
         if self.goal_condition == 4:
             await self.track_exhibitions_won()
             await self.has_ex_goaled()
-
-
-        # Custom Tournament Settings
-        if self.in_tournament_match:
-            await self.handle_custom_tournament_settings()
 
         # Deathlink
         await self.handle_send_deathlink()

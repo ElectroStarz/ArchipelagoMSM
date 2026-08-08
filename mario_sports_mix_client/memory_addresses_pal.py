@@ -1,5 +1,5 @@
 class MatchAddresses:
-    game_code = 0x800000 # String
+    game_code = 0x80000000 # String
     match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_court = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
@@ -23,7 +23,6 @@ class MatchAddresses:
 
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL
-
 
 class PartyMode:
     difficulty = 0x804D7978 # Word | Also used for HH stage

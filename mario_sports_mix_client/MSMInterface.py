@@ -264,13 +264,12 @@ class MSMInterface:
             court_id = base_id[:3]
             court_name = court_names.get(court_id)
 
-            return court_id, court_name
         else:
 
             court_id = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
             court_name = harmony_mapping.get(court_id)
 
-            return court_id, court_name
+        return court_id, court_name
 
     def get_mode(self):
         string_stage = self.dolphin_client.read_string(get_address(MatchAddresses.current_court))
@@ -292,8 +291,6 @@ class MSMInterface:
             return "Volleyball"
         elif current_sport == "HO":
             return "Hockey"
-        else:
-            return None
 
     def get_tab(self):
         diff = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
@@ -387,10 +384,7 @@ class MSMInterface:
             value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
                                                      Pointers.Player.special_active_offsets, "word")
 
-            if value == 1:
-                return True
-            else:
-                return False
+            return bool(value)
         except RuntimeError:
             return False
 
