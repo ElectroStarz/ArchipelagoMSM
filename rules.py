@@ -518,18 +518,18 @@ def set_all_location_rules(world: MSMWorld) -> None:
     # === Sanity Locations ===
 
     # Character Sanity Locations
-    playable_match_rule = can_play_any_cup(world) | can_play_any_ex(world) | can_play_any_party(world)
+    playable_match_rule = can_play_any_cup(world) | can_play_any_ex(world)
 
     if world.options.character_sanity.value in (CharacterSanity.option_characters,
                                                 CharacterSanity.option_characters_and_costumes):
         for character in character_names:
             location = world.get_location(f"Win as {character}")
-            world.set_rule(location, Has(character) & playable_match_rule)
+            world.set_rule(location, Has(character) & (playable_match_rule | can_play_any_party(world)))
 
     if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         for costume, char in costume_names.items():
             location = world.get_location(f"Win as {costume}")
-            world.set_rule(location, HasAll(char, costume) & playable_match_rule)
+            world.set_rule(location, HasAll(char, costume) & (playable_match_rule | can_play_any_party(world)))
 
     # Court Sanity Locations
     if world.options.court_sanity.value:
