@@ -16,15 +16,16 @@ def run_client(*args: str) -> None:
     from .mario_sports_mix_client.main_client import launch_mario_sports_mix_client as launch_msm_client
     launch(launch_msm_client, name="Mario Sports Mix Client", args=args)
 
-icon_paths["SportMixIcon"] = f"ap:{__name__}/icon/SportMixIcon.png"
+icon_paths["SportsMixIcon"] = f"ap:{__name__}/icon/SportMixIcon.png"
 components.append(
     Component(
         "Mario Sports Mix Client",
+        script_name="Mario Sports Mix Client",
         func=run_client,
         game_name="Mario Sports Mix",
         component_type=Type.CLIENT,
         supports_uri=True,
-        icon="SportMixIcon",
+        icon="SportsMixIcon",
     )
 )
 
@@ -57,8 +58,8 @@ class MSMWebWorld(WebWorld):
     )
 
     setup_fr = Tutorial(
-        "Guide de configuration Multimonde.",
-        "Un guide pour configurer Mario Sports Mix MultiWorld.",
+        "Multiworld Setup Guide",
+        "A guide to setting up Mario Sports Mix for MultiWorld.",
         "Français",
         "setup_fr.md",
         "setup/fr",
@@ -129,10 +130,29 @@ class MSMWorld(World):
                 f"[Mario Sports Mix] {self.player_name}'s Boss Locations option is the same as their win condition!"
             )
 
-        if self.options.boss_locations.value in (1, 2) and not self.options.include_tournaments:
+        if self.options.boss_locations.value in (1, 2, 3) and not self.options.include_tournaments.value:
             raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s Boss Locations options requires tournaments but they don't"
+                f"[Mario Sports Mix] {self.player_name}'s Boss Locations option requires tournaments but they don't "
                 f"have them enabled!"
+            )
+
+        if self.options.boss_locations.value in (2, 3) and "Sports Mix" not in self.options.enabled_sports.value:
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name}'s Boss Locations option requires Sports Mix but they don't have"
+                f" it enabled!"
+            )
+
+        main_sports_enabled = {
+            sport for sport in self.options.enabled_sports.value
+            if sport in {"Basketball", "Dodgeball", "Volleyball", "Hockey"}
+        }
+        needs_behemoth = (
+            self.options.goal_condition.value == 1 or
+            self.options.boss_locations.value in (1, 3)
+        )
+        if needs_behemoth and not main_sports_enabled:
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name} requires Behemoth but has no main sport enabled."
             )
 
         # Max points voids deathlink points check
@@ -164,19 +184,56 @@ class MSMWorld(World):
                 f"[Mario Sports Mix] {self.player_name}'s goal condition requires Sports Mix but they don't have it enabled"
             )
 
-        if self.options.goal_condition.value == 4 and not self.options.include_exhibition.value:
-            raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s goal condition requires exhibitions but they don't have them enabled"
-            )
+        if self.options.goal_condition.value == 4:
+            if not self.options.include_exhibition.value:
+                raise OptionError(
+                    f"[Mario Sports Mix] {self.player_name}'s goal condition requires exhibitions but they don't have them enabled"
+                )
+            if self.options.exhibition_type.value != 0:
+                raise OptionError(
+                    f"[Mario Sports Mix] {self.player_name}'s Exhibition Tour goal requires Exhibition Type: All Sports."
+                )
+            if not self.options.exhibition_difficulties.value:
+                raise OptionError(
+                    f"[Mario Sports Mix] {self.player_name}'s Exhibition Tour goal requires at least one exhibition difficulty."
+                )
+            if not main_sports_enabled:
+                raise OptionError(
+                    f"[Mario Sports Mix] {self.player_name}'s Exhibition Tour goal requires at least one main sport."
+                )
 
         if self.options.goal_condition.value == 5 and len(self.options.party_mode.value) != 4:
             self.options.party_mode.value = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
 
-        if (self.options.goal_condition.value == 3 and
-           (not self.options.hard_tournament_difficulty.value and self.options.win_cups_amount.value > 12)):
+        has_tournament_match = bool(
+            self.options.include_tournaments.value and self.options.enabled_sports.value
+        )
+        has_exhibition_match = bool(
+            self.options.include_exhibition.value and
+            self.options.exhibition_difficulties.value and
+            main_sports_enabled
+        )
+        has_party_match = bool(self.options.party_mode.value)
+
+        if ((self.options.character_sanity.value or self.options.special_sanity.value) and
+                not (has_tournament_match or has_exhibition_match or has_party_match)):
             raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s Win Cups amount is larger than the amount of cups they can receive"
+                f"[Mario Sports Mix] {self.player_name}'s Character/Special Sanity requires at least one playable "
+                f"tournament, exhibition, or Party Mode match."
             )
+
+        if self.options.goal_condition.value == 3:
+            difficulty_count = 1 + int(bool(self.options.hard_tournament_difficulty.value))
+            max_cups = len(main_sports_enabled) * 3 * difficulty_count
+            if "Sports Mix" in self.options.enabled_sports.value:
+                max_cups += 3
+
+            if self.options.win_cups_amount.value > max_cups:
+                raise OptionError(
+                    f"[Mario Sports Mix] {self.player_name}'s Win Cups amount "
+                    f"({self.options.win_cups_amount.value}) is larger than the {max_cups} cups "
+                    f"available with the enabled sports/difficulties."
+                )
 
         time_values = [self.options.basket_time.value, self.options.hockey_time.value]
         enable_points = [self.options.b_points_win.value, self.options.h_points_win.value]

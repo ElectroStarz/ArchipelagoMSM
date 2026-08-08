@@ -26,7 +26,6 @@ courts_list = ["Mario Stadium", "Koopa Troopa Beach", "Toad Park", "DK Dock", "P
 class MSMLocation(Location):
     game = "Mario Sports Mix"
 
-
 class LocGroup(str, Enum):
     # === Cup Groups ===
     BASKETBALL_NORMAL_CUPS = "Basketball Normal Cups"
@@ -99,9 +98,6 @@ def create_all_locations(world: "MSMWorld") -> None:
 
 
 base_id = 0
-
-
-# Split from the original location_table. IDs, groups, and priorities are unchanged.
 
 cup_round_locations: Dict[str, LocData] = {
     # --- Normal ---
@@ -909,6 +905,16 @@ def create_regular_locations(world: MSMWorld) -> None:
                     regions[sport].add_locations(locations, MSMLocation)
 
             else:
+                # Universal exhibitions are only playable when at least one main
+                # sport is enabled. Do not create unreachable global exhibition
+                # checks for configurations such as Party Palooza + enabled_sports: [].
+                enabled_main_sports = {
+                    sport for sport in world.options.enabled_sports.value
+                    if sport in exhibition_courts
+                }
+                if not enabled_main_sports:
+                    continue
+
                 locations = get_location_names_with_ids([
                     f"Exhibition: Beat {court} ({difficulty})"
                     for court in courts_list
@@ -952,67 +958,69 @@ def create_regular_locations(world: MSMWorld) -> None:
         main_menu.add_locations(costume_locations)
 
     # Court Sanity Locations
-    # Can this be simplified? Probably. Will I? No. THIS TOOK SO LONG TO MAKE
-    if world.options.court_sanity:
+    if world.options.court_sanity.value:
         locations = {}
 
-        main_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "DK Dock",
-                       "Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
-                       "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction"]
-
-        smash_skate_courts = ["Sherbet Sea", "Fire Mountain", "Rowdy Raft"]
-
-        harmony_courts = ["Peach's Castle", "DK Dock", "Bowser Jr. Blvd."]
-
-        basket_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Daisy Garden",
-                         "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
-                         "Wario Factory", "Star Ship", "Western Junction"]
-
-        dodge_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Toad Park", "Daisy Garden",
-                        "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
-                        "Wario Factory", "Star Ship", "Western Junction"]
-
-        volley_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Toad Park", "Peach's Castle",
-                         "Bowser Jr. Blvd.", "Luigi's Mansion", "Ghoulish Galleon", "Bowser's Castle",
-                         "Waluigi Pinball", "Star Ship", "Western Junction"]
-
-        hockey_courts = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle", "Toad Park", "Daisy Garden",
-                         "Waluigi Pinball", "Luigi's Mansion", "Wario Factory", "Star Ship", "Ghoulish Galleon",
-                         "Bowser's Castle", "Western Junction"]
-
-        mode_to_court = {
-            "Basketball": basket_courts,
-            "Dodgeball": dodge_courts,
-            "Volleyball": volley_courts,
-            "Hockey": hockey_courts,
-            "Harmony Hustle": harmony_courts,
-            "Smash Skate": smash_skate_courts,
+        tournament_courts = {
+            "Basketball": {
+                "Mario Stadium", "Koopa Troopa Beach", "DK Dock",
+                "Luigi's Mansion", "Western Junction", "Daisy Garden",
+                "Bowser Jr. Blvd.", "Bowser's Castle", "Star Ship",
+            },
+            "Dodgeball": {
+                "Mario Stadium", "Koopa Troopa Beach", "Peach's Castle",
+                "DK Dock", "Toad Park", "Daisy Garden",
+                "Wario Factory", "Bowser's Castle", "Star Ship",
+            },
+            "Volleyball": {
+                "Mario Stadium", "Koopa Troopa Beach", "Peach's Castle",
+                "DK Dock", "Luigi's Mansion", "Western Junction",
+                "Bowser Jr. Blvd.", "Bowser's Castle", "Star Ship",
+            },
+            "Hockey": {
+                "Mario Stadium", "Toad Park", "Peach's Castle",
+                "Western Junction", "Wario Factory", "Daisy Garden",
+                "Bowser Jr. Blvd.", "Waluigi Pinball", "Star Ship",
+            },
         }
 
-        if world.options.include_tournaments.value or world.options.include_exhibition.value:
+        party_mode_courts = {
+            "Feed Petey": {"Daisy Garden", "DK Dock", "Wario Factory"},
+            "Harmony Hustle": {"Peach's Castle", "DK Dock", "Bowser Jr. Blvd."},
+            "Bob-omb Dodge": {"Mario Stadium", "Ghoulish Galleon", "Western Junction"},
+            "Smash Skate": {"Sherbet Sea", "Rowdy Raft", "Fire Mountain"},
+        }
 
-            if world.options.enabled_sports:
-                for sport in world.options.enabled_sports.value:
-                    if sport != "Sports Mix":
-                        # Get the viable courts_dict for the sport
-                        court_list = mode_to_court[sport]
+        playable_courts = set()
+        enabled_main_sports = {
+            sport for sport in world.options.enabled_sports.value
+            if sport in exhibition_courts
+        }
 
-                        for name in main_courts:
-                            # Make sure that court exists for the sport
-                            if name in court_list:
-                                location = get_location_names_with_ids([f"Win on {name}"])
-                                if f"Win on {name}" not in locations:
-                                    locations.update(location)
+        # Only create Court Sanity checks for courts that are playable in the
+        # generated configuration. Tournament-only seeds must not inherit the
+        # larger exhibition court lists.
+        if world.options.include_tournaments.value:
+            for sport in enabled_main_sports:
+                playable_courts.update(tournament_courts[sport])
 
-        if world.options.party_mode:
-            for mode in world.options.party_mode.value:
-                if mode in mode_to_court:
-                    court_list = mode_to_court[mode]
+        # An exhibition option with no selected difficulties creates no matches,
+        # so it must not create otherwise-unreachable Court Sanity checks.
+        if (world.options.include_exhibition.value and
+                world.options.exhibition_difficulties.value and
+                enabled_main_sports):
+            if world.options.exhibition_type.value == ExhibitionType.option_all_sports:
+                for sport in enabled_main_sports:
+                    playable_courts.update(exhibition_courts[sport])
+            else:
+                playable_courts.update(courts_list)
 
-                    for name in court_list:
-                        location = get_location_names_with_ids([f"Win on {name}"])
-                        if f"Win on {name}" not in locations:
-                            locations.update(location)
+        for mode in world.options.party_mode.value:
+            playable_courts.update(party_mode_courts.get(mode, set()))
+
+        for court in playable_courts:
+            location_name = f"Win on {court}"
+            locations.update(get_location_names_with_ids([location_name]))
 
         main_menu.add_locations(locations, MSMLocation)
 
@@ -1057,7 +1065,11 @@ def create_events(world: "MSMWorld") -> None:
             behemoth_king_boss.add_locations(behemoth_king_locations, MSMLocation)
 
     elif world.options.goal_condition.value == GoalCondition.option_exhibition_tour:
-        amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
+        amount = find_num_exhibition_locs(
+            world.options.enabled_sports.value,
+            world.options.exhibition_type.value,
+            world.options.exhibition_difficulties.value,
+        )
 
         main_menu.add_event(f"Win {amount} Exhibition Matches!", "Victory!", location_type=MSMLocation,
                             item_type=items.MSMItem)

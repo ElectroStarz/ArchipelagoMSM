@@ -2,7 +2,6 @@ from enum import Enum
 from typing import Dict, NamedTuple, TYPE_CHECKING
 from BaseClasses import Item, ItemClassification as IC
 from .options import *
-from .rules import can_play_any_cup, can_play_any_ex
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -404,15 +403,31 @@ def create_all_items(world: "MSMWorld") -> None:
         for character in characters:
             itempool.append(world.create_item(character))
 
-    # Create cups & courts based on options
-    if world.options.include_tournaments:
+    enabled_sports = world.options.enabled_sports.value
+    enabled_main_sports = {
+        sport for sport in enabled_sports
+        if sport in {"Basketball", "Dodgeball", "Volleyball", "Hockey"}
+    }
+    has_tournament_content = bool(
+        world.options.include_tournaments.value and enabled_sports
+    )
+    has_exhibition_content = bool(
+        world.options.include_exhibition.value
+        and world.options.exhibition_difficulties.value
+        and enabled_main_sports
+    )
+
+    # Create cups & courts only when that content can actually exist.
+    if has_tournament_content:
         create_cups(world, itempool)
 
-    if world.options.include_tournaments or world.options.include_exhibition:
+    if has_tournament_content or has_exhibition_content:
         create_courts(world, itempool)
 
     # Exhibition Difficulty Items
-    if world.options.include_exhibition:
+    # Universal exhibitions with no enabled main sport create no locations, so
+    # they must not inject dead progression items into the pool either.
+    if has_exhibition_content:
         selected_difficulties = set(world.options.exhibition_difficulties.value)
         first_difficulty = next(
             (difficulty for difficulty in ("Easy", "Normal", "Hard", "Expert")
@@ -429,8 +444,6 @@ def create_all_items(world: "MSMWorld") -> None:
         for difficulty in selected_difficulties:
             if difficulty != first_difficulty:
                 itempool.append(world.create_item(f"Exhibition {difficulty}"))
-
-    enabled_sports = world.options.enabled_sports.value
 
     # Start with Sports option
     if world.options.start_with_sports.value:
@@ -503,27 +516,6 @@ def create_all_items(world: "MSMWorld") -> None:
     # Submit to multiworld
     #print(itempool)
     world.multiworld.itempool += itempool
-
-    # # Create a state with ALL items in the multiworld
-    # all_state = world.multiworld.get_all_state(False, False, True, True)
-    # any_cup_rule = can_play_any_cup(world)
-    # any_ex_rule = can_play_any_ex()
-    #
-    # # 2. Get the current inventory state
-    #
-    # print("--- Special Sanity Debug ---")
-    # print(f"Has Special Meter? {all_state.has('Special Meter', world.player)}")
-    #
-    # print(f"Can play any cup? {any_cup_rule.resolve(world)(all_state)}")
-    # print(f"Can play any EX? {any_ex_rule.resolve(world)(all_state)}")
-    #
-    # for character in characters:
-    #     loc = world.get_location(f"Use {character}'s Special")
-    #     print(f"Has {character}? {all_state.has(character, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
-    #
-    # for mii in miis:
-    #     loc = world.get_location(f"Use {mii}'s Special")
-    #     print(f"Has {mii}? {all_state.has(mii, world.player)} | Loc Can Reach: {loc.can_reach(all_state)}")
 
 
 
