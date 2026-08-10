@@ -625,14 +625,17 @@ msm_option_groups = [
     ]),
     OptionGroup("Meme Options", [
         OopsAllCharacter,
+        ReplaceExtra,
         ShuffleMusic,
         TintStages,
+        TintVolleyball,
     ]),
 ]
 
 @dataclass
 class MSMOptions(PerGameCommonOptions):
     enabled_sports: EnabledSports
+    restrict_sports_mix: RestrictSportsMix
     include_tournaments: IncludeTournaments
     include_exhibition: IncludeExhibition
     start_with_sports: StartWithSports
