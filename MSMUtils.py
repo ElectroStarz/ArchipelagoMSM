@@ -1,4 +1,5 @@
 from typing_extensions import TYPE_CHECKING
+from .options import *
 
 if TYPE_CHECKING:
     from . import MSMWorld
@@ -31,25 +32,32 @@ courts_list = ["Mario Stadium", "Koopa Troopa Beach", "Toad Park", "DK Dock", "P
                "Luigi's Mansion", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle", "Waluigi Pinball",
                "Western Junction", "Ghoulish Galleon", "Star Ship"]
 
-def find_num_exhibition_locs(enabled_sports, exhibition_difficulty):
+def find_num_exhibition_locs(enabled_sports, ex_type, exhibition_difficulty):
     """Return the number of exhibition checks that this configuration creates.
 
     Sports Mix is a selectable sport but has no exhibition locations. Counting
     the generated names rather than applying a formula prevents it (and any
     future non-exhibition sport) from inflating the Exhibition Tour goal.
     """
-    return len(generate_exhibition_locations(enabled_sports, exhibition_difficulty))
+    return len(generate_exhibition_locations(enabled_sports, ex_type, exhibition_difficulty))
 
 
-def generate_exhibition_locations(sports, difficulties):
+def generate_exhibition_locations(sports, ex_type, difficulties):
     locations = []
 
     for diff in difficulties:
-        for sport in sports:
-            if sport != "Sports Mix":
-                courts = courts_by_sport.get(sport, [])
+        if ex_type == ExhibitionType.option_all_sports:
+            for sport in sports:
+                if sport != "Sports Mix":
+                    courts = courts_by_sport.get(sport, [])
 
-                for court in courts:
-                    locations.append(f"{sport} Ex: Beat {court} ({diff})")
+                    for court in courts:
+                        locations.append(f"{sport} Ex: Beat {court} ({diff})")
+        else:
+            # Universal exhibitions still need at least one main sport to play.
+            # Sports Mix by itself cannot satisfy the exhibition rule.
+            if any(sport in courts_by_sport for sport in sports):
+                for court in courts_list:
+                    locations.append(f"Exhibition: Beat {court} ({diff})")
 
     return locations

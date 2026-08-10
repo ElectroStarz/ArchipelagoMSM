@@ -114,7 +114,7 @@ class MusicFiles:
     
 
 class MatchAddresses:
-    game_code = 0x800000 # String
+    game_code = 0x80000000 # String
     match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_court = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
@@ -235,7 +235,6 @@ class TournamentAddresses:
     ff_team_character_2 = 0x804D780B # Byte
     ff_team_character_3 = 0x804D780D # Byte
     
-
 
 
 

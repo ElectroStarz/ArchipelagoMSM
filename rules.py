@@ -237,10 +237,8 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
         # If Main Sport
         return Has(f"{sport}: {cup_name} Cup ({category})")
 
-
-# Completely rewritten since the original did not account for Progressive Courts
+# Credit to Puffy for adding Progressive Court compatibility!!
 def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
-
     round_1_courts = {
         "Mushroom": ["Mario Stadium"],
         "Flower": ["Luigi's Mansion", "DK Dock", "Western Junction"],
@@ -259,30 +257,28 @@ def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
         "Star": ["Star Ship"]
     }
 
-    required_courts = []
-
     if round_num == 1:
         required_courts = round_1_courts.get(cup_name, [])
     elif round_num == 2:
         required_courts = round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
     elif round_num == 3:
-        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
+        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(
+            cup_name, [])
     else:
-        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
+        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(
+            cup_name, [])
         return HasAny(*required_courts)
-
 
     if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         needed_count = 0
         for court in required_courts:
             if courts_dict[court] > needed_count:
                 needed_count = courts_dict[court]
-        
+
         return Has("Progressive Court", needed_count)
-    
+
     else:
         return HasAll(*required_courts)
-
 
 def get_all_cup_locations(world):
     locations = []
@@ -350,57 +346,80 @@ def get_all_party_location_rules(world: MSMWorld):
     return combined_rule
 
 
-def can_play_any_cup(world: MSMWorld) -> Rule:
-    """
-    Returns a combined Rule representing:
-    (Has(Cup1) & Has(first_court)) | (Has(Cup2) & Has(first_court)) | ...
-    """
-    sub_rules = []
+def _any_reachable_location(location_names: list[str]) -> Rule:
+    """Return a rule that is true when at least one listed location is reachable."""
+    if not location_names:
+        return False_()
 
-    for sport in all_sports:
-        sport_data = tournament_rules.get(sport, {})
-
-        for cup in cups:
-            associated_courts = sport_data.get(cup, []) if sport != "Sports Mix" else courts_list
-            first_court = associated_courts[0]
-            if not associated_courts:
-                continue
-
-            # Determine cup requirement logic depending on progressive settings
-            if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
-                needed_normal = get_unified_cup_level(world, "Normal", cup)
-                cup_rule_cond = Has("Progressive Cup", needed_normal)
-
-                if world.options.hard_tournament_difficulty.value:
-                    needed_hard = get_unified_cup_level(world, "Hard", cup)
-                    cup_rule_cond |= Has("Progressive Cup", needed_hard)
-            else:
-                if sport != "Sports Mix":
-                    cup_rule_cond = Has(f"{sport}: {cup} Cup (Normal)")
-                    if world.options.hard_tournament_difficulty:
-                        cup_rule_cond |= Has(f"{sport}: {cup} Cup (Hard)")
-                else:
-                    cup_rule_cond = Has(f"Sports Mix: {cup} Cup")
-
-            any_cup_rule = cup_rule_cond & Has(first_court)
-            sub_rules.append(any_cup_rule)
-
-    if not sub_rules:
-        return Rule()
-
-    # Safely chain the rules together with the OR (|) operator
-    combined_rule = sub_rules[0]
-    for rule in sub_rules[1:]:
+    rules = [CanReachLocation(name) for name in location_names]
+    combined_rule = rules[0]
+    for rule in rules[1:]:
         combined_rule |= rule
-
     return combined_rule
 
 
-def can_play_any_ex() -> Rule:
-    """Returns if the player has any main sport, ex diff and any court"""
+def can_play_any_cup(world: MSMWorld) -> Rule:
+    """Return whether at least one generated tournament match can be played."""
+    if not world.options.include_tournaments.value:
+        return False_()
 
-    ex_diffs = ["Exhibition Easy", "Exhibition Normal", "Exhibition Hard", "Exhibition Expert"]
-    return HasAny(*main_sports) & HasAny(*ex_diffs) & HasAny(*courts_list)
+    location_names = []
+    difficulties = ["Normal"]
+    if world.options.hard_tournament_difficulty.value:
+        difficulties.append("Hard")
+
+    for sport in world.options.enabled_sports.value:
+        if sport in main_sports:
+            for difficulty in difficulties:
+                for cup in cups:
+                    location_names.append(f"{sport}: Beat {difficulty} {cup} Cup Round 1")
+        elif sport == "Sports Mix":
+            for cup in cups:
+                location_names.append(f"Sports Mix: Beat {cup} Cup Round 1")
+
+    return _any_reachable_location(location_names)
+
+
+def can_play_any_ex(world: MSMWorld) -> Rule:
+    """Return whether at least one generated exhibition match can be played."""
+    if (not world.options.include_exhibition.value or
+            not world.options.exhibition_difficulties.value or
+            not any(sport in main_sports for sport in world.options.enabled_sports.value)):
+        return False_()
+
+    location_names = generate_exhibition_locations(
+        world.options.enabled_sports.value,
+        world.options.exhibition_type.value,
+        world.options.exhibition_difficulties.value,
+    )
+    return _any_reachable_location(location_names)
+
+
+def can_play_any_party(world: MSMWorld) -> Rule:
+    """Return whether at least one generated Party Mode match can be played."""
+    location_names = []
+    party_mode_to_courts = {
+        "Feed Petey": feed_petey_courts,
+        "Harmony Hustle": harmony_hustle_songs,
+        "Bob-omb Dodge": bob_omb_dodge_courts,
+        "Smash Skate": smash_skate_courts,
+    }
+    party_mode_to_tabs = {
+        "Feed Petey": ["Apple", "Watermelon"],
+        "Bob-omb Dodge": ["Bob-omb", "Cannon"],
+        "Smash Skate": ["Hockey Stick", "Hockey Skate"],
+    }
+
+    for mode in world.options.party_mode.value:
+        courts = party_mode_to_courts.get(mode, [])
+        if mode == "Harmony Hustle":
+            location_names.extend(f"{mode}: Beat {song}" for song in courts)
+        else:
+            for court in courts:
+                for tab in party_mode_to_tabs.get(mode, []):
+                    location_names.append(f"{mode}: Beat {court} ({tab})")
+
+    return _any_reachable_location(location_names)
 
 
 @dataclasses.dataclass()
@@ -436,7 +455,8 @@ class CanExGoal(Rule["MSMWorld"], game="Mario Sports Mix"):
 
     @override
     def _instantiate(self, world: "MSMWorld") -> Rule.Resolved:
-        valid_ex_locations = generate_exhibition_locations(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
+        valid_ex_locations = generate_exhibition_locations(world.options.enabled_sports.value, world.options.exhibition_type.value,
+                                                           world.options.exhibition_difficulties.value)
 
         # Convert the location strings into actual Rule objects
         location_rules = [CanReachLocation(loc) for loc in valid_ex_locations]
@@ -444,7 +464,8 @@ class CanExGoal(Rule["MSMWorld"], game="Mario Sports Mix"):
         resolved_rules = tuple([rule.resolve(world) for rule in location_rules])
 
         return CanExGoal.Resolved(
-            num_ex_locations = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value),
+            num_ex_locations = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_type.value,
+                                                        world.options.exhibition_difficulties.value),
             valid_ex_rules=resolved_rules,
             player=world.player,
         )
@@ -464,6 +485,7 @@ class CanExGoal(Rule["MSMWorld"], game="Mario Sports Mix"):
 def set_all_rules(world: MSMWorld) -> None:
     set_all_location_rules(world)
     set_all_entrance_rules(world)
+
     set_goal_rules(world)
     set_completion_condition(world)
 
@@ -483,10 +505,21 @@ def set_all_location_rules(world: MSMWorld) -> None:
                             world.set_rule(location,
                                            Has(sport) & court_rule(world, court, False) & Has(f"Exhibition {difficulty}"))
             else:
+                enabled_main_sports = [
+                    sport for sport in world.options.enabled_sports.value
+                    if sport in main_sports
+                ]
+                if not enabled_main_sports:
+                    continue
+
                 for court in courts_list:
                     location = world.get_location(f"Exhibition: Beat {court} ({difficulty})")
-                    world.set_rule(location,
-                                   HasAny(*main_sports) & court_rule(world, court, False) & Has(f"Exhibition {difficulty}"))
+                    world.set_rule(
+                        location,
+                        HasAny(*enabled_main_sports)
+                        & court_rule(world, court, False)
+                        & Has(f"Exhibition {difficulty}")
+                    )
 
     # Tournament cup rules
     cup_difficulties = ["Normal"]
@@ -624,75 +657,26 @@ def set_all_location_rules(world: MSMWorld) -> None:
     # === Sanity Locations ===
 
     # Character Sanity Locations
+    playable_match_rule = can_play_any_cup(world) | can_play_any_ex(world)
+
     if world.options.character_sanity.value in (CharacterSanity.option_characters,
                                                 CharacterSanity.option_characters_and_costumes):
         for character in character_names:
             location = world.get_location(f"Win as {character}")
-            world.set_rule(location, Has(character) & (can_play_any_cup(world) | can_play_any_ex()))
+            world.set_rule(location, Has(character) & (playable_match_rule | can_play_any_party(world)))
 
     if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         for costume, char in costume_names.items():
             location = world.get_location(f"Win as {costume}")
-            world.set_rule(location, HasAll(char, costume) & (can_play_any_cup(world) | can_play_any_ex()))
+            world.set_rule(location, HasAll(char, costume) & (playable_match_rule | can_play_any_party(world)))
 
     # Court Sanity Locations
     if world.options.court_sanity.value:
-        sport_court_to_cups = {
-            "Basketball": {
-                "Mario Stadium": ["Mushroom Cup"],
-                "Koopa Troopa Beach": ["Mushroom Cup"],
-                "DK Dock": ["Mushroom Cup"],
-                "Luigi's Mansion": ["Flower Cup"],
-                "Western Junction": ["Flower Cup"],
-                "Daisy Garden": ["Flower Cup"],
-                "Bowser Jr. Blvd.": ["Star Cup"],
-                "Bowser's Castle": ["Star Cup"],
-                "Star Ship": ["Star Cup"],
-            },
-            "Dodgeball": {
-                "Mario Stadium": ["Mushroom Cup"],
-                "Koopa Troopa Beach": ["Mushroom Cup"],
-                "Peach's Castle": ["Mushroom Cup"],
-                "DK Dock": ["Flower Cup"],
-                "Toad Park": ["Flower Cup"],
-                "Daisy Garden": ["Flower Cup"],
-                "Wario Factory": ["Star Cup"],
-                "Bowser's Castle": ["Star Cup"],
-                "Star Ship": ["Star Cup"],
-            },
-            "Volleyball": {
-                "Mario Stadium": ["Mushroom Cup"],
-                "Koopa Troopa Beach": ["Mushroom Cup"],
-                "Peach's Castle": ["Mushroom Cup"],
-                "DK Dock": ["Flower Cup"],
-                "Luigi's Mansion": ["Flower Cup"],
-                "Western Junction": ["Flower Cup"],
-                "Bowser Jr. Blvd.": ["Star Cup"],
-                "Bowser's Castle": ["Star Cup"],
-                "Star Ship": ["Star Cup"],
-            },
-            "Hockey": {
-                "Mario Stadium": ["Mushroom Cup"],
-                "Toad Park": ["Mushroom Cup"],
-                "Peach's Castle": ["Mushroom Cup"],
-                "Western Junction": ["Flower Cup"],
-                "Wario Factory": ["Flower Cup"],
-                "Daisy Garden": ["Flower Cup"],
-                "Bowser Jr. Blvd.": ["Star Cup"],
-                "Waluigi Pinball": ["Star Cup"],
-                "Star Ship": ["Star Cup"],
-            },
-        }
-
-        mode_to_court = {
-            "Basketball": list(sport_court_to_cups.get("Basketball", {}).keys()),
-            "Dodgeball": list(sport_court_to_cups.get("Dodgeball", {}).keys()),
-            "Volleyball": list(sport_court_to_cups.get("Volleyball", {}).keys()),
-            "Hockey": list(sport_court_to_cups.get("Hockey", {}).keys()),
-            "Feed Petey": feed_petey_courts,
-            "Harmony Hustle": harmony_hustle_courts,
-            "Bob-omb Dodge": bob_omb_dodge_courts,
-            "Smash Skate": smash_skate_courts,
+        tournament_court_rounds = {
+            sport: {court: (cup, round_num)
+                    for cup, court_list in cup_map.items()
+                    for round_num, court in enumerate(court_list, start=1)}
+            for sport, cup_map in tournament_rules.items()
         }
 
         hh_court_to_song = {
@@ -700,90 +684,78 @@ def set_all_location_rules(world: MSMWorld) -> None:
             "Bowser Jr. Blvd.": ["Chocobo Rhythm", "Chocobo Pop", "Chocobo Beat", "Star Mix Medley"],
             "DK Dock": ["Mario Athletic", "Punk Athletic", "Island Athletic", "Blossom Mix Medley"],
         }
+        party_mode_courts = {
+            "Feed Petey": feed_petey_courts,
+            "Harmony Hustle": harmony_hustle_courts,
+            "Bob-omb Dodge": bob_omb_dodge_courts,
+            "Smash Skate": smash_skate_courts,
+        }
+        party_mode_tabs = {
+            "Feed Petey": ["Apple", "Watermelon"],
+            "Bob-omb Dodge": ["Bob-omb", "Cannon"],
+            "Smash Skate": ["Hockey Stick", "Hockey Skate"],
+        }
 
-        def apply_all_court_rules():
-            all_unique_courts = set()
-            for courts in mode_to_court.values():
-                all_unique_courts.update(courts)
+        for win_location in [loc for loc in world.multiworld.get_locations(world.player)
+                             if loc.name.startswith("Win on ")]:
+            court_name = win_location.name.removeprefix("Win on ")
+            match_locations = []
 
-            for court_name in all_unique_courts:
-                try:
-                    win_location = world.get_location(f"Win on {court_name}")
-                except KeyError:
+            if world.options.include_tournaments.value:
+                difficulties = ["Normal"]
+                if world.options.hard_tournament_difficulty.value:
+                    difficulties.append("Hard")
+
+                for sport in world.options.enabled_sports.value:
+                    court_data = tournament_court_rounds.get(sport, {}).get(court_name)
+                    if court_data is None:
+                        continue
+                    cup, round_num = court_data
+                    for difficulty in difficulties:
+                        match_locations.append(
+                            f"{sport}: Beat {difficulty} {cup} Cup Round {round_num}"
+                        )
+
+            if (world.options.include_exhibition.value and
+                    world.options.exhibition_difficulties.value):
+                if world.options.exhibition_type.value == ExhibitionType.option_all_sports:
+                    for sport in world.options.enabled_sports.value:
+                        if court_name in exhibition_rules.get(sport, []):
+                            for difficulty in world.options.exhibition_difficulties.value:
+                                match_locations.append(
+                                    f"{sport} Ex: Beat {court_name} ({difficulty})"
+                                )
+                elif any(sport in main_sports for sport in world.options.enabled_sports.value):
+                    if court_name in courts_list:
+                        for difficulty in world.options.exhibition_difficulties.value:
+                            match_locations.append(
+                                f"Exhibition: Beat {court_name} ({difficulty})"
+                            )
+
+            for mode in world.options.party_mode.value:
+                if court_name not in party_mode_courts.get(mode, []):
                     continue
-
-                court_valid_rules = []
-
-                if world.options.include_tournaments or world.options.include_exhibition:
-                    for sport_name in world.options.enabled_sports.value:
-                        tournament_cups = sport_court_to_cups.get(sport_name, {}).get(court_name, [])
-                        has_exhibition_match = court_name in exhibition_rules.get(sport_name, [])
-
-                        if tournament_cups or has_exhibition_match:
-                            if court_name in courts_dict:
-                                court_access_rule = court_rule(world, court_name, False)
-                            else:
-                                court_access_rule = Has(court_name)
-
-                            base_sport_rule = Has(sport_name) & court_access_rule
-
-                            formatted_cups = [f"{sport_name}: {cup_name} ({diff})" for cup_name in tournament_cups
-                                              for diff in cup_difficulties]
-
-                            allowed_modes = []
-
-                            if formatted_cups:
-                                allowed_modes.append(
-                                    HasAny(*formatted_cups, options=[OptionFilter(IncludeTournaments, IncludeTournaments.option_true)])
-                                )
-                            if has_exhibition_match:
-                                ex_diffs = [f"Exhibition {diff}"
-                                            for diff in world.options.exhibition_difficulties.value]
-                                allowed_modes.append(
-                                    HasAny(*ex_diffs, options=[OptionFilter(IncludeExhibition, IncludeExhibition.option_true)])
-                                )
-
-                            if allowed_modes:
-                                mode_rule = allowed_modes[0]
-                                for mode in allowed_modes[1:]:
-                                    mode_rule |= mode
-
-                                court_valid_rules.append(base_sport_rule & mode_rule)
-
-                for party_name in world.options.party_mode.value:
-                    if party_name in mode_to_court and court_name in mode_to_court[party_name]:
-                        if court_name in courts_dict:
-                            court_access_rule = court_rule(world, court_name, False)
-                        else:
-                            court_access_rule = Has(court_name)
-
-                        if party_name == "Harmony Hustle":
-                            hh_court_list = hh_court_to_song[court_name]
-                            party_rule = Has(party_name) & court_access_rule & HasAny(*hh_court_list)
-                        else:
-                            party_rule = Has(party_name) & court_access_rule
-
-                        court_valid_rules.append(party_rule)
-
-                if court_valid_rules:
-                    final_court_rule = court_valid_rules[0]
-                    for valid_rule in court_valid_rules[1:]:
-                        final_court_rule |= valid_rule
-                    world.set_rule(win_location, final_court_rule)
+                if mode == "Harmony Hustle":
+                    match_locations.extend(
+                        f"Harmony Hustle: Beat {song}"
+                        for song in hh_court_to_song.get(court_name, [])
+                    )
                 else:
-                    world.set_rule(win_location, False_())
+                    match_locations.extend(
+                        f"{mode}: Beat {court_name} ({tab})"
+                        for tab in party_mode_tabs.get(mode, [])
+                    )
 
-        apply_all_court_rules()
+            world.set_rule(win_location, _any_reachable_location(match_locations))
 
     if world.options.special_sanity.value:
         for character in character_names:
             location = world.get_location(f"Use {character}'s Special")
-            world.set_rule(location, Has("Special Meter") & Has(character) &
-                           (can_play_any_cup(world) | can_play_any_ex()))
+            world.set_rule(location, Has("Special Meter") & Has(character) & playable_match_rule)
 
 def set_all_entrance_rules(world: MSMWorld) -> None:
     cup_tiers = ["Mushroom", "Flower", "Star"]
-    hard_enabled = bool(world.options.hard_tournament_difficulty)
+    hard_enabled = bool(world.options.hard_tournament_difficulty.value)
 
     sports_mix_rule = (
         (Has("Sports Mix", options=[OptionFilter(SportsMixUnlock, SportsMixUnlock.option_sports_mix_item)]) |
@@ -900,9 +872,12 @@ def set_goal_rules(world: MSMWorld) -> None:
             if world.options.hard_tournament_difficulty:
                 valid_behemoth_hard_rules.append(CanReachLocation(f"{sport}: Beat Hard Star Cup Round 3"))
 
-    behemoth_normal_rule = valid_behemoth_normal_rules[0]
-    for access_rule in valid_behemoth_normal_rules[1:]:
-        behemoth_normal_rule &= access_rule
+    if valid_behemoth_normal_rules:
+        behemoth_normal_rule = valid_behemoth_normal_rules[0]
+        for access_rule in valid_behemoth_normal_rules[1:]:
+            behemoth_normal_rule &= access_rule
+    else:
+        behemoth_normal_rule = False_()
 
     if valid_behemoth_hard_rules:
         behemoth_hard_rule = valid_behemoth_hard_rules[0]
@@ -924,12 +899,12 @@ def set_goal_rules(world: MSMWorld) -> None:
 
     if world.options.goal_condition.value == GoalCondition.option_defeat_behemoth:
         world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
-        if world.options.boss_locations == BossLocations.option_defeat_behemoth_king:
+        if world.options.boss_locations.value == BossLocations.option_defeat_behemoth_king:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
     elif world.options.goal_condition.value == GoalCondition.option_defeat_behemoth_king:
         world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
-        if world.options.boss_locations == BossLocations.option_defeat_behemoth:
+        if world.options.boss_locations.value == BossLocations.option_defeat_behemoth:
             world.set_rule(world.get_location("Defeat Behemoth!"), final_behemoth_rule)
 
     elif world.options.goal_condition.value == GoalCondition.option_win_cups:
@@ -943,7 +918,8 @@ def set_goal_rules(world: MSMWorld) -> None:
             world.set_rule(world.get_location("Defeat Behemoth King!"), behemoth_king_rule)
 
     elif world.options.goal_condition.value == GoalCondition.option_exhibition_tour:
-        amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_difficulties.value)
+        amount = find_num_exhibition_locs(world.options.enabled_sports.value, world.options.exhibition_type.value,
+                                          world.options.exhibition_difficulties.value)
 
         world.set_rule(world.get_location(f"Win {amount} Exhibition Matches!"), CanExGoal().resolve(world))
 

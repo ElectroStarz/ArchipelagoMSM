@@ -501,7 +501,7 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
     # Start with random characters option
-    # This only uses the main roster as getting characters outside
+    # This only uses the main mario roster as getting characters outside
     # the main roster before getting characters in the roster can bug
     # the game and make them not appear
     row_1 = ["Mario", "Peach",   "Wario",       "Diddy Kong"]
@@ -539,17 +539,33 @@ def create_all_items(world: "MSMWorld") -> None:
         for character in characters:
             itempool.append(world.create_item(character))
 
-    # Create cups & courts based on options
-    if world.options.include_tournaments:
+    enabled_sports = world.options.enabled_sports.value
+    enabled_main_sports = {
+        sport for sport in enabled_sports
+        if sport in {"Basketball", "Dodgeball", "Volleyball", "Hockey"}
+    }
+    has_tournament_content = bool(
+        world.options.include_tournaments.value and enabled_sports
+    )
+    has_exhibition_content = bool(
+        world.options.include_exhibition.value
+        and world.options.exhibition_difficulties.value
+        and enabled_main_sports
+    )
+
+    # Create cups & courts only when that content can actually exist.
+    if has_tournament_content:
         create_cups(world, itempool)
         if world.options.include_alt_paths:
             create_alt_paths(world, itempool)
 
-    if world.options.include_tournaments or world.options.include_exhibition:
+    if has_tournament_content or has_exhibition_content:
         create_courts(world, itempool)
 
     # Exhibition Difficulty Items
-    if world.options.include_exhibition:
+    # Universal exhibitions with no enabled main sport create no locations, so
+    # they must not inject dead progression items into the pool either.
+    if has_exhibition_content:
         selected_difficulties = set(world.options.exhibition_difficulties.value)
         first_difficulty = next(
             (difficulty for difficulty in ("Easy", "Normal", "Hard", "Expert")
@@ -567,23 +583,11 @@ def create_all_items(world: "MSMWorld") -> None:
             if difficulty != first_difficulty:
                 itempool.append(world.create_item(f"Exhibition {difficulty}"))
 
-    enabled_sports = world.options.enabled_sports.value
-
     # Start with Sports option
-    if world.options.start_with_sports.value > 0:
-        available_sports = [s for s in enabled_sports if s != "Sports Mix"]
-
-        # Make sure we don't try to sample more Sports than available
-        sample_size = min(world.options.start_with_sports.value, len(available_sports))
-
-        given_sports: list[str] = world.random.sample(available_sports, sample_size)
-
+    if world.options.start_with_sports.value:
         for sport in enabled_sports:
-            if sport in given_sports:
+            if sport != "Sports Mix":
                 world.push_precollected(world.create_item(sport))
-            else:
-                itempool.append(world.create_item(sport))
-
     else:
         for sport in enabled_sports:
             if sport != "Sports Mix":
@@ -972,18 +976,18 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     # access rules.
 
     # Character Sanity (Characters)
-    if (world.options.character_sanity == CharacterSanity.option_characters or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+    if (world.options.character_sanity.value == CharacterSanity.option_characters or
+        world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes):
         if name in characters or name in miis:
             classification = IC.progression
 
     # Character Sanity (Costumes)
-    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+    if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         if name in character_costumes:
             classification = IC.progression
 
     # Special Sanity
-    if name == "Special Meter" and world.options.special_sanity:
+    if (name == "Special Meter" or name in characters or name in miis) and world.options.special_sanity.value:
         classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
