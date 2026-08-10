@@ -16,6 +16,11 @@ Behemoth King **requires** Sports Mix enabled"""
     valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
     default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
 
+class RestrictSportsMix(Toggle):
+    """Sports Mix will only choose between enabled sports."""
+    display_name = "Restrict Sports Mix"
+    default = True
+
 class IncludeTournaments(DefaultOnToggle):
     """Include tournament locations and items"""
     display_name = "Include Tournaments"
@@ -518,6 +523,11 @@ class OopsAllCharacter(Choice):
     option_black_mage = 18
     default = 0
 
+class ReplaceExtra(Toggle):
+    """Choose whether to also replace the Goalie in Hockey and the Yoshi in Dodgeball"""
+    display_name = "Replace Extra Characters"
+    default = False
+
 class ShuffleMusic(Choice):
     """Meme Option, Shuffles the music in the game"""
     option_off = 0
@@ -526,13 +536,23 @@ class ShuffleMusic(Choice):
     default = 0
 
 class TintStages(Toggle):
-    """Randomly tints each stage. Colors are limited to avoid any eye straining colors."""
+    """Randomly tints each stage. Colors are limited to avoid any eye straining colors.
+    Volleyball has some issues and will not be tinted as a result."""
     display_name = "Tint Stages"
+    default = False
+
+class TintVolleyball(Toggle):
+    """EPILEPSY WARNING! DO NOT ENABLE IF YOU'RE SENSITVE TO FLASHING LIGHTS
+    
+    Volleyball has some issues with tinting, flickering back to white constantly
+    for a single frame during gameplay. Enable this option only if your okay with this."""
+    display_name = "Tint Volleyball"
     default = False
 
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
+        RestrictSportsMix,
         IncludeExhibition,
         IncludeTournaments,
         StartWithSports,
@@ -680,7 +700,9 @@ class MSMOptions(PerGameCommonOptions):
 
     # Meme Stuff
     oops_all_character: OopsAllCharacter
+    replace_extra: ReplaceExtra
     shuffle_music: ShuffleMusic
     random_tint: TintStages
+    tint_volleyball: TintVolleyball
 
     start_inventory_from_pool: StartInventoryPool

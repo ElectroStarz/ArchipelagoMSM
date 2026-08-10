@@ -550,6 +550,7 @@ class MSMContext(SuperContext):
         self.win_cups_amount: int = 0
 
         self.enabled_sports: tuple = ()
+        self.restrict_sports_mix: bool = False
         self.start_with_mushroom: int = 0
         self.exhibition_difficulties: tuple = ()
         self.hard_tournament_difficulty: bool = False
@@ -604,9 +605,13 @@ class MSMContext(SuperContext):
         self.score_sanity_max: int = 0
         self.score_sanity_points_req: int = 0
 
-        # Meme Options
-        self.oops_all_character: Any = int
-        self.shuffle_music: Any = int
+        # Cosmetic Options
+        self.oops_all_character: int = 0
+        self.replace_extra: bool = False
+        self.shuffle_music: int = 0
+        self.random_tint: int = 0
+        self.tint_volleyball: bool = False
+
 
         # AP gives every received item a position/index in the received item list.
         # Use that index, not the item name, so duplicate filler items are handled separately.
@@ -676,10 +681,10 @@ class MSMContext(SuperContext):
         self.custom_data: Dict[str, Dict[str, Any]] = {"music": {}, "tints": {}}
         self.music_randomization_applied = False
 
-        # Needed for handling the Sports Mix Restrictions on Alt Paths
-        # The game hates me
+        # QOL Helpers
         self.previous_node: int = 0
         self.current_sm_alt_sport: str = ""
+        self.spawn_side_choice: int = 0
 
         # Address Library
         self.addresslib = AddressLib()
@@ -967,6 +972,7 @@ class MSMContext(SuperContext):
 
             # Enabled/Unlock Data
             self.enabled_sports = self.slot_data.get("enabled_sports", ())
+            self.restrict_sports_mix = self.slot_data.get("restrict_sports_mix", False)
             self.start_with_mushroom = self.slot_data.get("start_with_mushroom_cup", 0)
             self.exhibition_difficulties = self.slot_data.get("exhibition_difficulties", ())
             self.hard_tournament_difficulty = self.slot_data.get("hard_tournament_difficulty", 1)
@@ -1020,8 +1026,10 @@ class MSMContext(SuperContext):
 
             # Cosmetic option data
             self.all_one_opponent = self.slot_data.get("oops_all_character", 0)
+            self.replace_extra = self.slot_data.get("replace_extra", False)
             self.music_shuffle = self.slot_data.get("shuffle_music", 0)
             self.random_tint = self.slot_data.get("random_tint", False)
+            self.tint_volleyball = self.slot_data.get("tint_volleyball", False)
             self.previous_stage = None
 
             self.custom_data = {"music": {}, "tints": {}}
@@ -3896,7 +3904,7 @@ class MSMContext(SuperContext):
 
             if self.game_interface.check_team_amount() == 3:
                 red_team_to_replace += 1
-            if self.game_interface.get_mode() in ["Dodgeball", "Hockey"]:
+            if self.game_interface.get_mode() in ["Dodgeball", "Hockey"] and self.replace_extra:
                 red_team_to_replace += 1
             
             for i in range(red_team_to_replace):
@@ -3952,23 +3960,21 @@ class MSMContext(SuperContext):
         if self.previous_stage != current_stage:
             self.previous_stage = current_stage
             current_tint = 0xFFFFFFFF
-            
-        current_tint_r = (current_tint >> 24)
-        current_tint_g = (current_tint >> 16) & 0xFF
-        current_tint_b = (current_tint >> 8) & 0xFF
+
+        if self.game_interface.get_mode() == "Volleyball" and not self.tint_volleyball:
+            return
         
-        # Changing this to "Close Enough" to avoid flickering issues in Volleyball
-        if current_tint_r >= 0xD8 and current_tint_g >= 0xD8 and current_tint_b >= 0xD8:
+        if current_tint == 0xFFFFFFFF:
             self.game_interface.dolphin_client.write_word(get_address(MatchAddresses.stage_tint), rgba_value)
             self.log_once("tints", f"Tint for stage {current_stage} applied: {hex(rgba_value)}", False)
 
         
     # === QOL Stuff ===
 
-    async def restrict_sports_mix (self):
+    async def restrict_sports_mix_sports (self):
 
         # Placeholder
-        restrict_sm = True
+        restrict_sm = self.restrict_sports_mix
 
         if not restrict_sm or not self.enabled_sports or self.enabled_sports == ["Sports Mix"] or "Sports Mix" not in self.enabled_sports:
             return
@@ -4024,6 +4030,65 @@ class MSMContext(SuperContext):
                 self.previous_node = self.game_interface.get_player_current_node()
 
 
+    async def spawn_control (self):
+
+        is_tournament = True if self.game_interface.get_tournament_cup() != "Not in Tournament" else False
+        is_loading = True if self.game_interface.get_tournament_round() == "Not in Tournament" else False
+        game_loaded_positions = False if self.game_interface.get_player_current_node() == 0xFF else True
+
+        self.log_once("sc", f"Spawn Control: is_tournament = {is_tournament}, is_loading = {is_loading}, game_loaded_positions = {game_loaded_positions}, spawn_side_choice = {self.spawn_side_choice}", False)
+        if is_tournament and is_loading and self.spawn_side_choice == 0 and not game_loaded_positions:
+
+            player_extension = self.game_interface.dolphin_client.read_byte(get_address(PlayerInputs.P1_Extension))
+            dpad_inputs = self.game_interface.dolphin_client.read_byte(get_address(PlayerInputs.P1_Dpad_Inputs))
+
+            holding_left = False
+            holding_right = False
+
+            if player_extension == 0:
+               
+                holding_left = (dpad_inputs & 0x08) != 0
+                holding_right = (dpad_inputs & 0x04) != 0
+
+            elif player_extension == 1:
+            
+                holding_left = (dpad_inputs & 0x01) != 0
+                holding_right = (dpad_inputs & 0x02) != 0
+
+            if holding_left:
+                self.spawn_side_choice = 1
+            elif holding_right:
+                self.spawn_side_choice = 2
+            else:
+                self.spawn_side_choice = 3
+
+        elif is_tournament and not is_loading and self.spawn_side_choice != 0 and game_loaded_positions:
+
+            if self.spawn_side_choice == 3:
+                self.spawn_side_choice = 0
+                return
+            elif self.spawn_side_choice == 1:
+                player_spawn_pos = random.choice([1,2,3,4])
+            elif self.spawn_side_choice == 2:
+                player_spawn_pos = random.choice([5,6,7,8])
+
+            self.game_interface.dolphin_client.write_byte(get_address(TournamentAddresses.player_current_node), player_spawn_pos)
+
+            for i in range (7):
+                cpu_spawn_pos = (player_spawn_pos + i + 1) % 8
+                if cpu_spawn_pos == 0:
+                    cpu_spawn_pos = 8
+
+                self.game_interface.dolphin_client.write_byte(get_address(getattr(TournamentAddresses, f"cpu_{i+1}_current_node")), cpu_spawn_pos)
+
+            self.spawn_side_choice = 0
+            
+
+                
+    
+
+    
+            
 
 
 
@@ -4190,7 +4255,7 @@ class MSMContext(SuperContext):
         await self.replace_all_opponent_characters()
 
         # Sports Mix Restriction
-        await self.restrict_sports_mix()
+        await self.restrict_sports_mix_sports()
 
         # Opponents Setter
         await self.replace_all_opponent_characters()
@@ -4276,9 +4341,11 @@ class MSMContext(SuperContext):
         await self.randomize_music()
         await self.randomize_tints()
         await self.replace_all_opponent_characters()
+        await self.spawn_control()
+        
 
         # Sports Mix Restriction
-        await self.restrict_sports_mix()
+        await self.restrict_sports_mix_sports()
 
         # Opponents Setter
         await self.replace_all_opponent_characters()
@@ -4331,9 +4398,10 @@ class MSMContext(SuperContext):
         await self.randomize_music()
         await self.randomize_tints()
         await self.replace_all_opponent_characters()
+        await self.spawn_control()
 
         # Sports Mix Restriction
-        await self.restrict_sports_mix()
+        await self.restrict_sports_mix_sports()
 
         # Cup Goal
         await self.track_cups_won()

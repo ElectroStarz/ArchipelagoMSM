@@ -591,6 +591,12 @@ class Pointers:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
         max_hp_offsets = [0x20, 0x34, 0x1F4]
 
+class PlayerInputs:
+
+    P1_Dpad_Inputs = 0x804CDDA3 # Upright: Bit 0: Left, Bit 1: Right, Bit 2: Down, Bit 3: Up
+                                # Sideways: Bit 0: Down, Bit 1: Up, Bit 2: Right, Bit 3: Left
+    P1_Extension = 0x804CDDFC # 0 = None, 1 = Nunchuk
+
 
 class GeckoCodes:
     gecko_codes_pal = {
