@@ -676,6 +676,9 @@ class MSMContext(SuperContext):
         self.custom_data: Dict[str, Dict[str, Any]] = {"music": {}, "tints": {}}
         self.music_randomization_applied = False
 
+        # Needed for handling the Sports Mix Restrictions on Alt Paths
+        self.previous_node: int = 0
+
         # Address Library
         self.addresslib = AddressLib()
 
@@ -981,9 +984,9 @@ class MSMContext(SuperContext):
 
 
             # Custom Tournament Settings Data
-            self.alt_paths_enabled = self.slot_data.get("include_alt_paths")
-            self.alt_paths_unlock_type = self.slot_data.get("alt_path_type")
-            self.alt_paths_always_spawn = self.slot_data.get("always_spawn_alt_paths")
+            self.alt_paths_enabled = self.slot_data.get("include_alt_paths", False)
+            self.alt_paths_unlock_type = self.slot_data.get("alt_path_type", 0)
+            self.alt_paths_always_spawn = self.slot_data.get("always_spawn_alt_paths", True)
 
             self.custom_basket_time = self.slot_data.get("basket_time", 2)
             self.enable_b_points = self.slot_data.get("enable_b_points_win", False)
@@ -4006,7 +4009,9 @@ class MSMContext(SuperContext):
             if len(available_sports) > 1:
                 banned_sport = new_sport
 
-        if self.game_interface.get_player_current_node() >= 0x17 and not self.game_interface.get_player_current_node() == 0xFF:
+        if self.previous_node == self.game_interface.get_player_current_node():
+            return
+        elif self.game_interface.get_player_current_node() >= 0x17 and not self.game_interface.get_player_current_node() == 0xFF:
             if not self.game_interface.is_in_match():
                 new_alt_sport = random.choice(available_sports)
                 self.game_interface.dolphin_client.write_byte(get_address(TournamentAddresses.alt_path_mode), sports_to_value[new_alt_sport] + 0x10)

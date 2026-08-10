@@ -36,11 +36,6 @@ def create_all_regions(world: "MSMWorld") -> None:
     sm_flower_cup_alternate = Region("Sports Mix: Flower Cup Alt Paths", world.player, world.multiworld)
     sm_star_cup_alternate = Region("Sports Mix: Star Cup Alt Paths", world.player, world.multiworld)
 
-    regions = [main_menu, exhibition, basketball, b_exhibition, dodgeball, d_exhibition,
-               volleyball, v_exhibition, hockey, h_exhibition,
-               sports_mix, sm_mushroom_cup, sm_flower_cup, sm_star_cup, 
-               sm_mushroom_cup_alternate, sm_flower_cup_alternate, sm_star_cup_alternate]
-
     # Basketball
     b_mushroom_cup_n = Region("Basketball: Mushroom Cup (Normal)", world.player, world.multiworld)
     b_flower_cup_n = Region("Basketball: Flower Cup (Normal)", world.player, world.multiworld)
@@ -81,45 +76,6 @@ def create_all_regions(world: "MSMWorld") -> None:
     g_mushroom_cup_alternate_n = Region("Global: Mushroom Cup Alt Paths (Normal)", world.player, world.multiworld)
     g_flower_cup_alternate_n = Region("Global: Flower Cup Alt Paths (Normal)", world.player, world.multiworld)
     g_star_cup_alternate_n = Region("Global: Star Cup Alt Paths (Normal)", world.player, world.multiworld)
-
-    # Append to regions list
-    # Basketball
-    regions.append(b_mushroom_cup_n)
-    regions.append(b_flower_cup_n)
-    regions.append(b_star_cup_n)
-    regions.append(b_mushroom_cup_alternate_n)
-    regions.append(b_flower_cup_alternate_n)
-    regions.append(b_star_cup_alternate_n)
-
-    # Dodgeball
-    regions.append(d_mushroom_cup_n)
-    regions.append(d_flower_cup_n)
-    regions.append(d_star_cup_n)
-    regions.append(d_mushroom_cup_alternate_n)
-    regions.append(d_flower_cup_alternate_n)
-    regions.append(d_star_cup_alternate_n)
-
-    # Volleyball
-    regions.append(v_mushroom_cup_n)
-    regions.append(v_flower_cup_n)
-    regions.append(v_star_cup_n)
-    regions.append(v_mushroom_cup_alternate_n)
-    regions.append(v_flower_cup_alternate_n)
-    regions.append(v_star_cup_alternate_n)
-
-    # Hockey
-    regions.append(h_mushroom_cup_n)
-    regions.append(h_flower_cup_n)
-    regions.append(h_star_cup_n)
-    regions.append(h_mushroom_cup_alternate_n)
-    regions.append(h_flower_cup_alternate_n)
-    regions.append(h_star_cup_alternate_n)
-
-    # Global Sport
-    regions.append(g_mushroom_cup_alternate_n)
-    regions.append(g_flower_cup_alternate_n)
-    regions.append(g_star_cup_alternate_n)
-
 
     # Basketball
     b_mushroom_cup_h = Region("Basketball: Mushroom Cup (Hard)", world.player, world.multiworld)
@@ -163,44 +119,6 @@ def create_all_regions(world: "MSMWorld") -> None:
     g_flower_cup_alternate_h = Region("Global: Flower Cup Alt Paths (Hard)", world.player, world.multiworld)
     g_star_cup_alternate_h = Region("Global: Star Cup Alt Paths (Hard)", world.player, world.multiworld)
 
-    # Append to regions list
-    # Basketball
-    regions.append(b_mushroom_cup_h)
-    regions.append(b_flower_cup_h)
-    regions.append(b_star_cup_h)
-    regions.append(b_mushroom_cup_alternate_h)
-    regions.append(b_flower_cup_alternate_h)
-    regions.append(b_star_cup_alternate_h)
-
-    # Dodgeball
-    regions.append(d_mushroom_cup_h)
-    regions.append(d_flower_cup_h)
-    regions.append(d_star_cup_h)
-    regions.append(d_mushroom_cup_alternate_h)
-    regions.append(d_flower_cup_alternate_h)
-    regions.append(d_star_cup_alternate_h)
-
-    # Volleyball
-    regions.append(v_mushroom_cup_h)
-    regions.append(v_flower_cup_h)
-    regions.append(v_star_cup_h)
-    regions.append(v_mushroom_cup_alternate_h)
-    regions.append(v_flower_cup_alternate_h)
-    regions.append(v_star_cup_alternate_h)
-
-    # Hockey
-    regions.append(h_mushroom_cup_h)
-    regions.append(h_flower_cup_h)
-    regions.append(h_star_cup_h)
-    regions.append(h_mushroom_cup_alternate_h)
-    regions.append(h_flower_cup_alternate_h)
-    regions.append(h_star_cup_alternate_h)
-
-    # Global Sport
-    regions.append(g_mushroom_cup_alternate_h)
-    regions.append(g_flower_cup_alternate_h)
-    regions.append(g_star_cup_alternate_h)
-
     # Global Alt Path Regions
     # Basketball
     b_mushroom_cup_alternate_g = Region("Basketball: Mushroom Cup Alt Paths (Global)", world.player, world.multiworld)
@@ -227,32 +145,6 @@ def create_all_regions(world: "MSMWorld") -> None:
     g_flower_cup_alternate_g = Region("Global: Flower Cup Alt Paths (Global)", world.player, world.multiworld)
     g_star_cup_alternate_g = Region("Global: Star Cup Alt Paths (Global)", world.player, world.multiworld)
 
-    # Append to regions list
-    # Basketball
-    regions.append(b_mushroom_cup_alternate_g)
-    regions.append(b_flower_cup_alternate_g)
-    regions.append(b_star_cup_alternate_g)
-
-    # Dodgeball
-    regions.append(d_mushroom_cup_alternate_g)
-    regions.append(d_flower_cup_alternate_g)
-    regions.append(d_star_cup_alternate_g)
-
-    # Volleyball
-    regions.append(v_mushroom_cup_alternate_g)
-    regions.append(v_flower_cup_alternate_g)
-    regions.append(v_star_cup_alternate_g)
-
-    # Hockey
-    regions.append(h_mushroom_cup_alternate_g)
-    regions.append(h_flower_cup_alternate_g)
-    regions.append(h_star_cup_alternate_g)
-
-    # Global Sport
-    regions.append(g_mushroom_cup_alternate_g)
-    regions.append(g_flower_cup_alternate_g)
-    regions.append(g_star_cup_alternate_g)
-
     # Party Mode Stuff
     feed_petey = Region("Feed Petey", world.player, world.multiworld)
     harmony_hustle = Region("Harmony Hustle", world.player, world.multiworld)
@@ -266,15 +158,41 @@ def create_all_regions(world: "MSMWorld") -> None:
     regions = [
         main_menu, exhibition,
         # Basketball
-        basketball, b_exhibition, b_mushroom_cup_n, b_flower_cup_n, b_star_cup_n, b_mushroom_cup_h, b_flower_cup_h, b_star_cup_h,
+        basketball, b_exhibition,
+        b_mushroom_cup_n, b_flower_cup_n, b_star_cup_n,
+        b_mushroom_cup_h, b_flower_cup_h, b_star_cup_h,
+        b_mushroom_cup_alternate_n, b_flower_cup_alternate_n, b_star_cup_alternate_n,
+        b_mushroom_cup_alternate_h, b_flower_cup_alternate_h, b_star_cup_alternate_h,
+        b_mushroom_cup_alternate_g, b_flower_cup_alternate_g, b_star_cup_alternate_g,
         # Dodgeball
-        dodgeball, d_exhibition, d_mushroom_cup_n, d_flower_cup_n, d_star_cup_n, d_mushroom_cup_h, d_flower_cup_h, d_star_cup_h,
+        dodgeball, d_exhibition,
+        d_mushroom_cup_n, d_flower_cup_n, d_star_cup_n,
+        d_mushroom_cup_h, d_flower_cup_h, d_star_cup_h,
+        d_mushroom_cup_alternate_n, d_flower_cup_alternate_n, d_star_cup_alternate_n,
+        d_mushroom_cup_alternate_h, d_flower_cup_alternate_h, d_star_cup_alternate_h,
+        d_mushroom_cup_alternate_g, d_flower_cup_alternate_g, d_star_cup_alternate_g,
         # Volleyball
-        volleyball, v_exhibition, v_mushroom_cup_n, v_flower_cup_n, v_star_cup_n, v_mushroom_cup_h, v_flower_cup_h, v_star_cup_h,
+        volleyball, v_exhibition,
+        v_mushroom_cup_n, v_flower_cup_n, v_star_cup_n,
+        v_mushroom_cup_h, v_flower_cup_h, v_star_cup_h,
+        v_mushroom_cup_alternate_n, v_flower_cup_alternate_n, v_star_cup_alternate_n,
+        v_mushroom_cup_alternate_h, v_flower_cup_alternate_h, v_star_cup_alternate_h,
+        v_mushroom_cup_alternate_g, v_flower_cup_alternate_g, v_star_cup_alternate_g,
         # Hockey
-        hockey, h_exhibition, h_mushroom_cup_n, h_flower_cup_n, h_star_cup_n, h_mushroom_cup_h, h_flower_cup_h, h_star_cup_h,
+        hockey, h_exhibition,
+        h_mushroom_cup_n, h_flower_cup_n, h_star_cup_n,
+        h_mushroom_cup_h, h_flower_cup_h, h_star_cup_h,
+        h_mushroom_cup_alternate_n, h_flower_cup_alternate_n, h_star_cup_alternate_n,
+        h_mushroom_cup_alternate_h, h_flower_cup_alternate_h, h_star_cup_alternate_h,
+        h_mushroom_cup_alternate_g, h_flower_cup_alternate_g, h_star_cup_alternate_g,
         # Sports Mix
-        sports_mix, sm_mushroom_cup, sm_flower_cup, sm_star_cup,
+        sports_mix,
+        sm_mushroom_cup, sm_flower_cup, sm_star_cup,
+        sm_mushroom_cup_alternate, sm_flower_cup_alternate, sm_star_cup_alternate,
+        # Global Alt Paths
+        g_mushroom_cup_alternate_n, g_flower_cup_alternate_n, g_star_cup_alternate_n,
+        g_mushroom_cup_alternate_h, g_flower_cup_alternate_h, g_star_cup_alternate_h,
+        g_mushroom_cup_alternate_g, g_flower_cup_alternate_g, g_star_cup_alternate_g,
         # Party Mode
         feed_petey, harmony_hustle, bob_omb_dodge, smash_skate,
         # Bosses
