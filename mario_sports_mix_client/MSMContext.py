@@ -78,24 +78,24 @@ character_names = [
 # Court IDs in the order they appear in the cups
 tournament_round_stages = {
     "Basketball": {
-        "Mushroom Cup": ["s01", "s02", "s05"],
-        "Flower Cup": ["s06", "s17", "s07"],
-        "Star Cup": ["s10", "s11", "s16"],
+        "Mushroom": ["s01", "s02", "s05"],
+        "Flower": ["s06", "s17", "s07"],
+        "Star": ["s10", "s11", "s16"],
     },
     "Dodgeball": {
-        "Mushroom Cup": ["s01", "s02", "s03"],
-        "Flower Cup": ["s05", "s04", "s07"],
-        "Star Cup": ["s09", "s11", "s16"],
+        "Mushroom": ["s01", "s02", "s03"],
+        "Flower": ["s05", "s04", "s07"],
+        "Star": ["s09", "s11", "s16"],
     },
     "Volleyball": {
-        "Mushroom Cup": ["s01", "s02", "s03"],
-        "Flower Cup": ["s05", "s06", "s17"],
-        "Star Cup": ["s10", "s11", "s16"],
+        "Mushroom": ["s01", "s02", "s03"],
+        "Flower": ["s05", "s06", "s17"],
+        "Star": ["s10", "s11", "s16"],
     },
     "Hockey": {
-        "Mushroom Cup": ["s01", "s04", "s03"],
-        "Flower Cup": ["s17", "s09", "s07"],
-        "Star Cup": ["s10", "s12", "s16"],
+        "Mushroom": ["s01", "s04", "s03"],
+        "Flower": ["s17", "s09", "s07"],
+        "Star": ["s10", "s12", "s16"],
     },
 }
 
@@ -656,7 +656,6 @@ class MSMContext(SuperContext):
         self.traps_to_give = deque()
 
         self.custom_data: Dict[str, Dict[str, Any]] = {"music": {}, "tints": {}}
-        # Music shuffle
         self.music_randomization_applied = False
 
         # Address Library
@@ -996,7 +995,7 @@ class MSMContext(SuperContext):
             self.court_sanity = self.slot_data.get("court_sanity")
             self.special_sanity = self.slot_data.get("special_sanity")
 
-            # Meme option data
+            # Cosmetic option data
             self.all_one_opponent = self.slot_data.get("oops_all_character")
             self.music_shuffle = self.slot_data.get("shuffle_music")
             self.random_tint = self.slot_data.get("random_tint")
@@ -1715,15 +1714,15 @@ class MSMContext(SuperContext):
     async def handle_alt_path_unlocks(self):
         """Handles unlocking Alt Paths"""
 
-        mushroom_alt_paths_unlocked = get_address(GlobalTournament.mushroom_alt_paths_unlocked)
-        flower_alt_paths_unlocked = get_address(GlobalTournament.flower_alt_paths_unlocked)
-        star_alt_paths_unlocked = get_address(GlobalTournament.star_alt_paths_unlocked)
+        mushroom_alt_paths_unlocked = get_address(TournamentAddresses.mushroom_alt_paths_unlocked)
+        flower_alt_paths_unlocked = get_address(TournamentAddresses.flower_alt_paths_unlocked)
+        star_alt_paths_unlocked = get_address(TournamentAddresses.star_alt_paths_unlocked)
         current_sport = self.game_interface.get_tournament_sport()
         
-        alt_path_spawn = get_address(GlobalTournament.alt_path_condition_fufilled)
+        alt_path_spawn = get_address(TournamentAddresses.alt_path_condition_fufilled)
         current_node = self.game_interface.get_player_current_node()
-        outer_bridge_addr = get_address(GlobalTournament.flower_outer_bridges_toggle)
-        inner_bridge_addr = get_address(GlobalTournament.flower_inner_bridges_toggle)
+        outer_bridge_addr = get_address(TournamentAddresses.flower_outer_bridges_toggle)
+        inner_bridge_addr = get_address(TournamentAddresses.flower_inner_bridges_toggle)
 
         current_cup = self.game_interface.get_tournament_cup()
         
@@ -1813,7 +1812,7 @@ class MSMContext(SuperContext):
 
                 for cup in cups:
                     if f"Sports Mix: {cup} Cup Alt Paths" in self.unlocked_alt_paths:
-                        sports_mix_values[cups.index(cup)] = 3
+                        sports_mix_values[cups.index(cup)] = 8
 
                 values_to_insert = sport_values[current_sport]
                 
@@ -3783,8 +3782,9 @@ class MSMContext(SuperContext):
                     self.game_interface.replace_music_file(song, new_song)
                     # self.log_once("music", f"Replaced {song} with {new_song}", False)
                     class_pool.remove(new_song)
-                await self.save_custom_data()
-                self.music_randomization_applied = True
+
+            await self.save_custom_data()
+            self.music_randomization_applied = True
 
         elif shuffle_mode == 2:
 
@@ -3811,9 +3811,9 @@ class MSMContext(SuperContext):
 
         if self.all_one_opponent != 0:
             for i in range(7):
-                character_attr = getattr(GlobalTournament, f"cpu_{i+1}_character")
-                teammate_1_attr = getattr(GlobalTournament, f"cpu_{i+1}_teammate_1")
-                teammate_2_attr = getattr(GlobalTournament, f"cpu_{i+1}_teammate_2")
+                character_attr = getattr(TournamentAddresses, f"cpu_{i+1}_character")
+                teammate_1_attr = getattr(TournamentAddresses, f"cpu_{i+1}_teammate_1")
+                teammate_2_attr = getattr(TournamentAddresses, f"cpu_{i+1}_teammate_2")
                 
                 cpu_main_char = get_address(character_attr)
                 cpu_teammate_1 = get_address(teammate_1_attr)
@@ -3876,6 +3876,9 @@ class MSMContext(SuperContext):
         rgba_value = red_value * 0x1000000 + green_value * 0x10000 + blue_value * 0x100 + 0xFF
 
         current_tint = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.stage_tint))
+        current_tint_r = (current_tint >> 24)
+        current_tint_g = (current_tint >> 16) & 0xFF
+        current_tint_b = (current_tint >> 8) & 0xFF
 
         if not self.previous_stage:
             self.previous_stage = current_stage
@@ -3884,14 +3887,74 @@ class MSMContext(SuperContext):
             self.previous_stage = current_stage
             current_tint = 0xFFFFFFFF
 
-        # self.log_once("tints", f"Current tint is {hex(current_tint)} for stage {current_stage}", False)
-        if current_tint == 0xFFFFFFFF:
+        # Changing this to "Close Enough" to avoid flickering issues in Volleyball
+        if current_tint_r >= 0xE6 and current_tint_g >= 0xE6 and current_tint_b >= 0xE6:
             self.game_interface.dolphin_client.write_word(get_address(MatchAddresses.stage_tint), rgba_value)
             self.log_once("tints", f"Tint for stage {current_stage} applied: {hex(rgba_value)}", False)
 
         
+    # === QOL Stuff ===
+
+    async def restrict_sports_mix (self):
+
+        # Placeholder
+        restrict_sm = True
+
+        if not restrict_sm or not self.enabled_sports or self.enabled_sports == ["Sports Mix"] or "Sports Mix" not in self.enabled_sports:
+            return
+
+        if self.game_interface.get_tournament_sport() != "Sports Mix":
+            return
+
+        available_sports = list(self.enabled_sports)
+        available_sports.remove("Sports Mix")
+
+        current_cup = self.game_interface.get_tournament_cup()
+
+        sports_to_value = {"Basketball": 0, "Volleyball": 1, "Dodgeball": 2, "Hockey": 3}
+
+        # Make sure that the tournament isnt just all one sport if possible
+        banned_sport = None
+        
+        for i in range(3):
+
+            new_sport = random.choice([sport for sport in available_sports if sport != banned_sport])
+
+            for j in range(2**(2-i)):
+
+                round = i + 1
+                match = j + 1
+
+                mode_address = get_address(getattr(TournamentAddresses, f"round_{round}_match_{match}_mode"))
+                stage_address = get_address(getattr(TournamentAddresses, f"round_{round}_match_{match}_stage"))
+                mode = self.game_interface.dolphin_client.read_byte(mode_address)
+
+                # Check the 16th's place to see if already rando'd or not (also do you even call it the 16th's place idk)
+                
+                
+                if not ((mode >> 4) == 1 or (mode >> 4) == 9):
+                    new_stage = int(tournament_round_stages[new_sport][current_cup][round - 1][-2:])
+
+                    self.game_interface.dolphin_client.write_byte(mode_address, sports_to_value[new_sport] + 0x10)
+                    self.game_interface.dolphin_client.write_byte(stage_address, new_stage)
+
+            # Just in case someone enables 1 sport and Sports Mix only for some reason (but why tho)
+            if len(available_sports) > 1:
+                banned_sport = new_sport
+
+        if self.game_interface.get_player_current_node() >= 0x17 and not self.game_interface.get_player_current_node() == 0xFF:
+            if not self.game_interface.is_in_match():
+                new_alt_sport = random.choice(available_sports)
+                self.game_interface.dolphin_client.write_byte(get_address(TournamentAddresses.alt_path_mode), sports_to_value[new_alt_sport] + 0x10)
 
 
+
+
+
+
+
+        
+        
 
     # === Misc stuff idk where to put ===
 
@@ -4049,6 +4112,9 @@ class MSMContext(SuperContext):
         await self.randomize_tints()
         await self.replace_all_opponent_characters()
 
+        # Sports Mix Restriction
+        await self.restrict_sports_mix()
+
         # Opponents Setter
         await self.replace_all_opponent_characters()
 
@@ -4135,7 +4201,9 @@ class MSMContext(SuperContext):
         await self.randomize_music()
         await self.randomize_tints()
         await self.replace_all_opponent_characters()
-        
+
+        # Sports Mix Restriction
+        await self.restrict_sports_mix()
 
         # Opponents Setter
         await self.replace_all_opponent_characters()
@@ -4188,6 +4256,9 @@ class MSMContext(SuperContext):
         await self.randomize_music()
         await self.randomize_tints()
         await self.replace_all_opponent_characters()
+
+        # Sports Mix Restriction
+        await self.restrict_sports_mix()
 
         # Cup Goal
         await self.track_cups_won()

@@ -277,8 +277,8 @@ class MSMInterface:
             return court_id, court_name
 
     def get_mode(self):
-        current_sport_value = self.dolphin_client.read_byte(get_address(GlobalTournament.current_sport))
-        is_party_mode = self.dolphin_client.read_byte(get_address(GlobalTournament.is_party_mode))
+        current_sport_value = self.dolphin_client.read_byte(get_address(MatchAddresses.current_sport))
+        is_party_mode = self.dolphin_client.read_byte(get_address(MatchAddresses.is_party_mode))
         current_sport = {0: "BA", 1: "VO", 2: "DO", 3: "HO", 5: "SM"}.get(current_sport_value)
         
         if current_sport == "BA" and is_party_mode == 2:
@@ -392,7 +392,7 @@ class MSMInterface:
 
     def get_tournament_cup(self):
 
-        cup = self.dolphin_client.read_byte(get_address(GlobalTournament.current_tournament_cup))
+        cup = self.dolphin_client.read_byte(get_address(TournamentAddresses.current_tournament_cup))
 
         if cup not in [1, 2, 3]:
             return "Not in Tournament"
@@ -400,7 +400,7 @@ class MSMInterface:
             return {1: "Mushroom", 2: "Flower", 3: "Star"}.get(cup)
 
     def get_tournament_round(self):
-        round = self.dolphin_client.read_byte(get_address(GlobalTournament.current_tournament_round))
+        round = self.dolphin_client.read_byte(get_address(TournamentAddresses.current_tournament_round))
 
         if round not in [1, 2, 3]:
             return "Not in Tournament"
@@ -408,7 +408,7 @@ class MSMInterface:
             return {1: "Round 1", 2: "Round 2", 3: "Round 3"}.get(round)
 
     def get_tournament_sport(self):
-        sport = self.dolphin_client.read_byte(get_address(GlobalTournament.current_tournament_sport_variation))
+        sport = self.dolphin_client.read_byte(get_address(TournamentAddresses.current_tournament_sport_variation))
 
         if sport not in [0, 1, 2, 3, 5]:
             return "Not in Tournament"
@@ -416,7 +416,7 @@ class MSMInterface:
             return {0: "Basketball", 1: "Volleyball", 2: "Dodgeball", 3: "Hockey", 5: "Sports Mix"}.get(sport)
 
     def get_player_current_node(self):
-        node = self.dolphin_client.read_byte(get_address(GlobalTournament.player_current_node))
+        node = self.dolphin_client.read_byte(get_address(TournamentAddresses.player_current_node))
 
         return node
     

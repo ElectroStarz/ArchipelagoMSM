@@ -143,10 +143,16 @@ class MatchAddresses:
     red_character_3 = 0x804D780D # Byte
     red_character_4 = 0x804D780F # Byte
 
+    current_sport = 0x804D77C4 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey
+    is_party_mode = 0x804D77C5 # Byte | 0 = Regular Sport, 2 = Party Mode
+
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL
 
-class GlobalTournament:
+
+
+
+class TournamentAddresses:
 
     player_current_node = 0x804D5D1F # Byte
     player_character = 0x804D5D18 # Byte
@@ -159,18 +165,25 @@ class GlobalTournament:
     current_tournament_song = 0x804D7097 # Byte
     current_tournament_round = 0x804D70A3 # Byte
 
-    current_sport = 0x804D77C4 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey
-    is_party_mode = 0x804D77C5 # Byte | 0 = Regular Sport, 2 = Party Mode
-
     round_1_match_1_stage = 0x804D5F5A # Byte
     round_1_match_2_stage = 0x804D5F6A # Byte
     round_1_match_3_stage = 0x804D5F7A # Byte
     round_1_match_4_stage = 0x804D5F8A # Byte
     round_2_match_1_stage = 0x804D5F9A # Byte
     round_2_match_2_stage = 0x804D5FAA # Byte
-    round_3_stage = 0x804D5FBA # Byte
+    round_3_match_1_stage = 0x804D5FBA # Byte
     node_17_stage = 0x804D5FCA # Byte
     alt_path_stage = 0x804D5FDA # Byte
+
+    round_1_match_1_mode = 0x804D5F56 # Byte
+    round_1_match_2_mode = 0x804D5F66 # Byte
+    round_1_match_3_mode = 0x804D5F76 # Byte
+    round_1_match_4_mode = 0x804D5F86 # Byte
+    round_2_match_1_mode = 0x804D5F96 # Byte
+    round_2_match_2_mode = 0x804D5FA6 # Byte
+    round_3_match_1_mode = 0x804D5FB6 # Byte
+    node_17_mode = 0x804D5FC6 # Byte
+    alt_path_mode = 0x804D5FD6 # Byte
 
     alt_path_condition_fufilled = 0x804D6FBC # Byte | Also checks for winning Alt Path missions
 
@@ -222,8 +235,6 @@ class GlobalTournament:
     ff_team_character_2 = 0x804D780B # Byte
     ff_team_character_3 = 0x804D780D # Byte
     
-
-
 
 
 
