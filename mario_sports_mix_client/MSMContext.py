@@ -677,7 +677,9 @@ class MSMContext(SuperContext):
         self.music_randomization_applied = False
 
         # Needed for handling the Sports Mix Restrictions on Alt Paths
+        # The game hates me
         self.previous_node: int = 0
+        self.current_sm_alt_sport: str = ""
 
         # Address Library
         self.addresslib = AddressLib()
@@ -3943,9 +3945,6 @@ class MSMContext(SuperContext):
         rgba_value = red_value * 0x1000000 + green_value * 0x10000 + blue_value * 0x100 + 0xFF
 
         current_tint = self.game_interface.dolphin_client.read_word(get_address(MatchAddresses.stage_tint))
-        current_tint_r = (current_tint >> 24)
-        current_tint_g = (current_tint >> 16) & 0xFF
-        current_tint_b = (current_tint >> 8) & 0xFF
 
         if not self.previous_stage:
             self.previous_stage = current_stage
@@ -3953,9 +3952,13 @@ class MSMContext(SuperContext):
         if self.previous_stage != current_stage:
             self.previous_stage = current_stage
             current_tint = 0xFFFFFFFF
-
+            
+        current_tint_r = (current_tint >> 24)
+        current_tint_g = (current_tint >> 16) & 0xFF
+        current_tint_b = (current_tint >> 8) & 0xFF
+        
         # Changing this to "Close Enough" to avoid flickering issues in Volleyball
-        if current_tint_r >= 0xE6 and current_tint_g >= 0xE6 and current_tint_b >= 0xE6:
+        if current_tint_r >= 0xD8 and current_tint_g >= 0xD8 and current_tint_b >= 0xD8:
             self.game_interface.dolphin_client.write_word(get_address(MatchAddresses.stage_tint), rgba_value)
             self.log_once("tints", f"Tint for stage {current_stage} applied: {hex(rgba_value)}", False)
 
@@ -4009,12 +4012,16 @@ class MSMContext(SuperContext):
             if len(available_sports) > 1:
                 banned_sport = new_sport
 
+        
         if self.previous_node == self.game_interface.get_player_current_node():
+            self.game_interface.dolphin_client.write_byte(get_address(TournamentAddresses.alt_path_mode), sports_to_value[self.current_sm_alt_sport] + 0x10)
             return
         elif self.game_interface.get_player_current_node() >= 0x17 and not self.game_interface.get_player_current_node() == 0xFF:
             if not self.game_interface.is_in_match():
-                new_alt_sport = random.choice(available_sports)
+                new_alt_sport = random.choice([sport for sport in available_sports if sport != self.current_sm_alt_sport])
+                self.current_sm_alt_sport = new_alt_sport
                 self.game_interface.dolphin_client.write_byte(get_address(TournamentAddresses.alt_path_mode), sports_to_value[new_alt_sport] + 0x10)
+                self.previous_node = self.game_interface.get_player_current_node()
 
 
 
