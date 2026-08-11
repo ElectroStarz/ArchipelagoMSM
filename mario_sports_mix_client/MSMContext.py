@@ -995,6 +995,7 @@ class MSMContext(SuperContext):
             self.alt_paths_enabled = self.slot_data.get("include_alt_paths", False)
             self.alt_paths_unlock_type = self.slot_data.get("alt_path_type", 0)
             self.alt_paths_always_spawn = self.slot_data.get("always_spawn_alt_paths", True)
+            self.in_alt_path = False
 
             self.custom_basket_time = self.slot_data.get("basket_time", 2)
             self.enable_b_points = self.slot_data.get("enable_b_points_win", False)
@@ -1778,6 +1779,11 @@ class MSMContext(SuperContext):
         inner_bridge_addr = get_address(TournamentAddresses.flower_inner_bridges_toggle)
 
         current_cup = self.game_interface.get_tournament_cup()
+
+        if current_node > 17 and not current_node == 0xFF:
+            self.in_alt_path = True
+        else
+            self.in_alt_path = False
         
 
         """self.log_once(
@@ -3902,9 +3908,11 @@ class MSMContext(SuperContext):
 
             red_team_to_replace = 2
 
+            hockey_no_goalie = ["s03", "s04"]
+
             if self.game_interface.check_team_amount() == 3:
                 red_team_to_replace += 1
-            if self.game_interface.get_mode() in ["Dodgeball", "Hockey"] and self.replace_extra:
+            if self.game_interface.get_mode() in ["Dodgeball", "Hockey"] and self.replace_extra and self.game_interface.get_court()[0] not in hockey_no_goalie:
                 red_team_to_replace += 1
             
             for i in range(red_team_to_replace):
@@ -4262,9 +4270,10 @@ class MSMContext(SuperContext):
 
         # Custom Tournament Settings
         await self.check_current_cup()
-        if self.in_tournament_match:
+        await self.handle_alt_path_unlocks()
+        if self.in_tournament_match and not self.in_alt_path:
             await self.handle_custom_tournament_settings()
-            await self.handle_alt_path_unlocks()
+            
 
         # Cup Goal
         await self.track_cups_won()
@@ -4280,16 +4289,20 @@ class MSMContext(SuperContext):
         await self.handle_send_deathlink()
         await self.reset_deathlink_status()
 
-        # Lock points if you don't have the stage/cup/difficulty
-        await self.handle_locked_tournament_court_points()
-        await self.handle_locked_exhibition_points()
+        # Lock points if you don't have the stage/cup/difficulty and not in an alt path
+        if not self.in_alt_path:
+            await self.handle_locked_tournament_court_points()
+            await self.handle_locked_exhibition_points()
 
         # Locations
         await self.handle_exhibition_win()
         await self.handle_cup_round_win()
         await self.handle_alt_path_win()
         await self.send_character_sanity_checks()
-        await self.send_court_sanity_checks()
+
+        if not self.in_alt_path:
+            await self.send_court_sanity_checks()
+
         await self.send_special_sanity_checks()
 
         await self.unlock_behemoth()
@@ -4381,10 +4394,12 @@ class MSMContext(SuperContext):
         await self.handle_alt_path_unlocks()
 
         # Locations
-        await self.handle_party_wins()
         await self.handle_alt_path_win()
         await self.send_character_sanity_checks()
-        await self.send_court_sanity_checks()
+
+        if not self.in_alt_path:
+            await self.handle_party_wins()
+            await self.send_court_sanity_checks()
 
         # Fillers and Traps are not handled here because most don't work in the modes.
 

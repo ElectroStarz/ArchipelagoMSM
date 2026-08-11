@@ -502,6 +502,7 @@ class AlwaysSpawnAltPaths(Toggle):
 
 class OopsAllCharacter(Choice):
     """Meme Option, Makes it so all Opponents are a Single Character"""
+    display_name = "Replace All Opponent Characters"
     option_off = 0
     option_mario = 1
     option_luigi = 2
@@ -529,14 +530,15 @@ class ReplaceExtra(Toggle):
     default = False
 
 class ShuffleMusic(Choice):
-    """Meme Option, Shuffles the music in the game"""
+    """Shuffles the music in the game"""
+    display_name = "Shuffle Music"
     option_off = 0
     option_shuffle_within_groups = 1
     option_full_shuffle = 2
     default = 0
 
 class TintStages(Toggle):
-    """Randomly tints each stage. Colors are limited to avoid any eye straining colors.
+    """Randomly tints each stage.
     Volleyball has some issues and will not be tinted as a result."""
     display_name = "Tint Stages"
     default = False
@@ -623,7 +625,7 @@ msm_option_groups = [
         # ScoreSanityPoints,
         # ScoreSanityMax,
     ]),
-    OptionGroup("Meme Options", [
+    OptionGroup("Extra Options", [
         OopsAllCharacter,
         ReplaceExtra,
         ShuffleMusic,
@@ -701,7 +703,7 @@ class MSMOptions(PerGameCommonOptions):
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
 
-    # Meme Stuff
+    # Extra Stuff
     oops_all_character: OopsAllCharacter
     replace_extra: ReplaceExtra
     shuffle_music: ShuffleMusic
