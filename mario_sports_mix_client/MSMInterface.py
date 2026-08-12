@@ -521,19 +521,23 @@ class MSMInterface:
         return file_name + ".brstm"
 
     def replace_music_file(self, music_to_be_replaced: str, music_to_replace_with: str) -> bool:
+
         classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs, MusicFiles.TournamentSongs, MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
         address = None
 
         for cls in classes:
             songs = self.get_songs_from_class(cls)
             if music_to_be_replaced in songs:
-                address = get_address(cls.__dict__[music_to_be_replaced])
+                address = get_address(getattr(cls, music_to_be_replaced))
                 break
 
         original_length = len(self.get_music_file_name(music_to_be_replaced)) 
         new_length = len(self.get_music_file_name(music_to_replace_with))
         new_song = self.get_music_file_name(music_to_replace_with)
 
+        if new_song is None:
+            self.logger.warning(f"Could not find replacement music file for {music_to_replace_with}")
+            return
 
         self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
         self.dolphin_client.write_string(address, new_song)

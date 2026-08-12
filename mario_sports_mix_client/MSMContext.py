@@ -819,21 +819,15 @@ class MSMContext(SuperContext):
 
                 if isinstance(custom_music_data, dict):
                     music_data = {str(song): str(new_song) for song, new_song in custom_music_data.items()}
-                elif isinstance(custom_music_data, list):
-                    music_data = {str(song): str(new_song) for song, new_song in custom_music_data}
                 else:
                     music_data = {}
                     
                 if isinstance(custom_tint_data, dict):
                     tint_data = {str(stage): [int(tint[0]), int(tint[1]), int(tint[2])] for stage, tint in custom_tint_data.items()}
-                elif isinstance(custom_tint_data, list):
-                    tint_data = {str(stage): [int(tint[0]), int(tint[1]), int(tint[2])] for stage, tint in custom_tint_data}
                 else:
                     tint_data = {}
 
                 self.custom_data = {"music": music_data, "tints": tint_data}
-        elif isinstance(value, list):
-            self.custom_data = {"music": {str(song): str(new_song) for song, new_song in value}, "tints": {}}
         else:
             logger.warning(f"Unexpected customization data value type: {type(value)}")
             return
@@ -1782,7 +1776,7 @@ class MSMContext(SuperContext):
 
         if current_node > 17 and not current_node == 0xFF:
             self.in_alt_path = True
-        else
+        else:
             self.in_alt_path = False
         
 
@@ -3013,12 +3007,14 @@ class MSMContext(SuperContext):
                 return f"{current_sport} {current_cup} Cup Alt Path {current_difficulty} Node {current_node:X}"
             else:
                 return f"Sports Mix {current_cup} Cup Alt Path Node {current_node:X}"
-        if self.alt_paths_unlock_type == 1:
+        elif self.alt_paths_unlock_type == 1:
             return f"{current_sport} {current_cup} Cup Alt Path Node {current_node:X}"
-        if self.alt_paths_unlock_type == 2 or self.alt_paths.unlock_type == 4:
+        elif self.alt_paths_unlock_type == 2 or self.alt_paths_unlock_type == 4:
             return f"{current_cup} Alt Path {current_difficulty} Node {current_node:X}"
-        if self.alt_paths_unlock_type == 3 or self.alt_paths.unlock_type == 5:
+        elif self.alt_paths_unlock_type == 3 or self.alt_paths_unlock_type == 5:
             return f"{current_cup} Alt Path Node {current_node:X}"
+        else:
+            return None
 
     async def check_pending_tournament_location(self):
         if self.last_tournament_location_name is None:
@@ -3123,7 +3119,12 @@ class MSMContext(SuperContext):
             return
 
         location_name = self.get_current_alt_path_location_name()
-        self.log_once("alt_path",f"Current Alt Path Location: {location_name}", False)
+
+        if location_name == None:
+            return 
+        
+        # self.log_once("alt_path",f"Current Alt Path Location: {location_name}", False)
+
         if match_status != 1:
             return
 
@@ -3482,6 +3483,7 @@ class MSMContext(SuperContext):
     def num_ex_locations(self):
         return MSMUtils.find_num_exhibition_locs(
             self.enabled_sports or (),
+            self.exhibition_type or 0,
             self.exhibition_difficulties or (),
         )
 
@@ -4072,13 +4074,14 @@ class MSMContext(SuperContext):
 
         elif is_tournament and not is_loading and self.spawn_side_choice != 0 and game_loaded_positions:
 
-            if self.spawn_side_choice == 3:
-                self.spawn_side_choice = 0
-                return
-            elif self.spawn_side_choice == 1:
+            
+            if self.spawn_side_choice == 1:
                 player_spawn_pos = random.choice([1,2,3,4])
             elif self.spawn_side_choice == 2:
                 player_spawn_pos = random.choice([5,6,7,8])
+            else:
+                self.spawn_side_choice = 0
+                return
 
             self.game_interface.dolphin_client.write_byte(get_address(TournamentAddresses.player_current_node), player_spawn_pos)
 

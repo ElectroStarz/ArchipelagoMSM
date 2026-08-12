@@ -245,13 +245,13 @@ def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
     if not world.options.restrict_sports_mix:
         enabled_sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
     
-    required_courts = []
+    required_courts = set()
 
     for i in range(round_num):
         for sport in enabled_sports:
             if sport != "Sports Mix":
                 possible_court = tournament_rules[sport][cup_name][i]
-                required_courts.append(possible_court) if possible_court not in required_courts
+                required_courts.add(possible_court)
 
     if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         needed_count = 0
