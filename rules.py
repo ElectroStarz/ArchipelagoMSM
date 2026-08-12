@@ -238,36 +238,20 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str):
         return Has(f"{sport}: {cup_name} Cup ({category})")
 
 # Credit to Puffy for adding Progressive Court compatibility!!
+# Added compatibility with Restrict Sports Mix.
 def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
-    round_1_courts = {
-        "Mushroom": ["Mario Stadium"],
-        "Flower": ["Luigi's Mansion", "DK Dock", "Western Junction"],
-        "Star": ["Bowser Jr. Blvd.", "Wario Factory"]
-    }
+    enabled_sports = [sport for sport in world.options.enabled_sports.value]
 
-    round_2_courts = {
-        "Mushroom": ["Koopa Troopa Beach", "Toad Park"],
-        "Flower": ["Wario Factory", "Toad Park", "Luigi's Mansion", "Western Junction"],
-        "Star": ["Bowser's Castle", "Waluigi Pinball"]
-    }
+    if not world.options.restrict_sports_mix:
+        enabled_sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
+    
+    required_courts = []
 
-    round_3_courts = {
-        "Mushroom": ["Peach's Castle", "DK Dock"],
-        "Flower": ["Daisy Garden", "Western Junction"],
-        "Star": ["Star Ship"]
-    }
-
-    if round_num == 1:
-        required_courts = round_1_courts.get(cup_name, [])
-    elif round_num == 2:
-        required_courts = round_2_courts.get(cup_name, []) + round_1_courts.get(cup_name, [])
-    elif round_num == 3:
-        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(
-            cup_name, [])
-    else:
-        required_courts = round_3_courts.get(cup_name, []) + round_2_courts.get(cup_name, []) + round_1_courts.get(
-            cup_name, [])
-        return HasAny(*required_courts)
+    for i in range(round_num):
+        for sport in enabled_sports:
+            if sport != "Sports Mix":
+                possible_court = tournament_rules[sport][cup_name][i]
+                required_courts.append(possible_court) if possible_court not in required_courts
 
     if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         needed_count = 0
