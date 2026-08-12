@@ -12,11 +12,11 @@ cups = ["Mushroom", "Flower", "Star"]
 
 # Court item mappings used for exhibition and tournament requirements
 courts_dict = {
-    "Mario Stadium": 1, "Koopa Troopa Beach": 2, "Toad Park": 3,
-    "DK Dock": 4, "Peach's Castle": 5, "Daisy Garden": 6,
-    "Luigi's Mansion": 7, "Wario Factory": 8, "Bowser Jr. Blvd.": 9,
-    "Bowser's Castle": 10, "Waluigi Pinball": 11, "Western Junction": 12,
-    "Ghoulish Galleon": 13, "Star Ship": 14, "Behemoth Stage": 15,
+    "Mario Stadium": 1, "Koopa Troopa Beach": 2, "Peach's Castle": 3,
+    "Toad Park": 4, "DK Dock": 5, "Western Junction": 6,  
+    "Luigi's Mansion": 7, "Wario Factory": 8, "Daisy Garden": 9, 
+    "Waluigi Pinball": 10, "Bowser Jr. Blvd.": 11, "Ghoulish Galleon": 12,
+    "Bowser's Castle": 13,  "Star Ship": 14, "Behemoth Stage": 15,
 }
 
 cup_dict = {

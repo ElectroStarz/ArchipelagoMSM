@@ -2071,17 +2071,17 @@ class MSMContext(SuperContext):
         court_unlock_order = [
             "Mario Stadium",
             "Koopa Troopa Beach",
+            "Peach's Castle",
             "Toad Park",
             "DK Dock",
-            "Peach's Castle",
-            "Daisy Garden",
+            "Western Junction",
             "Luigi's Mansion",
             "Wario Factory",
-            "Bowser Jr. Blvd.",
-            "Bowser's Castle",
+            "Daisy Garden",
             "Waluigi Pinball",
-            "Western Junction",
+            "Bowser Jr. Blvd.",
             "Ghoulish Galleon",
+            "Bowser's Castle",
             "Star Ship",
             "Behemoth Stage"
         ]
