@@ -127,10 +127,9 @@ def get_address(address, offset=0xF80):
     Address inputted should be a PAL address which will then be converted to NTSC-U & vice versa"""
     #print(f"[DEBUG] Game Version is: {dc.GAME_VERSION}")
     #print(f"[DEBUG] Input Address (Hex): {hex(address)}")
+    # Some addresses are the same in PAL and NTSC-U
     if is_save_addr(address):
         return apply_file_offset(address)
-
-    # Some addresses are the same in PAL and NTSC-U
 
     if dc.GAME_VERSION == "NTSC-U":
         if address == MatchAddresses.current_court:

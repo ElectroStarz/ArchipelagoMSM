@@ -7,24 +7,20 @@ from .MSMContext import MSMContext, logger, tracker_loaded
 
 
 def launch_mario_sports_mix_client(*args):
-
     Utils.init_logging("Mario Sports Mix Client")
 
     async def main(main_args):
         multiprocessing.freeze_support()
         logger.info("main")
-        main_parser = get_base_parser()
-        parser_args = main_parser.parse_args()
 
-        ctx = MSMContext(parser_args.connect, parser_args.password)
+        ctx = MSMContext(main_args.connect, main_args.password)
         ctx.auth = main_args.name
-
 
         logger.info("Connecting to server...")
         ctx.server_task = asyncio.create_task(server_loop(ctx), name="Server Loop")
 
         if tracker_loaded:
-            ctx.run_generator() # type: ignore
+            ctx.run_generator()  # type: ignore
         if gui_enabled:
             ctx.run_gui()
         ctx.run_cli()
@@ -39,9 +35,8 @@ def launch_mario_sports_mix_client(*args):
             await asyncio.sleep(3)
             await ctx.dolphin_sync_task
 
-
     import colorama
-    parser = get_base_parser(description="Mario Sports Mix Client.")
+    parser = get_base_parser(description="Mario Sports Mix Client")
     parser.add_argument('--name', default=None, help="Slot Name to connect as.")
     parser.add_argument("url", nargs="?", help="Archipelago connection url")
 
