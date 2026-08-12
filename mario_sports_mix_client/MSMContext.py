@@ -2451,6 +2451,7 @@ class MSMContext(SuperContext):
         """Check if the player has goaled in the boss, if their goal isn't that boss, send the check for it"""
         # If we already sent the goal or location check for the boss, stop running
         if self.boss_defeat_handled:
+            self.log_once("boss_defeat_hanlded","Boss Defeat Handled, skipping function", True)
             return
 
         if self.ready_to_handle():
@@ -3719,6 +3720,7 @@ class MSMContext(SuperContext):
         self.boss_hp_handled = False
         self.is_behemoth = False
         self.is_behemoth_king = False
+        self.boss_defeat_handled = False
         self.game_interface.current_tournament = None
 
         await asyncio.sleep(0.1)
