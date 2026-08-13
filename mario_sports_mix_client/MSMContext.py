@@ -1774,7 +1774,7 @@ class MSMContext(SuperContext):
 
         current_cup = self.game_interface.get_tournament_cup()
 
-        if current_node > 17 and not current_node == 0xFF:
+        if current_node > 0x17 and not current_node == 0xFF:
             self.in_alt_path = True
         else:
             self.in_alt_path = False
@@ -2766,9 +2766,9 @@ class MSMContext(SuperContext):
         """Check if the player has scored the required amount of points to win the period/set"""
 
         sport = self.game_interface.get_mode()
-        curr_player_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_player_score_addr())
+        curr_player_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_player_score_addr(True))
         curr_opp_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_opponent_score_addr
-                                                                      (self.party_mode_opponent))
+                                                                      (self.party_mode_opponent, True))
         _, court_name = self.game_interface.get_court()
 
         if sport == "Basketball":
@@ -2989,10 +2989,11 @@ class MSMContext(SuperContext):
             self.debug_log(f"Could not find tournament difficulty for cup={cup}")
             return None
 
+
         if sports_mix_activated:
-            return f"Sports Mix: Beat {cup} Round {round_number}"
+            return f"Sports Mix: Beat {cup} Cup {round_number}"
         else:
-            return f"{sport}: Beat {difficulty} {cup} Round {round_number}"
+            return f"{sport}: Beat {difficulty} {cup} Cup {round_number}"
 
     def get_current_alt_path_location_name(self) -> Optional[str]:
         """Same as above, but for alt paths"""
@@ -3642,7 +3643,7 @@ class MSMContext(SuperContext):
         """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points) in
         everything but dodgeball - Used for DL-C Opponent gains points. Returns True if yes, False if no"""
 
-        addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent)
+        addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent, True)
         current_opponent_score = self.game_interface.dolphin_client.read_word(addr)
         mode = self.game_interface.get_mode()
 
@@ -4069,8 +4070,6 @@ class MSMContext(SuperContext):
                 self.spawn_side_choice = 1
             elif holding_right:
                 self.spawn_side_choice = 2
-            else:
-                self.spawn_side_choice = 3
 
         elif is_tournament and not is_loading and self.spawn_side_choice != 0 and game_loaded_positions:
 

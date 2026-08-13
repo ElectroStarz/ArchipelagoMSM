@@ -222,10 +222,13 @@ class MSMInterface:
 
         return id_to_char.get(value, "None")
 
-    def get_player_score_addr(self):
+    def get_player_score_addr(self, get_total: bool = False):
         if self.is_in_match():
-            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
-            return get_address(player_score_addresses[current_period])
+            if get_total:
+                return get_address(PlayerAddresses.Score.feed_petey_score)
+            else:
+                current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+                return get_address(player_score_addresses[current_period])
         elif self.is_in_feed_petey():
             return get_address(PlayerAddresses.Score.feed_petey_score)
         elif self.is_in_bob_omb():
@@ -239,11 +242,14 @@ class MSMInterface:
                                                        Pointers.Player.B1.ss_score)
         else: return None
 
-    def get_opponent_score_addr(self, opponent: int):
+    def get_opponent_score_addr(self, opponent: int, get_total: bool = False):
         ls_opponent = opponent - 1
         if self.is_in_match():
-            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
-            return get_address(opponent_score_addresses[current_period])
+            if get_total:
+                return get_address(OpponentAddresses.Score.r1_fp_score)
+            else:
+                current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+                return get_address(opponent_score_addresses[current_period])
         elif self.is_in_feed_petey():
             return get_address(fp_opp_score_addresses[ls_opponent])
         elif self.is_in_bob_omb():
