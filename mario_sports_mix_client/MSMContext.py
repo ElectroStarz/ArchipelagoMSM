@@ -1790,14 +1790,14 @@ class MSMContext(SuperContext):
 
 
         # Flower Cup Bridges always accessible
-        if current_node == 55:
+        if current_node == 0x55:
             self.game_interface.dolphin_client.write_byte(outer_bridge_addr, 1)
             await self.check_write(outer_bridge_addr, "byte", 1)
         else:
             self.game_interface.dolphin_client.write_byte(outer_bridge_addr, 0)
             await self.check_write(outer_bridge_addr, "byte", 0)
 
-        if current_node == 26:
+        if current_node == 0x26:
             self.game_interface.dolphin_client.write_byte(inner_bridge_addr, 0)
             await self.check_write(inner_bridge_addr, "byte", 0)
         else:
@@ -3095,7 +3095,7 @@ class MSMContext(SuperContext):
     async def handle_cup_round_win(self):
         """Handles sending the checks for winning a round of a cup"""
 
-        if not self.in_tournament_match:
+        if not self.in_tournament_match or self.in_alt_path:
             return
 
         location_name = self.get_current_cup_location_name()
@@ -3923,7 +3923,7 @@ class MSMContext(SuperContext):
                 character_addr = get_address(character_attr)
                 self.game_interface.dolphin_client.write_byte(character_addr, self.all_one_opponent - 1)
 
-            if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"]:
+            if self.game_interface.get_mode() in ["Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"] and not self.in_alt_path:
                 self.game_interface.dolphin_client.write_byte(get_address(PlayerAddresses.character_2), self.all_one_opponent - 1)
 
     async def randomize_tints(self):

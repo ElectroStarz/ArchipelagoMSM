@@ -56,17 +56,17 @@ class MusicFiles:
         smash_skate_normal_fast = base_addr + offset # String
         feed_petey_normal = base_addr + offset * 2 # String
         feed_petey_bonus_time = base_addr + offset * 3 # String
-        feed_petey_normal_fast = base_addr + offset * 4 # String
-        bob_omb_dodge_normal = base_addr + offset * 5 # String
-        bob_omb_dodge_normal_fast = base_addr + offset * 6 # String
-        harmony_hustle_normal = base_addr + offset * 7 # String
-        harmony_hustle_normal_fast = base_addr + offset * 8 # String
-        smash_skate_hard = base_addr + offset * 9 # String
-        smash_skate_hard_fast = base_addr + offset * 10 # String
-        feed_petey_hard = base_addr + offset * 11 # String
-        feed_petey_hard_fast = base_addr + offset * 12 # String
-        bob_omb_dodge_hard = base_addr + offset * 13 # String
-        bob_omb_dodge_hard_fast = base_addr + offset * 14 # String
+        feed_petey_normal_fast = base_addr + offset * 4 + 0x04 # String
+        bob_omb_dodge_normal = base_addr + offset * 5 + 0x04 # String
+        bob_omb_dodge_normal_fast = base_addr + offset * 6 + 0x04 # String
+        harmony_hustle_normal = base_addr + offset * 7 + 0x04 # String
+        harmony_hustle_normal_fast = base_addr + offset * 8 + 0x04 # String
+        smash_skate_hard = base_addr + offset * 9 + 0x04 # String
+        smash_skate_hard_fast = base_addr + offset * 10 + 0x04 # String
+        feed_petey_hard = base_addr + offset * 11 + 0x04 # String
+        feed_petey_hard_fast = base_addr + offset * 12 + 0x04 # String
+        bob_omb_dodge_hard = base_addr + offset * 13 + 0x04 # String
+        bob_omb_dodge_hard_fast = base_addr + offset * 14 + 0x04 # String
 
     class TournamentSongs:
 
