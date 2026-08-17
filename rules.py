@@ -544,9 +544,9 @@ def set_all_location_rules(world: MSMWorld) -> None:
         # Alternate Path Nodes that Require Round 2
         # make sure to edit when proper node names get added
         alt_path_r2_nodes = {
-            "Mushroom": ["Node 25", "Node 29", "Node 39"],
+            "Mushroom": ["Near Green Toad House", "Upper Field", "By Logs"],
             "Flower": [],
-            "Star": ["Node 23"]
+            "Star": ["Tower E6"]
         }
 
         alt_path_type = world.options.alt_path_type.value

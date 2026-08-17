@@ -3,7 +3,7 @@ class MusicFiles:
 
     class MenuSongs:
 
-        base_addr = 0x80DC770F # String
+        base_addr = 0x80DC76CF # String
         offset = 0x38
 
         title_theme = base_addr # String
@@ -13,7 +13,7 @@ class MusicFiles:
 
     class StageSongs:
 
-        base_addr = 0x80DC77EF # String
+        base_addr = 0x80DC77AF # String
         offset = 0x3C
 
         mario_stadium = base_addr # String
@@ -49,7 +49,7 @@ class MusicFiles:
 
     class PartySongs:
 
-        base_addr = 0x80DC7F3F # String
+        base_addr = 0x80DC7EFF # String
         offset = 0x3C
 
         smash_skate_normal = base_addr # String
@@ -70,7 +70,7 @@ class MusicFiles:
 
     class TournamentSongs:
 
-        base_addr = 0x80DC82C7 # String
+        base_addr = 0x80DC8297 # String
         offset = 0x40
 
         tournament_opening = base_addr # String
@@ -81,19 +81,19 @@ class MusicFiles:
 
     class MiscSongs:
 
-        win_1 = 0x80DC8407 # String
-        lose_1 = 0x80DC843F # String
-        win_2 = 0x80DC8477 # String
-        lose_2 = 0x80DC84AF # String
-        matching = 0x80DC84E7 # String
-        results = 0x80DC8523 # String
-        get_item = 0x80DC855B # String
-        starman = 0x80DC8593 # String
-        star_road_complete = 0x80DC85CB # String
+        win_1 = 0x80DC83C7 # String
+        lose_1 = 0x80DC83FF # String
+        win_2 = 0x80DC8437 # String
+        lose_2 = 0x80DC846F # String
+        matching = 0x80DC84A7 # String
+        results = 0x80DC84E3 # String
+        get_item = 0x80DC851B # String
+        starman = 0x80DC8553 # String
+        star_road_complete = 0x80DC858B # String
 
     class HarmonyHustlePreviews:
 
-        base_addr = 0x80DC8F03 # String
+        base_addr = 0x80DC8EC3 # String
         offset = 0x44
 
         classic_ocean = base_addr # String

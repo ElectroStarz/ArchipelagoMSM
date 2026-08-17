@@ -1953,17 +1953,32 @@ class MSMContext(SuperContext):
                 if progressive_alt_path_count >= 3:
                     self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
 
-            # Handles those Final Fantasy Characters block paths that I hate
+            # Handles characters that block paths
             if current_cup in ["Mushroom", "Flower"]:
                 self.game_interface.dolphin_client.write_byte(star_alt_paths_unlocked, 3)
-                if current_cup == "Flower":
-                    for sport in sports:
-                        if sport != "Sports Mix":
-                            sport_class = sport_addresses[sport]
-                            addr = getattr(sport_class.Characters, "white_mage")
-                            new_addr = get_address(addr)
-                            self.game_interface.dolphin_client.write_byte(new_addr, 1)
-                            await self.check_write(new_addr, "byte", 1)
+
+            if self.in_alt_path:
+                for sport in sports:
+                    if sport != "Sports Mix":
+                        sport_class = sport_addresses[sport]
+
+                        ninja_attr = getattr(sport_class.Characters, "ninja")
+                        ninja_addr = get_address(ninja_attr)
+                        white_mage_attr = getattr(sport_class.Characters, "white_mage")
+                        white_mage_addr = get_address(white_mage_attr)
+                        black_mage_attr = getattr(sport_class.Characters, "black_mage")
+                        black_mage_addr = get_address(black_mage_attr)
+                        slime_attr = getattr(sport_class.Characters, "slime")
+                        slime_addr = get_address(slime_attr)
+
+                        self.game_interface.dolphin_client.write_byte(ninja_addr, 1)
+                        await self.check_write(ninja_addr, "byte", 1)
+                        self.game_interface.dolphin_client.write_byte(white_mage_addr, 1)
+                        await self.check_write(white_mage_addr, "byte", 1)
+                        self.game_interface.dolphin_client.write_byte(black_mage_addr, 1)
+                        await self.check_write(black_mage_addr, "byte", 1)
+                        self.game_interface.dolphin_client.write_byte(slime_addr, 1)
+                        await self.check_write(slime_addr, "byte", 1)
         else:
             self.game_interface.dolphin_client.write_byte(mushroom_alt_paths_unlocked, 0)
             self.game_interface.dolphin_client.write_byte(flower_alt_paths_unlocked, 0)
@@ -3003,17 +3018,19 @@ class MSMContext(SuperContext):
         current_difficulty = self.game_interface.get_tournament_difficulty()
         current_sport = self.game_interface.get_tournament_sport()
 
+        current_node_name = self.game_interface.get_name_from_node(current_cup, current_node)
+
         if self.alt_paths_unlock_type == 0:
             if current_sport != "Sports Mix":
-                return f"{current_sport} {current_cup} Cup Alt Path {current_difficulty} Node {current_node:X}"
+                return f"{current_sport} {current_cup} Cup Alt Path {current_difficulty} {current_node_name}"
             else:
-                return f"Sports Mix {current_cup} Cup Alt Path Node {current_node:X}"
+                return f"Sports Mix {current_cup} Cup Alt Path {current_node_name}"
         elif self.alt_paths_unlock_type == 1:
-            return f"{current_sport} {current_cup} Cup Alt Path Node {current_node:X}"
+            return f"{current_sport} {current_cup} Cup Alt Path {current_node_name}"
         elif self.alt_paths_unlock_type == 2 or self.alt_paths_unlock_type == 4:
-            return f"{current_cup} Alt Path {current_difficulty} Node {current_node:X}"
+            return f"{current_cup} Alt Path {current_difficulty} {current_node_name}"
         elif self.alt_paths_unlock_type == 3 or self.alt_paths_unlock_type == 5:
-            return f"{current_cup} Alt Path Node {current_node:X}"
+            return f"{current_cup} Alt Path {current_node_name}"
         else:
             return None
 
@@ -3032,7 +3049,7 @@ class MSMContext(SuperContext):
 
         location_name = self.last_alt_path_location_name
         self.last_alt_path_location_name = None
-        self.debug_log(f"Sending pending tournament location: {location_name}")
+        self.debug_log(f"Sending pending alt path location: {location_name}")
         await self.check_location(location_name)
 
     async def handle_exhibition_win(self):
@@ -3977,7 +3994,7 @@ class MSMContext(SuperContext):
         
         if current_tint == 0xFFFFFFFF:
             self.game_interface.dolphin_client.write_word(get_address(MatchAddresses.stage_tint), rgba_value)
-            self.log_once("tints", f"Tint for stage {current_stage} applied: {hex(rgba_value)}", False)
+            # self.log_once("tints", f"Tint for stage {current_stage} applied: {hex(rgba_value)}", False)
 
         
     # === QOL Stuff ===
@@ -4047,7 +4064,7 @@ class MSMContext(SuperContext):
         is_loading = True if self.game_interface.get_tournament_round() == "Not in Tournament" else False
         game_loaded_positions = False if self.game_interface.get_player_current_node() == 0xFF else True
 
-        self.log_once("sc", f"Spawn Control: is_tournament = {is_tournament}, is_loading = {is_loading}, game_loaded_positions = {game_loaded_positions}, spawn_side_choice = {self.spawn_side_choice}", False)
+        # self.log_once("sc", f"Spawn Control: is_tournament = {is_tournament}, is_loading = {is_loading}, game_loaded_positions = {game_loaded_positions}, spawn_side_choice = {self.spawn_side_choice}", False)
         if is_tournament and is_loading and self.spawn_side_choice == 0 and not game_loaded_positions:
 
             player_extension = self.game_interface.dolphin_client.read_byte(get_address(PlayerInputs.P1_Extension))

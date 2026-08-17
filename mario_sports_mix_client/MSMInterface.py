@@ -534,7 +534,7 @@ class MSMInterface:
         for cls in classes:
             songs = self.get_songs_from_class(cls)
             if music_to_be_replaced in songs:
-                address = get_address(getattr(cls, music_to_be_replaced))
+                address = get_address(getattr(cls, music_to_be_replaced), offset = 0xF40)
                 break
 
         original_length = len(self.get_music_file_name(music_to_be_replaced)) 
@@ -545,7 +545,7 @@ class MSMInterface:
             self.logger.warning(f"Could not find replacement music file for {music_to_replace_with}")
             return
 
-        self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
+        # self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
         self.dolphin_client.write_string(address, new_song)
 
         # Clearing in case stale stuff gets in the way
@@ -563,6 +563,77 @@ class MSMInterface:
             if not attr.startswith("__") and not attr.startswith("base") and not attr.startswith("offset"):
                 songs.append(attr)
         return songs
+
+    def get_name_from_node(self, cup: str, node: int):
+        names = {
+            "Mushroom": {
+                        0x21: "East of Red Toad House",
+                        0x24: "Lower Field",
+                        0x25: "Near Green Toad House",
+                        0x28: "South of Lake",
+                        0x29: "Upper Field",
+                        0x2B: "By Lake",
+                        0x30: "Below the Curve",
+                        0x31: "Lake Platform",
+                        0x32: "Hidden Finale",
+                        0x34: "Upper Curve",
+                        0x35: "Middle Curve",
+                        0x36: "Lower Curve",
+                        0x37: "Top of the Mountain",
+                        0x38: "Red Toad House",
+                        0x39: "By Logs",
+                        0x3B: "By Castle Flowers",
+                        },
+
+            "Flower":   {
+                        0x26: "Left-Center Bridge",
+                        0x2A: "Waterwheel",
+                        0x2D: "Left Shoreline",
+                        0x32: "Right Shoreline",
+                        0x36: "Bottom-Left Island House",
+                        0x39: "Bottom-Left Island Cannon",
+                        0x3D: "Middle-Left Islands",
+                        0x3E: "Hidden Finale",
+                        0x43: "Middle-Right Island Cannon",
+                        0x44: "Middle-Right Island Field",
+                        0x46: "Top-Right Island Tower",
+                        0x47: "Top-Right Island Bottom Field",
+                        0x49: "Top-Right Island Right Field",
+                        0x4B: "Top-Left Island",
+                        0x4E: "Bottom-Right Island",
+                        0x50: "Leftmost Bridge",
+                        0x52: "Flower Lake Island",
+                        0x55: "Below Rightmost Bridge",
+                        0x57: "Above Rightmost Bridge",
+                        },
+
+            "Star":     {
+                        0x21: "Tower E1",
+                        0x23: "Tower E6",
+                        0x27: "Tower D2",
+                        0x2A: "Tower D7",
+                        0x2E: "Tower C3",
+                        0x30: "Tower C6",
+                        0x32: "Tower B1",
+                        0x33: "Tower B2",
+                        0x36: "Tower B5",
+                        0x37: "Tower B6",
+                        0x38: "Tower B7",
+                        0x3D: "Tower A7",
+                        0x43: "Star Road Bottom-Left of Star",
+                        0x45: "Star Road Bottom-Right of Star",
+                        0x47: "Star Road Top-Left of Star",
+                        0x48: "Star Road Top-Right of Star",
+                        0x49: "Star Road (Right) Intro",
+                        0x4A: "Star Road (Left) Intro",
+                        0x4B: "Star Road Top-Center of Star",
+                        0x4C: "Star Road (Left) Bonus",
+                        0x4D: "Star Road (Right) Bonus",
+                        },
+        }
+
+        return names.get(cup, {}).get(node, "Unknown Node")
+
 
     def get_connection_state(self):
         try:
