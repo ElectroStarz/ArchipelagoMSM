@@ -70,7 +70,7 @@ class MusicFiles:
 
     class TournamentSongs:
 
-        base_addr = 0x80DC8297 # String
+        base_addr = 0x80DC8287 # String
         offset = 0x40
 
         tournament_opening = base_addr # String
@@ -81,8 +81,9 @@ class MusicFiles:
 
     class MiscSongs:
 
-        win_1 = 0x80DC83C7 # String
-        lose_1 = 0x80DC83FF # String
+        # Commented out to avoid potential infinite loops
+        # win_1 = 0x80DC83C7 # String
+        # lose_1 = 0x80DC83FF # String
         win_2 = 0x80DC8437 # String
         lose_2 = 0x80DC846F # String
         matching = 0x80DC84A7 # String

@@ -466,8 +466,7 @@ from Coins Trap, etc)"""
 class IncludeAltPaths(Toggle):
     """Include alternate paths?
     No: Alt Paths will not be included
-    Yes: Alt Paths will be included
-    LR Split: Alt Paths will be split between Left and Right"""
+    Yes: Alt Paths will be included"""
 
     display_name = "Include Alternate Paths"
     default = False

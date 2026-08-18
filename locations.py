@@ -2055,7 +2055,7 @@ def create_regular_locations(world: MSMWorld) -> None:
                                         
                             location_names = [
                                 name for name in alt_path_tables[sport][difficulty]
-                                if cup.casefold() in name.casefold()
+                                if f"{cup.casefold()} cup" in name.casefold()
                             ]
 
                             locations = get_location_names_with_ids(location_names)
@@ -2065,7 +2065,7 @@ def create_regular_locations(world: MSMWorld) -> None:
                     for cup, region in sports_mix_alt_regions.items():
                         location_names = [
                             name for name in sports_mix_alternate_path_locations
-                            if cup.casefold() in name.casefold()
+                            if f"{cup.casefold()} cup" in name.casefold()
                         ]
                         locations = get_location_names_with_ids(location_names)
                         region.add_locations(locations, MSMLocation)
@@ -2079,7 +2079,7 @@ def create_regular_locations(world: MSMWorld) -> None:
                                                         
                         location_names = [
                             name for name in alt_path_tables[sport]["Global"]
-                            if cup.casefold() in name.casefold()
+                            if f"{cup.casefold()} cup" in name.casefold()
                         ]
                     
                         locations = get_location_names_with_ids(location_names)
@@ -2095,7 +2095,7 @@ def create_regular_locations(world: MSMWorld) -> None:
 
                         location_names = [
                             name for name in alt_path_tables["Global"][difficulty]
-                            if cup.casefold() in name.casefold()
+                            if f"{cup.casefold()} cup" in name.casefold()
                         ]
 
                         locations = get_location_names_with_ids(location_names)
@@ -2106,7 +2106,7 @@ def create_regular_locations(world: MSMWorld) -> None:
 
                     location_names = [
                         name for name in alt_path_tables["Global"]["Global"]
-                        if cup.casefold() in name.casefold()
+                        if f"{cup.casefold()} cup" in name.casefold()
                     ]
 
                     locations = get_location_names_with_ids(location_names)

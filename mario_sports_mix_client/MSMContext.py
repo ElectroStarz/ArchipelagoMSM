@@ -34,7 +34,7 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "2.2.0"
+CLIENT_VERSION = "3.0.0"
 COMPATIBLE_VERSIONS = []
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
@@ -3028,9 +3028,9 @@ class MSMContext(SuperContext):
         elif self.alt_paths_unlock_type == 1:
             return f"{current_sport} {current_cup} Cup Alt Path {current_node_name}"
         elif self.alt_paths_unlock_type == 2 or self.alt_paths_unlock_type == 4:
-            return f"{current_cup} Alt Path {current_difficulty} {current_node_name}"
+            return f"{current_cup} Cup Alt Path {current_difficulty} {current_node_name}"
         elif self.alt_paths_unlock_type == 3 or self.alt_paths_unlock_type == 5:
-            return f"{current_cup} Alt Path {current_node_name}"
+            return f"{current_cup} Cup Alt Path {current_node_name}"
         else:
             return None
 

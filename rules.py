@@ -751,13 +751,20 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
     )
 
     # Menu rules
-    for sport in world.options.enabled_sports.value:
+    # Now properly blocks off disabled sports
+    for sport in all_sports:
         if sport != "Sports Mix":
             entrance = world.get_entrance(f"Main Menu -> {sport}")
-            world.set_rule(entrance, Has(sport))
+            if sport in world.options.enabled_sports.value:
+                world.set_rule(entrance, Has(sport))
+            else:
+                world.set_rule(entrance, False_())
         else:
             sm_entrance = world.get_entrance(f"Main Menu -> Sports Mix")
-            world.set_rule(sm_entrance, sports_mix_rule)
+            if "Sports Mix" in world.options.enabled_sports.value:
+                world.set_rule(sm_entrance, sports_mix_rule)
+            else:
+                world.set_rule(sm_entrance, False_())
 
     # Tournament Rules
     if world.options.include_tournaments:
