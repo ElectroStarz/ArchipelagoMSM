@@ -110,7 +110,7 @@ class AddressLib:
 
     @cached_property
     def current_node_addr(self):
-        return get_address(GlobalTournament.current_node)
+        return get_address(TournamentAddresses.player_current_node)
 
     @cached_property
     def mushroom_cup_alt_unlocked_addr(self):
@@ -134,11 +134,11 @@ class AddressLib:
 
     @cached_property
     def current_tournament_round_addr(self):
-        return get_address(GlobalTournament.current_round)
+        return get_address(TournamentAddresses.current_tournament_round)
 
     @cached_property
     def current_tournament_cup_addr(self):
-        return get_address(GlobalTournament.current_cup)
+        return get_address(TournamentAddresses.current_tournament_cup)
 
     @cached_property
     def current_tournament_map_sport_addr(self):
@@ -146,7 +146,7 @@ class AddressLib:
 
     @cached_property
     def current_tournament_sport_addr(self):
-        return get_address(GlobalTournament.current_tournament_sport)
+        return get_address(TournamentAddresses.current_tournament_sport_variation)
 
     address_properties = [
         "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",

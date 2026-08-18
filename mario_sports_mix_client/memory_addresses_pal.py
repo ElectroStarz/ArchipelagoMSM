@@ -1,7 +1,7 @@
 # Need someone with PAL copy to verify these
 class MusicFiles:
     class MenuSongs:
-        base_addr = 0x80DC770F  # String
+        base_addr = 0x80DC76CF  # String
         offset = 0x38
 
         title_theme = base_addr  # String
@@ -10,7 +10,7 @@ class MusicFiles:
         records_menu = base_addr + offset * 3  # String
 
     class StageSongs:
-        base_addr = 0x80DC77EF  # String
+        base_addr = 0x80DC77AF  # String
         offset = 0x3C
 
         mario_stadium = base_addr  # String
@@ -45,27 +45,27 @@ class MusicFiles:
         behemoth_stage_fast = base_addr + offset * 29  # String
 
     class PartySongs:
-        base_addr = 0x80DC7F3F  # String
+        base_addr = 0x80DC7EFF  # String
         offset = 0x3C
 
         smash_skate_normal = base_addr  # String
         smash_skate_normal_fast = base_addr + offset  # String
         feed_petey_normal = base_addr + offset * 2  # String
         feed_petey_bonus_time = base_addr + offset * 3  # String
-        feed_petey_normal_fast = base_addr + offset * 4  # String
-        bob_omb_dodge_normal = base_addr + offset * 5  # String
-        bob_omb_dodge_normal_fast = base_addr + offset * 6  # String
-        harmony_hustle_normal = base_addr + offset * 7  # String
-        harmony_hustle_normal_fast = base_addr + offset * 8  # String
-        smash_skate_hard = base_addr + offset * 9  # String
-        smash_skate_hard_fast = base_addr + offset * 10  # String
-        feed_petey_hard = base_addr + offset * 11  # String
-        feed_petey_hard_fast = base_addr + offset * 12  # String
-        bob_omb_dodge_hard = base_addr + offset * 13  # String
-        bob_omb_dodge_hard_fast = base_addr + offset * 14  # String
+        feed_petey_normal_fast = base_addr + offset * 4 + 0x04  # String
+        bob_omb_dodge_normal = base_addr + offset * 5 + 0x04  # String
+        bob_omb_dodge_normal_fast = base_addr + offset * 6 + 0x04  # String
+        harmony_hustle_normal = base_addr + offset * 7 + 0x04  # String
+        harmony_hustle_normal_fast = base_addr + offset * 8 + 0x04  # String
+        smash_skate_hard = base_addr + offset * 9 + 0x04  # String
+        smash_skate_hard_fast = base_addr + offset * 10 + 0x04  # String
+        feed_petey_hard = base_addr + offset * 11 + 0x04  # String
+        feed_petey_hard_fast = base_addr + offset * 12 + 0x04  # String
+        bob_omb_dodge_hard = base_addr + offset * 13 + 0x04  # String
+        bob_omb_dodge_hard_fast = base_addr + offset * 14 + 0x04  # String
 
     class TournamentSongs:
-        base_addr = 0x80DC82C7  # String
+        base_addr = 0x80DC8287  # String
         offset = 0x40
 
         tournament_opening = base_addr  # String
@@ -75,18 +75,19 @@ class MusicFiles:
         tournament_victory = base_addr + offset * 4  # String
 
     class MiscSongs:
-        win_1 = 0x80DC8407  # String
-        lose_1 = 0x80DC843F  # String
-        win_2 = 0x80DC8477  # String
-        lose_2 = 0x80DC84AF  # String
-        matching = 0x80DC84E7  # String
-        results = 0x80DC8523  # String
-        get_item = 0x80DC855B  # String
-        starman = 0x80DC8593  # String
-        star_road_complete = 0x80DC85CB  # String
+        # Commented out to avoid potential infinite loops
+        # win_1 = 0x80DC83C7 # String
+        # lose_1 = 0x80DC83FF # String
+        win_2 = 0x80DC8437  # String
+        lose_2 = 0x80DC846F  # String
+        matching = 0x80DC84A7  # String
+        results = 0x80DC84E3  # String
+        get_item = 0x80DC851B  # String
+        starman = 0x80DC8553  # String
+        star_road_complete = 0x80DC858B  # String
 
     class HarmonyHustlePreviews:
-        base_addr = 0x80DC8F03  # String
+        base_addr = 0x80DC8EC3  # String
         offset = 0x44
 
         classic_ocean = base_addr  # String
