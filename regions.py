@@ -451,7 +451,7 @@ def connect_regions(world: MSMWorld) -> None:
     d_star_cup_n.connect(g_star_cup_alternate_n, "Dodgeball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
     v_star_cup_n.connect(g_star_cup_alternate_n, "Volleyball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
     h_star_cup_n.connect(g_star_cup_alternate_n, "Hockey: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
-    
+
 
     b_mushroom_cup_h.connect(g_mushroom_cup_alternate_h, "Basketball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
     d_mushroom_cup_h.connect(g_mushroom_cup_alternate_h, "Dodgeball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
@@ -477,7 +477,7 @@ def connect_regions(world: MSMWorld) -> None:
     d_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Dodgeball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
     v_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Volleyball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
     h_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Hockey: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
-    
+
     b_flower_cup_n.connect(g_flower_cup_alternate_g, "Basketball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
     d_flower_cup_n.connect(g_flower_cup_alternate_g, "Dodgeball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
     v_flower_cup_n.connect(g_flower_cup_alternate_g, "Volleyball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
@@ -486,7 +486,7 @@ def connect_regions(world: MSMWorld) -> None:
     d_flower_cup_h.connect(g_flower_cup_alternate_g, "Dodgeball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
     v_flower_cup_h.connect(g_flower_cup_alternate_g, "Volleyball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
     h_flower_cup_h.connect(g_flower_cup_alternate_g, "Hockey: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
-    
+
     b_star_cup_n.connect(g_star_cup_alternate_g, "Basketball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Global)")
     d_star_cup_n.connect(g_star_cup_alternate_g, "Dodgeball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Global)")
     v_star_cup_n.connect(g_star_cup_alternate_g, "Volleyball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Global)")
@@ -500,7 +500,7 @@ def connect_regions(world: MSMWorld) -> None:
 
 
 
-    
+
     # Behemoth is accessed by completing all normal star cups, connect all to the Behemoth Boss region
     # Note: Add rule if 3 other star cups have been beaten, Note : "has cleared" is the same as "can reach"
     b_star_cup_n.connect(behemoth_boss, "Basketball Star Cup (Normal) -> Behemoth Boss")

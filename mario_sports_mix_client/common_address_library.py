@@ -2,6 +2,7 @@ from functools import cached_property
 from .memory_addresses_pal import *
 from .MSMFunctions import get_address
 
+
 # This is a file with commonly used addresses. These values are cached and saved as the user if probably not going to
 # change regions midway through a sync/async. If needed though, there is a command to reset these values in the client.
 

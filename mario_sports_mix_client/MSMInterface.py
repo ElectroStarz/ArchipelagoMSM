@@ -205,7 +205,7 @@ class MSMInterface:
 
     def check_team_amount(self):
         value = self.dolphin_client.read_byte(self.addresslib.game_layout_addr)
-        
+
         if value == 0:
             return 3
         elif value == 4:
@@ -285,7 +285,7 @@ class MSMInterface:
         current_sport_value = self.dolphin_client.read_byte(get_address(MatchAddresses.current_sport))
         is_party_mode = self.dolphin_client.read_byte(get_address(MatchAddresses.is_party_mode))
         current_sport = {0: "BA", 1: "VO", 2: "DO", 3: "HO", 5: "SM"}.get(current_sport_value)
-        
+
         if current_sport == "BA" and is_party_mode == 2:
             return "Feed Petey"
         elif current_sport == "VO" and is_party_mode == 2:
@@ -309,13 +309,13 @@ class MSMInterface:
 
     def get_tab(self):
         diff = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
-            
+
         if self.is_in_feed_petey():
             return {0: "Apple", 1: "Watermelon"}.get(diff)
-            
+
         elif self.is_in_bob_omb():
             return {0: "Bob-omb", 1: "Cannon"}.get(diff)
-            
+
         elif self.is_in_smash():
             return {0: "Hockey Stick", 1: "Hockey Skate"}.get(diff)
         else:
@@ -424,7 +424,7 @@ class MSMInterface:
         node = self.dolphin_client.read_byte(get_address(TournamentAddresses.player_current_node))
 
         return node
-    
+
     def special_active(self):
         try:
             value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
@@ -523,12 +523,13 @@ class MSMInterface:
         if file_name is None:
             self.logger.warning(f"No file for {music_name}")
             return None
-    
+
         return file_name + ".brstm"
 
-    def replace_music_file(self, music_to_be_replaced: str, music_to_replace_with: str) -> bool:
+    def replace_music_file(self, music_to_be_replaced: str, music_to_replace_with: str) -> bool | None:
 
-        classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs, MusicFiles.TournamentSongs, MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
+        classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs,
+                   MusicFiles.TournamentSongs, MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
         address = None
 
         for cls in classes:
@@ -537,7 +538,7 @@ class MSMInterface:
                 address = get_address(getattr(cls, music_to_be_replaced), offset = 0xF40)
                 break
 
-        original_length = len(self.get_music_file_name(music_to_be_replaced)) 
+        original_length = len(self.get_music_file_name(music_to_be_replaced))
         new_length = len(self.get_music_file_name(music_to_replace_with))
         new_song = self.get_music_file_name(music_to_replace_with)
 
@@ -555,8 +556,8 @@ class MSMInterface:
         self.dolphin_client.write_byte(address + new_length, 0x00)
         new_length += 1
         self.dolphin_client.write_byte(address + new_length, 0x00)
-        
-            
+
+
     def get_songs_from_class(self, cls):
         songs = []
         for attr in dir(cls):

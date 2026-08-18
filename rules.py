@@ -13,8 +13,8 @@ cups = ["Mushroom", "Flower", "Star"]
 # Court item mappings used for exhibition and tournament requirements
 courts_dict = {
     "Mario Stadium": 1, "Koopa Troopa Beach": 2, "Peach's Castle": 3,
-    "Toad Park": 4, "DK Dock": 5, "Western Junction": 6,  
-    "Luigi's Mansion": 7, "Wario Factory": 8, "Daisy Garden": 9, 
+    "Toad Park": 4, "DK Dock": 5, "Western Junction": 6,
+    "Luigi's Mansion": 7, "Wario Factory": 8, "Daisy Garden": 9,
     "Waluigi Pinball": 10, "Bowser Jr. Blvd.": 11, "Ghoulish Galleon": 12,
     "Bowser's Castle": 13,  "Star Ship": 14, "Behemoth Stage": 15,
 }
@@ -148,7 +148,7 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
                 else:
                     cup_logic = cup_rule(world, enabled_sport, cup_name, category)
 
-                
+
                 for i in range(round_num if round_num is not None else 1):
                     court_logic &= court_rule(world, tournament_rules[enabled_sport][cup_name][i], False)
 
@@ -162,18 +162,18 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
             logic &= Has(f"{cup_name} Cup Alt Paths ({category})")
 
         return logic
-    
+
     else:
 
         court_logic = True_()
         if sport == "Sports Mix":
-            
+
             for i in range(round_num if round_num is not None else 1):
                 court_logic &= sports_mix_court_rule(world, cup_name, i + 1)
         else:
             for i in range(round_num if round_num is not None else 1):
                 court_logic &= court_rule(world, tournament_rules[sport][cup_name][i], False)
-        
+
         if category == "Global":
             cup_logic = cup_rule(world, sport, cup_name, "Normal") | cup_rule(world, sport, cup_name, "Hard")
         else:
@@ -189,10 +189,10 @@ def alternate_path_rule(world: MSMWorld, sport: str, cup_name: str, category: st
                 logic &= Has(f"Sports Mix: {cup_name} Cup Alt Paths")
             else:
                 logic &= Has(f"{sport}: {cup_name} Cup Alt Paths ({category})")
-        
+
         return logic
 
-     
+
 
 def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
     """Calculates exactly how many Progressive Cups are needed for a specific tier."""
@@ -244,7 +244,7 @@ def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int):
 
     if not world.options.restrict_sports_mix:
         enabled_sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
-    
+
     required_courts = set()
 
     for i in range(round_num):
@@ -564,7 +564,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                                     # Apparantely Dodgeball is the only sport to have a node locked off by special meter and its literally just this one im crine
                                     if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_paths.value:
                                         world.set_rule(location, alternate_path_rule(world, "Dodgeball", "Star", difficulty, round_num=2) & Has("Special Meter"))
-                                    else:    
+                                    else:
                                         world.set_rule(location, alternate_path_rule(world, sport, cup, difficulty, round_num=2))
 
                 if "Sports Mix" in world.options.enabled_sports.value:
@@ -581,7 +581,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                                 location = world.get_location(f"{sport} {cup} Cup Alt Path {node}")
                                 if cup == "Star" and sport == "Dodgeball" and not world.options.always_spawn_alt_paths.value:
                                     world.set_rule(location, alternate_path_rule(world, "Dodgeball", "Star", "Global", round_num=2) & Has("Special Meter"))
-                                else:    
+                                else:
                                     world.set_rule(location, alternate_path_rule(world, sport, cup, "Global", round_num=2))
 
             if alt_path_type == 2 or alt_path_type == 4:
@@ -601,7 +601,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                         location = world.get_location(f"{cup} Cup Alt Path {node}")
                         if cup == "Star" and not world.options.always_spawn_alt_paths.value:
                             world.set_rule(location, alternate_path_rule(world, "Global", "Star", "Global", round_num=2) & Has("Special Meter"))
-                        else:    
+                        else:
                             world.set_rule(location, alternate_path_rule(world, "Global", cup, "Global", round_num=2))
 
 
@@ -790,7 +790,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
         if world.options.include_alt_paths:
 
             alt_path_type = world.options.alt_path_type.value
-            
+
             # Yeah its the same as the tournament sue me it works :P
             if alt_path_type == 0:
                 for sport in world.options.enabled_sports.value:
@@ -810,7 +810,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                     for cup in cup_tiers:
                         entrance = world.get_entrance(f"Sports Mix: {cup} Cup -> {cup} Cup Alt Paths")
                         world.set_rule(entrance, alternate_path_rule(world, "Sports Mix", cup, "Sports Mix"))
-            
+
             elif alt_path_type == 1:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
@@ -819,7 +819,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                             entrance_h = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> {cup} Cup Alt Paths (Global)")
                             world.set_rule(entrance_n, alternate_path_rule(world, sport, cup, "Global"))
                             world.set_rule(entrance_h, alternate_path_rule(world, sport, cup, "Global"))
-            
+
             elif alt_path_type == 2 or alt_path_type == 4:
                 for sport in world.options.enabled_sports.value:
                     if sport != "Sports Mix":
@@ -842,7 +842,7 @@ def set_all_entrance_rules(world: MSMWorld) -> None:
                             entrance_h = world.get_entrance(f"{sport}: {cup} Cup (Hard) -> Global: {cup} Cup Alt Paths (Global)")
                             world.set_rule(entrance_n, alternate_path_rule(world, "Global", cup, "Global"))
                             world.set_rule(entrance_h, alternate_path_rule(world, "Global", cup, "Global"))
-            
+
 
     # Party Mode Entrance Rules
     if world.options.party_mode:

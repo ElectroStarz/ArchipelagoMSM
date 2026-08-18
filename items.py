@@ -631,7 +631,7 @@ def create_all_items(world: "MSMWorld") -> None:
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
 
     # Small configurations (for example, Exhibition Tour with one difficulty)
-    # can have fewer locations than optional cosmetics.  Remove filler items
+    # can have fewer locations than optional cosmetics. Remove filler items
     # first so every generated pool item has a valid destination.
     overflow = len(itempool) - number_of_unfilled_locations
     if overflow > 0:
@@ -661,14 +661,17 @@ def create_all_items(world: "MSMWorld") -> None:
 def create_courts(world: "MSMWorld", itempool):
     if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
 
-        the_awesome_edge_case = world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court
+        the_awesome_edge_case = (world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups
+                                 and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup
+                                 and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court)
 
         mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
 
         other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
                         "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
-        
-        if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups) or the_awesome_edge_case:
+
+        if (world.options.start_with_mushroom_cup not in
+                (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups) or the_awesome_edge_case):
             for court in mush_courts:
                 world.push_precollected(world.create_item(court))
 
@@ -834,7 +837,7 @@ def create_cups(world: "MSMWorld", itempool):
                     itempool.append(world.create_item(name))
 
 
-           
+
         prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
         # Push free individual starting items
@@ -916,7 +919,7 @@ def create_alt_paths(world: "MSMWorld", itempool):
 
     prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
-    
+
     if alt_path_type == 0:
         for name in all_normal_items:
             sport = prefix_to_sport[name[:1]]
@@ -938,32 +941,32 @@ def create_alt_paths(world: "MSMWorld", itempool):
             sport = prefix_to_sport[name[:1]]
             if sport in enabled_sports:
                 itempool.append(world.create_item(name))
-    
+
     elif alt_path_type == 2:
         for name in global_alt_paths_n:
             itempool.append(world.create_item(name))
-        
+
         if world.options.hard_tournament_difficulty.value:
             for name in global_alt_paths_h:
                 itempool.append(world.create_item(name))
-    
+
     elif alt_path_type == 3:
         for name in global_alt_paths_g:
             itempool.append(world.create_item(name))
-    
+
     elif alt_path_type == 4:
         total_progressive_alt_paths = 3
         if world.options.hard_tournament_difficulty.value:
             total_progressive_alt_paths += 3
-        
+
         for _ in range(total_progressive_alt_paths):
             itempool.append(world.create_item("Progressive Alternate Path"))
-    
+
     elif alt_path_type == 5:
         # im no longer too lazy to loop
         for _ in range(3):
             itempool.append(world.create_item("Progressive Alternate Path"))
-        
+
     else:
         raise OptionError(f"[Mario Sports Mix] {world.player_name}'s alt path type is invalid.")
 
