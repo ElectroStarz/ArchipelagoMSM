@@ -6,8 +6,10 @@ from .options import *
 if TYPE_CHECKING:
     from . import MSMWorld
 
+
 class MSMItem(Item):
     game: str = "Mario Sports Mix"
+
 
 class ItemGroup(str, Enum):
     BASKETBALL_NORMAL_CUPS = "Basketball Normal Cups"
@@ -67,6 +69,7 @@ class ItemGroup(str, Enum):
     BOB_OMB_DODGE = "Bob-omb Dodge"
     SMASH_SKATE = "Smash Skate"
 
+
 class ItemData(NamedTuple):
     id: int
     classification: IC
@@ -77,337 +80,364 @@ base_id = 0
 
 # Core Unlocks (1 - 99 range)
 sport_items = {
-    "Basketball":                        ItemData(base_id + 1, IC.progression|IC.useful, ItemGroup.SPORTS),
-    "Dodgeball":                         ItemData(base_id + 2, IC.progression|IC.useful, ItemGroup.SPORTS),
-    "Volleyball":                        ItemData(base_id + 3, IC.progression|IC.useful, ItemGroup.SPORTS),
-    "Hockey":                            ItemData(base_id + 4, IC.progression|IC.useful, ItemGroup.SPORTS),
+    "Basketball": ItemData(base_id + 1, IC.progression | IC.useful, ItemGroup.SPORTS),
+    "Dodgeball": ItemData(base_id + 2, IC.progression | IC.useful, ItemGroup.SPORTS),
+    "Volleyball": ItemData(base_id + 3, IC.progression | IC.useful, ItemGroup.SPORTS),
+    "Hockey": ItemData(base_id + 4, IC.progression | IC.useful, ItemGroup.SPORTS),
 }
 
 sports_mix_item = {
-    "Sports Mix":                        ItemData(base_id + 5, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS),
+    "Sports Mix": ItemData(base_id + 5, IC.progression_skip_balancing | IC.useful, ItemGroup.SPORTS),
 }
 
 ex_difficulties = {
-    "Exhibition Easy":                   ItemData(base_id + 6, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Normal":                 ItemData(base_id + 7, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Hard":                   ItemData(base_id + 8, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
-    "Exhibition Expert":                 ItemData(base_id + 9, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Easy": ItemData(base_id + 6, IC.progression | IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Normal": ItemData(base_id + 7, IC.progression | IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Hard": ItemData(base_id + 8, IC.progression | IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
+    "Exhibition Expert": ItemData(base_id + 9, IC.progression | IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
 }
 
 # Cups / Tournaments / Alt Paths (100 range)
 basketball_items_n = {
     "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 101, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Flower Cup (Normal)":   ItemData(base_id + 102, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
-    "Basketball: Star Cup (Normal)":     ItemData(base_id + 103, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Flower Cup (Normal)": ItemData(base_id + 102, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+    "Basketball: Star Cup (Normal)": ItemData(base_id + 103, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
 }
 
 basketball_alt_paths_n = {
-    "Basketball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 104, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_N),
-    "Basketball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 105, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_N),
-    "Basketball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 106, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_N),
+    "Basketball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 104, IC.progression,
+                                                            ItemGroup.BASKETBALL_ALT_PATHS_N),
+    "Basketball: Flower Cup Alt Paths (Normal)": ItemData(base_id + 105, IC.progression,
+                                                          ItemGroup.BASKETBALL_ALT_PATHS_N),
+    "Basketball: Star Cup Alt Paths (Normal)": ItemData(base_id + 106, IC.progression,
+                                                        ItemGroup.BASKETBALL_ALT_PATHS_N),
 }
 
 basketball_items_h = {
-    "Basketball: Mushroom Cup (Hard)":   ItemData(base_id + 111, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Flower Cup (Hard)":     ItemData(base_id + 112, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
-    "Basketball: Star Cup (Hard)":       ItemData(base_id + 113, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Mushroom Cup (Hard)": ItemData(base_id + 111, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Flower Cup (Hard)": ItemData(base_id + 112, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
+    "Basketball: Star Cup (Hard)": ItemData(base_id + 113, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
 }
 
 basketball_alt_paths_h = {
-    "Basketball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 114, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
-    "Basketball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 115, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
-    "Basketball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 116, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
+    "Basketball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 114, IC.progression,
+                                                          ItemGroup.BASKETBALL_ALT_PATHS_H),
+    "Basketball: Flower Cup Alt Paths (Hard)": ItemData(base_id + 115, IC.progression,
+                                                        ItemGroup.BASKETBALL_ALT_PATHS_H),
+    "Basketball: Star Cup Alt Paths (Hard)": ItemData(base_id + 116, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
 }
 
 basketball_alt_paths_g = {
-    "Basketball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 117, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_G),
-    "Basketball: Flower Cup Alt Paths (Global)":   ItemData(base_id + 118, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_G),
-    "Basketball: Star Cup Alt Paths (Global)":     ItemData(base_id + 119, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_G),
+    "Basketball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 117, IC.progression,
+                                                            ItemGroup.BASKETBALL_ALT_PATHS_G),
+    "Basketball: Flower Cup Alt Paths (Global)": ItemData(base_id + 118, IC.progression,
+                                                          ItemGroup.BASKETBALL_ALT_PATHS_G),
+    "Basketball: Star Cup Alt Paths (Global)": ItemData(base_id + 119, IC.progression,
+                                                        ItemGroup.BASKETBALL_ALT_PATHS_G),
 }
 
 dodgeball_items_n = {
     "Dodgeball: Mushroom Cup (Normal)": ItemData(base_id + 121, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Flower Cup (Normal)":   ItemData(base_id + 122, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Star Cup (Normal)":     ItemData(base_id + 123, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Flower Cup (Normal)": ItemData(base_id + 122, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Star Cup (Normal)": ItemData(base_id + 123, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
 }
 
 dodgeball_alt_paths_n = {
-    "Dodgeball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 124, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
-    "Dodgeball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 125, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
-    "Dodgeball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 126, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
+    "Dodgeball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 124, IC.progression,
+                                                           ItemGroup.DODGEBALL_ALT_PATHS_N),
+    "Dodgeball: Flower Cup Alt Paths (Normal)": ItemData(base_id + 125, IC.progression,
+                                                         ItemGroup.DODGEBALL_ALT_PATHS_N),
+    "Dodgeball: Star Cup Alt Paths (Normal)": ItemData(base_id + 126, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
 }
 
 dodgeball_items_h = {
     "Dodgeball: Mushroom Cup (Hard)": ItemData(base_id + 131, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Flower Cup (Hard)":   ItemData(base_id + 132, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Star Cup (Hard)":     ItemData(base_id + 133, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Flower Cup (Hard)": ItemData(base_id + 132, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Star Cup (Hard)": ItemData(base_id + 133, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
 }
 
 dodgeball_alt_paths_h = {
-    "Dodgeball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 134, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
-    "Dodgeball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 135, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
-    "Dodgeball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 136, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
+    "Dodgeball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 134, IC.progression,
+                                                         ItemGroup.DODGEBALL_ALT_PATHS_H),
+    "Dodgeball: Flower Cup Alt Paths (Hard)": ItemData(base_id + 135, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
+    "Dodgeball: Star Cup Alt Paths (Hard)": ItemData(base_id + 136, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
 }
 
 dodgeball_alt_paths_g = {
-    "Dodgeball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 137, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
-    "Dodgeball: Flower Cup Alt Paths (Global)":   ItemData(base_id + 138, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
-    "Dodgeball: Star Cup Alt Paths (Global)":     ItemData(base_id + 139, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
+    "Dodgeball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 137, IC.progression,
+                                                           ItemGroup.DODGEBALL_ALT_PATHS_G),
+    "Dodgeball: Flower Cup Alt Paths (Global)": ItemData(base_id + 138, IC.progression,
+                                                         ItemGroup.DODGEBALL_ALT_PATHS_G),
+    "Dodgeball: Star Cup Alt Paths (Global)": ItemData(base_id + 139, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
 }
 
 volleyball_items_n = {
     "Volleyball: Mushroom Cup (Normal)": ItemData(base_id + 141, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Flower Cup (Normal)":   ItemData(base_id + 142, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
-    "Volleyball: Star Cup (Normal)":     ItemData(base_id + 143, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Flower Cup (Normal)": ItemData(base_id + 142, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
+    "Volleyball: Star Cup (Normal)": ItemData(base_id + 143, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
 }
 
 volleyball_alt_paths_n = {
-    "Volleyball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 144, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_N),
-    "Volleyball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 145, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_N),
-    "Volleyball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 146, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_N),
+    "Volleyball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 144, IC.progression,
+                                                            ItemGroup.VOLLEYBALL_ALT_PATHS_N),
+    "Volleyball: Flower Cup Alt Paths (Normal)": ItemData(base_id + 145, IC.progression,
+                                                          ItemGroup.VOLLEYBALL_ALT_PATHS_N),
+    "Volleyball: Star Cup Alt Paths (Normal)": ItemData(base_id + 146, IC.progression,
+                                                        ItemGroup.VOLLEYBALL_ALT_PATHS_N),
 }
 
 volleyball_items_h = {
-    "Volleyball: Mushroom Cup (Hard)":   ItemData(base_id + 151, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Flower Cup (Hard)":     ItemData(base_id + 152, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
-    "Volleyball: Star Cup (Hard)":       ItemData(base_id + 153, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Mushroom Cup (Hard)": ItemData(base_id + 151, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Flower Cup (Hard)": ItemData(base_id + 152, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
+    "Volleyball: Star Cup (Hard)": ItemData(base_id + 153, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
 }
 
 volleyball_alt_paths_h = {
-    "Volleyball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 154, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
-    "Volleyball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 155, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
-    "Volleyball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 156, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
+    "Volleyball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 154, IC.progression,
+                                                          ItemGroup.VOLLEYBALL_ALT_PATHS_H),
+    "Volleyball: Flower Cup Alt Paths (Hard)": ItemData(base_id + 155, IC.progression,
+                                                        ItemGroup.VOLLEYBALL_ALT_PATHS_H),
+    "Volleyball: Star Cup Alt Paths (Hard)": ItemData(base_id + 156, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
 }
 
 volleyball_alt_paths_g = {
-    "Volleyball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 147, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_G),
-    "Volleyball: Flower Cup Alt Paths (Global)":   ItemData(base_id + 148, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_G),
-    "Volleyball: Star Cup Alt Paths (Global)":     ItemData(base_id + 149, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_G),
+    "Volleyball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 147, IC.progression,
+                                                            ItemGroup.VOLLEYBALL_ALT_PATHS_G),
+    "Volleyball: Flower Cup Alt Paths (Global)": ItemData(base_id + 148, IC.progression,
+                                                          ItemGroup.VOLLEYBALL_ALT_PATHS_G),
+    "Volleyball: Star Cup Alt Paths (Global)": ItemData(base_id + 149, IC.progression,
+                                                        ItemGroup.VOLLEYBALL_ALT_PATHS_G),
 }
 
 hockey_items_n = {
     "Hockey: Mushroom Cup (Normal)": ItemData(base_id + 161, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Flower Cup (Normal)":   ItemData(base_id + 162, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Star Cup (Normal)":     ItemData(base_id + 163, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Flower Cup (Normal)": ItemData(base_id + 162, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Star Cup (Normal)": ItemData(base_id + 163, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
 }
 
 hockey_alt_paths_n = {
     "Hockey: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 164, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
-    "Hockey: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 165, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
-    "Hockey: Star Cup Alt Paths (Normal)":     ItemData(base_id + 166, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
+    "Hockey: Flower Cup Alt Paths (Normal)": ItemData(base_id + 165, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
+    "Hockey: Star Cup Alt Paths (Normal)": ItemData(base_id + 166, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
 }
 
 hockey_items_h = {
-    "Hockey: Mushroom Cup (Hard)":   ItemData(base_id + 171, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Flower Cup (Hard)":     ItemData(base_id + 172, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Star Cup (Hard)":       ItemData(base_id + 173, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Mushroom Cup (Hard)": ItemData(base_id + 171, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Flower Cup (Hard)": ItemData(base_id + 172, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Star Cup (Hard)": ItemData(base_id + 173, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
 }
 
 hockey_alt_paths_h = {
     "Hockey: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 174, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
-    "Hockey: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 175, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
-    "Hockey: Star Cup Alt Paths (Hard)":     ItemData(base_id + 176, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
+    "Hockey: Flower Cup Alt Paths (Hard)": ItemData(base_id + 175, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
+    "Hockey: Star Cup Alt Paths (Hard)": ItemData(base_id + 176, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
 }
 
 hockey_alt_paths_g = {
     "Hockey: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 177, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
-    "Hockey: Flower Cup Alt Paths (Global)":   ItemData(base_id + 178, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
-    "Hockey: Star Cup Alt Paths (Global)":     ItemData(base_id + 179, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
+    "Hockey: Flower Cup Alt Paths (Global)": ItemData(base_id + 178, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
+    "Hockey: Star Cup Alt Paths (Global)": ItemData(base_id + 179, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
 }
 
 sports_mix_cups = {
     "Sports Mix: Mushroom Cup": ItemData(base_id + 181, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Flower Cup":   ItemData(base_id + 182, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Star Cup":     ItemData(base_id + 183, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Flower Cup": ItemData(base_id + 182, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Star Cup": ItemData(base_id + 183, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
 }
 
 sports_mix_alt_paths = {
-    "Sports Mix: Mushroom Cup Alt Paths": ItemData(base_id + 184, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_ALT_PATHS),
-    "Sports Mix: Flower Cup Alt Paths":   ItemData(base_id + 185, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_ALT_PATHS),
-    "Sports Mix: Star Cup Alt Paths":     ItemData(base_id + 186, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_ALT_PATHS),
+    "Sports Mix: Mushroom Cup Alt Paths": ItemData(base_id + 184, IC.progression_skip_balancing,
+                                                   ItemGroup.SPORTS_MIX_ALT_PATHS),
+    "Sports Mix: Flower Cup Alt Paths": ItemData(base_id + 185, IC.progression_skip_balancing,
+                                                 ItemGroup.SPORTS_MIX_ALT_PATHS),
+    "Sports Mix: Star Cup Alt Paths": ItemData(base_id + 186, IC.progression_skip_balancing,
+                                               ItemGroup.SPORTS_MIX_ALT_PATHS),
 }
 
 global_alt_paths_n = {
     "Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 190, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
-    "Flower Cup Alt Paths (Normal)":   ItemData(base_id + 191, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
-    "Star Cup Alt Paths (Normal)":     ItemData(base_id + 192, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Flower Cup Alt Paths (Normal)": ItemData(base_id + 191, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Star Cup Alt Paths (Normal)": ItemData(base_id + 192, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
 }
 
 global_alt_paths_h = {
     "Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 193, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
-    "Flower Cup Alt Paths (Hard)":   ItemData(base_id + 194, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
-    "Star Cup Alt Paths (Hard)":     ItemData(base_id + 195, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Flower Cup Alt Paths (Hard)": ItemData(base_id + 194, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Star Cup Alt Paths (Hard)": ItemData(base_id + 195, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
 }
 
 global_alt_paths_g = {
     "Mushroom Cup Alt Paths (Global)": ItemData(base_id + 196, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
-    "Flower Cup Alt Paths (Global)":   ItemData(base_id + 197, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
-    "Star Cup Alt Paths (Global)":     ItemData(base_id + 198, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Flower Cup Alt Paths (Global)": ItemData(base_id + 197, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Star Cup Alt Paths (Global)": ItemData(base_id + 198, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
 }
 
 # Crystals (200 range)
 sports_crystals = {
-    "Sports Crystal: Red":               ItemData(base_id + 201, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
-    "Sports Crystal: Green":             ItemData(base_id + 202, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
-    "Sports Crystal: Yellow":            ItemData(base_id + 203, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
-    "Sports Crystal: Blue":              ItemData(base_id + 204, IC.progression_skip_balancing|IC.useful, ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Red": ItemData(base_id + 201, IC.progression_skip_balancing | IC.useful,
+                                    ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Green": ItemData(base_id + 202, IC.progression_skip_balancing | IC.useful,
+                                      ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Yellow": ItemData(base_id + 203, IC.progression_skip_balancing | IC.useful,
+                                       ItemGroup.SPORTS_CRYSTALS),
+    "Sports Crystal: Blue": ItemData(base_id + 204, IC.progression_skip_balancing | IC.useful,
+                                     ItemGroup.SPORTS_CRYSTALS),
 }
 
 # Courts (300 range)
 individual_courts = {
-    "Mario Stadium":                     ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
-    "Koopa Troopa Beach":                ItemData(base_id + 302, IC.progression, ItemGroup.COURTS),
-    "Peach's Castle":                    ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
-    "Toad Park":                         ItemData(base_id + 304, IC.progression, ItemGroup.COURTS),
-    "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
-    "Luigi's Mansion":                   ItemData(base_id + 306, IC.progression, ItemGroup.COURTS),
-    "Daisy Garden":                      ItemData(base_id + 307, IC.progression, ItemGroup.COURTS),
-    "Wario Factory":                     ItemData(base_id + 308, IC.progression, ItemGroup.COURTS),
-    "Bowser Jr. Blvd.":                  ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
-    "Bowser's Castle":                   ItemData(base_id + 310, IC.progression, ItemGroup.COURTS),
-    "Waluigi Pinball":                   ItemData(base_id + 311, IC.progression, ItemGroup.COURTS),
-    "Ghoulish Galleon":                  ItemData(base_id + 312, IC.progression, ItemGroup.COURTS),
-    "Star Ship":                         ItemData(base_id + 313, IC.progression, ItemGroup.COURTS),
-    "Western Junction":                  ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
-    "Behemoth Stage":                    ItemData(base_id + 315, IC.progression_skip_balancing, ItemGroup.COURTS),
+    "Mario Stadium": ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
+    "Koopa Troopa Beach": ItemData(base_id + 302, IC.progression, ItemGroup.COURTS),
+    "Peach's Castle": ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
+    "Toad Park": ItemData(base_id + 304, IC.progression, ItemGroup.COURTS),
+    "DK Dock": ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
+    "Luigi's Mansion": ItemData(base_id + 306, IC.progression, ItemGroup.COURTS),
+    "Daisy Garden": ItemData(base_id + 307, IC.progression, ItemGroup.COURTS),
+    "Wario Factory": ItemData(base_id + 308, IC.progression, ItemGroup.COURTS),
+    "Bowser Jr. Blvd.": ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
+    "Bowser's Castle": ItemData(base_id + 310, IC.progression, ItemGroup.COURTS),
+    "Waluigi Pinball": ItemData(base_id + 311, IC.progression, ItemGroup.COURTS),
+    "Ghoulish Galleon": ItemData(base_id + 312, IC.progression, ItemGroup.COURTS),
+    "Star Ship": ItemData(base_id + 313, IC.progression, ItemGroup.COURTS),
+    "Western Junction": ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
+    "Behemoth Stage": ItemData(base_id + 315, IC.progression_skip_balancing, ItemGroup.COURTS),
 }
 
 progressive_items = {
-    "Progressive Court":                 ItemData(base_id + 316, IC.progression, ItemGroup.PROGRESSIVE_COURTS),
-    "Progressive Cup":                   ItemData(base_id + 317, IC.progression, ItemGroup.PROGRESSIVE_CUPS),
-    "Progressive Alternate Path":        ItemData(base_id + 318, IC.progression, ItemGroup.PROGRESSIVE_ALTERNATE_PATHS),
+    "Progressive Court": ItemData(base_id + 316, IC.progression, ItemGroup.PROGRESSIVE_COURTS),
+    "Progressive Cup": ItemData(base_id + 317, IC.progression, ItemGroup.PROGRESSIVE_CUPS),
+    "Progressive Alternate Path": ItemData(base_id + 318, IC.progression, ItemGroup.PROGRESSIVE_ALTERNATE_PATHS),
 }
 
 # Characters (400 range)
 characters = {
-    "Mario":                             ItemData(base_id + 401, IC.useful, ItemGroup.CHARACTERS),
-    "Luigi":                             ItemData(base_id + 402, IC.useful, ItemGroup.CHARACTERS),
-    "Peach":                             ItemData(base_id + 403, IC.useful, ItemGroup.CHARACTERS),
-    "Daisy":                             ItemData(base_id + 404, IC.useful, ItemGroup.CHARACTERS),
-    "Yoshi":                             ItemData(base_id + 405, IC.useful, ItemGroup.CHARACTERS),
-    "Wario":                             ItemData(base_id + 406, IC.useful, ItemGroup.CHARACTERS),
-    "Waluigi":                           ItemData(base_id + 407, IC.useful, ItemGroup.CHARACTERS),
-    "Donkey Kong":                       ItemData(base_id + 408, IC.useful, ItemGroup.CHARACTERS),
-    "Diddy Kong":                        ItemData(base_id + 409, IC.useful, ItemGroup.CHARACTERS),
-    "Toad":                              ItemData(base_id + 410, IC.useful, ItemGroup.CHARACTERS),
-    "Bowser":                            ItemData(base_id + 411, IC.useful, ItemGroup.CHARACTERS),
-    "Bowser Jr":                         ItemData(base_id + 412, IC.useful, ItemGroup.CHARACTERS),
-    "Moogle":                            ItemData(base_id + 413, IC.useful, ItemGroup.CHARACTERS),
-    "Cactuar":                           ItemData(base_id + 414, IC.useful, ItemGroup.CHARACTERS),
-    "Ninja":                             ItemData(base_id + 415, IC.useful, ItemGroup.CHARACTERS),
-    "White Mage":                        ItemData(base_id + 416, IC.useful, ItemGroup.CHARACTERS),
-    "Slime":                             ItemData(base_id + 417, IC.useful, ItemGroup.CHARACTERS),
-    "Black Mage":                        ItemData(base_id + 418, IC.useful, ItemGroup.CHARACTERS),
+    "Mario": ItemData(base_id + 401, IC.useful, ItemGroup.CHARACTERS),
+    "Luigi": ItemData(base_id + 402, IC.useful, ItemGroup.CHARACTERS),
+    "Peach": ItemData(base_id + 403, IC.useful, ItemGroup.CHARACTERS),
+    "Daisy": ItemData(base_id + 404, IC.useful, ItemGroup.CHARACTERS),
+    "Yoshi": ItemData(base_id + 405, IC.useful, ItemGroup.CHARACTERS),
+    "Wario": ItemData(base_id + 406, IC.useful, ItemGroup.CHARACTERS),
+    "Waluigi": ItemData(base_id + 407, IC.useful, ItemGroup.CHARACTERS),
+    "Donkey Kong": ItemData(base_id + 408, IC.useful, ItemGroup.CHARACTERS),
+    "Diddy Kong": ItemData(base_id + 409, IC.useful, ItemGroup.CHARACTERS),
+    "Toad": ItemData(base_id + 410, IC.useful, ItemGroup.CHARACTERS),
+    "Bowser": ItemData(base_id + 411, IC.useful, ItemGroup.CHARACTERS),
+    "Bowser Jr": ItemData(base_id + 412, IC.useful, ItemGroup.CHARACTERS),
+    "Moogle": ItemData(base_id + 413, IC.useful, ItemGroup.CHARACTERS),
+    "Cactuar": ItemData(base_id + 414, IC.useful, ItemGroup.CHARACTERS),
+    "Ninja": ItemData(base_id + 415, IC.useful, ItemGroup.CHARACTERS),
+    "White Mage": ItemData(base_id + 416, IC.useful, ItemGroup.CHARACTERS),
+    "Slime": ItemData(base_id + 417, IC.useful, ItemGroup.CHARACTERS),
+    "Black Mage": ItemData(base_id + 418, IC.useful, ItemGroup.CHARACTERS),
 }
 
 miis = {
-    "Mii (Male)":                        ItemData(base_id + 419, IC.useful, ItemGroup.CHARACTERS),
-    "Mii (Female)":                      ItemData(base_id + 420, IC.useful, ItemGroup.CHARACTERS),
+    "Mii (Male)": ItemData(base_id + 419, IC.useful, ItemGroup.CHARACTERS),
+    "Mii (Female)": ItemData(base_id + 420, IC.useful, ItemGroup.CHARACTERS),
 }
 
 # Costumes (500 range)
 character_costumes = {
-    "Light Blue Yoshi":                  ItemData(base_id + 501, IC.filler, ItemGroup.COSTUMES),
-    "Yellow Yoshi":                      ItemData(base_id + 502, IC.filler, ItemGroup.COSTUMES),
-    "Pink Yoshi":                        ItemData(base_id + 503, IC.filler, ItemGroup.COSTUMES),
-    "Tennis-wear Peach":                 ItemData(base_id + 504, IC.filler, ItemGroup.COSTUMES),
-    "Tennis-wear Daisy":                 ItemData(base_id + 505, IC.filler, ItemGroup.COSTUMES),
-    "Blue Toad":                         ItemData(base_id + 506, IC.filler, ItemGroup.COSTUMES),
-    "Yellow Toad":                       ItemData(base_id + 507, IC.filler, ItemGroup.COSTUMES),
-    "Green Toad":                        ItemData(base_id + 508, IC.filler, ItemGroup.COSTUMES),
-    "Shadow White Ninja":                ItemData(base_id + 509, IC.filler, ItemGroup.COSTUMES),
-    "Pure White - White Mage":           ItemData(base_id + 510, IC.filler, ItemGroup.COSTUMES),
-    "Magic Red Black Mage":              ItemData(base_id + 511, IC.filler, ItemGroup.COSTUMES),
-    "She-Slime":                         ItemData(base_id + 512, IC.filler, ItemGroup.COSTUMES),
-    "Metal Slime":                       ItemData(base_id + 513, IC.filler, ItemGroup.COSTUMES),
+    "Light Blue Yoshi": ItemData(base_id + 501, IC.filler, ItemGroup.COSTUMES),
+    "Yellow Yoshi": ItemData(base_id + 502, IC.filler, ItemGroup.COSTUMES),
+    "Pink Yoshi": ItemData(base_id + 503, IC.filler, ItemGroup.COSTUMES),
+    "Tennis-wear Peach": ItemData(base_id + 504, IC.filler, ItemGroup.COSTUMES),
+    "Tennis-wear Daisy": ItemData(base_id + 505, IC.filler, ItemGroup.COSTUMES),
+    "Blue Toad": ItemData(base_id + 506, IC.filler, ItemGroup.COSTUMES),
+    "Yellow Toad": ItemData(base_id + 507, IC.filler, ItemGroup.COSTUMES),
+    "Green Toad": ItemData(base_id + 508, IC.filler, ItemGroup.COSTUMES),
+    "Shadow White Ninja": ItemData(base_id + 509, IC.filler, ItemGroup.COSTUMES),
+    "Pure White - White Mage": ItemData(base_id + 510, IC.filler, ItemGroup.COSTUMES),
+    "Magic Red Black Mage": ItemData(base_id + 511, IC.filler, ItemGroup.COSTUMES),
+    "She-Slime": ItemData(base_id + 512, IC.filler, ItemGroup.COSTUMES),
+    "Metal Slime": ItemData(base_id + 513, IC.filler, ItemGroup.COSTUMES),
 }
 
 # Abilities & Panel Items (600 range)
 unlockable_panel_items = {
-    "? Panel: Green Shell":              ItemData(base_id + 601, IC.useful, ItemGroup.PANEL_ITEMS),
-    "? Panel: Red Shell":                ItemData(base_id + 602, IC.useful, ItemGroup.PANEL_ITEMS),
-    "? Panel: Banana":                   ItemData(base_id + 603, IC.useful, ItemGroup.PANEL_ITEMS),
-    "? Panel: Bob-omb":                  ItemData(base_id + 604, IC.useful, ItemGroup.PANEL_ITEMS),
-    "? Panel: Mini Mushroom":            ItemData(base_id + 605, IC.useful, ItemGroup.PANEL_ITEMS),
-    "? Panel: Super Star":               ItemData(base_id + 606, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Green Shell": ItemData(base_id + 601, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Red Shell": ItemData(base_id + 602, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Banana": ItemData(base_id + 603, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Bob-omb": ItemData(base_id + 604, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Mini Mushroom": ItemData(base_id + 605, IC.useful, ItemGroup.PANEL_ITEMS),
+    "? Panel: Super Star": ItemData(base_id + 606, IC.useful, ItemGroup.PANEL_ITEMS),
 }
 
 unlockable_abilities = {
-    "Special Meter":                     ItemData(base_id + 610, IC.useful, ItemGroup.ABILITIES),
+    "Special Meter": ItemData(base_id + 610, IC.useful, ItemGroup.ABILITIES),
 }
 
 # 1 time use / Filler (700 range)
 one_time_items = {
-    "1 Coin":                            ItemData(base_id + 701, IC.filler, ItemGroup.FILLER),
-    "1 Green Shell":                     ItemData(base_id + 702, IC.filler, ItemGroup.FILLER),
-    "1 Red Shell":                       ItemData(base_id + 703, IC.filler, ItemGroup.FILLER),
-    "1 Banana":                          ItemData(base_id + 704, IC.filler, ItemGroup.FILLER),
-    "1 Bob-omb":                         ItemData(base_id + 705, IC.filler, ItemGroup.FILLER),
-    "1 Mini Mushroom":                   ItemData(base_id + 706, IC.filler, ItemGroup.FILLER),
-    "1 Super Star":                      ItemData(base_id + 707, IC.filler, ItemGroup.FILLER),
-    "Special Meter Charge":              ItemData(base_id + 708, IC.filler, ItemGroup.FILLER)
+    "1 Coin": ItemData(base_id + 701, IC.filler, ItemGroup.FILLER),
+    "1 Green Shell": ItemData(base_id + 702, IC.filler, ItemGroup.FILLER),
+    "1 Red Shell": ItemData(base_id + 703, IC.filler, ItemGroup.FILLER),
+    "1 Banana": ItemData(base_id + 704, IC.filler, ItemGroup.FILLER),
+    "1 Bob-omb": ItemData(base_id + 705, IC.filler, ItemGroup.FILLER),
+    "1 Mini Mushroom": ItemData(base_id + 706, IC.filler, ItemGroup.FILLER),
+    "1 Super Star": ItemData(base_id + 707, IC.filler, ItemGroup.FILLER),
+    "Special Meter Charge": ItemData(base_id + 708, IC.filler, ItemGroup.FILLER)
 }
 
 # Traps (800 range)
 traps = {
-    "Coins Trap":                        ItemData(base_id + 801, IC.trap, ItemGroup.TRAPS),
-    "Timer Trap":                        ItemData(base_id + 802, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 1 Trap":           ItemData(base_id + 803, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 2 Trap":           ItemData(base_id + 804, IC.trap, ItemGroup.TRAPS),
-    "Freeze Character 3 Trap":           ItemData(base_id + 805, IC.trap, ItemGroup.TRAPS),
-    "Fast Trap":                         ItemData(base_id + 806, IC.trap, ItemGroup.TRAPS),
-    "Slow Trap":                         ItemData(base_id + 807, IC.trap, ItemGroup.TRAPS),
-    "Teleport Character 1 Trap":         ItemData(base_id + 808, IC.trap, ItemGroup.TRAPS),
-    "Teleport Character 2 Trap":         ItemData(base_id + 809, IC.trap, ItemGroup.TRAPS),
-    "Teleport Character 3 Trap":         ItemData(base_id + 810, IC.trap, ItemGroup.TRAPS),
-    #"Swap Trap":                         ItemData(base_id + 811, IC.trap, ItemGroup.TRAPS),
+    "Coins Trap": ItemData(base_id + 801, IC.trap, ItemGroup.TRAPS),
+    "Timer Trap": ItemData(base_id + 802, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 1 Trap": ItemData(base_id + 803, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 2 Trap": ItemData(base_id + 804, IC.trap, ItemGroup.TRAPS),
+    "Freeze Character 3 Trap": ItemData(base_id + 805, IC.trap, ItemGroup.TRAPS),
+    "Fast Trap": ItemData(base_id + 806, IC.trap, ItemGroup.TRAPS),
+    "Slow Trap": ItemData(base_id + 807, IC.trap, ItemGroup.TRAPS),
+    "Teleport Character 1 Trap": ItemData(base_id + 808, IC.trap, ItemGroup.TRAPS),
+    "Teleport Character 2 Trap": ItemData(base_id + 809, IC.trap, ItemGroup.TRAPS),
+    "Teleport Character 3 Trap": ItemData(base_id + 810, IC.trap, ItemGroup.TRAPS),
+    # "Swap Trap":                         ItemData(base_id + 811, IC.trap, ItemGroup.TRAPS),
 }
 
 # Party Mode Items (900 - 1300 range)
 
 party_mode_items = {
-    "Feed Petey":                        ItemData(base_id + 900, IC.progression, ItemGroup.FEED_PETEY),
-    "Harmony Hustle":                    ItemData(base_id + 1000, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Bob-omb Dodge":                     ItemData(base_id + 1100, IC.progression, ItemGroup.BOB_OMB_DODGE),
-    "Smash Skate":                       ItemData(base_id + 1200, IC.progression, ItemGroup.SMASH_SKATE),
+    "Feed Petey": ItemData(base_id + 900, IC.progression, ItemGroup.FEED_PETEY),
+    "Harmony Hustle": ItemData(base_id + 1000, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Bob-omb Dodge": ItemData(base_id + 1100, IC.progression, ItemGroup.BOB_OMB_DODGE),
+    "Smash Skate": ItemData(base_id + 1200, IC.progression, ItemGroup.SMASH_SKATE),
 }
 
 feed_petey_items = {
-    "Daisy Garden":                      ItemData(base_id + 307, IC.progression, ItemGroup.COURTS),
-    "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
-    "Wario Factory":                     ItemData(base_id + 308, IC.progression, ItemGroup.COURTS),
+    "Daisy Garden": ItemData(base_id + 307, IC.progression, ItemGroup.COURTS),
+    "DK Dock": ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
+    "Wario Factory": ItemData(base_id + 308, IC.progression, ItemGroup.COURTS),
 }
 
 harmony_hustle_items = {
-    "Classic Ocean":                     ItemData(base_id + 1001, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Rhythm":                    ItemData(base_id + 1002, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Mario Athletic":                    ItemData(base_id + 1003, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Mushroom Mix Medley":               ItemData(base_id + 1004, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Bloocheep Ocean":                   ItemData(base_id + 1005, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Pop":                       ItemData(base_id + 1006, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Punk Athletic":                     ItemData(base_id + 1007, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Blossom Mix Medley":                ItemData(base_id + 1008, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Punk Ocean":                        ItemData(base_id + 1009, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Chocobo Beat":                      ItemData(base_id + 1010, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Island Athletic":                   ItemData(base_id + 1011, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Star Mix Medley":                   ItemData(base_id + 1012, IC.progression, ItemGroup.HARMONY_HUSTLE),
-    "Peach's Castle":                    ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
-    "Bowser Jr. Blvd.":                  ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
-    "DK Dock":                           ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
+    "Classic Ocean": ItemData(base_id + 1001, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Rhythm": ItemData(base_id + 1002, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Mario Athletic": ItemData(base_id + 1003, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Mushroom Mix Medley": ItemData(base_id + 1004, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Bloocheep Ocean": ItemData(base_id + 1005, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Pop": ItemData(base_id + 1006, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Punk Athletic": ItemData(base_id + 1007, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Blossom Mix Medley": ItemData(base_id + 1008, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Punk Ocean": ItemData(base_id + 1009, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Chocobo Beat": ItemData(base_id + 1010, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Island Athletic": ItemData(base_id + 1011, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Star Mix Medley": ItemData(base_id + 1012, IC.progression, ItemGroup.HARMONY_HUSTLE),
+    "Peach's Castle": ItemData(base_id + 303, IC.progression, ItemGroup.COURTS),
+    "Bowser Jr. Blvd.": ItemData(base_id + 309, IC.progression, ItemGroup.COURTS),
+    "DK Dock": ItemData(base_id + 305, IC.progression, ItemGroup.COURTS),
 }
 
 bob_omb_dodge_items = {
-    "Mario Stadium":                     ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
-    "Ghoulish Galleon":                  ItemData(base_id + 312, IC.progression, ItemGroup.COURTS),
-    "Western Junction":                  ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
+    "Mario Stadium": ItemData(base_id + 301, IC.progression, ItemGroup.COURTS),
+    "Ghoulish Galleon": ItemData(base_id + 312, IC.progression, ItemGroup.COURTS),
+    "Western Junction": ItemData(base_id + 314, IC.progression, ItemGroup.COURTS),
 }
 
 smash_skate_items = {
-    "Sherbet Sea":                       ItemData(base_id + 1201, IC.progression, ItemGroup.SMASH_SKATE),
-    "Rowdy Raft":                        ItemData(base_id + 1202, IC.progression, ItemGroup.SMASH_SKATE),
-    "Fire Mountain":                     ItemData(base_id + 1203, IC.progression, ItemGroup.SMASH_SKATE),
+    "Sherbet Sea": ItemData(base_id + 1201, IC.progression, ItemGroup.SMASH_SKATE),
+    "Rowdy Raft": ItemData(base_id + 1202, IC.progression, ItemGroup.SMASH_SKATE),
+    "Fire Mountain": ItemData(base_id + 1203, IC.progression, ItemGroup.SMASH_SKATE),
 }
-
 
 # Put all into a table
 item_table: Dict[str, ItemData] = {
@@ -499,14 +529,13 @@ def create_all_items(world: "MSMWorld") -> None:
     for mii in miis:
         world.push_precollected(world.create_item(mii))
 
-
     # Start with random characters option
     # This only uses the main mario roster as getting characters outside
     # the main roster before getting characters in the roster can bug
     # the game and make them not appear
-    row_1 = ["Mario", "Peach",   "Wario",       "Diddy Kong"]
-    row_2 = ["Luigi", "Daisy",   "Donkey Kong", "Bowser Jr"]
-    row_3 = ["Yoshi", "Waluigi", "Bowser",      "Toad"]
+    row_1 = ["Mario", "Peach", "Wario", "Diddy Kong"]
+    row_2 = ["Luigi", "Daisy", "Donkey Kong", "Bowser Jr"]
+    row_3 = ["Yoshi", "Waluigi", "Bowser", "Toad"]
     all_rows = [row_1, row_2, row_3]
 
     if world.options.start_with_characters.value == StartWithCharacters.option_2_characters:
@@ -631,7 +660,7 @@ def create_all_items(world: "MSMWorld") -> None:
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
 
     # Small configurations (for example, Exhibition Tour with one difficulty)
-    # can have fewer locations than optional cosmetics. Remove filler items
+    # can have fewer locations than optional cosmetics.  Remove filler items
     # first so every generated pool item has a valid destination.
     overflow = len(itempool) - number_of_unfilled_locations
     if overflow > 0:
@@ -652,26 +681,22 @@ def create_all_items(world: "MSMWorld") -> None:
     itempool += [world.create_filler() for _ in range(needed_number_of_filler_items)]
 
     # Submit to multiworld
-    #print(itempool)
+    # print(itempool)
     world.multiworld.itempool += itempool
-
-
 
 
 def create_courts(world: "MSMWorld", itempool):
     if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
 
-        the_awesome_edge_case = (world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups
-                                 and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup
-                                 and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court)
+        the_awesome_edge_case = world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court
 
         mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
 
         other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
                         "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
 
-        if (world.options.start_with_mushroom_cup not in
-                (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups) or the_awesome_edge_case):
+        if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none,
+                                                         StartWithMushroomCup.option_random_cups) or the_awesome_edge_case:
             for court in mush_courts:
                 world.push_precollected(world.create_item(court))
 
@@ -701,6 +726,7 @@ def create_courts(world: "MSMWorld", itempool):
             for _ in range(total_stages):
                 itempool.append(world.create_item("Progressive Court"))
 
+
 # Random mushroom cup start handled in cups to avoid giving courts to locked cups
 def create_cups(world: "MSMWorld", itempool):
     enabled_sports = world.options.enabled_sports.value
@@ -716,7 +742,7 @@ def create_cups(world: "MSMWorld", itempool):
             total_progressive_cups += 3  # 6 items
 
         if "Sports Mix" in enabled_sports:
-            total_progressive_cups += 3 # 9 items max
+            total_progressive_cups += 3  # 9 items max
 
         start_option = world.options.start_with_mushroom_cup.value
 
@@ -743,10 +769,10 @@ def create_cups(world: "MSMWorld", itempool):
     # --- Individual Cups ---
     else:
         all_normal_items = {
-                **basketball_items_n, **dodgeball_items_n, **volleyball_items_n, **hockey_items_n
+            **basketball_items_n, **dodgeball_items_n, **volleyball_items_n, **hockey_items_n
         }
         all_hard_items = {
-                **basketball_items_h, **dodgeball_items_h, **volleyball_items_h, **hockey_items_h
+            **basketball_items_h, **dodgeball_items_h, **volleyball_items_h, **hockey_items_h
         }
 
         precollect_names = set()
@@ -787,7 +813,6 @@ def create_cups(world: "MSMWorld", itempool):
                     mushroom_cups.append("Hockey: Mushroom Cup (Normal)")
                     if world.options.hard_tournament_difficulty.value:
                         mushroom_cups.append("Hockey: Mushroom Cup (Hard)")
-
 
             basketball_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock"]
             dodgeball_stages = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"]
@@ -835,8 +860,6 @@ def create_cups(world: "MSMWorld", itempool):
 
                 for name in courts_in_pool:
                     itempool.append(world.create_item(name))
-
-
 
         prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
@@ -899,26 +922,23 @@ def create_cups(world: "MSMWorld", itempool):
                 itempool.append(world.create_item(cup))
 
 
-
-
 def create_alt_paths(world: "MSMWorld", itempool):
     enabled_sports = world.options.enabled_sports.value
     alt_path_type = world.options.alt_path_type.value
 
     all_normal_items = {
-            **basketball_alt_paths_n, **dodgeball_alt_paths_n, **volleyball_alt_paths_n, **hockey_alt_paths_n
+        **basketball_alt_paths_n, **dodgeball_alt_paths_n, **volleyball_alt_paths_n, **hockey_alt_paths_n
     }
 
     all_hard_items = {
-            **basketball_alt_paths_h, **dodgeball_alt_paths_h, **volleyball_alt_paths_h, **hockey_alt_paths_h
+        **basketball_alt_paths_h, **dodgeball_alt_paths_h, **volleyball_alt_paths_h, **hockey_alt_paths_h
     }
 
     all_global_items = {
-            **basketball_alt_paths_g, **dodgeball_alt_paths_g, **volleyball_alt_paths_g, **hockey_alt_paths_g
+        **basketball_alt_paths_g, **dodgeball_alt_paths_g, **volleyball_alt_paths_g, **hockey_alt_paths_g
     }
 
     prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
-
 
     if alt_path_type == 0:
         for name in all_normal_items:
@@ -980,7 +1000,7 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
 
     # Character Sanity (Characters)
     if (world.options.character_sanity.value == CharacterSanity.option_characters or
-        world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes):
+            world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes):
         if name in characters or name in miis:
             classification = IC.progression
 

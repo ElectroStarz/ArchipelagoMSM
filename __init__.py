@@ -121,12 +121,11 @@ class MSMWorld(World):
         # YAML, then supplies the original slot data for regeneration. Restore
         # every MSM generation option before creating regions, items, or rules.
         re_gen_passthrough = getattr(self.multiworld, "re_gen_passthrough", {})
-        if re_gen_passthrough and self.game in re_gen_passthrough:
-            slot_data = re_gen_passthrough[self.game]
-            for option_name, value in slot_data.get("options", {}).items():
-                option = getattr(self.options, option_name, None)
-                if option is not None:
-                    setattr(self.options, option_name, option.from_any(value))
+        slot_data = re_gen_passthrough.get(self.game, {})
+        for option_name, value in slot_data.get("options", {}).items():
+            option = getattr(self.options, option_name, None)
+            if option is not None:
+                setattr(self.options, option_name, option.from_any(value))
 
         # Boss Location check
         if (self.options.goal_condition.value == self.options.boss_locations.value and
@@ -167,7 +166,7 @@ class MSMWorld(World):
             "v_points": {"value": self.options.v_points_win.value, "enabled": True}, # Volleyball always has win points
         }
 
-        # Alt Path should only be enabled with Tournaments
+        # Alt Path should only be enable with Tournaments
         if self.options.include_alt_paths.value and not self.options.include_tournaments.value:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name} has Alt Paths enabled but they don't have Tournaments enabled!"
@@ -227,18 +226,12 @@ class MSMWorld(World):
         )
         has_party_match = bool(self.options.party_mode.value)
 
-        if self.options.special_sanity.value and not (has_tournament_match or has_exhibition_match):
+        if ((self.options.character_sanity.value or self.options.special_sanity.value) and
+                not (has_tournament_match or has_exhibition_match or has_party_match)):
             raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s Special Sanity requires at least one playable "
-                f"tournament or exhibition match."
-            )
-
-        if self.options.character_sanity.value and not (has_tournament_match or has_exhibition_match or has_party_match):
-            raise OptionError(
-                f"[Mario Sports Mix] {self.player_name}'s Character Sanity requires at least one playable "
+                f"[Mario Sports Mix] {self.player_name}'s Character/Special Sanity requires at least one playable "
                 f"tournament, exhibition, or Party Mode match."
             )
-
 
         if self.options.goal_condition.value == 3:
             difficulty_count = 1 + int(bool(self.options.hard_tournament_difficulty.value))
@@ -302,7 +295,7 @@ class MSMWorld(World):
             "version": WORLD_VERSION,
             # Universal Tracker uses this to generate the same MSMWorld without
             # requiring a local YAML file.
-
+            "options": self.options.as_dict(*self.ut_generation_options),
 
             # Goal/Boss Stuff
             "goal_condition": self.options.goal_condition.value,

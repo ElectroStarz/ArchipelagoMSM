@@ -347,15 +347,10 @@ class BasketTime(Choice):
                 return "ERROR"
 
 
-class EnableBPointsWin(Choice):
-    """Getting a certain amount of points wins you or the opponent the set
-Win Set: Wins the current period/set
-Win Round: Wins the whole round"""
+class EnableBPointsWin(Toggle):
+    """Getting a certain amount of points wins you or the opponent the set"""
     display_name = "Enable Points Win"
-    option_off = 0
-    option_win_set = 1
-    option_win_round = 2
-    default = 0
+    default = False
 
 
 class BPointsToWin(Range):
@@ -479,15 +474,10 @@ class HockeyTime(Choice):
                 return "ERROR"
 
 
-class EnableHPointsWin(Choice):
-    """Getting a certain amount of points wins you or the opponent the set
-Win Set: Wins the current period/set
-Win Round: Wins the whole round"""
+class EnableHPointsWin(Toggle):
+    """Getting a certain amount of points wins you or the opponent the set"""
     display_name = "Enable Points Win"
-    option_off = 0
-    option_win_set = 1
-    option_win_round = 2
-    default = 0
+    default = False
 
 
 class HPointsToWin(Range):
@@ -552,7 +542,8 @@ from Coins Trap, etc)"""
 class IncludeAltPaths(Toggle):
     """Include alternate paths?
     No: Alt Paths will not be included
-    Yes: Alt Paths will be included"""
+    Yes: Alt Paths will be included
+    LR Split: Alt Paths will be split between Left and Right"""
 
     display_name = "Include Alternate Paths"
     default = False
