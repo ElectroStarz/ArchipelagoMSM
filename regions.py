@@ -202,7 +202,6 @@ def create_all_regions(world: "MSMWorld") -> None:
     # Add regions to AP multiworld so it knows it exists
     world.multiworld.regions += regions
 
-
 def connect_regions(world: MSMWorld) -> None:
     # Get all regions
     main_menu = world.get_region("Main Menu")
@@ -369,80 +368,66 @@ def connect_regions(world: MSMWorld) -> None:
     sports_mix.connect(sm_flower_cup, "Sports Mix -> Flower Cup")
     sports_mix.connect(sm_star_cup, "Sports Mix -> Star Cup")
 
+
     # Connect alt paths to cups. Global Difficulty connected
 
     # Basketball
-    b_mushroom_cup_n.connect(b_mushroom_cup_alternate_n,
-                             "Basketball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
+    b_mushroom_cup_n.connect(b_mushroom_cup_alternate_n, "Basketball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
     b_flower_cup_n.connect(b_flower_cup_alternate_n, "Basketball: Flower Cup (Normal) -> Flower Cup Alt Paths (Normal)")
     b_star_cup_n.connect(b_star_cup_alternate_n, "Basketball: Star Cup (Normal) -> Star Cup Alt Paths (Normal)")
-    b_mushroom_cup_h.connect(b_mushroom_cup_alternate_h,
-                             "Basketball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
+    b_mushroom_cup_h.connect(b_mushroom_cup_alternate_h, "Basketball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
     b_flower_cup_h.connect(b_flower_cup_alternate_h, "Basketball: Flower Cup (Hard) -> Flower Cup Alt Paths (Hard)")
     b_star_cup_h.connect(b_star_cup_alternate_h, "Basketball: Star Cup (Hard) -> Star Cup Alt Paths (Hard)")
 
-    b_mushroom_cup_n.connect(b_mushroom_cup_alternate_g,
-                             "Basketball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
+    b_mushroom_cup_n.connect(b_mushroom_cup_alternate_g, "Basketball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
     b_flower_cup_n.connect(b_flower_cup_alternate_g, "Basketball: Flower Cup (Normal) -> Flower Cup Alt Paths (Global)")
     b_star_cup_n.connect(b_star_cup_alternate_g, "Basketball: Star Cup (Normal) -> Star Cup Alt Paths (Global)")
-    b_mushroom_cup_h.connect(b_mushroom_cup_alternate_g,
-                             "Basketball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
+    b_mushroom_cup_h.connect(b_mushroom_cup_alternate_g, "Basketball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
     b_flower_cup_h.connect(b_flower_cup_alternate_g, "Basketball: Flower Cup (Hard) -> Flower Cup Alt Paths (Global)")
     b_star_cup_h.connect(b_star_cup_alternate_g, "Basketball: Star Cup (Hard) -> Star Cup Alt Paths (Global)")
 
     # Dodgeball
-    d_mushroom_cup_n.connect(d_mushroom_cup_alternate_n,
-                             "Dodgeball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
+    d_mushroom_cup_n.connect(d_mushroom_cup_alternate_n, "Dodgeball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
     d_flower_cup_n.connect(d_flower_cup_alternate_n, "Dodgeball: Flower Cup (Normal) -> Flower Cup Alt Paths (Normal)")
     d_star_cup_n.connect(d_star_cup_alternate_n, "Dodgeball: Star Cup (Normal) -> Star Cup Alt Paths (Normal)")
-    d_mushroom_cup_h.connect(d_mushroom_cup_alternate_h,
-                             "Dodgeball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
+    d_mushroom_cup_h.connect(d_mushroom_cup_alternate_h, "Dodgeball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
     d_flower_cup_h.connect(d_flower_cup_alternate_h, "Dodgeball: Flower Cup (Hard) -> Flower Cup Alt Paths (Hard)")
     d_star_cup_h.connect(d_star_cup_alternate_h, "Dodgeball: Star Cup (Hard) -> Star Cup Alt Paths (Hard)")
 
-    d_mushroom_cup_n.connect(d_mushroom_cup_alternate_g,
-                             "Dodgeball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
+    d_mushroom_cup_n.connect(d_mushroom_cup_alternate_g, "Dodgeball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
     d_flower_cup_n.connect(d_flower_cup_alternate_g, "Dodgeball: Flower Cup (Normal) -> Flower Cup Alt Paths (Global)")
     d_star_cup_n.connect(d_star_cup_alternate_g, "Dodgeball: Star Cup (Normal) -> Star Cup Alt Paths (Global)")
-    d_mushroom_cup_h.connect(d_mushroom_cup_alternate_g,
-                             "Dodgeball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
+    d_mushroom_cup_h.connect(d_mushroom_cup_alternate_g, "Dodgeball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
     d_flower_cup_h.connect(d_flower_cup_alternate_g, "Dodgeball: Flower Cup (Hard) -> Flower Cup Alt Paths (Global)")
     d_star_cup_h.connect(d_star_cup_alternate_g, "Dodgeball: Star Cup (Hard) -> Star Cup Alt Paths (Global)")
 
     # Volleyball
-    v_mushroom_cup_n.connect(v_mushroom_cup_alternate_n,
-                             "Volleyball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
+    v_mushroom_cup_n.connect(v_mushroom_cup_alternate_n, "Volleyball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
     v_flower_cup_n.connect(v_flower_cup_alternate_n, "Volleyball: Flower Cup (Normal) -> Flower Cup Alt Paths (Normal)")
     v_star_cup_n.connect(v_star_cup_alternate_n, "Volleyball: Star Cup (Normal) -> Star Cup Alt Paths (Normal)")
-    v_mushroom_cup_h.connect(v_mushroom_cup_alternate_h,
-                             "Volleyball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
+    v_mushroom_cup_h.connect(v_mushroom_cup_alternate_h, "Volleyball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
     v_flower_cup_h.connect(v_flower_cup_alternate_h, "Volleyball: Flower Cup (Hard) -> Flower Cup Alt Paths (Hard)")
     v_star_cup_h.connect(v_star_cup_alternate_h, "Volleyball: Star Cup (Hard) -> Star Cup Alt Paths (Hard)")
 
-    v_mushroom_cup_n.connect(v_mushroom_cup_alternate_g,
-                             "Volleyball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
+    v_mushroom_cup_n.connect(v_mushroom_cup_alternate_g, "Volleyball: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
     v_flower_cup_n.connect(v_flower_cup_alternate_g, "Volleyball: Flower Cup (Normal) -> Flower Cup Alt Paths (Global)")
     v_star_cup_n.connect(v_star_cup_alternate_g, "Volleyball: Star Cup (Normal) -> Star Cup Alt Paths (Global)")
-    v_mushroom_cup_h.connect(v_mushroom_cup_alternate_g,
-                             "Volleyball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
+    v_mushroom_cup_h.connect(v_mushroom_cup_alternate_g, "Volleyball: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
     v_flower_cup_h.connect(v_flower_cup_alternate_g, "Volleyball: Flower Cup (Hard) -> Flower Cup Alt Paths (Global)")
     v_star_cup_h.connect(v_star_cup_alternate_g, "Volleyball: Star Cup (Hard) -> Star Cup Alt Paths (Global)")
 
     # Hockey
-    h_mushroom_cup_n.connect(h_mushroom_cup_alternate_n,
-                             "Hockey: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
+    h_mushroom_cup_n.connect(h_mushroom_cup_alternate_n, "Hockey: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Normal)")
     h_flower_cup_n.connect(h_flower_cup_alternate_n, "Hockey: Flower Cup (Normal) -> Flower Cup Alt Paths (Normal)")
     h_star_cup_n.connect(h_star_cup_alternate_n, "Hockey: Star Cup (Normal) -> Star Cup Alt Paths (Normal)")
     h_mushroom_cup_h.connect(h_mushroom_cup_alternate_h, "Hockey: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Hard)")
     h_flower_cup_h.connect(h_flower_cup_alternate_h, "Hockey: Flower Cup (Hard) -> Flower Cup Alt Paths (Hard)")
     h_star_cup_h.connect(h_star_cup_alternate_h, "Hockey: Star Cup (Hard) -> Star Cup Alt Paths (Hard)")
 
-    h_mushroom_cup_n.connect(h_mushroom_cup_alternate_g,
-                             "Hockey: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
+    h_mushroom_cup_n.connect(h_mushroom_cup_alternate_g, "Hockey: Mushroom Cup (Normal) -> Mushroom Cup Alt Paths (Global)")
     h_flower_cup_n.connect(h_flower_cup_alternate_g, "Hockey: Flower Cup (Normal) -> Flower Cup Alt Paths (Global)")
     h_star_cup_n.connect(h_star_cup_alternate_g, "Hockey: Star Cup (Normal) -> Star Cup Alt Paths (Global)")
-    h_mushroom_cup_h.connect(h_mushroom_cup_alternate_g,
-                             "Hockey: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
+    h_mushroom_cup_h.connect(h_mushroom_cup_alternate_g, "Hockey: Mushroom Cup (Hard) -> Mushroom Cup Alt Paths (Global)")
     h_flower_cup_h.connect(h_flower_cup_alternate_g, "Hockey: Flower Cup (Hard) -> Flower Cup Alt Paths (Global)")
     h_star_cup_h.connect(h_star_cup_alternate_g, "Hockey: Star Cup (Hard) -> Star Cup Alt Paths (Global)")
 
@@ -452,48 +437,30 @@ def connect_regions(world: MSMWorld) -> None:
     sm_star_cup.connect(sm_star_cup_alternate, "Sports Mix: Star Cup -> Star Cup Alt Paths")
 
     # Global Sport (Can be acc)
-    b_mushroom_cup_n.connect(g_mushroom_cup_alternate_n,
-                             "Basketball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
-    d_mushroom_cup_n.connect(g_mushroom_cup_alternate_n,
-                             "Dodgeball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
-    v_mushroom_cup_n.connect(g_mushroom_cup_alternate_n,
-                             "Volleyball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
-    h_mushroom_cup_n.connect(g_mushroom_cup_alternate_n,
-                             "Hockey: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
-    sm_mushroom_cup.connect(g_mushroom_cup_alternate_n,
-                            "Sports Mix: Mushroom Cup -> Global: Mushroom Cup Alt Paths (Normal)")
+    b_mushroom_cup_n.connect(g_mushroom_cup_alternate_n, "Basketball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
+    d_mushroom_cup_n.connect(g_mushroom_cup_alternate_n, "Dodgeball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
+    v_mushroom_cup_n.connect(g_mushroom_cup_alternate_n, "Volleyball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
+    h_mushroom_cup_n.connect(g_mushroom_cup_alternate_n, "Hockey: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Normal)")
 
-    b_flower_cup_n.connect(g_flower_cup_alternate_n,
-                           "Basketball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
-    d_flower_cup_n.connect(g_flower_cup_alternate_n,
-                           "Dodgeball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
-    v_flower_cup_n.connect(g_flower_cup_alternate_n,
-                           "Volleyball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
-    h_flower_cup_n.connect(g_flower_cup_alternate_n,
-                           "Hockey: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
-    sm_flower_cup.connect(g_flower_cup_alternate_n, "Sports Mix: Flower Cup -> Global: Flower Cup Alt Paths (Normal)")
+    b_flower_cup_n.connect(g_flower_cup_alternate_n, "Basketball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
+    d_flower_cup_n.connect(g_flower_cup_alternate_n, "Dodgeball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
+    v_flower_cup_n.connect(g_flower_cup_alternate_n, "Volleyball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
+    h_flower_cup_n.connect(g_flower_cup_alternate_n, "Hockey: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Normal)")
 
     b_star_cup_n.connect(g_star_cup_alternate_n, "Basketball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
     d_star_cup_n.connect(g_star_cup_alternate_n, "Dodgeball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
     v_star_cup_n.connect(g_star_cup_alternate_n, "Volleyball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
     h_star_cup_n.connect(g_star_cup_alternate_n, "Hockey: Star Cup (Normal) -> Global: Star Cup Alt Paths (Normal)")
-    sm_star_cup.connect(g_star_cup_alternate_n, "Sports Mix: Star Cup -> Global: Star Cup Alt Paths (Normal)")
+    
 
-    b_mushroom_cup_h.connect(g_mushroom_cup_alternate_h,
-                             "Basketball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
-    d_mushroom_cup_h.connect(g_mushroom_cup_alternate_h,
-                             "Dodgeball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
-    v_mushroom_cup_h.connect(g_mushroom_cup_alternate_h,
-                             "Volleyball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
-    h_mushroom_cup_h.connect(g_mushroom_cup_alternate_h,
-                             "Hockey: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
+    b_mushroom_cup_h.connect(g_mushroom_cup_alternate_h, "Basketball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
+    d_mushroom_cup_h.connect(g_mushroom_cup_alternate_h, "Dodgeball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
+    v_mushroom_cup_h.connect(g_mushroom_cup_alternate_h, "Volleyball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
+    h_mushroom_cup_h.connect(g_mushroom_cup_alternate_h, "Hockey: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Hard)")
 
-    b_flower_cup_h.connect(g_flower_cup_alternate_h,
-                           "Basketball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
-    d_flower_cup_h.connect(g_flower_cup_alternate_h,
-                           "Dodgeball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
-    v_flower_cup_h.connect(g_flower_cup_alternate_h,
-                           "Volleyball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
+    b_flower_cup_h.connect(g_flower_cup_alternate_h, "Basketball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
+    d_flower_cup_h.connect(g_flower_cup_alternate_h, "Dodgeball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
+    v_flower_cup_h.connect(g_flower_cup_alternate_h, "Volleyball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
     h_flower_cup_h.connect(g_flower_cup_alternate_h, "Hockey: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Hard)")
 
     b_star_cup_h.connect(g_star_cup_alternate_h, "Basketball: Star Cup (Hard) -> Global: Star Cup Alt Paths (Hard)")
@@ -501,40 +468,25 @@ def connect_regions(world: MSMWorld) -> None:
     v_star_cup_h.connect(g_star_cup_alternate_h, "Volleyball: Star Cup (Hard) -> Global: Star Cup Alt Paths (Hard)")
     h_star_cup_h.connect(g_star_cup_alternate_h, "Hockey: Star Cup (Hard) -> Global: Star Cup Alt Paths (Hard)")
 
-    b_mushroom_cup_n.connect(g_mushroom_cup_alternate_g,
-                             "Basketball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
-    d_mushroom_cup_n.connect(g_mushroom_cup_alternate_g,
-                             "Dodgeball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
-    v_mushroom_cup_n.connect(g_mushroom_cup_alternate_g,
-                             "Volleyball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
-    h_mushroom_cup_n.connect(g_mushroom_cup_alternate_g,
-                             "Hockey: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
-    b_mushroom_cup_h.connect(g_mushroom_cup_alternate_g,
-                             "Basketball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
-    d_mushroom_cup_h.connect(g_mushroom_cup_alternate_g,
-                             "Dodgeball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
-    v_mushroom_cup_h.connect(g_mushroom_cup_alternate_g,
-                             "Volleyball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
-    h_mushroom_cup_h.connect(g_mushroom_cup_alternate_g,
-                             "Hockey: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
 
-    b_flower_cup_n.connect(g_flower_cup_alternate_g,
-                           "Basketball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
-    d_flower_cup_n.connect(g_flower_cup_alternate_g,
-                           "Dodgeball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
-    v_flower_cup_n.connect(g_flower_cup_alternate_g,
-                           "Volleyball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
-    h_flower_cup_n.connect(g_flower_cup_alternate_g,
-                           "Hockey: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
-    b_flower_cup_h.connect(g_flower_cup_alternate_g,
-                           "Basketball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
-    d_flower_cup_h.connect(g_flower_cup_alternate_g,
-                           "Dodgeball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
-    v_flower_cup_h.connect(g_flower_cup_alternate_g,
-                           "Volleyball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
-    h_flower_cup_h.connect(g_flower_cup_alternate_g,
-                           "Hockey: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
-
+    b_mushroom_cup_n.connect(g_mushroom_cup_alternate_g, "Basketball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
+    d_mushroom_cup_n.connect(g_mushroom_cup_alternate_g, "Dodgeball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
+    v_mushroom_cup_n.connect(g_mushroom_cup_alternate_g, "Volleyball: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
+    h_mushroom_cup_n.connect(g_mushroom_cup_alternate_g, "Hockey: Mushroom Cup (Normal) -> Global: Mushroom Cup Alt Paths (Global)")
+    b_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Basketball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
+    d_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Dodgeball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
+    v_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Volleyball: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
+    h_mushroom_cup_h.connect(g_mushroom_cup_alternate_g, "Hockey: Mushroom Cup (Hard) -> Global: Mushroom Cup Alt Paths (Global)")
+    
+    b_flower_cup_n.connect(g_flower_cup_alternate_g, "Basketball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
+    d_flower_cup_n.connect(g_flower_cup_alternate_g, "Dodgeball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
+    v_flower_cup_n.connect(g_flower_cup_alternate_g, "Volleyball: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
+    h_flower_cup_n.connect(g_flower_cup_alternate_g, "Hockey: Flower Cup (Normal) -> Global: Flower Cup Alt Paths (Global)")
+    b_flower_cup_h.connect(g_flower_cup_alternate_g, "Basketball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
+    d_flower_cup_h.connect(g_flower_cup_alternate_g, "Dodgeball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
+    v_flower_cup_h.connect(g_flower_cup_alternate_g, "Volleyball: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
+    h_flower_cup_h.connect(g_flower_cup_alternate_g, "Hockey: Flower Cup (Hard) -> Global: Flower Cup Alt Paths (Global)")
+    
     b_star_cup_n.connect(g_star_cup_alternate_g, "Basketball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Global)")
     d_star_cup_n.connect(g_star_cup_alternate_g, "Dodgeball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Global)")
     v_star_cup_n.connect(g_star_cup_alternate_g, "Volleyball: Star Cup (Normal) -> Global: Star Cup Alt Paths (Global)")
@@ -544,6 +496,11 @@ def connect_regions(world: MSMWorld) -> None:
     v_star_cup_h.connect(g_star_cup_alternate_g, "Volleyball: Star Cup (Hard) -> Global: Star Cup Alt Paths (Global)")
     h_star_cup_h.connect(g_star_cup_alternate_g, "Hockey: Star Cup (Hard) -> Global: Star Cup Alt Paths (Global)")
 
+
+
+
+
+    
     # Behemoth is accessed by completing all normal star cups, connect all to the Behemoth Boss region
     # Note: Add rule if 3 other star cups have been beaten, Note : "has cleared" is the same as "can reach"
     b_star_cup_n.connect(behemoth_boss, "Basketball Star Cup (Normal) -> Behemoth Boss")

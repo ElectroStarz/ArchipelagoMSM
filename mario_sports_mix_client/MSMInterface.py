@@ -5,7 +5,6 @@ from .memory_addresses_pal import *
 from .common_address_library import AddressLib
 from .MSMFunctions import get_address
 
-
 class ConnectionState(Enum):
     DISCONNECTED = 0
     CONNECTED = 1
@@ -17,7 +16,6 @@ class ConnectionState(Enum):
     HARMONY_HUSTLE = 8
     BOB_OMB_DODGE = 9
     SMASH_SKATE = 10
-
 
 court_ids = ["s01", "s02", "s03", "s04", "s05", "s06", "s07", "s08", "s09", "s10", "s11", "s12", "s15", "s16", "s17"]
 
@@ -75,16 +73,16 @@ court_names = {
 }
 
 harmony_mapping = {
-    0: "Classic Ocean",
-    1: "Chocobo Rhythm",
-    2: "Mario Athletic",
-    3: "Bloocheep Ocean",
-    4: "Chocobo Pop",
-    5: "Punk Athletic",
-    6: "Punk Ocean",
-    7: "Chocobo Beat",
-    8: "Island Athletic",
-    9: "Mushroom Mix Medley",
+    0:  "Classic Ocean",
+    1:  "Chocobo Rhythm",
+    2:  "Mario Athletic",
+    3:  "Bloocheep Ocean",
+    4:  "Chocobo Pop",
+    5:  "Punk Athletic",
+    6:  "Punk Ocean",
+    7:  "Chocobo Beat",
+    8:  "Island Athletic",
+    9:  "Mushroom Mix Medley",
     10: "Blossom Mix Medley",
     11: "Star Mix Medley",
 }
@@ -122,7 +120,6 @@ ss_opp_score_pointers = [
     Pointers.Opponent.R2.ss_score,
     Pointers.Opponent.R3.ss_score,
 ]
-
 
 class MSMInterface:
     dolphin_client: DolphinClient
@@ -208,7 +205,7 @@ class MSMInterface:
 
     def check_team_amount(self):
         value = self.dolphin_client.read_byte(self.addresslib.game_layout_addr)
-
+        
         if value == 0:
             return 3
         elif value == 4:
@@ -225,10 +222,13 @@ class MSMInterface:
 
         return id_to_char.get(value, "None")
 
-    def get_player_score_addr(self):
+    def get_player_score_addr(self, get_total: bool = False):
         if self.is_in_match():
-            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
-            return get_address(player_score_addresses[current_period])
+            if get_total:
+                return get_address(PlayerAddresses.Score.feed_petey_score)
+            else:
+                current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+                return get_address(player_score_addresses[current_period])
         elif self.is_in_feed_petey():
             return get_address(PlayerAddresses.Score.feed_petey_score)
         elif self.is_in_bob_omb():
@@ -240,14 +240,16 @@ class MSMInterface:
         elif self.is_in_smash():
             return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
                                                        Pointers.Player.B1.ss_score)
-        else:
-            return None
+        else: return None
 
-    def get_opponent_score_addr(self, opponent: int):
+    def get_opponent_score_addr(self, opponent: int, get_total: bool = False):
         ls_opponent = opponent - 1
         if self.is_in_match():
-            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
-            return get_address(opponent_score_addresses[current_period])
+            if get_total:
+                return get_address(OpponentAddresses.Score.r1_fp_score)
+            else:
+                current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+                return get_address(opponent_score_addresses[current_period])
         elif self.is_in_feed_petey():
             return get_address(fp_opp_score_addresses[ls_opponent])
         elif self.is_in_bob_omb():
@@ -259,8 +261,7 @@ class MSMInterface:
         elif self.is_in_smash():
             return self.dolphin_client.follow_pointers(get_address(PlayerAddresses.various_shp_pointers),
                                                        ss_opp_score_pointers[ls_opponent])
-        else:
-            return None
+        else: return None
 
     def match_status(self):
         return self.dolphin_client.read_byte(self.addresslib.match_status_addr)
@@ -284,7 +285,7 @@ class MSMInterface:
         current_sport_value = self.dolphin_client.read_byte(get_address(MatchAddresses.current_sport))
         is_party_mode = self.dolphin_client.read_byte(get_address(MatchAddresses.is_party_mode))
         current_sport = {0: "BA", 1: "VO", 2: "DO", 3: "HO", 5: "SM"}.get(current_sport_value)
-
+        
         if current_sport == "BA" and is_party_mode == 2:
             return "Feed Petey"
         elif current_sport == "VO" and is_party_mode == 2:
@@ -308,13 +309,13 @@ class MSMInterface:
 
     def get_tab(self):
         diff = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
-
+            
         if self.is_in_feed_petey():
             return {0: "Apple", 1: "Watermelon"}.get(diff)
-
+            
         elif self.is_in_bob_omb():
             return {0: "Bob-omb", 1: "Cannon"}.get(diff)
-
+            
         elif self.is_in_smash():
             return {0: "Hockey Stick", 1: "Hockey Skate"}.get(diff)
         else:
@@ -326,15 +327,15 @@ class MSMInterface:
         time = self.dolphin_client.read_byte(self.addresslib.basket_time_addr)
 
         if time == 0:
-            return 5400  # 1:30
+            return 5400 # 1:30
         elif time == 1:
-            return 7200  # 2:00
+            return 7200 # 2:00
         elif time == 2:
-            return 9000  # 2:30
+            return 9000 # 2:30
         elif time == 3:
-            return 10800  # 3:00
+            return 10800 # 3:00
         elif time == 4:
-            return 12600  # 3:30
+            return 12600 # 3:30
         else:
             return 99999
 
@@ -342,15 +343,15 @@ class MSMInterface:
         time = self.dolphin_client.read_byte(self.addresslib.dodge_time_addr)
 
         if time == 0:
-            return 7200  # 2:00
+            return 7200 # 2:00
         elif time == 1:
-            return 9000  # 2:30
+            return 9000 # 2:30
         elif time == 2:
-            return 10800  # 3:00
+            return 10800 # 3:00
         elif time == 3:
-            return 12600  # 3:30
+            return 12600 # 3:30
         elif time == 4:
-            return 14400  # 4:00
+            return 14400 # 4:00
         elif time == 5:
             return "Off"
         else:
@@ -423,7 +424,7 @@ class MSMInterface:
         node = self.dolphin_client.read_byte(get_address(TournamentAddresses.player_current_node))
 
         return node
-
+    
     def special_active(self):
         try:
             value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
@@ -432,6 +433,7 @@ class MSMInterface:
             return bool(value)
         except RuntimeError:
             return False
+
 
     def get_music_file_name(self, music_name: str):
         # the big evil dictionary of doooooom
@@ -521,25 +523,29 @@ class MSMInterface:
         if file_name is None:
             self.logger.warning(f"No file for {music_name}")
             return None
-
+    
         return file_name + ".brstm"
 
     def replace_music_file(self, music_to_be_replaced: str, music_to_replace_with: str) -> bool:
-        classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs, MusicFiles.TournamentSongs,
-                   MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
+
+        classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs, MusicFiles.TournamentSongs, MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
         address = None
 
         for cls in classes:
             songs = self.get_songs_from_class(cls)
             if music_to_be_replaced in songs:
-                address = get_address(cls.__dict__[music_to_be_replaced])
+                address = get_address(getattr(cls, music_to_be_replaced), offset = 0xF40)
                 break
 
-        original_length = len(self.get_music_file_name(music_to_be_replaced))
+        original_length = len(self.get_music_file_name(music_to_be_replaced)) 
         new_length = len(self.get_music_file_name(music_to_replace_with))
         new_song = self.get_music_file_name(music_to_replace_with)
 
-        self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
+        if new_song is None:
+            self.logger.warning(f"Could not find replacement music file for {music_to_replace_with}")
+            return
+
+        # self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
         self.dolphin_client.write_string(address, new_song)
 
         # Clearing in case stale stuff gets in the way
@@ -549,13 +555,85 @@ class MSMInterface:
         self.dolphin_client.write_byte(address + new_length, 0x00)
         new_length += 1
         self.dolphin_client.write_byte(address + new_length, 0x00)
-
+        
+            
     def get_songs_from_class(self, cls):
         songs = []
         for attr in dir(cls):
             if not attr.startswith("__") and not attr.startswith("base") and not attr.startswith("offset"):
                 songs.append(attr)
         return songs
+
+    def get_name_from_node(self, cup: str, node: int):
+        names = {
+            "Mushroom": {
+                        0x21: "East of Red Toad House",
+                        0x24: "Lower Field",
+                        0x25: "Near Green Toad House",
+                        0x28: "South of Lake",
+                        0x29: "Upper Field",
+                        0x2B: "By Lake",
+                        0x30: "Below the Curve",
+                        0x31: "Lake Platform",
+                        0x32: "Hidden Finale",
+                        0x34: "Upper Curve",
+                        0x35: "Middle Curve",
+                        0x36: "Lower Curve",
+                        0x37: "Top of the Mountain",
+                        0x38: "Red Toad House",
+                        0x39: "By Logs",
+                        0x3B: "By Castle Flowers",
+                        },
+
+            "Flower":   {
+                        0x26: "Left-Center Bridge",
+                        0x2A: "Waterwheel",
+                        0x2D: "Left Shoreline",
+                        0x32: "Right Shoreline",
+                        0x36: "Bottom-Left Island House",
+                        0x39: "Bottom-Left Island Cannon",
+                        0x3D: "Middle-Left Islands",
+                        0x3E: "Hidden Finale",
+                        0x43: "Middle-Right Island Cannon",
+                        0x44: "Middle-Right Island Field",
+                        0x46: "Top-Right Island Tower",
+                        0x47: "Top-Right Island Bottom Field",
+                        0x49: "Top-Right Island Right Field",
+                        0x4B: "Top-Left Island",
+                        0x4E: "Bottom-Right Island",
+                        0x50: "Leftmost Bridge",
+                        0x52: "Flower Lake Island",
+                        0x55: "Below Rightmost Bridge",
+                        0x57: "Above Rightmost Bridge",
+                        },
+
+            "Star":     {
+                        0x21: "Tower E1",
+                        0x23: "Tower E6",
+                        0x27: "Tower D2",
+                        0x2A: "Tower D7",
+                        0x2E: "Tower C3",
+                        0x30: "Tower C6",
+                        0x32: "Tower B1",
+                        0x33: "Tower B2",
+                        0x36: "Tower B5",
+                        0x37: "Tower B6",
+                        0x38: "Tower B7",
+                        0x3D: "Tower A7",
+                        0x43: "Star Road Bottom-Left of Star",
+                        0x45: "Star Road Bottom-Right of Star",
+                        0x47: "Star Road Top-Left of Star",
+                        0x48: "Star Road Top-Right of Star",
+                        0x49: "Star Road (Right) Intro",
+                        0x4A: "Star Road (Left) Intro",
+                        0x4B: "Star Road Top-Center of Star",
+                        0x4C: "Star Road (Left) Bonus",
+                        0x4D: "Star Road (Right) Bonus",
+                        },
+        }
+
+        return names.get(cup, {}).get(node, "Unknown Node")
+
 
     def get_connection_state(self):
         try:

@@ -2,7 +2,6 @@ from functools import cached_property
 from .memory_addresses_pal import *
 from .MSMFunctions import get_address
 
-
 # This is a file with commonly used addresses. These values are cached and saved as the user if probably not going to
 # change regions midway through a sync/async. If needed though, there is a command to reset these values in the client.
 
@@ -111,7 +110,7 @@ class AddressLib:
     @cached_property
     def current_node_addr(self):
         return get_address(GlobalTournament.current_node)
-
+    
     @cached_property
     def mushroom_cup_alt_unlocked_addr(self):
         return get_address(GlobalTournament.mushroom_alt_paths_unlocked)
@@ -147,6 +146,8 @@ class AddressLib:
     @cached_property
     def current_tournament_sport_addr(self):
         return get_address(GlobalTournament.current_tournament_sport)
+    
+
 
     address_properties = [
         "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",
