@@ -554,13 +554,18 @@ def create_all_items(world: "MSMWorld") -> None:
     )
 
     # Create cups & courts only when that content can actually exist.
+    # Party mode dupe prevention
+    precollected_courts = []
+
     if has_tournament_content:
-        create_cups(world, itempool)
+        create_cups(world, itempool, precollected_courts)
         if world.options.include_alt_paths:
             create_alt_paths(world, itempool)
 
     if has_tournament_content or has_exhibition_content:
-        create_courts(world, itempool)
+        create_courts(world, itempool, precollected_courts)
+
+    print(precollected_courts)
 
     # Exhibition Difficulty Items
     # Universal exhibitions with no enabled main sport create no locations, so
@@ -601,32 +606,8 @@ def create_all_items(world: "MSMWorld") -> None:
             for crystal_name in sports_crystals:
                 itempool.append(world.create_item(crystal_name))
 
-    party_mode_to_dict = {
-        "Feed Petey": feed_petey_items,
-        "Harmony Hustle": harmony_hustle_items,
-        "Bob-omb Dodge": bob_omb_dodge_items,
-        "Smash Skate": smash_skate_items,
-    }
-
-    # Have we enabled any party modes?
     if world.options.party_mode:
-
-        # For every item in the enabled modes:
-        for enabled in world.options.party_mode:
-
-            # Get the dictionary of items to do with it
-            create_dict = party_mode_to_dict[enabled]
-
-            if world.options.start_with_party_modes:
-                world.push_precollected(world.create_item(enabled))
-            else:
-                itempool.append(world.create_item(enabled))
-
-            for item in create_dict:
-                # Create all the other items and add them to the itempool
-                item = world.create_item(item)
-                if item not in itempool:
-                    itempool.append(item)
+        create_party_modes(world, itempool, precollected_courts)
 
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
 
@@ -656,9 +637,38 @@ def create_all_items(world: "MSMWorld") -> None:
     world.multiworld.itempool += itempool
 
 
+def create_party_modes(world: "MSMWorld", itempool, precollected_courts):
+
+    party_mode_to_dict = {
+        "Feed Petey": feed_petey_items,
+        "Harmony Hustle": harmony_hustle_items,
+        "Bob-omb Dodge": bob_omb_dodge_items,
+        "Smash Skate": smash_skate_items,
+    }
+
+    for enabled in world.options.party_mode:
+
+         # Get the dictionary of items to do with it
+        create_dict = party_mode_to_dict[enabled]
+
+        if world.options.start_with_party_modes:
+            world.push_precollected(world.create_item(enabled))
+        else:
+            itempool.append(world.create_item(enabled))
+
+        # Dont add courts for progressive courts
+        if enabled in ("Feed Petey", "Bob-omb Dodge") and world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+            continue
+
+        for item in create_dict:
+            if item not in precollected_courts:
+                # Create all the other items and add them to the itempool
+                item = world.create_item(item)
+                if item not in itempool:
+                    itempool.append(item)
 
 
-def create_courts(world: "MSMWorld", itempool):
+def create_courts(world: "MSMWorld", itempool, precollected_courts):
     if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
 
         the_awesome_edge_case = world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court
@@ -670,6 +680,7 @@ def create_courts(world: "MSMWorld", itempool):
         
         if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups) or the_awesome_edge_case:
             for court in mush_courts:
+                precollected_courts.append(court)
                 world.push_precollected(world.create_item(court))
 
             for court in other_courts:
@@ -699,7 +710,7 @@ def create_courts(world: "MSMWorld", itempool):
                 itempool.append(world.create_item("Progressive Court"))
 
 # Random mushroom cup start handled in cups to avoid giving courts to locked cups
-def create_cups(world: "MSMWorld", itempool):
+def create_cups(world: "MSMWorld", itempool, precollected_courts):
     enabled_sports = world.options.enabled_sports.value
 
     # --- Progressive Cups ---
@@ -828,6 +839,7 @@ def create_cups(world: "MSMWorld", itempool):
 
                 precollect_names_courts.update(starting_courts)
                 for name in precollect_names_courts:
+                    precollected_courts.append(name)
                     world.push_precollected(world.create_item(name))
 
                 for name in courts_in_pool:

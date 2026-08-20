@@ -950,10 +950,6 @@ class MSMContext(SuperContext):
             new_slot = args["slot"]
             ap_locations_checked = args["checked_locations"]
             self.locations_checked.update(ap_locations_checked)
-            if self.team is not None and self.slot is not None and (self.team, self.slot) != (new_team, new_slot):
-                # Clear before CommonContext handles Connected so it cannot send stale local checks for the new slot.
-                self.reset_local_item_state(clear_received=True, clear_consumed=True)
-                self.reset_location_state()
 
 
             self.slot_data = args.get("slot_data", {})
@@ -1097,6 +1093,8 @@ class MSMContext(SuperContext):
         self.game_interface.dolphin_client.disconnect()
         self.reset_game_session_state(game_active= True if dc.GAME_VERSION is not None else False)
         await super().disconnect(allow_autoreconnect)
+        self.reset_local_item_state(clear_received=True, clear_consumed=True)
+        self.reset_location_state()
 
     def update_connection_status(self):
         self.connection_state = self.game_interface.get_connection_state()
@@ -2781,9 +2779,14 @@ class MSMContext(SuperContext):
         """Check if the player has scored the required amount of points to win the period/set"""
 
         sport = self.game_interface.get_mode()
-        curr_player_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_player_score_addr(True))
-        curr_opp_score = self.game_interface.dolphin_client.read_word(self.game_interface.get_opponent_score_addr
-                                                                      (self.party_mode_opponent, True))
+        player_score_addr = self.game_interface.get_player_score_addr(True)
+        opp_score_addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent, True)
+
+        if player_score_addr is None or opp_score_addr is None:
+            return
+
+        curr_player_score = self.game_interface.dolphin_client.read_word(player_score_addr)
+        curr_opp_score = self.game_interface.dolphin_client.read_word(opp_score_addr)
         _, court_name = self.game_interface.get_court()
 
         if sport == "Basketball":
