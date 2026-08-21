@@ -1,6 +1,6 @@
 {
   "game": "Mario Sports Mix",
   "minimum_ap_version": "0.6.7",
-  "world_version": "2.1.1",
-  "authors": ["ElectroStarz"]
+  "world_version": "3.0.0",
+  "authors": ["ElectroStarz", "Puffy"]
 }

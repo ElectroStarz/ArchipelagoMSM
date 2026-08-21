@@ -1,5 +1,121 @@
+# Need someone with PAL copy to verify these
+class MusicFiles:
+
+    class MenuSongs:
+
+        base_addr = 0x80DC76CF # String
+        offset = 0x38
+
+        title_theme = base_addr # String
+        exhibition_settings = base_addr + offset # String
+        wifi_menu = base_addr + offset * 2 # String
+        records_menu = base_addr + offset * 3 # String
+
+    class StageSongs:
+
+        base_addr = 0x80DC77AF # String
+        offset = 0x3C
+
+        mario_stadium = base_addr # String
+        mario_stadium_fast = base_addr + offset # String
+        koopa_troopa_beach = base_addr + offset * 2 # String
+        koopa_troopa_beach_fast = base_addr + offset * 3 # String
+        peachs_castle = base_addr + offset * 4 # String
+        peachs_castle_fast = base_addr + offset * 5 # String
+        toad_park = base_addr + offset * 6 # String
+        toad_park_fast = base_addr + offset * 7 # String
+        dk_dock = base_addr + offset * 8 # String
+        dk_dock_fast = base_addr + offset * 9 # String
+        luigis_mansion = base_addr + offset * 10 # String
+        luigis_mansion_fast = base_addr + offset * 11 # String
+        daisy_garden = base_addr + offset * 12 # String
+        daisy_garden_fast = base_addr + offset * 13 # String
+        wario_factory = base_addr + offset * 14 # String
+        wario_factory_fast = base_addr + offset * 15 # String
+        bowser_jr_blvd = base_addr + offset * 16 # String
+        bowser_jr_blvd_fast = base_addr + offset * 17 # String
+        bowsers_castle = base_addr + offset * 18 # String
+        bowsers_castle_fast = base_addr + offset * 19 # String
+        waluigi_pinball = base_addr + offset * 20 # String
+        waluigi_pinball_fast = base_addr + offset * 21 # String
+        ghoulish_galleon = base_addr + offset * 22 # String
+        ghoulish_galleon_fast = base_addr + offset * 23 # String
+        star_ship = base_addr + offset * 24 # String
+        star_ship_fast = base_addr + offset * 25 # String
+        western_junction = base_addr + offset * 26 # String
+        western_junction_fast = base_addr + offset * 27 # String
+        behemoth_stage = base_addr + offset * 28 # String
+        behemoth_stage_fast = base_addr + offset * 29 # String
+
+    class PartySongs:
+
+        base_addr = 0x80DC7EFF # String
+        offset = 0x3C
+
+        smash_skate_normal = base_addr # String
+        smash_skate_normal_fast = base_addr + offset # String
+        feed_petey_normal = base_addr + offset * 2 # String
+        feed_petey_bonus_time = base_addr + offset * 3 # String
+        feed_petey_normal_fast = base_addr + offset * 4 + 0x04 # String
+        bob_omb_dodge_normal = base_addr + offset * 5 + 0x04 # String
+        bob_omb_dodge_normal_fast = base_addr + offset * 6 + 0x04 # String
+        harmony_hustle_normal = base_addr + offset * 7 + 0x04 # String
+        harmony_hustle_normal_fast = base_addr + offset * 8 + 0x04 # String
+        smash_skate_hard = base_addr + offset * 9 + 0x04 # String
+        smash_skate_hard_fast = base_addr + offset * 10 + 0x04 # String
+        feed_petey_hard = base_addr + offset * 11 + 0x04 # String
+        feed_petey_hard_fast = base_addr + offset * 12 + 0x04 # String
+        bob_omb_dodge_hard = base_addr + offset * 13 + 0x04 # String
+        bob_omb_dodge_hard_fast = base_addr + offset * 14 + 0x04 # String
+
+    class TournamentSongs:
+
+        base_addr = 0x80DC8287 # String
+        offset = 0x40
+
+        tournament_opening = base_addr # String
+        mushroom_cup = base_addr + offset # String
+        flower_cup = base_addr + offset * 2 # String
+        star_cup = base_addr + offset * 3 # String
+        tournament_victory = base_addr + offset * 4 # String
+
+    class MiscSongs:
+
+        # Commented out to avoid potential infinite loops
+        # win_1 = 0x80DC83C7 # String
+        # lose_1 = 0x80DC83FF # String
+        win_2 = 0x80DC8437 # String
+        lose_2 = 0x80DC846F # String
+        matching = 0x80DC84A7 # String
+        results = 0x80DC84E3 # String
+        get_item = 0x80DC851B # String
+        starman = 0x80DC8553 # String
+        star_road_complete = 0x80DC858B # String
+
+    class HarmonyHustlePreviews:
+
+        base_addr = 0x80DC8EC3 # String
+        offset = 0x44
+
+        classic_ocean = base_addr # String
+        chocobo_rhythm = base_addr + offset # String
+        mario_athletic = base_addr + offset * 2 # String
+        bloocheep_ocean = base_addr + offset * 3 # String
+        chocobo_pop = base_addr + offset * 4 # String
+        punk_athletic = base_addr + offset * 5 # String
+        punk_ocean = base_addr + offset * 6 # String
+        chocobo_beat = base_addr + offset * 7 # String
+        island_athletic = base_addr + offset * 8 # String
+        mushroom_mix_medley = base_addr + offset * 9 # String
+        flower_mix_medley = base_addr + offset * 10 # String
+        star_mix_medley = base_addr + offset * 11 # String
+
+
+        
+    
+
 class MatchAddresses:
-    game_code = 0x800000 # String
+    game_code = 0x80000000 # String
     match_status = 0x804D78BC  # Byte | 0=Ongoing, 1=Win, 2=Lose, 3=Tie | In CAL
     match_started = 0x805C1977 # Byte | 1 = Yes, 0 = No
     current_court = 0x8047888E  # String | Uses -0xF20 for NTSC-U | In CAL
@@ -16,13 +132,111 @@ class MatchAddresses:
     loading_screen_active = 0x804D8354  # Word | In CAL
     set_break = 0x804D1178 # Word | Has Pointers
     game_speed = 0x804D77F4 # Float
+    stage_tint = 0x805C1C64 # Word | In RGBA format, though Alpha Channel is unnused.
 
     shot_clock = 0x804D77F0  # Float
     time_remaining = 0x804D77E4  # Float | In CAL
     max_time = 0x804D77E0 # Float | In CAL
 
+    # Opposing Team Characters
+    red_character_1 = 0x804D7809 # Byte
+    red_character_2 = 0x804D780B # Byte
+    red_character_3 = 0x804D780D # Byte
+    red_character_4 = 0x804D780F # Byte
+
+    current_sport = 0x804D77C4 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey
+    is_party_mode = 0x804D77C5 # Byte | 0 = Regular Sport, 2 = Party Mode
+
     # 4 = 2v2, 0 = 3v3
     game_layout = 0x804D77C6 # Byte | In CAL
+
+
+
+
+class TournamentAddresses:
+
+    player_current_node = 0x804D5D1F # Byte
+    player_character = 0x804D5D18 # Byte
+    player_teammate_1 = 0x804D5D19 # Byte
+    player_teammate_2 = 0x804D5D1A # Byte
+
+    current_tournament_sport_variation = 0x804D7094 # Byte | 0 = Basketball, 1 = Volleyball, 2 = Dodgeball, 3 = Hockey, 5 = Sports Mix
+    current_tournament_cup = 0x804D7095 # Byte
+    current_tournament_map = 0x804D7096 # Byte
+    current_tournament_song = 0x804D7097 # Byte
+    current_tournament_round = 0x804D70A3 # Byte
+
+    round_1_match_1_stage = 0x804D5F5A # Byte
+    round_1_match_2_stage = 0x804D5F6A # Byte
+    round_1_match_3_stage = 0x804D5F7A # Byte
+    round_1_match_4_stage = 0x804D5F8A # Byte
+    round_2_match_1_stage = 0x804D5F9A # Byte
+    round_2_match_2_stage = 0x804D5FAA # Byte
+    round_3_match_1_stage = 0x804D5FBA # Byte
+    node_17_stage = 0x804D5FCA # Byte
+    alt_path_stage = 0x804D5FDA # Byte
+
+    round_1_match_1_mode = 0x804D5F56 # Byte
+    round_1_match_2_mode = 0x804D5F66 # Byte
+    round_1_match_3_mode = 0x804D5F76 # Byte
+    round_1_match_4_mode = 0x804D5F86 # Byte
+    round_2_match_1_mode = 0x804D5F96 # Byte
+    round_2_match_2_mode = 0x804D5FA6 # Byte
+    round_3_match_1_mode = 0x804D5FB6 # Byte
+    node_17_mode = 0x804D5FC6 # Byte
+    alt_path_mode = 0x804D5FD6 # Byte
+
+    alt_path_condition_fufilled = 0x804D6FBC # Byte | Also checks for winning Alt Path missions
+
+    mushroom_alt_paths_unlocked = 0x804D6FFD # Byte | Bit 0 = Normal | Bit 1 = Hard
+    flower_alt_paths_unlocked = 0x804D701D # Byte
+    star_alt_paths_unlocked = 0x804D703D # Byte | Also controls Final Fantasy Character Spawns
+
+    flower_inner_bridges_toggle = 0x804D701E # Byte
+    flower_outer_bridges_toggle = 0x804D701F # Byte
+
+    # +0x24 offset between players
+    cpu_1_current_node = player_current_node + 0x24 # Byte
+    cpu_2_current_node = player_current_node + 0x48 # Byte
+    cpu_3_current_node = player_current_node + 0x6C # Byte
+    cpu_4_current_node = player_current_node + 0x90 # Byte
+    cpu_5_current_node = player_current_node + 0xB4 # Byte
+    cpu_6_current_node = player_current_node + 0xD8 # Byte
+    cpu_7_current_node = player_current_node + 0xFC # Byte
+
+    cpu_1_character = player_character + 0x24 # Byte
+    cpu_1_teammate_1 = player_teammate_1 + 0x24 # Byte
+    cpu_1_teammate_2 = player_teammate_2 + 0x24 # Byte
+
+    cpu_2_character = player_character + 0x48 # Byte
+    cpu_2_teammate_1 = player_teammate_1 + 0x48 # Byte
+    cpu_2_teammate_2 = player_teammate_2 + 0x48 # Byte
+
+    cpu_3_character = player_character + 0x6C # Byte
+    cpu_3_teammate_1 = player_teammate_1 + 0x6C # Byte
+    cpu_3_teammate_2 = player_teammate_2 + 0x6C # Byte
+
+    cpu_4_character = player_character + 0x90 # Byte
+    cpu_4_teammate_1 = player_teammate_1 + 0x90 # Byte
+    cpu_4_teammate_2 = player_teammate_2 + 0x90 # Byte
+
+    cpu_5_character = player_character + 0xB4 # Byte
+    cpu_5_teammate_1 = player_teammate_1 + 0xB4 # Byte
+    cpu_5_teammate_2 = player_teammate_2 + 0xB4 # Byte
+
+    cpu_6_character = player_character + 0xD8 # Byte
+    cpu_6_teammate_1 = player_teammate_1 + 0xD8 # Byte
+    cpu_6_teammate_2 = player_teammate_2 + 0xD8 # Byte
+
+    cpu_7_character = player_character + 0xFC # Byte
+    cpu_7_teammate_1 = player_teammate_1 + 0xFC # Byte
+    cpu_7_teammate_2 = player_teammate_2 + 0xFC # Byte
+
+    ff_team_character_1 = 0x804D7809 # Byte
+    ff_team_character_2 = 0x804D780B # Byte
+    ff_team_character_3 = 0x804D780D # Byte
+    
+
 
 
 class PartyMode:
@@ -377,6 +591,12 @@ class Pointers:
     class Boss:
         behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
         max_hp_offsets = [0x20, 0x34, 0x1F4]
+
+class PlayerInputs:
+
+    P1_Dpad_Inputs = 0x804CDDA3 # Upright: Bit 0: Left, Bit 1: Right, Bit 2: Down, Bit 3: Up
+                                # Sideways: Bit 0: Down, Bit 1: Up, Bit 2: Right, Bit 3: Left
+    P1_Extension = 0x804CDDFC # 0 = None, 1 = Nunchuk
 
 
 class GeckoCodes:

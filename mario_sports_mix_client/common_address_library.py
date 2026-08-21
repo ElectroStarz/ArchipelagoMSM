@@ -103,6 +103,52 @@ class AddressLib:
     def p_special_meter_addr(self):
         return get_address(PlayerAddresses.special_meter)
 
+    @cached_property
+    def alt_path_spawn_addr(self):
+        return get_address(GlobalTournament.alt_path_condition_fufilled)
+    
+    @cached_property
+    def current_node_addr(self):
+        return get_address(GlobalTournament.current_node)
+    
+    @cached_property
+    def mushroom_cup_alt_unlocked_addr(self):
+        return get_address(GlobalTournament.mushroom_alt_paths_unlocked)
+    
+    @cached_property
+    def flower_cup_alt_unlocked_addr(self):
+        return get_address(GlobalTournament.flower_alt_paths_unlocked)
+    
+    @cached_property
+    def flower_cup_alt_bridges_inner_addr(self):
+        return get_address(GlobalTournament.flower_inner_bridges_toggle)
+    
+    @cached_property
+    def flower_cup_alt_bridges_outer_addr(self):
+        return get_address(GlobalTournament.flower_outer_bridges_toggle)
+    
+    @cached_property
+    def star_cup_alt_unlocked_addr(self):
+        return get_address(GlobalTournament.star_alt_paths_unlocked)
+
+    @cached_property
+    def current_tournament_round_addr(self):
+        return get_address(GlobalTournament.current_round)
+
+    @cached_property
+    def current_tournament_cup_addr(self):
+        return get_address(GlobalTournament.current_cup)
+
+    @cached_property
+    def current_tournament_map_sport_addr(self):
+        return get_address(GlobalTournament.current_tournament_sport_variation)
+
+    @cached_property
+    def current_tournament_sport_addr(self):
+        return get_address(GlobalTournament.current_tournament_sport)
+    
+
+
     address_properties = [
         "current_stage_addr", "current_module_addr", "match_status_addr", "game_layout_addr",
         "paused_addr", "timer_addr", "current_period_addr", "cutscene_active_addr",
@@ -110,7 +156,12 @@ class AddressLib:
         "basket_time_addr", "dodge_time_addr", "hockey_time_addr",
         "is_sports_mix_addr", "exhibition_diff_addr", "tournament_diff_addr",
         "p_pos_addr", "p_item_held_addr", "p_coins_addr",
-        "o_coins_addr", "o_item_held_addr", "p_special_meter_addr"
+        "o_coins_addr", "o_item_held_addr", "p_special_meter_addr",
+        "alt_path_spawn_addr", "current_node_addr", "mushroom_cup_alt_unlocked_addr",
+        "flower_cup_alt_unlocked_addr", "flower_cup_alt_bridges_inner_addr",
+        "flower_cup_alt_bridges_outer_addr", "star_cup_alt_unlocked_addr",
+        "current_tournament_round_addr", "current_tournament_cup_addr",
+        "current_tournament_map_sport_addr", "current_tournament_sport_addr"
     ]
 
     def reset_all_addresses(self, logger):

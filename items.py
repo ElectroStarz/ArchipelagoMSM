@@ -24,8 +24,31 @@ class ItemGroup(str, Enum):
 
     SPORTS_MIX_CUPS = "Sports Mix Cups"
 
+    BASKETBALL_ALT_PATHS_N = "Basketball Alt Paths (Normal)"
+    BASKETBALL_ALT_PATHS_H = "Basketball Alt Paths (Hard)"
+    BASKETBALL_ALT_PATHS_G = "Basketball Alt Paths"
+
+    DODGEBALL_ALT_PATHS_N = "Dodgeball Alt Paths (Normal)"
+    DODGEBALL_ALT_PATHS_H = "Dodgeball Alt Paths (Hard)"
+    DODGEBALL_ALT_PATHS_G = "Dodgeball Alt Paths"
+
+    VOLLEYBALL_ALT_PATHS_N = "Volleyball Alt Paths (Normal)"
+    VOLLEYBALL_ALT_PATHS_H = "Volleyball Alt Paths (Hard)"
+    VOLLEYBALL_ALT_PATHS_G = "Volleyball Alt Paths"
+
+    HOCKEY_ALT_PATHS_N = "Hockey Alt Paths (Normal)"
+    HOCKEY_ALT_PATHS_H = "Hockey Alt Paths (Hard)"
+    HOCKEY_ALT_PATHS_G = "Hockey Alt Paths"
+
+    SPORTS_MIX_ALT_PATHS = "Sports Mix Alt Paths"
+
+    GLOBAL_ALT_PATHS_N = "Global Alt Paths (Normal)"
+    GLOBAL_ALT_PATHS_H = "Global Alt Paths (Hard)"
+    GLOBAL_ALT_PATHS_G = "Global Alt Paths"
+
     PROGRESSIVE_CUPS = "Progressive Cups"
     PROGRESSIVE_COURTS = "Progressive Courts"
+    PROGRESSIVE_ALTERNATE_PATHS = "Progressive Alternate Paths"
 
     EXHIBITION_DIFFICULTIES = "Exhibition Difficulties"
 
@@ -71,11 +94,17 @@ ex_difficulties = {
     "Exhibition Expert":                 ItemData(base_id + 9, IC.progression|IC.useful, ItemGroup.EXHIBITION_DIFFICULTIES),
 }
 
-# Cups / Tournaments (100 range)
+# Cups / Tournaments / Alt Paths (100 range)
 basketball_items_n = {
     "Basketball: Mushroom Cup (Normal)": ItemData(base_id + 101, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
     "Basketball: Flower Cup (Normal)":   ItemData(base_id + 102, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
     "Basketball: Star Cup (Normal)":     ItemData(base_id + 103, IC.progression, ItemGroup.BASKETBALL_NORMAL_CUPS),
+}
+
+basketball_alt_paths_n = {
+    "Basketball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 104, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_N),
+    "Basketball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 105, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_N),
+    "Basketball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 106, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_N),
 }
 
 basketball_items_h = {
@@ -84,16 +113,46 @@ basketball_items_h = {
     "Basketball: Star Cup (Hard)":       ItemData(base_id + 113, IC.progression, ItemGroup.BASKETBALL_HARD_CUPS),
 }
 
+basketball_alt_paths_h = {
+    "Basketball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 114, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
+    "Basketball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 115, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
+    "Basketball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 116, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_H),
+}
+
+basketball_alt_paths_g = {
+    "Basketball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 117, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_G),
+    "Basketball: Flower Cup Alt Paths (Global)":   ItemData(base_id + 118, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_G),
+    "Basketball: Star Cup Alt Paths (Global)":     ItemData(base_id + 119, IC.progression, ItemGroup.BASKETBALL_ALT_PATHS_G),
+}
+
 dodgeball_items_n = {
-    "Dodgeball: Mushroom Cup (Normal)":  ItemData(base_id + 121, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Flower Cup (Normal)":    ItemData(base_id + 122, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
-    "Dodgeball: Star Cup (Normal)":      ItemData(base_id + 123, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Mushroom Cup (Normal)": ItemData(base_id + 121, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Flower Cup (Normal)":   ItemData(base_id + 122, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+    "Dodgeball: Star Cup (Normal)":     ItemData(base_id + 123, IC.progression, ItemGroup.DODGEBALL_NORMAL_CUPS),
+}
+
+dodgeball_alt_paths_n = {
+    "Dodgeball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 124, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
+    "Dodgeball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 125, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
+    "Dodgeball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 126, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_N),
 }
 
 dodgeball_items_h = {
-    "Dodgeball: Mushroom Cup (Hard)":    ItemData(base_id + 131, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Flower Cup (Hard)":      ItemData(base_id + 132, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
-    "Dodgeball: Star Cup (Hard)":        ItemData(base_id + 133, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Mushroom Cup (Hard)": ItemData(base_id + 131, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Flower Cup (Hard)":   ItemData(base_id + 132, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+    "Dodgeball: Star Cup (Hard)":     ItemData(base_id + 133, IC.progression, ItemGroup.DODGEBALL_HARD_CUPS),
+}
+
+dodgeball_alt_paths_h = {
+    "Dodgeball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 134, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
+    "Dodgeball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 135, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
+    "Dodgeball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 136, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_H),
+}
+
+dodgeball_alt_paths_g = {
+    "Dodgeball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 137, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
+    "Dodgeball: Flower Cup Alt Paths (Global)":   ItemData(base_id + 138, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
+    "Dodgeball: Star Cup Alt Paths (Global)":     ItemData(base_id + 139, IC.progression, ItemGroup.DODGEBALL_ALT_PATHS_G),
 }
 
 volleyball_items_n = {
@@ -102,28 +161,88 @@ volleyball_items_n = {
     "Volleyball: Star Cup (Normal)":     ItemData(base_id + 143, IC.progression, ItemGroup.VOLLEYBALL_NORMAL_CUPS),
 }
 
+volleyball_alt_paths_n = {
+    "Volleyball: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 144, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_N),
+    "Volleyball: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 145, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_N),
+    "Volleyball: Star Cup Alt Paths (Normal)":     ItemData(base_id + 146, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_N),
+}
+
 volleyball_items_h = {
     "Volleyball: Mushroom Cup (Hard)":   ItemData(base_id + 151, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
     "Volleyball: Flower Cup (Hard)":     ItemData(base_id + 152, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
     "Volleyball: Star Cup (Hard)":       ItemData(base_id + 153, IC.progression, ItemGroup.VOLLEYBALL_HARD_CUPS),
 }
 
+volleyball_alt_paths_h = {
+    "Volleyball: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 154, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
+    "Volleyball: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 155, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
+    "Volleyball: Star Cup Alt Paths (Hard)":     ItemData(base_id + 156, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_H),
+}
+
+volleyball_alt_paths_g = {
+    "Volleyball: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 147, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_G),
+    "Volleyball: Flower Cup Alt Paths (Global)":   ItemData(base_id + 148, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_G),
+    "Volleyball: Star Cup Alt Paths (Global)":     ItemData(base_id + 149, IC.progression, ItemGroup.VOLLEYBALL_ALT_PATHS_G),
+}
+
 hockey_items_n = {
-    "Hockey: Mushroom Cup (Normal)":     ItemData(base_id + 161, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Flower Cup (Normal)":       ItemData(base_id + 162, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
-    "Hockey: Star Cup (Normal)":         ItemData(base_id + 163, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Mushroom Cup (Normal)": ItemData(base_id + 161, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Flower Cup (Normal)":   ItemData(base_id + 162, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+    "Hockey: Star Cup (Normal)":     ItemData(base_id + 163, IC.progression, ItemGroup.HOCKEY_NORMAL_CUPS),
+}
+
+hockey_alt_paths_n = {
+    "Hockey: Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 164, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
+    "Hockey: Flower Cup Alt Paths (Normal)":   ItemData(base_id + 165, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
+    "Hockey: Star Cup Alt Paths (Normal)":     ItemData(base_id + 166, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_N),
 }
 
 hockey_items_h = {
-    "Hockey: Mushroom Cup (Hard)":       ItemData(base_id + 171, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Flower Cup (Hard)":         ItemData(base_id + 172, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
-    "Hockey: Star Cup (Hard)":           ItemData(base_id + 173, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Mushroom Cup (Hard)":   ItemData(base_id + 171, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Flower Cup (Hard)":     ItemData(base_id + 172, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+    "Hockey: Star Cup (Hard)":       ItemData(base_id + 173, IC.progression, ItemGroup.HOCKEY_HARD_CUPS),
+}
+
+hockey_alt_paths_h = {
+    "Hockey: Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 174, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
+    "Hockey: Flower Cup Alt Paths (Hard)":   ItemData(base_id + 175, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
+    "Hockey: Star Cup Alt Paths (Hard)":     ItemData(base_id + 176, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_H),
+}
+
+hockey_alt_paths_g = {
+    "Hockey: Mushroom Cup Alt Paths (Global)": ItemData(base_id + 177, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
+    "Hockey: Flower Cup Alt Paths (Global)":   ItemData(base_id + 178, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
+    "Hockey: Star Cup Alt Paths (Global)":     ItemData(base_id + 179, IC.progression, ItemGroup.HOCKEY_ALT_PATHS_G),
 }
 
 sports_mix_cups = {
-    "Sports Mix: Mushroom Cup":          ItemData(base_id + 181, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Flower Cup":            ItemData(base_id + 182, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
-    "Sports Mix: Star Cup":              ItemData(base_id + 183, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Mushroom Cup": ItemData(base_id + 181, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Flower Cup":   ItemData(base_id + 182, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+    "Sports Mix: Star Cup":     ItemData(base_id + 183, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_CUPS),
+}
+
+sports_mix_alt_paths = {
+    "Sports Mix: Mushroom Cup Alt Paths": ItemData(base_id + 184, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_ALT_PATHS),
+    "Sports Mix: Flower Cup Alt Paths":   ItemData(base_id + 185, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_ALT_PATHS),
+    "Sports Mix: Star Cup Alt Paths":     ItemData(base_id + 186, IC.progression_skip_balancing, ItemGroup.SPORTS_MIX_ALT_PATHS),
+}
+
+global_alt_paths_n = {
+    "Mushroom Cup Alt Paths (Normal)": ItemData(base_id + 190, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Flower Cup Alt Paths (Normal)":   ItemData(base_id + 191, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+    "Star Cup Alt Paths (Normal)":     ItemData(base_id + 192, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_N),
+}
+
+global_alt_paths_h = {
+    "Mushroom Cup Alt Paths (Hard)": ItemData(base_id + 193, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Flower Cup Alt Paths (Hard)":   ItemData(base_id + 194, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+    "Star Cup Alt Paths (Hard)":     ItemData(base_id + 195, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_H),
+}
+
+global_alt_paths_g = {
+    "Mushroom Cup Alt Paths (Global)": ItemData(base_id + 196, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Flower Cup Alt Paths (Global)":   ItemData(base_id + 197, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
+    "Star Cup Alt Paths (Global)":     ItemData(base_id + 198, IC.progression, ItemGroup.GLOBAL_ALT_PATHS_G),
 }
 
 # Crystals (200 range)
@@ -156,6 +275,7 @@ individual_courts = {
 progressive_items = {
     "Progressive Court":                 ItemData(base_id + 316, IC.progression, ItemGroup.PROGRESSIVE_COURTS),
     "Progressive Cup":                   ItemData(base_id + 317, IC.progression, ItemGroup.PROGRESSIVE_CUPS),
+    "Progressive Alternate Path":        ItemData(base_id + 318, IC.progression, ItemGroup.PROGRESSIVE_ALTERNATE_PATHS),
 }
 
 # Characters (400 range)
@@ -295,14 +415,30 @@ item_table: Dict[str, ItemData] = {
     **sports_mix_item,
     **ex_difficulties,
     **basketball_items_n,
+    **basketball_alt_paths_n,
     **basketball_items_h,
+    **basketball_alt_paths_h,
+    **basketball_alt_paths_g,
     **dodgeball_items_n,
+    **dodgeball_alt_paths_n,
     **dodgeball_items_h,
+    **dodgeball_alt_paths_h,
+    **dodgeball_alt_paths_g,
     **volleyball_items_n,
+    **volleyball_alt_paths_n,
     **volleyball_items_h,
+    **volleyball_alt_paths_h,
+    **volleyball_alt_paths_g,
     **hockey_items_n,
+    **hockey_alt_paths_n,
     **hockey_items_h,
+    **hockey_alt_paths_h,
+    **hockey_alt_paths_g,
     **sports_mix_cups,
+    **sports_mix_alt_paths,
+    **global_alt_paths_n,
+    **global_alt_paths_h,
+    **global_alt_paths_g,
     **sports_crystals,
     **individual_courts,
     **progressive_items,
@@ -365,7 +501,7 @@ def create_all_items(world: "MSMWorld") -> None:
 
 
     # Start with random characters option
-    # This only uses the main roster as getting characters outside
+    # This only uses the main mario roster as getting characters outside
     # the main roster before getting characters in the roster can bug
     # the game and make them not appear
     row_1 = ["Mario", "Peach",   "Wario",       "Diddy Kong"]
@@ -373,7 +509,7 @@ def create_all_items(world: "MSMWorld") -> None:
     row_3 = ["Yoshi", "Waluigi", "Bowser",      "Toad"]
     all_rows = [row_1, row_2, row_3]
 
-    if world.options.start_with_characters == StartWithCharacters.option_2_characters:
+    if world.options.start_with_characters.value == StartWithCharacters.option_2_characters:
         # Pick 2 random rows
         selected_1, selected_2 = world.random.sample(all_rows, 2)
         # Select random characters from said rows
@@ -386,7 +522,7 @@ def create_all_items(world: "MSMWorld") -> None:
             if character not in (character_1, character_2):
                 itempool.append(world.create_item(character))
 
-    elif world.options.start_with_characters == StartWithCharacters.option_3_characters:
+    elif world.options.start_with_characters.value == StartWithCharacters.option_3_characters:
         character_1 = world.random.choice(row_1)
         character_2 = world.random.choice(row_2)
         character_3 = world.random.choice(row_3)
@@ -403,15 +539,38 @@ def create_all_items(world: "MSMWorld") -> None:
         for character in characters:
             itempool.append(world.create_item(character))
 
-    # Create cups & courts based on options
-    if world.options.include_tournaments:
-        create_cups(world, itempool)
+    enabled_sports = world.options.enabled_sports.value
+    enabled_main_sports = {
+        sport for sport in enabled_sports
+        if sport in {"Basketball", "Dodgeball", "Volleyball", "Hockey"}
+    }
+    has_tournament_content = bool(
+        world.options.include_tournaments.value and enabled_sports
+    )
+    has_exhibition_content = bool(
+        world.options.include_exhibition.value
+        and world.options.exhibition_difficulties.value
+        and enabled_main_sports
+    )
 
-    if world.options.include_tournaments or world.options.include_exhibition:
-        create_courts(world, itempool)
+    # Create cups & courts only when that content can actually exist.
+    # Party mode dupe prevention
+    precollected_courts = []
+
+    if has_tournament_content:
+        create_cups(world, itempool, precollected_courts)
+        if world.options.include_alt_paths:
+            create_alt_paths(world, itempool)
+
+    if has_tournament_content or has_exhibition_content:
+        create_courts(world, itempool, precollected_courts)
+
+    print(precollected_courts)
 
     # Exhibition Difficulty Items
-    if world.options.include_exhibition:
+    # Universal exhibitions with no enabled main sport create no locations, so
+    # they must not inject dead progression items into the pool either.
+    if has_exhibition_content:
         selected_difficulties = set(world.options.exhibition_difficulties.value)
         first_difficulty = next(
             (difficulty for difficulty in ("Easy", "Normal", "Hard", "Expert")
@@ -429,62 +588,26 @@ def create_all_items(world: "MSMWorld") -> None:
             if difficulty != first_difficulty:
                 itempool.append(world.create_item(f"Exhibition {difficulty}"))
 
-    enabled_sports = world.options.enabled_sports.value
-
     # Start with Sports option
-    if world.options.start_with_sports.value > 0:
-        available_sports = [s for s in enabled_sports if s != "Sports Mix"]
-
-        # Make sure we don't try to sample more Sports than available
-        sample_size = min(world.options.start_with_sports.value, len(available_sports))
-
-        given_sports: list[str] = world.random.sample(available_sports, sample_size)
-
+    if world.options.start_with_sports.value:
         for sport in enabled_sports:
-            if sport in given_sports:
+            if sport != "Sports Mix":
                 world.push_precollected(world.create_item(sport))
-            else:
-                itempool.append(world.create_item(sport))
-
     else:
         for sport in enabled_sports:
             if sport != "Sports Mix":
                 itempool.append(world.create_item(sport))
 
     if "Sports Mix" in enabled_sports:
-        if world.options.sports_mix_unlock == SportsMixUnlock.option_sports_mix_item:
+        if world.options.sports_mix_unlock.value == SportsMixUnlock.option_sports_mix_item:
             itempool.append(world.create_item("Sports Mix"))
 
-        elif world.options.sports_mix_unlock == SportsMixUnlock.option_sports_crystals:
+        elif world.options.sports_mix_unlock.value == SportsMixUnlock.option_sports_crystals:
             for crystal_name in sports_crystals:
                 itempool.append(world.create_item(crystal_name))
 
-    party_mode_to_dict = {
-        "Feed Petey": feed_petey_items,
-        "Harmony Hustle": harmony_hustle_items,
-        "Bob-omb Dodge": bob_omb_dodge_items,
-        "Smash Skate": smash_skate_items,
-    }
-
-    # Have we enabled any party modes?
     if world.options.party_mode:
-
-        # For every item in the enabled modes:
-        for enabled in world.options.party_mode:
-
-            # Get the dictionary of items to do with it
-            create_dict = party_mode_to_dict[enabled]
-
-            if world.options.start_with_party_modes:
-                world.push_precollected(world.create_item(enabled))
-            else:
-                itempool.append(world.create_item(enabled))
-
-            for item in create_dict:
-                # Create all the other items and add them to the itempool
-                item = world.create_item(item)
-                if item not in itempool:
-                    itempool.append(item)
+        create_party_modes(world, itempool, precollected_courts)
 
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
 
@@ -514,25 +637,63 @@ def create_all_items(world: "MSMWorld") -> None:
     world.multiworld.itempool += itempool
 
 
+def create_party_modes(world: "MSMWorld", itempool, precollected_courts):
+
+    party_mode_to_dict = {
+        "Feed Petey": feed_petey_items,
+        "Harmony Hustle": harmony_hustle_items,
+        "Bob-omb Dodge": bob_omb_dodge_items,
+        "Smash Skate": smash_skate_items,
+    }
+
+    for enabled in world.options.party_mode:
+
+         # Get the dictionary of items to do with it
+        create_dict = party_mode_to_dict[enabled]
+
+        if world.options.start_with_party_modes:
+            world.push_precollected(world.create_item(enabled))
+        else:
+            itempool.append(world.create_item(enabled))
+
+        # Dont add courts for progressive courts
+        if enabled in ("Feed Petey", "Bob-omb Dodge") and world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+            continue
+
+        for item in create_dict:
+            if item not in precollected_courts:
+                # Create all the other items and add them to the itempool
+                item = world.create_item(item)
+                if item not in itempool:
+                    itempool.append(item)
 
 
-def create_courts(world: "MSMWorld", itempool):
-    if world.options.court_unlock_type == CourtUnlockType.option_court_item:
-        if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
-            mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+def create_courts(world: "MSMWorld", itempool, precollected_courts):
+    if world.options.court_unlock_type.value == CourtUnlockType.option_court_item:
+
+        the_awesome_edge_case = world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups and world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup and not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court
+
+        mush_courts = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+
+        other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
+                        "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
+        
+        if world.options.start_with_mushroom_cup not in (StartWithMushroomCup.option_none, StartWithMushroomCup.option_random_cups) or the_awesome_edge_case:
             for court in mush_courts:
+                precollected_courts.append(court)
                 world.push_precollected(world.create_item(court))
-
-            other_courts = ["Luigi's Mansion", "Daisy Garden", "Wario Factory", "Bowser Jr. Blvd.", "Bowser's Castle",
-                            "Waluigi Pinball", "Ghoulish Galleon", "Star Ship", "Western Junction", "Behemoth Stage"]
 
             for court in other_courts:
                 itempool.append(world.create_item(court))
         else:
-            for court in individual_courts:
-                itempool.append(world.create_item(court))
+            if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_random_cups:
+                for court in other_courts:
+                    itempool.append(world.create_item(court))
+            else:
+                for court in individual_courts:
+                    itempool.append(world.create_item(court))
 
-    elif world.options.court_unlock_type == CourtUnlockType.option_progressive_court:
+    elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         total_stages = 15
 
         if world.options.start_with_mushroom_cup != StartWithMushroomCup.option_none:
@@ -548,22 +709,24 @@ def create_courts(world: "MSMWorld", itempool):
             for _ in range(total_stages):
                 itempool.append(world.create_item("Progressive Court"))
 
-def create_cups(world: "MSMWorld", itempool):
+# Random mushroom cup start handled in cups to avoid giving courts to locked cups
+def create_cups(world: "MSMWorld", itempool, precollected_courts):
     enabled_sports = world.options.enabled_sports.value
 
     # --- Progressive Cups ---
-    if world.options.cup_unlock_type == CupUnlockType.option_progressive_cup:
+    if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
+
         # Base: 3 Standard Cups (Mushroom, Flower, Star)
         total_progressive_cups = 3
 
         # If Hard mode is enabled, add 3 more for the Hard Tournament tiers
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             total_progressive_cups += 3  # 6 items
 
         if "Sports Mix" in enabled_sports:
             total_progressive_cups += 3 # 9 items max
 
-        start_option = world.options.start_with_mushroom_cup
+        start_option = world.options.start_with_mushroom_cup.value
 
         # Determine how many starting levels the player gets for free
         precollected_count = 0
@@ -571,7 +734,7 @@ def create_cups(world: "MSMWorld", itempool):
             precollected_count = 1  # Starts with Tier 1
         elif start_option == StartWithMushroomCup.option_hard_difficulty:
             precollected_count = 1  # Starts with Tier 1
-        elif start_option == StartWithMushroomCup.option_both:
+        elif start_option in (StartWithMushroomCup.option_both, StartWithMushroomCup.option_random_cups):
             precollected_count = 2  # Starts with Tier 1 and Tier 2 equivalent
 
         # Push free starting levels to inventory
@@ -584,6 +747,7 @@ def create_cups(world: "MSMWorld", itempool):
             itempool.append(world.create_item("Progressive Cup"))
 
 
+
     # --- Individual Cups ---
     else:
         all_normal_items = {
@@ -594,7 +758,7 @@ def create_cups(world: "MSMWorld", itempool):
         }
 
         precollect_names = set()
-        start_option = world.options.start_with_mushroom_cup
+        start_option = world.options.start_with_mushroom_cup.value
 
         if start_option in (StartWithMushroomCup.option_normal_difficulty, StartWithMushroomCup.option_both):
             precollect_names.update([
@@ -608,6 +772,81 @@ def create_cups(world: "MSMWorld", itempool):
                 "Volleyball: Mushroom Cup (Hard)", "Hockey: Mushroom Cup (Hard)"
             ])
 
+        if start_option == StartWithMushroomCup.option_random_cups:
+
+            starting_cups = []
+
+            mushroom_cups = []
+
+            for sport in enabled_sports:
+                if sport == "Basketball":
+                    mushroom_cups.append("Basketball: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Basketball: Mushroom Cup (Hard)")
+                elif sport == "Dodgeball":
+                    mushroom_cups.append("Dodgeball: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Dodgeball: Mushroom Cup (Hard)")
+                elif sport == "Volleyball":
+                    mushroom_cups.append("Volleyball: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Volleyball: Mushroom Cup (Hard)")
+                elif sport == "Hockey":
+                    mushroom_cups.append("Hockey: Mushroom Cup (Normal)")
+                    if world.options.hard_tournament_difficulty.value:
+                        mushroom_cups.append("Hockey: Mushroom Cup (Hard)")
+
+
+            basketball_stages = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock"]
+            dodgeball_stages = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"]
+            volleyball_stages = ["Mario Stadium", "Koopa Troopa Beach", "Peach's Castle"]
+            hockey_stages = ["Mario Stadium", "Toad Park", "Peach's Castle"]
+            courts_in_pool = ["Mario Stadium", "Koopa Troopa Beach", "DK Dock", "Peach's Castle", "Toad Park"]
+
+            for _ in range(world.options.start_with_random_mushroom_cups.value):
+                if mushroom_cups:
+                    random_cup = world.random.choice(mushroom_cups)
+                    starting_cups.append(random_cup)
+                    mushroom_cups.remove(random_cup)
+
+            precollect_names.update(starting_cups)
+
+            if not world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+                starting_courts = []
+                precollect_names_courts = set()
+
+                for name in starting_cups:
+                    if name.startswith("Basketball"):
+                        for court in basketball_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+                    elif name.startswith("Dodgeball"):
+                        for court in dodgeball_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+                    elif name.startswith("Volleyball"):
+                        for court in volleyball_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+                    elif name.startswith("Hockey"):
+                        for court in hockey_stages:
+                            if court not in starting_courts:
+                                starting_courts.append(court)
+                                courts_in_pool.remove(court)
+
+                precollect_names_courts.update(starting_courts)
+                for name in precollect_names_courts:
+                    precollected_courts.append(name)
+                    world.push_precollected(world.create_item(name))
+
+                for name in courts_in_pool:
+                    itempool.append(world.create_item(name))
+
+
+           
         prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
 
         # Push free individual starting items
@@ -623,18 +862,123 @@ def create_cups(world: "MSMWorld", itempool):
                 if name not in precollect_names:
                     itempool.append(world.create_item(name))
 
+        '''for name in basketball_items_n:
+            if "Basketball" in enabled_sports:
+                itempool.append(world.create_item(name))
+
+        for name in dodgeball_items_n:
+            if "Dodgeball" in enabled_sports:
+                itempool.append(world.create_item(name))
+
+        for name in volleyball_items_n:
+            if "Volleyball" in enabled_sports:
+                itempool.append(world.create_item(name))
+
+        for name in hockey_items_n:
+            if "Hockey" in enabled_sports:
+                itempool.append(world.create_item(name))'''
+
         # Add Hard Cups to the pool (if enabled)
-        if world.options.hard_tournament_difficulty:
+        if world.options.hard_tournament_difficulty.value:
             for name in all_hard_items:
                 sport = prefix_to_sport[name[:1]]
                 if sport in enabled_sports:
                     if name not in precollect_names:
                         itempool.append(world.create_item(name))
 
+            '''for name in basketball_items_h:
+                if "Basketball" in enabled_sports:
+                    itempool.append(world.create_item(name))
+
+            for name in dodgeball_items_h:
+                if "Dodgeball" in enabled_sports:
+                    itempool.append(world.create_item(name))
+
+            for name in volleyball_items_h:
+                if "Volleyball" in enabled_sports:
+                    itempool.append(world.create_item(name))
+
+            for name in hockey_items_h:
+                if "Hockey" in enabled_sports:
+                    itempool.append(world.create_item(name))'''
+
         # Sports Mix Cups
         if "Sports Mix" in enabled_sports:
             for cup in sports_mix_cups:
                 itempool.append(world.create_item(cup))
+
+
+
+
+def create_alt_paths(world: "MSMWorld", itempool):
+    enabled_sports = world.options.enabled_sports.value
+    alt_path_type = world.options.alt_path_type.value
+
+    all_normal_items = {
+            **basketball_alt_paths_n, **dodgeball_alt_paths_n, **volleyball_alt_paths_n, **hockey_alt_paths_n
+    }
+
+    all_hard_items = {
+            **basketball_alt_paths_h, **dodgeball_alt_paths_h, **volleyball_alt_paths_h, **hockey_alt_paths_h
+    }
+
+    all_global_items = {
+            **basketball_alt_paths_g, **dodgeball_alt_paths_g, **volleyball_alt_paths_g, **hockey_alt_paths_g
+    }
+
+    prefix_to_sport = {"B": "Basketball", "D": "Dodgeball", "V": "Volleyball", "H": "Hockey"}
+
+    
+    if alt_path_type == 0:
+        for name in all_normal_items:
+            sport = prefix_to_sport[name[:1]]
+            if sport in enabled_sports:
+                itempool.append(world.create_item(name))
+
+        if "Sports Mix" in enabled_sports:
+            for name in sports_mix_alt_paths:
+                itempool.append(world.create_item(name))
+
+        if world.options.hard_tournament_difficulty.value:
+            for name in all_hard_items:
+                sport = prefix_to_sport[name[:1]]
+                if sport in enabled_sports:
+                    itempool.append(world.create_item(name))
+
+    elif alt_path_type == 1:
+        for name in all_global_items:
+            sport = prefix_to_sport[name[:1]]
+            if sport in enabled_sports:
+                itempool.append(world.create_item(name))
+    
+    elif alt_path_type == 2:
+        for name in global_alt_paths_n:
+            itempool.append(world.create_item(name))
+        
+        if world.options.hard_tournament_difficulty.value:
+            for name in global_alt_paths_h:
+                itempool.append(world.create_item(name))
+    
+    elif alt_path_type == 3:
+        for name in global_alt_paths_g:
+            itempool.append(world.create_item(name))
+    
+    elif alt_path_type == 4:
+        total_progressive_alt_paths = 3
+        if world.options.hard_tournament_difficulty.value:
+            total_progressive_alt_paths += 3
+        
+        for _ in range(total_progressive_alt_paths):
+            itempool.append(world.create_item("Progressive Alternate Path"))
+    
+    elif alt_path_type == 5:
+        # im no longer too lazy to loop
+        for _ in range(3):
+            itempool.append(world.create_item("Progressive Alternate Path"))
+        
+    else:
+        raise OptionError(f"[Mario Sports Mix] {world.player_name}'s alt path type is invalid.")
+
 
 def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSMItem:
     classification = item_table[name].classification
@@ -644,18 +988,18 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     # access rules.
 
     # Character Sanity (Characters)
-    if (world.options.character_sanity == CharacterSanity.option_characters or
-        world.options.character_sanity == CharacterSanity.option_characters_and_costumes):
+    if (world.options.character_sanity.value == CharacterSanity.option_characters or
+        world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes):
         if name in characters or name in miis:
             classification = IC.progression
 
     # Character Sanity (Costumes)
-    if world.options.character_sanity == CharacterSanity.option_characters_and_costumes:
+    if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         if name in character_costumes:
             classification = IC.progression
 
     # Special Sanity
-    if name == "Special Meter" and world.options.special_sanity:
+    if (name == "Special Meter" or name in characters or name in miis) and world.options.special_sanity.value:
         classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

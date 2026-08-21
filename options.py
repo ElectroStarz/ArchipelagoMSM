@@ -1,14 +1,11 @@
 from dataclasses import dataclass
 from Options import *
 
-class StartWithSports(Range):
+class StartWithSports(DefaultOnToggle):
     """Start with random sports? HEAVILY RECOMMENDED
 Will cause immediate BK if off and you DON'T have any party modes given at the start.
 This will NOT give you Sports Mix."""
     display_name = "Start With Random Sports"
-    range_start = 0
-    range_end = 4
-    default = 2
 
 class EnabledSports(OptionSet):
     """Choose which sports to enable
@@ -18,6 +15,11 @@ Behemoth King **requires** Sports Mix enabled"""
     display_name = "Enabled Sports"
     valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
     default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
+
+class RestrictSportsMix(Toggle):
+    """Sports Mix will only choose between enabled sports."""
+    display_name = "Restrict Sports Mix"
+    default = True
 
 class IncludeTournaments(DefaultOnToggle):
     """Include tournament locations and items"""
@@ -39,12 +41,24 @@ class ExhibitionType(Choice):
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
-(Also unlocks related courts) - Recommended if you don't have party games on!"""
+(Also unlocks related courts) - Recommended if you don't have party games on!
+
+Random option pulls from both Normal and Hard Cups 
+and defaults to both if Progressive Cups are enabled.
+Gives all Mushroom Cup Stages as well if Progressive Courts are enabled."""
     display_name = "Start with Mushroom Cup (+Courts)"
     option_none = 0
     option_normal_difficulty = 1
     option_hard_difficulty = 2
     option_both = 3
+    option_random_cups = 4
+    default = 1
+
+class StartWithRandomMushroomCups(Range):
+    """How many random Mushroom Cups should you start with? (1-7)"""
+    display_name = "Start with Random Mushroom Cups"
+    range_start = 1
+    range_end = 7
     default = 1
 
 class StartWithCharacters(Choice):
@@ -449,13 +463,103 @@ from Coins Trap, etc)"""
             case 2: return "CPU 4 (Yellow)"
             case _: return "ERROR"
 
+class IncludeAltPaths(Toggle):
+    """Include alternate paths?
+    No: Alt Paths will not be included
+    Yes: Alt Paths will be included
+    LR Split: Alt Paths will be split between Left and Right"""
+
+    display_name = "Include Alternate Paths"
+    default = False
+
+class AltPathType(Choice):
+    """What Type of Alt Path Locations do you want?
+    All Paths: Alt Path locations will be per sport and per difficulty
+    Difficulty Universal: Alt Path Locations will be for **any** difficulty
+    Sport Universal: Alt Path Locations will be for **any** sport
+    Full Universal: Alt Path Locations will be for **any** difficulty/sport
+    Progessive Options give Progressive items which unlock the Alt Paths in cup order
+    
+    IMPORTANT NOTE: Sports Mix will NOT send any alt path checks if alt paths are combined"""
+
+    display_name = "Alternate Path Type"
+    option_all_paths = 0
+    option_difficulty_combine = 1
+    option_sport_combine = 2
+    option_full_combine = 3
+    option_progressive_sport_combine = 4
+    option_progressive_full_combine = 5
+    default = 0
+
+class AlwaysSpawnAltPaths(Toggle):
+    """Make it so the criteria to spawn Alternate Paths is always enabled
+
+    NOTE: Certain conditions require Special Meter, you can reset to get a better
+    position for most of them except the Dodgeball Star Cup Round 2 condition,
+    though this is covered in logic."""
+    display_name = "Always Spawn Alt Paths"
+    default = True
+
+class OopsAllCharacter(Choice):
+    """Meme Option, Makes it so all Opponents are a Single Character"""
+    display_name = "Replace All Opponent Characters"
+    option_off = 0
+    option_mario = 1
+    option_luigi = 2
+    option_peach = 3
+    option_daisy = 4
+    option_yoshi = 5
+    option_wario = 6
+    option_waluigi = 7
+    option_donkey_kong = 8
+    option_diddy_kong = 9
+    option_toad = 10
+    option_bowser = 11
+    option_bowser_jr = 12
+    option_moogle = 13
+    option_cactuar = 14
+    option_ninja = 15
+    option_white_mage = 16
+    option_slime = 17
+    option_black_mage = 18
+    default = 0
+
+class ReplaceExtra(Toggle):
+    """Choose whether to also replace the Goalie in Hockey and the Yoshi in Dodgeball"""
+    display_name = "Replace Extra Characters"
+    default = False
+
+class ShuffleMusic(Choice):
+    """Shuffles the music in the game"""
+    display_name = "Shuffle Music"
+    option_off = 0
+    option_shuffle_within_groups = 1
+    option_full_shuffle = 2
+    default = 0
+
+class TintStages(Toggle):
+    """Randomly tints each stage.
+    Volleyball has some issues and will not be tinted as a result."""
+    display_name = "Tint Stages"
+    default = False
+
+class TintVolleyball(Toggle):
+    """EPILEPSY WARNING! DO NOT ENABLE IF YOU'RE SENSITVE TO FLASHING LIGHTS
+    
+    Volleyball has some issues with tinting, flickering back to white constantly
+    for a single frame during gameplay. Enable this option only if your okay with this."""
+    display_name = "Tint Volleyball"
+    default = False
+
 msm_option_groups = [
     OptionGroup("Game Options", [
         EnabledSports,
+        RestrictSportsMix,
         IncludeExhibition,
         IncludeTournaments,
         StartWithSports,
         StartWithMushroomCup,
+        StartWithRandomMushroomCups,
         CupUnlockType,
         CourtUnlockType,
         StartWithCharacters,
@@ -498,6 +602,11 @@ msm_option_groups = [
         StartWithParty,
         PartyModeOpponent,
     ]),
+    OptionGroup("Alternate Path Options", [
+        IncludeAltPaths,
+        AltPathType,
+        AlwaysSpawnAltPaths,
+    ]),
     OptionGroup("Deathlink Options", [
         Deathlink,
         DeathlinkAction,
@@ -516,15 +625,24 @@ msm_option_groups = [
         # ScoreSanityPoints,
         # ScoreSanityMax,
     ]),
+    OptionGroup("Extra Options", [
+        OopsAllCharacter,
+        ReplaceExtra,
+        ShuffleMusic,
+        TintStages,
+        TintVolleyball,
+    ]),
 ]
 
 @dataclass
 class MSMOptions(PerGameCommonOptions):
     enabled_sports: EnabledSports
+    restrict_sports_mix: RestrictSportsMix
     include_tournaments: IncludeTournaments
     include_exhibition: IncludeExhibition
     start_with_sports: StartWithSports
     start_with_mushroom_cup: StartWithMushroomCup
+    start_with_random_mushroom_cups: StartWithRandomMushroomCups
     cup_unlock_type: CupUnlockType
     court_unlock_type: CourtUnlockType
     start_with_characters: StartWithCharacters
@@ -538,6 +656,11 @@ class MSMOptions(PerGameCommonOptions):
     behemoth_hp: BehemothHP
     behemoth_king_hp: BehemothKingHP
     trap_chance: TrapChance
+
+    # Alternate Path Options
+    include_alt_paths: IncludeAltPaths
+    alt_path_type: AltPathType
+    always_spawn_alt_paths: AlwaysSpawnAltPaths
 
     # Tournament Rules
     basket_time: BasketTime
@@ -579,5 +702,12 @@ class MSMOptions(PerGameCommonOptions):
     score_sanity: ScoreSanity
     score_sanity_points: ScoreSanityPoints
     score_sanity_max: ScoreSanityMax
+
+    # Extra Stuff
+    oops_all_character: OopsAllCharacter
+    replace_extra: ReplaceExtra
+    shuffle_music: ShuffleMusic
+    random_tint: TintStages
+    tint_volleyball: TintVolleyball
 
     start_inventory_from_pool: StartInventoryPool

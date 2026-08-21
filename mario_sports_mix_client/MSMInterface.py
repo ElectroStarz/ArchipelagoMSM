@@ -66,6 +66,10 @@ court_names = {
     "s85": "Sherbet Sea",
     "s86": "Fire Mountain",
     "s87": "Rowdy Raft",
+
+    # Misc
+    "s34": "Opening Cutscene",
+    "s21": "Tournament Cutscene",
 }
 
 harmony_mapping = {
@@ -218,10 +222,13 @@ class MSMInterface:
 
         return id_to_char.get(value, "None")
 
-    def get_player_score_addr(self):
+    def get_player_score_addr(self, get_total: bool = False):
         if self.is_in_match():
-            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
-            return get_address(player_score_addresses[current_period])
+            if get_total:
+                return get_address(PlayerAddresses.Score.feed_petey_score)
+            else:
+                current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+                return get_address(player_score_addresses[current_period])
         elif self.is_in_feed_petey():
             return get_address(PlayerAddresses.Score.feed_petey_score)
         elif self.is_in_bob_omb():
@@ -235,11 +242,14 @@ class MSMInterface:
                                                        Pointers.Player.B1.ss_score)
         else: return None
 
-    def get_opponent_score_addr(self, opponent: int):
+    def get_opponent_score_addr(self, opponent: int, get_total: bool = False):
         ls_opponent = opponent - 1
         if self.is_in_match():
-            current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
-            return get_address(opponent_score_addresses[current_period])
+            if get_total:
+                return get_address(OpponentAddresses.Score.r1_fp_score)
+            else:
+                current_period = self.dolphin_client.read_byte(self.addresslib.current_period_addr)
+                return get_address(opponent_score_addresses[current_period])
         elif self.is_in_feed_petey():
             return get_address(fp_opp_score_addresses[ls_opponent])
         elif self.is_in_bob_omb():
@@ -264,25 +274,25 @@ class MSMInterface:
             court_id = base_id[:3]
             court_name = court_names.get(court_id)
 
-            return court_id, court_name
         else:
 
             court_id = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
             court_name = harmony_mapping.get(court_id)
 
-            return court_id, court_name
+        return court_id, court_name
 
     def get_mode(self):
-        string_stage = self.dolphin_client.read_string(get_address(MatchAddresses.current_court))
-        current_sport = string_stage[-2:]
+        current_sport_value = self.dolphin_client.read_byte(get_address(MatchAddresses.current_sport))
+        is_party_mode = self.dolphin_client.read_byte(get_address(MatchAddresses.is_party_mode))
+        current_sport = {0: "BA", 1: "VO", 2: "DO", 3: "HO", 5: "SM"}.get(current_sport_value)
         
-        if self.is_in_feed_petey():
+        if current_sport == "BA" and is_party_mode == 2:
             return "Feed Petey"
-        elif self.is_in_harmony():
+        elif current_sport == "VO" and is_party_mode == 2:
             return "Harmony Hustle"
-        elif self.is_in_bob_omb():
+        elif current_sport == "DO" and is_party_mode == 2:
             return "Bob-omb Dodge"
-        elif self.is_in_smash():
+        elif current_sport == "HO" and is_party_mode == 2:
             return "Smash Skate"
         elif current_sport == "BA":
             return "Basketball"
@@ -292,11 +302,13 @@ class MSMInterface:
             return "Volleyball"
         elif current_sport == "HO":
             return "Hockey"
+        elif current_sport == "SM":
+            return "Sports Mix"
         else:
             return None
 
     def get_tab(self):
-        diff = self.dolphin_client.read_word(PartyMode.difficulty)
+        diff = self.dolphin_client.read_word(get_address(PartyMode.difficulty))
             
         if self.is_in_feed_petey():
             return {0: "Apple", 1: "Watermelon"}.get(diff)
@@ -374,25 +386,253 @@ class MSMInterface:
 
         return difficulty_int, name
 
-    def get_tournament_difficulty(self, cup: str) -> Optional[str]:
+    def get_tournament_difficulty(self) -> Optional[str]:
         difficulty = self.dolphin_client.read_byte(self.addresslib.tournament_diff_addr)
+        cup = self.get_tournament_cup()
 
-        if cup == "Mushroom Cup":
+        if cup == "Mushroom":
             return {0: "Normal", 1: "Hard"}.get(difficulty)
 
         return {1: "Normal", 2: "Hard"}.get(difficulty)
 
+    def get_tournament_cup(self):
+
+        cup = self.dolphin_client.read_byte(get_address(TournamentAddresses.current_tournament_cup))
+
+        if cup not in [1, 2, 3]:
+            return "Not in Tournament"
+        else:
+            return {1: "Mushroom", 2: "Flower", 3: "Star"}.get(cup)
+
+    def get_tournament_round(self):
+        round = self.dolphin_client.read_byte(get_address(TournamentAddresses.current_tournament_round))
+
+        if round not in [1, 2, 3]:
+            return "Not in Tournament"
+        else:
+            return {1: "Round 1", 2: "Round 2", 3: "Round 3"}.get(round)
+
+    def get_tournament_sport(self):
+        sport = self.dolphin_client.read_byte(get_address(TournamentAddresses.current_tournament_sport_variation))
+
+        if sport not in [0, 1, 2, 3, 5]:
+            return "Not in Tournament"
+        else:
+            return {0: "Basketball", 1: "Volleyball", 2: "Dodgeball", 3: "Hockey", 5: "Sports Mix"}.get(sport)
+
+    def get_player_current_node(self):
+        node = self.dolphin_client.read_byte(get_address(TournamentAddresses.player_current_node))
+
+        return node
+    
     def special_active(self):
         try:
             value = self.dolphin_client.read_pointer(get_address(MatchAddresses.special_active),
                                                      Pointers.Player.special_active_offsets, "word")
 
-            if value == 1:
-                return True
-            else:
-                return False
+            return bool(value)
         except RuntimeError:
             return False
+
+
+    def get_music_file_name(self, music_name: str):
+        # the big evil dictionary of doooooom
+        music_to_file = {
+            "title_theme": "BGM_MENU_01",
+            "exhibition_settings": "BGM_MENU_04",
+            "wifi_menu": "BGM_MENU_05",
+            "records_menu": "BGM_MENU_06",
+            "mario_stadium": "BGM_STAGE_01",
+            "mario_stadium_fast": "BGM_STAGE_H01",
+            "koopa_troopa_beach": "BGM_STAGE_02",
+            "koopa_troopa_beach_fast": "BGM_STAGE_H02",
+            "peachs_castle": "BGM_STAGE_03",
+            "peachs_castle_fast": "BGM_STAGE_H03",
+            "toad_park": "BGM_STAGE_04",
+            "toad_park_fast": "BGM_STAGE_H04",
+            "dk_dock": "BGM_STAGE_05",
+            "dk_dock_fast": "BGM_STAGE_H05",
+            "luigis_mansion": "BGM_STAGE_06",
+            "luigis_mansion_fast": "BGM_STAGE_H06",
+            "daisy_garden": "BGM_STAGE_07",
+            "daisy_garden_fast": "BGM_STAGE_H07",
+            "wario_factory": "BGM_STAGE_09",
+            "wario_factory_fast": "BGM_STAGE_H09",
+            "bowser_jr_blvd": "BGM_STAGE_10",
+            "bowser_jr_blvd_fast": "BGM_STAGE_H10",
+            "bowsers_castle": "BGM_STAGE_11",
+            "bowsers_castle_fast": "BGM_STAGE_H11",
+            "waluigi_pinball": "BGM_STAGE_12",
+            "waluigi_pinball_fast": "BGM_STAGE_H12",
+            "ghoulish_galleon": "BGM_STAGE_15",
+            "ghoulish_galleon_fast": "BGM_STAGE_H15",
+            "star_ship": "BGM_STAGE_16",
+            "star_ship_fast": "BGM_STAGE_H16",
+            "western_junction": "BGM_STAGE_17",
+            "western_junction_fast": "BGM_STAGE_H17",
+            "behemoth_stage": "BGM_STAGE_20",
+            "behemoth_stage_fast": "BGM_STAGE_H20",
+            "behemoth_battle": "BGM_STAGE_20",
+            "behemoth_battle_fast": "BGM_STAGE_H20",
+            "smash_skate_normal": "BGM_PARTY_01",
+            "smash_skate_normal_fast": "BGM_PARTY_H01",
+            "feed_petey_normal": "BGM_PARTY_02",
+            "feed_petey_bonus_time": "BGM_PARTY_02_ARR",
+            "feed_petey_normal_fast": "BGM_PARTY_H02",
+            "bob_omb_dodge_normal": "BGM_PARTY_03",
+            "bob_omb_dodge_normal_fast": "BGM_PARTY_H03",
+            "harmony_hustle_normal": "BGM_PARTY_04",
+            "harmony_hustle_normal_fast": "BGM_PARTY_H04",
+            "smash_skate_hard": "BGM_PARTY_05",
+            "smash_skate_hard_fast": "BGM_PARTY_H05",
+            "feed_petey_hard": "BGM_PARTY_06",
+            "feed_petey_hard_fast": "BGM_PARTY_H06",
+            "bob_omb_dodge_hard": "BGM_PARTY_07",
+            "bob_omb_dodge_hard_fast": "BGM_PARTY_H07",
+            "tournament_opening": "BGM_TOURNAMENT_00",
+            "mushroom_cup": "BGM_TOURNAMENT_01",
+            "flower_cup": "BGM_TOURNAMENT_02",
+            "star_cup": "BGM_TOURNAMENT_03",
+            "tournament_victory": "FANFARE_01_SEmix",
+            "win_1": "BGM_WIN_01",
+            "lose_1": "BGM_LOSE_01",
+            "win_2": "BGM_WIN_02",
+            "lose_2": "BGM_LOSE_02",
+            "matching": "BGM_MATCHING",
+            "results": "BGM_RESULT",
+            "get_item": "BGM_GETITEM",
+            "starman": "BGM_STAR_01",
+            "star_road_complete": "BGM_STAR_02",
+            "classic_ocean": "OTOGAME_00_PREVIEW_LP",
+            "chocobo_rhythm": "OTOGAME_01_PREVIEW_LP",
+            "mario_athletic": "OTOGAME_02_PREVIEW_LP",
+            "bloocheep_ocean": "OTOGAME_03_PREVIEW_LP",
+            "chocobo_pop": "OTOGAME_04_PREVIEW_LP",
+            "chcocobo_pop": "OTOGAME_04_PREVIEW_LP",
+            "punk_athletic": "OTOGAME_05_PREVIEW_LP",
+            "punk_ocean": "OTOGAME_06_PREVIEW_LP",
+            "chocobo_beat": "OTOGAME_07_PREVIEW_LP",
+            "island_athletic": "OTOGAME_08_PREVIEW_LP",
+            "mushroom_mix_medley": "OTOGAME_09_PREVIEW_LP",
+            "flower_mix_medley": "OTOGAME_10_PREVIEW_LP",
+            "star_mix_medley": "OTOGAME_11_PREVIEW_LP",
+        }
+
+        file_name = music_to_file.get(music_name)
+
+        if file_name is None:
+            self.logger.warning(f"No file for {music_name}")
+            return None
+    
+        return file_name + ".brstm"
+
+    def replace_music_file(self, music_to_be_replaced: str, music_to_replace_with: str) -> bool:
+
+        classes = [MusicFiles.MenuSongs, MusicFiles.StageSongs, MusicFiles.PartySongs, MusicFiles.TournamentSongs, MusicFiles.MiscSongs, MusicFiles.HarmonyHustlePreviews]
+        address = None
+
+        for cls in classes:
+            songs = self.get_songs_from_class(cls)
+            if music_to_be_replaced in songs:
+                address = get_address(getattr(cls, music_to_be_replaced), offset = 0xF40)
+                break
+
+        original_length = len(self.get_music_file_name(music_to_be_replaced)) 
+        new_length = len(self.get_music_file_name(music_to_replace_with))
+        new_song = self.get_music_file_name(music_to_replace_with)
+
+        if new_song is None:
+            self.logger.warning(f"Could not find replacement music file for {music_to_replace_with}")
+            return
+
+        # self.logger.info(f"Replacing {music_to_be_replaced} with {music_to_replace_with} at address 0x{address:X}")
+        self.dolphin_client.write_string(address, new_song)
+
+        # Clearing in case stale stuff gets in the way
+        for _ in range(original_length - new_length - 2):
+            self.dolphin_client.write_byte(address + new_length, 0x00)
+            new_length += 1
+        self.dolphin_client.write_byte(address + new_length, 0x00)
+        new_length += 1
+        self.dolphin_client.write_byte(address + new_length, 0x00)
+        
+            
+    def get_songs_from_class(self, cls):
+        songs = []
+        for attr in dir(cls):
+            if not attr.startswith("__") and not attr.startswith("base") and not attr.startswith("offset"):
+                songs.append(attr)
+        return songs
+
+    def get_name_from_node(self, cup: str, node: int):
+        names = {
+            "Mushroom": {
+                        0x21: "East of Red Toad House",
+                        0x24: "Lower Field",
+                        0x25: "Near Green Toad House",
+                        0x28: "South of Lake",
+                        0x29: "Upper Field",
+                        0x2B: "By Lake",
+                        0x30: "Below the Curve",
+                        0x31: "Lake Platform",
+                        0x32: "Hidden Finale",
+                        0x34: "Upper Curve",
+                        0x35: "Middle Curve",
+                        0x36: "Lower Curve",
+                        0x37: "Top of the Mountain",
+                        0x38: "Red Toad House",
+                        0x39: "By Logs",
+                        0x3B: "By Castle Flowers",
+                        },
+
+            "Flower":   {
+                        0x26: "Left-Center Bridge",
+                        0x2A: "Waterwheel",
+                        0x2D: "Left Shoreline",
+                        0x32: "Right Shoreline",
+                        0x36: "Bottom-Left Island House",
+                        0x39: "Bottom-Left Island Cannon",
+                        0x3D: "Middle-Left Islands",
+                        0x3E: "Hidden Finale",
+                        0x43: "Middle-Right Island Cannon",
+                        0x44: "Middle-Right Island Field",
+                        0x46: "Top-Right Island Tower",
+                        0x47: "Top-Right Island Bottom Field",
+                        0x49: "Top-Right Island Right Field",
+                        0x4B: "Top-Left Island",
+                        0x4E: "Bottom-Right Island",
+                        0x50: "Leftmost Bridge",
+                        0x52: "Flower Lake Island",
+                        0x55: "Below Rightmost Bridge",
+                        0x57: "Above Rightmost Bridge",
+                        },
+
+            "Star":     {
+                        0x21: "Tower E1",
+                        0x23: "Tower E6",
+                        0x27: "Tower D2",
+                        0x2A: "Tower D7",
+                        0x2E: "Tower C3",
+                        0x30: "Tower C6",
+                        0x32: "Tower B1",
+                        0x33: "Tower B2",
+                        0x36: "Tower B5",
+                        0x37: "Tower B6",
+                        0x38: "Tower B7",
+                        0x3D: "Tower A7",
+                        0x43: "Star Road Bottom-Left of Star",
+                        0x45: "Star Road Bottom-Right of Star",
+                        0x47: "Star Road Top-Left of Star",
+                        0x48: "Star Road Top-Right of Star",
+                        0x49: "Star Road (Right) Intro",
+                        0x4A: "Star Road (Left) Intro",
+                        0x4B: "Star Road Top-Center of Star",
+                        0x4C: "Star Road (Left) Bonus",
+                        0x4D: "Star Road (Right) Bonus",
+                        },
+        }
+
+        return names.get(cup, {}).get(node, "Unknown Node")
 
 
     def get_connection_state(self):
