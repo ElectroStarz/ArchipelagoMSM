@@ -11,6 +11,9 @@
 ### [Avertissements](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/bugs_fr.md)
 # Contributing
 [English](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/Contributing.md)
+## Developers
+- ElectroStarz
+- Puffy
 ## Credits
 - Yoshmin, s0uth & Elty (Finding memory addresses)
 - Saulf (Creating Gecko Codes for AP)
