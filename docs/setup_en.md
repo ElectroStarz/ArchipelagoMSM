@@ -17,6 +17,10 @@ your custom_worlds folder, or click Install APWorld in the Archipelago Launcher 
 1) Dump your version of Mario Sports Mix
 2) Put the dump into a folder and set it as a game folder in Dolphin (Config → Paths)
 
+### Mac Setup
+For Mac devices, Dolphin requires a special signing. See [here](https://github.com/aldelaro5/dolphin-memory-engine/blob/master/README.md#macos-code-signing)
+for more detail and setup. You will need [this file](https://github.com/aldelaro5/dolphin-memory-engine/blob/master/Tools/MacSetup.sh).
+
 ### Notes
 * Select a save file before connecting to a room
 
