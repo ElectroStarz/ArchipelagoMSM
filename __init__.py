@@ -1,10 +1,10 @@
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, ClassVar
 from BaseClasses import Tutorial
 from Options import OptionError
 from worlds.LauncherComponents import Component, Type, components, launch, icon_paths
 from worlds.AutoWorld import WebWorld, World
-from . import regions, rules, locations
+from . import regions, rules, locations, msm_settings
 from .options import MSMOptions, msm_option_groups
 from .items import ITEM_NAME_TO_ID, auto_item_groups
 from .locations import LOCATION_NAME_TO_ID, auto_location_groups
@@ -106,6 +106,8 @@ class MSMWorld(World):
     options_dataclass = MSMOptions
     options: MSMOptions
 
+    settings: ClassVar[msm_settings.MSMSettings]
+    settings_key = msm_settings.MSMSettings.settings_key
 
     location_name_to_id = LOCATION_NAME_TO_ID
     item_name_to_id = ITEM_NAME_TO_ID
@@ -117,6 +119,21 @@ class MSMWorld(World):
     origin_region_name = "Main Menu"
 
     def generate_early(self) -> None:
+        none_start_with = []
+
+        if self.options.start_with_sports.value == 0 and (self.options.include_tournaments.value or self.options.include_exhibition.value)\
+                and (self.options.start_with_party_modes.value == 0 and self.options.party_mode.value):
+            none_start_with.append([self.options.start_with_sports, self.options.enabled_sports])
+            none_start_with.append([self.options.start_with_party_modes, self.options.party_mode])
+
+        if none_start_with:
+            option = self.random.choice(none_start_with)
+
+            option[0].value = min(self.random.randint(1, 4), len(option[1].value))
+
+
+
+
         # Universal Tracker performs its initial fake generation with an empty
         # YAML, then supplies the original slot data for regeneration. Restore
         # every MSM generation option before creating regions, items, or rules.
@@ -302,7 +319,7 @@ class MSMWorld(World):
             "version": WORLD_VERSION,
             # Universal Tracker uses this to generate the same MSMWorld without
             # requiring a local YAML file.
-
+            "options": self.options.as_dict(*self.ut_generation_options),
 
             # Goal/Boss Stuff
             "goal_condition": self.options.goal_condition.value,

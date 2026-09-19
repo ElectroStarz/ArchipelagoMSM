@@ -2,18 +2,20 @@ from dataclasses import dataclass
 from Options import *
 
 
-class StartWithSports(DefaultOnToggle):
+class StartWithSports(Range):
     """Start with random sports? HEAVILY RECOMMENDED
-Will cause immediate BK if off and you DON'T have any party modes given at the start.
-This will NOT give you Sports Mix."""
+    Will cause immediate BK if off and you DON'T have any party modes given at the start.
+    This will NOT give you Sports Mix."""
     display_name = "Start With Random Sports"
-
+    range_start = 0
+    range_end = 4
+    default = 4
 
 class EnabledSports(OptionSet):
     """Choose which sports to enable
 
-NOTE: You can still do Behemoth without all the 4 main sports enabled however
-Behemoth King **requires** Sports Mix enabled"""
+    NOTE: You can still do Behemoth without all the 4 main sports enabled however
+    Behemoth King **requires** Sports Mix enabled"""
     display_name = "Enabled Sports"
     valid_keys = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
     default = {"Basketball", "Dodgeball", "Volleyball", "Hockey", "Sports Mix"}
@@ -38,8 +40,8 @@ class IncludeExhibition(DefaultOnToggle):
 class ExhibitionType(Choice):
     """What type of exhibition locations do you want?
 
-**All Sports**: Exhibition locations will be for all the 4 main sports
-**Universal**: Exhibition locations will be for **any** sport"""
+    **All Sports**: Exhibition locations will be for all the 4 main sports
+    **Universal**: Exhibition locations will be for **any** sport"""
     display_name = "Exhibition Type"
     option_all_sports = 0
     option_universal = 1
@@ -48,11 +50,11 @@ class ExhibitionType(Choice):
 
 class StartWithMushroomCup(Choice):
     """Start with Mushroom Cup for Basketball, Dodgeball, Volleyball and Hockey?
-(Also unlocks related courts) - Recommended if you don't have party games on!
+    (Also unlocks related courts) - Recommended if you don't have party games on!
 
-Random option pulls from both Normal and Hard Cups
-and defaults to both if Progressive Cups are enabled.
-Gives all Mushroom Cup Stages as well if Progressive Courts are enabled."""
+    Random option pulls from both Normal and Hard Cups
+    and defaults to both if Progressive Cups are enabled.
+    Gives all Mushroom Cup Stages as well if Progressive Courts are enabled."""
     display_name = "Start with Mushroom Cup (+Courts)"
     option_none = 0
     option_normal_difficulty = 1
@@ -81,8 +83,8 @@ class StartWithCharacters(Choice):
 
 class ExhibitionDifficulties(OptionSet):
     """Which exhibition difficulties should be included?
-If the difficulty is off, you won't be able to send checks with that difficulty
-(Easy, Normal, Hard, Expert)"""
+    If the difficulty is off, you won't be able to send checks with that difficulty
+    (Easy, Normal, Hard, Expert)"""
     display_name = "Exhibition Difficulties"
     valid_keys = {"Easy", "Normal", "Hard", "Expert"}
     default = {"Normal", "Hard"}
@@ -91,9 +93,9 @@ If the difficulty is off, you won't be able to send checks with that difficulty
 class CourtUnlockType(Choice):
     """How to unlock courts
 
-**Court Item**: Each court is its own item
-**Progressive Court**: Courts are unlocked in a certain order with progressive items
-Note: Behemoth Stage is an item! Behemoth Stage is the last court unlocked in Progressive Court"""
+    **Court Item**: Each court is its own item
+    **Progressive Court**: Courts are unlocked in a certain order with progressive items
+    Note: Behemoth Stage is an item! Behemoth Stage is the last court unlocked in Progressive Court"""
     display_name = "Court Unlock Type"
     option_court_item = 0
     option_progressive_court = 1
@@ -103,10 +105,10 @@ Note: Behemoth Stage is an item! Behemoth Stage is the last court unlocked in Pr
 class CupUnlockType(Choice):
     """How to unlock cups
 
-**Cup Item**: Each cup is its own item
-**Progressive Cup**: Cups are unlocked in a certain order with progressive items. (Normal -> Hard (If enabled) ->
-Sports Mix)
-Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
+    **Cup Item**: Each cup is its own item
+    **Progressive Cup**: Cups are unlocked in a certain order with progressive items. (Normal -> Hard (If enabled) ->
+    Sports Mix)
+    Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has cups for each sport"""
     display_name = "Cup Unlock Type"
     option_cup_item = 0
     option_progressive_cup = 1
@@ -115,7 +117,7 @@ Note: Progressive Cup will unlock the cup for **every** sport while Cup Item has
 
 class HardTournamentDifficulty(DefaultOnToggle):
     """Would you like to include locations and items for Hard Tournaments?
-Adds 3 Progressive Cups to the pool if Progressive Cup Item is selected"""
+    Adds 3 Progressive Cups to the pool if Progressive Cup Item is selected"""
     display_name = "Include Hard Tournaments"
 
 
@@ -130,14 +132,14 @@ class SportsMixUnlock(Choice):
 class GoalCondition(Choice):
     """What is your goal?
 
-**Defeat Behemoth**: Defeat the Behemoth to goal!
-**Defeat Behemoth King**: Defeat the Behemoth King to goal!
-**Win Cups**: Win a certain amount of cups to goal!
-**Exhibition Tour**: Win every exhibition match for your selected difficulties to goal! (Needs All Sports option)
-**Party Palooza**: Win every game in every Party Mode to goal!
+    **Defeat Behemoth**: Defeat the Behemoth to goal!
+    **Defeat Behemoth King**: Defeat the Behemoth King to goal!
+    **Win Cups**: Win a certain amount of cups to goal!
+    **Exhibition Tour**: Win every exhibition match for your selected difficulties to goal! (Needs All Sports option)
+    **Party Palooza**: Win every game in every Party Mode to goal!
 
-NOTE: Exhibition Tour disables the QoL feature for winning exhibition matches, recommended to have 2 difficulties
-selected"""
+    NOTE: Exhibition Tour disables the QoL feature for winning exhibition matches, recommended to have 2 difficulties
+    selected"""
     display_name = "Goal Condition"
     option_defeat_behemoth = 1
     option_defeat_behemoth_king = 2
@@ -157,7 +159,7 @@ class WinCupsAmount(Range):
 
 class BossLocations(Choice):
     """Have locations behind bosses even if your goal isn't that boss!
-Cannot be the same as the goal condition!"""
+    Cannot be the same as the goal condition!"""
     display_name = "Boss Locations"
     option_no = 0
     option_defeat_behemoth = 1
@@ -168,7 +170,7 @@ Cannot be the same as the goal condition!"""
 
 class BehemothHP(Range):
     """Behemoth Health - 2400 is default
-Recommended to edit this in the YAML (2400 - 4000)"""
+    Recommended to edit this in the YAML (2400 - 4000)"""
     display_name = "Behemoth HP"
     range_start = 2400
     range_end = 4000
@@ -177,7 +179,7 @@ Recommended to edit this in the YAML (2400 - 4000)"""
 
 class BehemothKingHP(Range):
     """Behemoth King Health - 3000 is default
-Recommended to edit this in the YAML (3000 - 7000)"""
+    Recommended to edit this in the YAML (3000 - 7000)"""
     display_name = "Behemoth King HP"
     range_start = 3000
     range_end = 7000
@@ -196,7 +198,7 @@ class TrapChance(Range):
 
 class Deathlink(DeathLink):
     """When you die, everyone who enabled death link dies. Of course, the reverse is true too.
-Toggleable inside client"""
+    Toggleable inside client"""
     display_name = "Death Link"
     default = False
 
@@ -204,11 +206,13 @@ Toggleable inside client"""
 class DeathlinkAction(Choice):
     """What counts as sending a deathlink? Requires Deathlink on
 
-NOTE: Every number of points works like normal for everything BUT dodgeball.
-In dodgeball, everytime the opponent wins the set a deathlink triggers"""
+    NOTE: Every number of points works like normal for everything BUT dodgeball.
+    In dodgeball, everytime the opponent wins the set a deathlink triggers
+    Also Bob-omb Dodge is stupid and doesn't send a deathlink with every number of points"""
     display_name = "Death Link Action"
-    option_losing_or_tying_a_match = 0
-    option_every_number_of_points = 1
+    option_losing_a_match = 0
+    option_losing_or_tying_a_match = 1
+    option_every_number_of_points = 2
     default = 0
 
 
@@ -223,7 +227,7 @@ class DeathlinkConsequence(Choice):
 # --- Action Specific Settings ---
 class DeathlinkOpponentScorePoints(Range):
     """How many points should the opponent get to send a deathlink?
-Requires Deathlink on & Every Number Of Points action"""
+    Requires Deathlink on & Every Number Of Points action"""
     display_name = "[DL-A] Opponent Scores Points"
     range_start = 1
     range_end = 20
@@ -233,7 +237,7 @@ Requires Deathlink on & Every Number Of Points action"""
 # --- Consequence Specific Settings ---
 class DeathlinkOpponentGetPoints(Range):
     """How many points should the opponent get when receiving a deathlink?
-Requires Deathlink on & Opponent Gains Point consequence"""
+    Requires Deathlink on & Opponent Gains Point consequence"""
     display_name = "[DL-C] Opponent Gets Points"
     range_start = 1
     range_end = 20
@@ -242,7 +246,7 @@ Requires Deathlink on & Opponent Gains Point consequence"""
 
 class DeathlinkBossHealthRecovered(Range):
     """What percentage of the boss' health should be recovered when sent a deathlink?
-(Behemoth & Behemoth King)"""
+    (Behemoth & Behemoth King)"""
     display_name = "[DL-C] Boss % Health Recovered"
     range_start = 0
     range_end = 100
@@ -251,7 +255,8 @@ class DeathlinkBossHealthRecovered(Range):
 
 class DeathlinkDodgeballHealthLost(Range):
     """**ONLY FOR DODGEBALL**
-How much health will you lose when you get sent a deathlink if you're in dodgeball?"""
+    How much health will you lose when you get
+    sent a deathlink if you're in dodgeball?"""
     display_name = "[DL-C] Dodgeball Health Lost"
     range_start = 0
     range_end = 100
@@ -262,7 +267,7 @@ How much health will you lose when you get sent a deathlink if you're in dodgeba
 
 class CharacterSanity(Choice):
     """Turn on or off Character Sanity
-(Winning with a character and/or costume sends a check)"""
+    (Winning with a character and/or costume sends a check)"""
     display_name = "Character Sanity"
     option_off = 0
     option_characters = 1
@@ -272,7 +277,7 @@ class CharacterSanity(Choice):
 
 class SendBothCharacterCostume(Toggle):
     """When winning with a costume, send the Character Sanity
-check for *both* the character and the costume or just the costume"""
+    check for *both* the character and the costume or just the costume"""
     display_name = "Send both Character Sanity"
     default = False
 
@@ -349,8 +354,8 @@ class BasketTime(Choice):
 
 class EnableBPointsWin(Choice):
     """Getting a certain amount of points wins you or the opponent the set
-Win Set: Wins the current period/set
-Win Round: Wins the whole round"""
+    Win Set: Wins the current period/set
+    Win Round: Wins the whole round"""
     display_name = "Enable Points Win"
     option_off = 0
     option_win_set = 1
@@ -360,8 +365,8 @@ Win Round: Wins the whole round"""
 
 class BPointsToWin(Range):
     """Set the required amount of points to win
-NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
-to the nearest 1 decimal place"""
+    NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
+    to the nearest 1 decimal place"""
     display_name = "Points to Win"
     range_start = 10
     range_end = 50
@@ -370,7 +375,7 @@ to the nearest 1 decimal place"""
 
 class BPeriod(Range):
     """How many periods do you want to be playing?
-Recommended to set a low amount, kinda boring otherwise."""
+    Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Period Amount"
     range_start = 1
     range_end = 5
@@ -410,7 +415,7 @@ class DodgeTime(Choice):
 
 class DPeriod(Range):
     """How many periods do you want to be playing?
-Recommended to set a low amount, kinda boring otherwise."""
+    Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Period Amount"
     range_start = 1
     range_end = 5
@@ -431,8 +436,8 @@ class DMaxHealth(Choice):
 # --- Volleyball ---
 class VPointsToWin(Range):
     """Set the required amount of points to win
-NOTE: The requirement for Bowser Jr. Blvd. is value x 2 rounded
-to the nearest 1 decimal place"""
+    NOTE: The requirement for Bowser Jr. Blvd. is value x 2 rounded
+    to the nearest 1 decimal place"""
     display_name = "Points to Win"
     range_start = 10
     range_end = 20
@@ -441,7 +446,7 @@ to the nearest 1 decimal place"""
 
 class VPeriod(Range):
     """How many sets do you want to be playing?
-Recommended to set a low amount, kinda boring otherwise."""
+    Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Set Amount"
     range_start = 1
     range_end = 5
@@ -481,8 +486,8 @@ class HockeyTime(Choice):
 
 class EnableHPointsWin(Choice):
     """Getting a certain amount of points wins you or the opponent the set
-Win Set: Wins the current period/set
-Win Round: Wins the whole round"""
+    Win Set: Wins the current period/set
+    Win Round: Wins the whole round"""
     display_name = "Enable Points Win"
     option_off = 0
     option_win_set = 1
@@ -492,8 +497,8 @@ Win Round: Wins the whole round"""
 
 class HPointsToWin(Range):
     """Set the required amount of points to win
-NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
-to the nearest 1 decimal place"""
+    NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
+    to the nearest 1 decimal place"""
     display_name = "Points to Win"
     range_start = 10
     range_end = 50
@@ -502,7 +507,7 @@ to the nearest 1 decimal place"""
 
 class HPeriod(Range):
     """How many periods do you want to be playing?
-Recommended to set a low amount, kinda boring otherwise."""
+    Recommended to set a low amount, kinda boring otherwise."""
     display_name = "Period Amount"
     range_start = 1
     range_end = 5
@@ -512,24 +517,27 @@ Recommended to set a low amount, kinda boring otherwise."""
 # === Party Mode Options ===
 class PartyMode(OptionSet):
     """Which (if any) Party Modes do you want enabled?
-(Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)
+    (Feed Petey, Harmony Hustle, Bob-omb Dodge, Smash Skate)
 
 NOTE: All are required if your goal is Party Palooza"""
     display_name = "Enabled Party Modes"
     valid_keys = {"Feed Petey", "Harmony Hustle", "Bob-omb Dodge", "Smash Skate"}
-    default = {"Feed Petey", "Smash Skate"}
+    default = {}
 
 
-class StartWithParty(Toggle):
+class StartWithParty(Range):
     """Start with the enabled party modes
-Useful if you're not starting with the sports!"""
+    Useful if you're not starting with the sports!"""
     display_name = "Start with Party Modes"
+    range_start = 0
+    range_end = 4
+    default = 0
 
 
 class PartyModeOpponent(Choice):
     """Which CPU will be your main opponent?
-(This CPU will get things like points from deathlink, points
-from Coins Trap, etc)"""
+    (This CPU will get things like points from deathlink, points
+    from Coins Trap, etc)"""
     display_name = "Party Mode Opponent"
     option_CPU_2 = 0
     option_CPU_3 = 1
@@ -564,7 +572,7 @@ class AltPathType(Choice):
     Difficulty Universal: Alt Path Locations will be for **any** difficulty
     Sport Universal: Alt Path Locations will be for **any** sport
     Full Universal: Alt Path Locations will be for **any** difficulty/sport
-    Progessive Options give Progressive items which unlock the Alt Paths in cup order
+    Progressive Options give Progressive items which unlock the Alt Paths in cup order
 
     IMPORTANT NOTE: Sports Mix will NOT send any alt path checks if alt paths are combined"""
 
@@ -636,10 +644,10 @@ class TintStages(Toggle):
 
 
 class TintVolleyball(Toggle):
-    """EPILEPSY WARNING! DO NOT ENABLE IF YOU'RE SENSITVE TO FLASHING LIGHTS
+    """EPILEPSY WARNING! DO NOT ENABLE IF YOU'RE SENSITIVE TO FLASHING LIGHTS
 
     Volleyball has some issues with tinting, flickering back to white constantly
-    for a single frame during gameplay. Enable this option only if your okay with this."""
+    for a single frame during gameplay. Enable this option only if you're okay with this."""
     display_name = "Tint Volleyball"
     default = False
 

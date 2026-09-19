@@ -672,8 +672,7 @@ boss_locations: Dict[str, LocData] = {
 }
 
 basketball_alternate_path_normal_locations: Dict[str, LocData] = {
-    "Basketball Mushroom Cup Alt Path Normal East of Red Toad House": LocData(base_id + 30000,
-                                                                              LocGroup.BASKETBALL_ALT_NORMAL),
+    "Basketball Mushroom Cup Alt Path Normal East of Red Toad House": LocData(base_id + 30000, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal By Lake": LocData(base_id + 30001, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal Lake Platform": LocData(base_id + 30002, LocGroup.BASKETBALL_ALT_NORMAL),
     "Basketball Mushroom Cup Alt Path Normal South of Lake": LocData(base_id + 30003, LocGroup.BASKETBALL_ALT_NORMAL),
@@ -2301,7 +2300,7 @@ def create_regular_locations(world: MSMWorld) -> None:
     }
 
     if world.options.include_exhibition.value:
-        for difficulty in world.options.exhibition_difficulties.value:
+        for difficulty in [d for d in ("Easy", "Normal", "Hard", "Expert") if d in world.options.exhibition_difficulties.value]:
 
             if world.options.exhibition_type == ExhibitionType.option_all_sports:
                 # Each sport has its own distinct set of "{sport} Ex: ..." locations,
@@ -2351,8 +2350,8 @@ def create_regular_locations(world: MSMWorld) -> None:
         "Smash Skate": smash_skate,
     }
 
-    if world.options.party_mode:
-        for mode in world.options.party_mode.value:
+    if world.options.party_mode.value:
+        for mode in [m for m in items.PARTY_MODE_ORDER if m in world.options.party_mode.value]:
             locations = party_mode_to_locations[mode]
             region = party_mode_to_region[mode]
 
@@ -2423,6 +2422,8 @@ def create_regular_locations(world: MSMWorld) -> None:
         if (world.options.include_exhibition.value and
                 world.options.exhibition_difficulties.value and
                 enabled_main_sports):
+
+
             if world.options.exhibition_type.value == ExhibitionType.option_all_sports:
                 for sport in enabled_main_sports:
                     playable_courts.update(exhibition_courts[sport])
@@ -2432,7 +2433,7 @@ def create_regular_locations(world: MSMWorld) -> None:
         for mode in world.options.party_mode.value:
             playable_courts.update(party_mode_courts.get(mode, set()))
 
-        for court in playable_courts:
+        for court in sorted(playable_courts):
             location_name = f"Win on {court}"
             locations.update(get_location_names_with_ids([location_name]))
 

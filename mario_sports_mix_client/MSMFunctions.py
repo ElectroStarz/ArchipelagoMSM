@@ -1,6 +1,7 @@
 import dolphin_memory_engine as dme
 from . import dolphin_connection as dc
 from .memory_addresses_pal import *
+from logging import Logger
 
 cups_difficulty = ["normal_cups", "hard_cups"]
 
@@ -109,10 +110,14 @@ def is_ntscu(address):
         return False
 
 def apply_file_offset(address):
-    if dc.GAME_VERSION == "PAL":
-        addr = dme.follow_pointers(0x804D1154, [0x1C3])
-    else:
-        addr = dme.follow_pointers(0x804D01D4, [0x1C3])
+    try:
+        if dc.GAME_VERSION == "PAL":
+            addr = dme.follow_pointers(0x804D1154, [0x1C3])
+        else:
+            addr = dme.follow_pointers(0x804D01D4, [0x1C3])
+    except RuntimeError:
+        Logger.info(Logger("client"), "No save file loaded/detected...")
+        return address
 
     file_selected = dme.read_byte(addr)
 

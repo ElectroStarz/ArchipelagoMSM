@@ -116,7 +116,7 @@ class MatchAddresses:
     using_special = 0x805C0CC8  # Word
     tournament_diff = 0x804D5FB8  # Byte | Mushroom Cup uses one less (0 for Normal, 1 for Hard) | In CAL
     exhibition_diff = 0x804D77D3  # Byte | In CAL
-    ex_diff_on_menu = 0x902319E3  # Byte | UNRELIABLE
+    ex_diff_on_menu = 0x80B3B16C  # Word | 0 = Easy, etc
     paused = 0x804D069B  # Byte | In CAL
     cutscene_active = 0x805C1999  # Byte | In CAL
     loading_screen_active = 0x804D8354  # Word | In CAL

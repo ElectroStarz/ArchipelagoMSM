@@ -111,8 +111,12 @@ class DolphinClient:
     def check_region(self):
         global GAME_VERSION
 
-        byte = self.read_bytes(0x80000000, 6)
-        decoded = byte.decode("utf-8", errors="ignore")
+        try:
+            byte = self.read_bytes(0x80000000, 6)
+            decoded = byte.decode("utf-8", errors="ignore")
+        except RuntimeError:
+            self.logger.info("Waiting for memory to initialise...")
+            return False
 
         if decoded == "RMKP01":
             detected_version = "PAL"

@@ -14,7 +14,7 @@
 your custom_worlds folder, or click Install APWorld in the Archipelago Launcher and select the APWorld you downloaded.
 
 ### Dolphin
-1) Dump your version of Mario Sports Mix
+1) [Dump your version of Mario Sports Mix](https://wii.hacks.guide/dump-games) (Requires modded Wii / vWii)
 2) Put the dump into a folder and set it as a game folder in Dolphin (Config → Paths)
 
 ### Mac Setup
