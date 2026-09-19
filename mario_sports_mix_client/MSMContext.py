@@ -34,8 +34,8 @@ logger = logging.getLogger("Client")
 
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "3.0.0"
-COMPATIBLE_VERSIONS = []
+CLIENT_VERSION = "3.0.1"
+COMPATIBLE_VERSIONS = ["3.0.0"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -3534,7 +3534,8 @@ class MSMContext(SuperContext):
 
         for location in self.checked_locations:
             name = LOCATION_ID_TO_NAME[location]
-            if any(["Feed Petey:", "Harmony Hustle:", "Bob-omb Dodge:", "Smash Skate:"]) in name:
+            pms = ["Feed Petey:", "Harmony Hustle:", "Bob-omb Dodge:", "Smash Skate:"]
+            if any(pm in name for pm in pms):
                 if name not in self.party_won:
                     self.party_won.add(name)
                     added = True
