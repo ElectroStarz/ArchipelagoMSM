@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict, NamedTuple, TYPE_CHECKING
 
-import MSMUtils
+from . import MSMUtils
 from BaseClasses import Item, ItemClassification as IC
 from .options import *
 
@@ -574,10 +574,10 @@ def create_all_items(world: "MSMWorld") -> None:
             itempool.append(world.create_item(character))
 
     enabled_sports = [sport for sport in SPORT_ORDER if sport in world.options.enabled_sports.value]
-    enabled_main_sports = {
+    enabled_main_sports = [
         sport for sport in enabled_sports
         if sport in {"Basketball", "Dodgeball", "Volleyball", "Hockey"}
-    }
+    ]
     has_tournament_content = bool(
         world.options.include_tournaments.value and enabled_sports
     )
@@ -623,14 +623,18 @@ def create_all_items(world: "MSMWorld") -> None:
                 itempool.append(world.create_item(f"Exhibition {difficulty}"))
 
     # Start with Sports option
-    if world.options.start_with_sports.value:
-        for sport in enabled_sports:
-            if sport != "Sports Mix":
+    sws = world.options.start_with_sports.value
+    if sws != 0:
+        precollect = world.random.sample(enabled_main_sports, min(sws, len(enabled_main_sports)))
+        
+        for sport in enabled_main_sports:
+            if sport in precollect:
                 world.push_precollected(world.create_item(sport))
-    else:
-        for sport in enabled_sports:
-            if sport != "Sports Mix":
+            else:
                 itempool.append(world.create_item(sport))
+    else:
+        for sport in enabled_main_sports:
+            itempool.append(world.create_item(sport))
 
     if "Sports Mix" in enabled_sports:
         if world.options.sports_mix_unlock.value == SportsMixUnlock.option_sports_mix_item:
@@ -680,23 +684,31 @@ def create_party_modes(world: "MSMWorld", itempool, precollected_courts):
         "Bob-omb Dodge": bob_omb_dodge_courts,
         "Smash Skate": smash_skate_courts,
     }
+    enabled_pms = [mode for mode in PARTY_MODE_ORDER if mode in world.options.party_mode.value]
 
-    for party_mode in [mode for mode in PARTY_MODE_ORDER if mode in world.options.party_mode.value]:
+    # Start with Sports option
+    swpm = world.options.start_with_party_modes.value
+    if swpm != 0:
+        precollect = world.random.sample(enabled_pms, min(swpm, len(enabled_pms)))
 
-        if world.options.start_with_party_modes.value:
-            world.push_precollected(world.create_item(party_mode))
-        else:
-            itempool.append(world.create_item(party_mode))
+        for mode in enabled_pms:
+            if mode in precollect:
+                world.push_precollected(world.create_item(mode))
+            else:
+                itempool.append(world.create_item(mode))
+    else:
+        for mode in enabled_pms:
+            itempool.append(world.create_item(mode))
 
-        # Get the dictionary of items to do with it
-        create_dict = party_mode_to_dict[party_mode]
+    # Prog Court implementation
+    if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
+        for _ in range(3):
+            itempool.append(world.create_item("Progressive Party Mode Court"))
 
-        # Prog Court implementation
-        if world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
-            for _ in range(3):
-                itempool.append(world.create_item(f"Progressive Party Mode Court"))
-
-        else:
+    else:
+        for party_mode in enabled_pms:
+            # Get the dictionary of items to do with it
+            create_dict = party_mode_to_dict[party_mode]
 
             for item in create_dict:
                 if item not in precollected_courts:
@@ -736,8 +748,9 @@ def create_courts(world: "MSMWorld", itempool, precollected_courts):
                     itempool.append(world.create_item(court))
 
     elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
-        total_stages = MSMUtils.get_enabled_sport_courts(world.options.enabled_sports)
-        precollect_amount = len([court for court in total_stages if court in ["Mario Stadium", "Peach's Castle"
+        total_courts = MSMUtils.get_enabled_sport_courts(world.options.enabled_sports)
+        total_court_count = len(total_courts)
+        precollect_amount = len([court for court in total_courts if court in ["Mario Stadium", "Peach's Castle"
                                                                               "Koopa Troopa Beach", "Toad Park", "DK Dock"]])
 
         if world.options.start_with_mushroom_cup.value != StartWithMushroomCup.option_none:
@@ -746,11 +759,11 @@ def create_courts(world: "MSMWorld", itempool, precollected_courts):
                 world.push_precollected(world.create_item("Progressive Court"))
 
             # Put the remaining items into the item pool
-            for _ in range(total_stages - precollect_amount):
+            for _ in range(total_court_count - precollect_amount):
                 itempool.append(world.create_item("Progressive Court"))
         else:
             # Put all progressive items directly into the pool
-            for _ in range(total_stages):
+            for _ in range(total_court_count):
                 itempool.append(world.create_item("Progressive Court"))
 
 
@@ -1031,8 +1044,7 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     # access rules.
 
     # Character Sanity (Characters)
-    if (world.options.character_sanity.value == CharacterSanity.option_characters or
-            world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes):
+    if world.options.character_sanity.value in (CharacterSanity.option_characters, CharacterSanity.option_characters_and_costumes):
         if name in characters or name in miis:
             classification = IC.progression
 

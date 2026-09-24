@@ -131,7 +131,11 @@ class MSMWorld(World):
 
             option[0].value = min(self.random.randint(1, 4), len(option[1].value))
 
+        if self.options.start_with_sports.value > len(self.options.enabled_sports.value):
+            self.options.start_with_sports.value = len(self.options.enabled_sports.value)
 
+        if self.options.start_with_party_modes.value > len(self.options.party_mode.value):
+            self.options.start_with_party_modes.value = len(self.options.party_mode.value)
 
 
         # Universal Tracker performs its initial fake generation with an empty

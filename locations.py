@@ -3,6 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, NamedTuple, Dict
 
+from AutoWorld import World
 from BaseClasses import Location, LocationProgressType as LPT
 from . import items
 from .options import *

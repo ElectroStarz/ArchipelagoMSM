@@ -567,7 +567,7 @@ class MSMContext(SuperContext):
 
     slot_data: Dict[str, Utils.Any] = {}
 
-    settings = get_settings()["msm_settings"]
+    settings = get_settings()["mario_sports_mix_settings"]
     auto_open: bool = settings["auto_open"]
     dolphin_exe_path: str = settings["dolphin_exe_path"]
     msm_iso_path: str = settings["msm_iso_path"]
@@ -661,6 +661,7 @@ class MSMContext(SuperContext):
         self._custom_data_load_event = asyncio.Event()
         self.start_process = True
         self.force_unhooked = False
+        self.overriding_ff_unlocks = False
         self.handled_gecko_codes = False
         self.game_session_active = False
         self.active_game_version = None
@@ -1125,7 +1126,7 @@ class MSMContext(SuperContext):
         self.reset_location_state()
         await super().disconnect(allow_autoreconnect)
 
-    def reset_game(self):
+    async def reset_game(self):
         """Resets the game to allow the 3 rows"""
 
         # If game is actually active
@@ -1136,9 +1137,20 @@ class MSMContext(SuperContext):
             time.sleep(1)
             self.kill_dolphin()
             time.sleep(2)
-            self.open_dolphin()
-            self.force_unhooked = False
-            self.do_roster_fix()
+            has_open = self.open_dolphin()
+            if has_open:
+                self.force_unhooked = False
+                self.do_roster_fix()
+        else:
+            self.log_colour("No recognised game version active, open the game? (y/n)", "salmon")
+            usr = await self.console_input()
+            if usr.lower() == "y":
+                has_open = self.open_dolphin()
+                if has_open:
+                    self.do_roster_fix()
+
+            else:
+                pass
 
     def kill_dolphin(self):
         for proc in psutil.process_iter(["pid", "name"]):
@@ -1148,17 +1160,25 @@ class MSMContext(SuperContext):
             except psutil.AccessDenied:
                 if proc.info["name"].lower() == "dolphin.exe":
                     proc.kill()
-            except (psutil.NoSuchProcess, psutil.ZombieProcess):
-                pass
+            except (psutil.NoSuchProcess, psutil.ZombieProcess) as e:
+                logger.info(f"Error whilst closing Dolphin: {e}")
 
     def open_dolphin(self, batch_mode=False):
+        if not self.dolphin_exe_path:
+            logger.info("Dolphin executable path not set in host.yaml")
+            return False
+
+        if not self.msm_iso_path:
+            logger.info("Game file not set in host.yaml")
+            return False
+
         if not os.path.exists(self.dolphin_exe_path):
             logger.info(f"Error: Dolphin executable not found at '{self.dolphin_exe_path}'")
-            return
+            return False
 
         if not os.path.exists(self.msm_iso_path):
             logger.info(f"Error: Game file not found at '{self.msm_iso_path}'")
-            return
+            return False
 
         cmd = [self.dolphin_exe_path, "-e", self.msm_iso_path]
 
@@ -1168,6 +1188,7 @@ class MSMContext(SuperContext):
 
         logger.info(f"Launching {os.path.basename(self.msm_iso_path)}...")
         subprocess.Popen(cmd)
+        return True
 
     def do_roster_fix(self):
         """Credit to Yoshmin for figuring this out!
@@ -1442,6 +1463,10 @@ class MSMContext(SuperContext):
                     self.progressive_courts += 1
                     self.debug_log(f"Added {item_name} to progressive_courts")
 
+                elif item_name == "Progressive Party Mode Court":
+                    self.progressive_party_courts += 1
+                    self.debug_log(f"Added {item_name} to progressive_party_courts")
+
                 elif item_name.startswith("Sports Crystal:"):
                     self.unlocked_sports_crystals.add(item_name)
                     self.debug_log(f"Added {item_name} to unlocked_sports_crystals")
@@ -1496,7 +1521,7 @@ class MSMContext(SuperContext):
         """Used to lock courts & cups when the user doesn't have the mode
         Sports Mix always returns True as that is unlocked by items anyway, not by default"""
 
-        if mode in self.unlocked_modes or mode == "SM":
+        if mode in self.unlocked_modes or mode in ["SM", "Sports Mix"]:
             return True
         else:
             return False
@@ -1507,6 +1532,10 @@ class MSMContext(SuperContext):
         """Handles the unlocking of characters using functions for characters with costume"""
 
         for char in character_names:
+
+            if char in ["slime", "ninja", "white_mage", "black_mage"] and self.overriding_ff_unlocks:
+                return
+
             # Format character name for value
             item_name = f"{char.replace('_', ' ').title()}"
 
@@ -2007,6 +2036,7 @@ class MSMContext(SuperContext):
                         slime_attr = getattr(sport_class.Characters, "slime")
                         slime_addr = get_address(slime_attr)
 
+                        self.overriding_ff_unlocks = True
                         self.game_interface.dolphin_client.write_byte(ninja_addr, 1)
                         await self.check_write(ninja_addr, "byte", 1)
                         self.game_interface.dolphin_client.write_byte(white_mage_addr, 1)
@@ -3586,7 +3616,8 @@ class MSMContext(SuperContext):
 
         for location in self.checked_locations:
             name = LOCATION_ID_TO_NAME[location]
-            if any(["Feed Petey:", "Harmony Hustle:", "Bob-omb Dodge:", "Smash Skate:"]) in name:
+            pms = ["Feed Petey:", "Harmony Hustle:", "Bob-omb Dodge:", "Smash Skate:"]
+            if any(pm in name for pm in pms):
                 if name not in self.party_won:
                     self.party_won.add(name)
                     added = True
