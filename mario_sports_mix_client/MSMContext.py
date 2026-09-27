@@ -1149,8 +1149,7 @@ class MSMContext(SuperContext):
                 if has_open:
                     self.do_roster_fix()
 
-            else:
-                pass
+
 
     def kill_dolphin(self):
         for proc in psutil.process_iter(["pid", "name"]):
