@@ -700,4 +700,10 @@ def lock_all_characters():
             addr = getattr(sport.Characters, char)
             dme.write_byte(addr, 0)
 
-lock_all_characters()
+
+try:
+    dme.follow_pointers(Addresses.BossAddresses.behemoth_hp,
+                                                       Addresses.Pointers.Boss.behemoth_hp_offsets)
+    print("Yes")
+except RuntimeError:
+    print("no")
