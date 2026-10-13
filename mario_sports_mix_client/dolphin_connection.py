@@ -39,7 +39,7 @@ class DolphinClient:
         self.attempt = 1
         self.told_region = False
         self.told_fork_warning = False
-
+        self.told_initialise_memory = False
 
     @staticmethod
     def get_running_dolphin_processes() -> list[str]:
@@ -115,7 +115,9 @@ class DolphinClient:
             byte = self.read_bytes(0x80000000, 6)
             decoded = byte.decode("utf-8", errors="ignore")
         except RuntimeError:
-            self.logger.info("Waiting for memory to initialise...")
+            if not self.told_initialse_memory:
+                self.logger.info("Waiting for memory to initialise...")
+                self.told_initialise_memory = True
             return False
 
         if decoded == "RMKP01":
@@ -135,6 +137,7 @@ class DolphinClient:
         if not self.told_region:
             self.logger.info(f"{detected_version} Detected!")
             self.told_region = True
+            self.told_initialise_memory = False
 
         return True
 
@@ -177,9 +180,9 @@ class DolphinClient:
         result = self.dme.read_float(address)
         return result
 
-    def read_string(self, address: int) -> str:
+    def read_string(self, address: int, length: int = 5) -> str:
         self._assert_hooked()
-        byte = self.dme.read_bytes(address, 5)
+        byte = self.dme.read_bytes(address, length)
         # Decode and strip out the invisible null bytes
         decoded = byte.decode("utf-8", errors="ignore").rstrip('\x00')
         return decoded

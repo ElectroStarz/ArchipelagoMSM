@@ -14,10 +14,13 @@ class MSMSettings(settings.Group):
     settings_key = "mario_sports_mix_settings"
 
     class AutoOpenMSM(settings.Bool):
-        """Enabling this will automatically open Mario Sports Mix when opening the client."""
+        """Enabling this will automatically open Mario Sports Mix when opening the client.
+        Automatically patches the roster when opening"""
 
     class MSMISOPath(settings.UserFilePath):
-        """A path to your Mario Sports Mix ISO file"""
+        """A path to your Mario Sports Mix ISO file
+
+        If your game is not an ISO you can convert it in Dolphin by right-clicking -> Convert File and then select ISO"""
         is_exe = False
 
         def browse(self: T, filetypes=None, **kwargs: Any) -> T | None:

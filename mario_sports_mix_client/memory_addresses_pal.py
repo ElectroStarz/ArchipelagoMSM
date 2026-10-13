@@ -295,6 +295,14 @@ class WonStarCups:
     dodgeball = 0x90228525
     hockey = 0x90228D25
 
+class TutorialPlayed:
+    # All byte
+    # 0 = None, 1 = Watched Basic, 2 = Watched Hard
+    basketball = 0x90226E54
+    volleyball = 0x90226E64
+    dodgeball = 0x90226E74
+    hockey = 0x90226E84
+
 
 class GamesPlayed:
     basketball = 0x902299AC  # Word
@@ -513,7 +521,7 @@ class SportsMixAddresses:
 
 
 class BossAddresses:
-    behemoth_hp = 0x804D0F74  # Float | Has Pointers | In CAL
+    behemoth_hp = 0x805C1B50  # Float | Has Pointers | In CAL
 
 
 class NTSCUAddresses:
@@ -593,7 +601,7 @@ class Pointers:
             b1 = [0x54, 0x0, 0x90, 0x1B4]
 
     class Boss:
-        behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
+        behemoth_hp_offsets = [0x34, 0x1F0]
         max_hp_offsets = [0x20, 0x34, 0x1F4]
 
 

@@ -19,6 +19,19 @@ sports_addresses = [
     HockeyAddresses
 ]
 
+def set_tutorial_played():
+    """Sets it so the game thinks the tutorials have already been played"""
+
+    address_list = [
+        get_address(TutorialPlayed.basketball),
+        get_address(TutorialPlayed.volleyball),
+        get_address(TutorialPlayed.dodgeball),
+        get_address(TutorialPlayed.hockey),
+    ]
+
+    for address in address_list:
+        dme.write_byte(address, 3)
+
 
 def unlock_tabs(hard_tournament_difficulty: bool):
     unlock_tournament_tabs(hard_tournament_difficulty)

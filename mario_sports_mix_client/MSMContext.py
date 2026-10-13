@@ -678,6 +678,8 @@ class MSMContext(SuperContext):
         self.pending_panel_replacement = False
         self.suppress_panel_until = 0.0
 
+        self.should_roster_patch = True
+
         self.boss_hp_handled: bool = False
         self.boss_defeat_handled: bool = False
         self.goal_handled: bool = False
@@ -1147,7 +1149,7 @@ class MSMContext(SuperContext):
             if usr.lower() == "y":
                 has_open = self.open_dolphin()
                 if has_open:
-                    self.do_roster_fix()
+                    await self.constant_roster_patch()
 
 
 
@@ -1162,7 +1164,7 @@ class MSMContext(SuperContext):
             except (psutil.NoSuchProcess, psutil.ZombieProcess) as e:
                 logger.info(f"Error whilst closing Dolphin: {e}")
 
-    def open_dolphin(self, batch_mode=False):
+    def open_dolphin(self, batch_mode=True):
         if not self.dolphin_exe_path:
             logger.info("Dolphin executable path not set in host.yaml")
             return False
@@ -3334,8 +3336,7 @@ class MSMContext(SuperContext):
                 costume_name = costume_db.get(costume_byte, None)
 
                 if costume_name is not None:
-                    if (character in self.unlocked_characters or character in ["Mii (Male)",
-                                                                               "Mii (Female)"]) and costume_name in self.unlocked_costumes:
+                    if (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]) and costume_name in self.unlocked_costumes:
                         await self.check_location(f"Win as {costume_name}")
 
     # --- Court Sanity ---
@@ -4232,6 +4233,7 @@ class MSMContext(SuperContext):
 
                 if self.start_process:
                     unlock_tabs(self.hard_tournament_difficulty)
+                    set_tutorial_played()
                     self.start_process = False
 
                 self.last_error_message = None
@@ -4266,6 +4268,24 @@ class MSMContext(SuperContext):
                     logger.error(f"Sync Task Error:\n{traceback.format_exc()}")
                 await asyncio.sleep(3)
 
+    async def constant_roster_patch(self):
+        while not self.exit_event.is_set():
+            try:
+                if self.game_interface.dolphin_client.is_hooked():
+                    try:
+                        if self.ready_to_handle():
+                            self.should_roster_patch = False
+
+                        if self.should_roster_patch:
+                            self.do_roster_fix()
+
+                        await asyncio.sleep(0.1)
+                    finally:
+                        await asyncio.sleep(0.1)
+
+            finally:
+                await asyncio.sleep(0.1)
+
     async def stop_stupid_unlock_notifs(self):
         """Stop SOME of the unlock messages from appearing constantly"""
         games_played_address_list = [GamesPlayed.basketball, GamesPlayed.dodgeball,
@@ -4281,7 +4301,8 @@ class MSMContext(SuperContext):
         """Handle the code patches for each region"""
 
         current_module = self.game_interface.dolphin_client.read_pointer(self.addresslib.current_module_addr,
-                                                                         Pointers.Match.current_module_offsets, "word")
+                                                                         Pointers.Match.current_module_offsets,
+                                                                         "word")
 
         if current_module == 0x6D656E75 and not self.handled_gecko_codes:
             # print(f"Game Version: {dc.GAME_VERSION}")
@@ -4359,6 +4380,7 @@ class MSMContext(SuperContext):
         # Custom Tournament Settings
         await self.check_current_cup()
         await self.handle_alt_path_unlocks()
+
         if self.in_tournament_match and not self.in_alt_path:
             await self.handle_custom_tournament_settings()
 
@@ -4400,7 +4422,7 @@ class MSMContext(SuperContext):
         await self.handle_question_mark_panel_items()
         await self.handle_unlocked_abilities()
 
-        self.toggle_log("rth", "Ready to handle!", "Not ready to handle", self.ready_to_handle(), True)
+        self.toggle_log("rth", "Ready to handle!", "Not ready to handle...", self.ready_to_handle(), True)
 
         self.handled_gecko_codes = False
 

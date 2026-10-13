@@ -701,9 +701,23 @@ def lock_all_characters():
             dme.write_byte(addr, 0)
 
 
-try:
-    dme.follow_pointers(Addresses.BossAddresses.behemoth_hp,
-                                                       Addresses.Pointers.Boss.behemoth_hp_offsets)
-    print("Yes")
-except RuntimeError:
-    print("no")
+# lock_all_characters()
+
+dme.hook()
+shall_pass = True
+
+while True:
+    try:
+        dme.write_byte(0x81619253, 3)
+        dme.write_byte(0x8161925f, 3)
+        dme.write_byte(0x8161926b, 3)
+        dme.write_byte(0x81619277, 3)
+        print("writing")
+    except RuntimeError:
+        if shall_pass:
+            pass
+        else:
+            if not dme.is_hooked():
+                print("Not hooked you idiot")
+            else:
+                print("no")
