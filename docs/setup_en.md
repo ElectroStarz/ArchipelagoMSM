@@ -14,7 +14,7 @@
 your custom_worlds folder, or click Install APWorld in the Archipelago Launcher and select the APWorld you downloaded.
 
 ### Dolphin
-1) [Dump your version of Mario Sports Mix](https://wii.hacks.guide/dump-games) (Requires modded Wii / vWii)
+1) [Dump your version of Mario Sports Mix](https://wii.hacks.guide/dump-games) (Requires [modded Wii / vWii](https://wii.hacks.guide/get-started))
 2) Put the dump into a folder and set it as a game folder in Dolphin (Config → Paths)
 
 ### Mac Setup
@@ -23,6 +23,11 @@ for more detail and setup. You will need [this file](https://github.com/aldelaro
 
 ### Notes
 * Select a save file before connecting to a room
+* Make sure to read the bugs!
+
+## Common Mistake
+"I can't find the Mario Sports Mix Client or the Mario Sports Mix tab in the Options Creator?" Make sure to restart your
+AP Launcher every time you install a custom world with the AP Launcher open!
 
 ## Creating a yaml file
 ### What is a yaml and why do I need one?
