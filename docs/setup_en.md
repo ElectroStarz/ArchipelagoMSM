@@ -47,6 +47,14 @@ Upon launching the Mario Sports Mix Client you will see an address bar. You can 
 host, it should look something like "archipelago.gg:65414". Then you can press connect and type in your slot name (and 
 password if needed) and that's it!
 
+## Auto Open
+If you open your host.yaml and find the Mario Sports Mix settings, you should find 3 options. Auto Open, Game Path and
+Dolphin Path. For auto open to work, you must set your Game Path (Which should look something like this:
+"E:\Dolphin Games\Mario Sports Mix.iso") and your Dolphin Path (Something like this:
+"C:\Users\elect\Downloads\Dolphin Emulator\Dolphin-x64\Dolphin.exe"). Once you open the client (If Dolphin isn't already
+open), you should see Mario Sports Mix automatically open with the Roster Fix automatically applied! (See [here](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/worlds/mario_sports_mix/docs/bugs.md)
+for more info on the Roster Bug)
+
 ## Still Having Trouble?
 * Read the [information doc](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/worlds/mario_sports_mix/docs/en_Mario%20Sports%20Mix.md)!
 * Read the [known bugs](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/worlds/mario_sports_mix/docs/bugs.md)!
