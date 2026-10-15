@@ -2,6 +2,7 @@
 
 import dolphin_memory_engine as dme
 import re
+import psutil
 
 class Addresses:
     class MusicFiles:
@@ -703,21 +704,26 @@ def lock_all_characters():
 
 # lock_all_characters()
 
-dme.hook()
-shall_pass = True
+# dme.hook()
+# shall_pass = True
+#
+# while True:
+#     try:
+#         dme.write_byte(0x81619253, 3)
+#         dme.write_byte(0x8161925f, 3)
+#         dme.write_byte(0x8161926b, 3)
+#         dme.write_byte(0x81619277, 3)
+#         print("writing")
+#     except RuntimeError:
+#         if shall_pass:
+#             pass
+#         else:
+#             if not dme.is_hooked():
+#                 print("Not hooked you idiot")
+#             else:
+#                 print("no")
 
-while True:
-    try:
-        dme.write_byte(0x81619253, 3)
-        dme.write_byte(0x8161925f, 3)
-        dme.write_byte(0x8161926b, 3)
-        dme.write_byte(0x81619277, 3)
-        print("writing")
-    except RuntimeError:
-        if shall_pass:
-            pass
-        else:
-            if not dme.is_hooked():
-                print("Not hooked you idiot")
-            else:
-                print("no")
+
+for proc in psutil.process_iter(["pid", "name"]):
+    if "dolphin" in proc.info.get("name").lower():
+        print(proc.info.get("name"))
