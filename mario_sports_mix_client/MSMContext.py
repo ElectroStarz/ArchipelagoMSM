@@ -256,7 +256,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
     def _cmd_roster_fix(self):
         """Run this command if the roster is bugged (E.g. Multiple characters appear over Mario's icon)
         Make sure your paths in host.yaml are set! If you just set them, you'll need to restart the client."""
-        self.ctx.reset_game()
+        asyncio.create_task(self.ctx.reset_game())
 
     def _cmd_unlock_tabs(self):
         """This command unlocks the tabs if they are already not unlocked"""
@@ -1132,7 +1132,7 @@ class MSMContext(SuperContext):
         """Resets the game to allow the 3 rows"""
 
         # If game is actually active
-        if self.active_game_version is not None:
+        if self.is_dolphin_open():
             self.force_unhooked = True
             # Unhook from dolphin
             self.game_interface.dolphin_client.disconnect()
@@ -1151,18 +1151,28 @@ class MSMContext(SuperContext):
                 if has_open:
                     await self.constant_roster_patch()
 
-
-
     def kill_dolphin(self):
         for proc in psutil.process_iter(["pid", "name"]):
+            name = proc.info["name"].casefold()
             try:
-                if proc.info["name"].lower() == "dolphin.exe":
+                if (name and "dolphin" in name) and "memoryengine" not in name:
                     proc.terminate()
             except psutil.AccessDenied:
-                if proc.info["name"].lower() == "dolphin.exe":
+                if (name and "dolphin" in name) and "memoryengine" not in name:
                     proc.kill()
             except (psutil.NoSuchProcess, psutil.ZombieProcess) as e:
                 logger.info(f"Error whilst closing Dolphin: {e}")
+
+    def is_dolphin_open(self) -> bool:
+        for proc in psutil.process_iter(["pid", "name"]):
+            try:
+                name = proc.info["name"].casefold()
+                if (name and "dolphin" in name) and "memoryengine" not in name:
+                    return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                continue
+        return False
+
 
     def open_dolphin(self, batch_mode=True):
         if not self.dolphin_exe_path:
