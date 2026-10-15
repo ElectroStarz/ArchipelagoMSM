@@ -27,7 +27,7 @@ def launch_mario_sports_mix_client(*args):
 
         logger.info("Running game...")
 
-        if ctx.auto_open:
+        if ctx.auto_open and not ctx.is_dolphin_open():
             ctx.open_dolphin()
 
         ctx.dolphin_sync_task = asyncio.create_task(ctx.dolphin_sync_task(), name="Dolphin Sync")
