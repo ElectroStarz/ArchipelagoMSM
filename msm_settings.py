@@ -22,39 +22,22 @@ class MSMSettings(settings.Group):
 
         If your game is not an ISO you can convert it in Dolphin by right-clicking -> Convert File and then select ISO"""
         is_exe = False
+        required = True
 
-        def browse(self: T, filetypes=None, **kwargs: Any) -> T | None:
-            from Utils import open_filename
-
+        def browse(self: T, filetypes: Sequence[tuple[str, Sequence[str]]] | None = None, **kwargs: Any) -> T | None:
             if filetypes is None:
                 filetypes = [("ISO File", ".iso")]
 
-            dialog_title = "Select Mario Sports Mix ISO"
-            selected_path = open_filename(dialog_title, filetypes, self)
-
-            if not selected_path:
-                return None
-
-            self.validate(selected_path)
-
-            try:
-                base_dir = self.__class__("").resolve()
-                rel_path = os.path.relpath(selected_path, base_dir)
-
-                if not rel_path.startswith(".."):
-                    selected_path = rel_path
-            except ValueError:
-                pass
-
-            return self.__class__(selected_path)
+            return super().browse(filetypes, **kwargs)
 
 
     class DolphinExePath(settings.UserFilePath):
         """A path to your installation of Dolphin Emulator"""
         is_exe = True
+        required = True
 
         def browse(self, filetypes=None, **kwargs):
-            from Utils import open_filename, is_windows
+            from Utils import is_windows
 
             # Set up the file filter based on the operating system
             if not filetypes:
@@ -62,27 +45,9 @@ class MSMSettings(settings.Group):
                 valid_exts = [".exe"] if is_windows else ["", ".app"]
                 filetypes = [("Dolphin Emulator", valid_exts)]
 
-            # Open the file dialogue
-            dialog_title = "Select Dolphin Executable"
-            selected_path = open_filename(dialog_title, filetypes, self)
+            return super().browse(filetypes, **kwargs)
 
-            if not selected_path:
-                return None
-
-            self.validate(selected_path)
-
-            # Try to use a relative path if the executable is inside the base directory
-            try:
-                base_dir = self.__class__("").resolve()
-                rel_path = os.path.relpath(selected_path, base_dir)
-
-                if not rel_path.startswith(".."):
-                    selected_path = rel_path
-            except ValueError:
-                pass  # Ignores errors on Windows if files are on different drives
-
-            return self.__class__(selected_path)
 
     auto_open: AutoOpenMSM | bool = False
-    msm_iso_path: MSMISOPath | str = MSMISOPath("")
-    dolphin_exe_path: DolphinExePath | str = DolphinExePath("")
+    msm_iso_path: MSMISOPath | str = MSMISOPath("mario_sports_mix.iso")
+    dolphin_exe_path: DolphinExePath | str = DolphinExePath("dolphin.exe")
