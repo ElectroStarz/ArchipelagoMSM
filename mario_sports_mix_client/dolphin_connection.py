@@ -115,7 +115,7 @@ class DolphinClient:
             byte = self.read_bytes(0x80000000, 6)
             decoded = byte.decode("utf-8", errors="ignore")
         except RuntimeError:
-            if not self.told_initialse_memory:
+            if not self.told_initialise_memory:
                 self.logger.info("Waiting for memory to initialise...")
                 self.told_initialise_memory = True
             return False
@@ -213,7 +213,7 @@ class DolphinClient:
         result = self.dme.follow_pointers(address, list(pointers))
         return result
 
-    def read_pointer(self, address: Any, pointers: list[int], data_type: str, length: int = 4) -> Any:
+    def read_pointer(self, address: Any, pointers: list[int], data_type: str, length: int = 5) -> Any:
         """
         Resolves a pointer path and extracts the final value using structural pattern matching.
         Supported types: 'string', 'byte', 'bytes', 'float', 'word'
