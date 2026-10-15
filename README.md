@@ -10,7 +10,7 @@
 ### [Guide de setup](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/setup_fr.md)
 ### [Avertissements](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/bugs_fr.md)
 # Contributing
-[English](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/Contributing.md)
+[English](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/contributing_resources/Contributing.md)
 ## Struggling with Alt Paths?
 See the [Alt Paths Guide](https://github.com/ElectroStarz/ArchipelagoMSM/releases/download/v3.0.0/Alternate.Paths.Guide.zip)! (Created by Puffy)
 ## Developers
