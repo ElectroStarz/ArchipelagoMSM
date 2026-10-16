@@ -1859,6 +1859,7 @@ class MSMContext(SuperContext):
             self.in_alt_path = True
         else:
             self.in_alt_path = False
+            self.overriding_ff_unlocks = False
 
         """self.log_once(
             "alt_paths",
