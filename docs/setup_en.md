@@ -51,8 +51,10 @@ password if needed) and that's it!
 If you open your host.yaml and find the Mario Sports Mix settings, you should find 3 options. Auto Open, Game Path and
 Dolphin Path. For auto open to work, you must set your Game Path (Which should look something like this:
 "E:\Dolphin Games\Mario Sports Mix.iso") and your Dolphin Path (Something like this:
-"C:\Users\elect\Downloads\Dolphin Emulator\Dolphin-x64\Dolphin.exe"). Once you open the client (If Dolphin isn't already
-open), you should see Mario Sports Mix automatically open with the Roster Fix automatically applied! (See [here](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/worlds/mario_sports_mix/docs/bugs.md)
+"C:\Users\elect\Downloads\Dolphin Emulator\Dolphin-x64\Dolphin.exe"). 
+
+Once you open the client (If Dolphin isn't already open), you should see Mario Sports Mix automatically open with the
+Roster Fix automatically applied! (See [here](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/worlds/mario_sports_mix/docs/bugs.md)
 for more info on the Roster Bug)
 
 ## Still Having Trouble?

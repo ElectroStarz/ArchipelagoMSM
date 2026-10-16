@@ -38,7 +38,7 @@ from .common_address_library import AddressLib
 logger = logging.getLogger("Client")
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "3.0.0"
+CLIENT_VERSION = "3.1.0"
 COMPATIBLE_VERSIONS = []
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
@@ -1105,8 +1105,10 @@ class MSMContext(SuperContext):
                 if any(key == f"_read_client_status_{self.team}_{self.slot}" for key in keys_dict):
                     if keys_dict.get(f"_read_client_status_{self.team}_{self.slot}") == 30:
                         self.server_goaled = True
+                        self.log_once("ss_goal", "Server recognised goal!", False)
                     else:
                         self.server_goaled = False
+                        self.log_once("ss_goal", "Server failed to recognise goal", False)
 
             elif cmd == "SetReply":
                 if consumable_key and args.get("key") == consumable_key:
