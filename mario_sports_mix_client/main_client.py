@@ -26,7 +26,12 @@ def launch_mario_sports_mix_client(*args):
         ctx.run_cli()
 
         logger.info("Running game...")
+
+        if ctx.auto_open and not ctx.is_dolphin_open():
+            ctx.open_dolphin()
+
         ctx.dolphin_sync_task = asyncio.create_task(ctx.dolphin_sync_task(), name="Dolphin Sync")
+        ctx.constant_roster_patch = asyncio.create_task(ctx.constant_roster_patch(), name="Constant Roster Patch")
 
         await ctx.exit_event.wait()
         ctx.server_address = None
@@ -34,6 +39,10 @@ def launch_mario_sports_mix_client(*args):
         if ctx.dolphin_sync_task:
             await asyncio.sleep(3)
             await ctx.dolphin_sync_task
+
+        if ctx.constant_roster_patch:
+            await asyncio.sleep(3)
+            await ctx.constant_roster_patch
 
     import colorama
     parser = get_base_parser(description="Mario Sports Mix Client")

@@ -61,3 +61,14 @@ def generate_exhibition_locations(sports, ex_type, difficulties):
                     locations.append(f"Exhibition: Beat {court} ({diff})")
 
     return locations
+
+def get_enabled_sport_courts(enabled_sports):
+    enabled_courts = set()
+
+    for sport in enabled_sports:
+        if sport != "Sports Mix":
+            enabled_courts.update(courts_by_sport[sport])
+
+    enabled_courts.add("Behemoth Stage")
+
+    return enabled_courts

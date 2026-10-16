@@ -1,6 +1,7 @@
 import dolphin_memory_engine as dme
 from . import dolphin_connection as dc
 from .memory_addresses_pal import *
+from logging import Logger
 
 cups_difficulty = ["normal_cups", "hard_cups"]
 
@@ -17,6 +18,19 @@ sports_addresses = [
     VolleyballAddresses,
     HockeyAddresses
 ]
+
+def set_tutorial_played():
+    """Sets it so the game thinks the tutorials have already been played"""
+
+    address_list = [
+        get_address(TutorialPlayed.basketball),
+        get_address(TutorialPlayed.volleyball),
+        get_address(TutorialPlayed.dodgeball),
+        get_address(TutorialPlayed.hockey),
+    ]
+
+    for address in address_list:
+        dme.write_byte(address, 3)
 
 
 def unlock_tabs(hard_tournament_difficulty: bool):
@@ -109,10 +123,14 @@ def is_ntscu(address):
         return False
 
 def apply_file_offset(address):
-    if dc.GAME_VERSION == "PAL":
-        addr = dme.follow_pointers(0x804D1154, [0x1C3])
-    else:
-        addr = dme.follow_pointers(0x804D01D4, [0x1C3])
+    try:
+        if dc.GAME_VERSION == "PAL":
+            addr = dme.follow_pointers(0x804D1154, [0x1C3])
+        else:
+            addr = dme.follow_pointers(0x804D01D4, [0x1C3])
+    except RuntimeError:
+        Logger.info(Logger("client"), "No save file loaded/detected...")
+        return address
 
     file_selected = dme.read_byte(addr)
 

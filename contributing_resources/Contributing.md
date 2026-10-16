@@ -29,13 +29,13 @@ there are addresses inside classes, these are used to distinguish what type of a
 name. Each variable has the address in hex and the memory type commented out, some may have additional info beside them
 to describe their behaviour. Let's take a look at 2 examples.
 
-![The current stage variable and address](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/contributing_resources/guide_images/current_stage_addr.png)
+![The current stage variable and address](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/contributing_resources/guide_images/current_stage_addr.png)
 
 This is the variable for the current stage address. As you can see, it has 2 things, the hex address and a comment. This
 comment refers to something that we'll cover in Cross-region Compatibility, but we can see that it tells us the address
 is a **string**! Now let's take a look at something else.
 
-![The special meter variable and address](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/contributing_resources/guide_images/special_meter_addr.png)
+![The special meter variable and address](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/contributing_resources/guide_images/special_meter_addr.png)
 
 This is the player's special meter address! Okay... We have the address, type and pointers! So we have a base address,
 then pointer(s) to find the address we need! Pointers can be found in the Pointers class near the bottom of the file.
@@ -91,4 +91,4 @@ deathlinks you'd be correct! Now, I can't tell you how exactly to make your func
 the past, but if you have any questions please feel free to ping me!
 
 ### Values
-I've made a little helper doc for some values of some addresses :] [Value Guide](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/contributing_resources/value_guide.md)
+I've made a little helper doc for some values of some addresses :] [Value Guide](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/contributing_resources/value_guide.md)

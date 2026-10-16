@@ -10,11 +10,14 @@
 ### [Guide de setup](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/setup_fr.md)
 ### [Avertissements](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/bugs_fr.md)
 # Contributing
-[English](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/docs/Contributing.md)
+[English](https://github.com/ElectroStarz/ArchipelagoMSM/blob/main/contributing_resources/Contributing.md)
+## Struggling with Alt Paths?
+See the [Alt Paths Guide](https://github.com/ElectroStarz/ArchipelagoMSM/releases/download/v3.0.0/Alternate.Paths.Guide.zip)! (Created by Puffy)
 ## Developers
 - ElectroStarz
 - Puffy
 ## Credits
+None of this would've been possible without the people here, I thank you all **so, so much!**
 - Yoshmin, s0uth & Elty (Finding memory addresses)
 - Saulf (Creating Gecko Codes for AP)
 - Sylaaz & Solz (Translating into French and proof-reading)
