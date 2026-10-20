@@ -287,6 +287,13 @@ class MSMCommandProcessor(SuperCommandProcessor):
 
     def _cmd_super_debug(self):
         """Prints out every piece of debug information I would want to know"""
+        try:
+            behemoth_hp = self.ctx.game_interface.dolphin_client.read_pointer(get_address(BossAddresses.behemoth_hp),
+                                                                              Pointers.Boss.behemoth_hp_offsets,
+                                                                              'float')
+        except RuntimeError:
+            behemoth_hp = "Not in Boss!"
+
         logger.info(
             f"=== Game Info ===\n"
             f"Mode={self.ctx.game_interface.get_mode()}\n"
@@ -296,8 +303,8 @@ class MSMCommandProcessor(SuperCommandProcessor):
             
             f"\n=== Boss/Goal Info ===\n"
             f"Behemoth={self.ctx.is_behemoth}, Behemoth King={self.ctx.is_behemoth_king}\n"
-            f"Current HP={self.ctx.game_interface.dolphin_client.read_pointer(get_address(BossAddresses.behemoth_hp), Pointers.Boss.behemoth_hp_offsets, 'float')}\n"
-            f"Client Goal Handled={self.ctx.goal_handled}\n"
+            f"Current HP={behemoth_hp}\n"
+            f"Server Recognised Goal={self.ctx.server_goaled}\n"
             
             f"\n=== Deathlink Info ===\n"
             f"Enabled={self.ctx.deathlink_enabled}\n"
@@ -318,8 +325,6 @@ class MSMCommandProcessor(SuperCommandProcessor):
         logger.info("Fetching live memory from Dolphin...")
 
         for prop in AddressLib.address_properties:
-            # We intentionally use getattr here!
-            # If it's not cached, this forces it to read from Dolphin right now.
             value = getattr(self.ctx.addresslib, prop)
 
             if value is None:
@@ -682,7 +687,6 @@ class MSMContext(SuperContext):
 
         self.boss_hp_handled: bool = False
         self.boss_defeat_handled: bool = False
-        self.goal_handled: bool = False
 
         self.in_tournament_match: bool = False
         self.last_tournament_location_name: Optional[str] = None
@@ -983,7 +987,7 @@ class MSMContext(SuperContext):
         super().on_package(cmd, args)
 
         if cmd == "Connected":
-            self.request_client_status()
+            self.request_client_status(True)
             ap_locations_checked = args["checked_locations"]
             self.locations_checked.update(ap_locations_checked)
 
@@ -1108,7 +1112,8 @@ class MSMContext(SuperContext):
                         self.log_once("ss_goal", "Server recognised goal!", False)
                     else:
                         self.server_goaled = False
-                        self.log_once("ss_goal", "Server failed to recognise goal", False)
+                        if not self.just_connected:
+                            self.log_once("ss_goal", "Server failed to recognise goal", False)
 
             elif cmd == "SetReply":
                 if consumable_key and args.get("key") == consumable_key:
@@ -2941,12 +2946,14 @@ class MSMContext(SuperContext):
 
     # === Goal/Boss Stuff ===
 
-    def request_client_status(self):
+    def request_client_status(self, is_startup: bool = False):
         """Sends a Get packet to the server for the slot's ClientStatus"""
         packet = {
             "cmd": "Get",
             "keys": [f"_read_client_status_{self.team}_{self.slot}"],
         }
+
+        self.just_connected = is_startup
 
         asyncio.create_task(self.send_msgs([packet]))
 
@@ -3317,8 +3324,7 @@ class MSMContext(SuperContext):
             return
 
         for character in characters_to_check:
-            if character != "None" and (
-                    character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]):
+            if character != "None" and character in self.unlocked_characters:
                 await self.check_location(f"Win as {character}")
 
     async def send_costume_character_sanity(self, char_1, char_2, char_3, costume_1, costume_2, costume_3):
@@ -3349,7 +3355,7 @@ class MSMContext(SuperContext):
                 costume_name = costume_db.get(costume_byte, None)
 
                 if costume_name is not None:
-                    if (character in self.unlocked_characters or character in ["Mii (Male)", "Mii (Female)"]) and costume_name in self.unlocked_costumes:
+                    if character in self.unlocked_characters and costume_name in self.unlocked_costumes:
                         await self.check_location(f"Win as {costume_name}")
 
     # --- Court Sanity ---
