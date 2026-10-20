@@ -38,8 +38,8 @@ from .common_address_library import AddressLib
 logger = logging.getLogger("Client")
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "3.1.0"
-COMPATIBLE_VERSIONS = []
+CLIENT_VERSION = "3.1.1"
+COMPATIBLE_VERSIONS = ["3.1.0"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
