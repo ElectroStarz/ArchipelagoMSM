@@ -687,7 +687,11 @@ def hook(function):
 
         if dme.is_hooked():
             print(f"Hooked! Running {function.__name__}")
-            function()
+            try:
+                function()
+                print(f"{function.__name__} completed!")
+            except Exception as e:
+                print(f"Something went wrong!\n{e}")
         else:
             print("Not Hooked!")
     return wrapper
@@ -701,29 +705,12 @@ def lock_all_characters():
             addr = getattr(sport.Characters, char)
             dme.write_byte(addr, 0)
 
+#lock_all_characters()
 
-# lock_all_characters()
+if not dme.is_hooked():
+    dme.hook()
 
-# dme.hook()
-# shall_pass = True
-#
-# while True:
-#     try:
-#         dme.write_byte(0x81619253, 3)
-#         dme.write_byte(0x8161925f, 3)
-#         dme.write_byte(0x8161926b, 3)
-#         dme.write_byte(0x81619277, 3)
-#         print("writing")
-#     except RuntimeError:
-#         if shall_pass:
-#             pass
-#         else:
-#             if not dme.is_hooked():
-#                 print("Not hooked you idiot")
-#             else:
-#                 print("no")
-
-
-for proc in psutil.process_iter(["pid", "name"]):
-    if "dolphin" in proc.info.get("name").lower():
-        print(proc.info.get("name"))
+dme.write_byte(0x81619253, 3)
+dme.write_byte(0x8161925f, 3)
+dme.write_byte(0x8161926b, 3)
+dme.write_byte(0x81619277, 3)

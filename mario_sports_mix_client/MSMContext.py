@@ -38,8 +38,8 @@ from .common_address_library import AddressLib
 logger = logging.getLogger("Client")
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "3.1.1"
-COMPATIBLE_VERSIONS = ["3.1.0"]
+CLIENT_VERSION = "3.1.2"
+COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -257,6 +257,21 @@ class MSMCommandProcessor(SuperCommandProcessor):
         """Run this command if the roster is bugged (E.g. Multiple characters appear over Mario's icon)
         Make sure your paths in host.yaml are set! If you just set them, you'll need to restart the client."""
         asyncio.create_task(self.ctx.reset_game())
+
+    def _cmd_ff_roster_fix(self):
+        """This is a roster fix specifically for if you have characters in the final 2 columns that won't unlock.
+
+        This temporarily unlocks 2 characters that unlock the full roster for 5 seconds. Please listen to what the client says."""
+
+        asyncio.create_task(self.ff_roster_fix())
+
+    async def ff_roster_fix(self):
+        self.ctx.ff_roster_override = True
+        logger.info("Please exit and re-enter the roster.")
+        logger.info("Please wait 5 seconds.")
+        await asyncio.sleep(5)
+        self.ctx.ff_roster_override = False
+        logger.info("Please exit and re-enter the roster again.")
 
     def _cmd_unlock_tabs(self):
         """This command unlocks the tabs if they are already not unlocked"""
@@ -667,6 +682,7 @@ class MSMContext(SuperContext):
         self.start_process = True
         self.force_unhooked = False
         self.overriding_ff_unlocks = False
+        self.ff_roster_override = False
         self.handled_gecko_codes = False
         self.game_session_active = False
         self.active_game_version = None
@@ -1554,9 +1570,6 @@ class MSMContext(SuperContext):
             if char in ["slime", "ninja", "white_mage", "black_mage"] and self.overriding_ff_unlocks:
                 return
 
-            # Format character name for value
-            item_name = f"{char.replace('_', ' ').title()}"
-
             # Have separate values for characters with costumes, adding values can equal different combinations
             if char == "yoshi":
                 value = self.yoshi_unlocks_value()
@@ -1576,7 +1589,10 @@ class MSMContext(SuperContext):
                 value = self.slime_unlocks_value()
             else:
                 # Else, value is 1 if the item name is in characters, if not it's 0
-                value = 1 if item_name in self.unlocked_characters else 0
+                value = 1 if char.replace('_', ' ').title() in self.unlocked_characters else 0
+
+            if self.ff_roster_override and char in ["mario", "toad"]:
+                value = 1
 
             sports_classes = [
                 BasketballAddresses,
