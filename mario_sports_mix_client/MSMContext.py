@@ -38,8 +38,8 @@ from .common_address_library import AddressLib
 logger = logging.getLogger("Client")
 
 id_to_name = {data.id: name for name, data in item_table.items()}
-CLIENT_VERSION = "3.1.2"
-COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1"]
+CLIENT_VERSION = "3.1.3"
+COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1", "3.1.2"]
 
 not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -1229,7 +1229,7 @@ class MSMContext(SuperContext):
         Has to be run right after start up because JIT cache is stupid"""
 
         if self.game_interface.dolphin_client.is_hooked():
-            
+
             if dc.GAME_VERSION == "NTSC-U":
                 self.game_interface.dolphin_client.write_byte(0x8161A413, 3)
                 self.game_interface.dolphin_client.write_byte(0x8161A41F, 3)
