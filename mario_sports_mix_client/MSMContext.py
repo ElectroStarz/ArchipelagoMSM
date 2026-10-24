@@ -1229,10 +1229,16 @@ class MSMContext(SuperContext):
         Has to be run right after start up because JIT cache is stupid"""
 
         if self.game_interface.dolphin_client.is_hooked():
-            self.game_interface.dolphin_client.write_byte(0x81619253, 3)
-            self.game_interface.dolphin_client.write_byte(0x8161925f, 3)
-            self.game_interface.dolphin_client.write_byte(0x8161926b, 3)
-            self.game_interface.dolphin_client.write_byte(0x81619277, 3)
+            if dc.GAME_VERSION == "NTSC-U":
+                self.game_interface.dolphin_client.write_byte(0x8161A413, 3)
+                self.game_interface.dolphin_client.write_byte(0x8161A41F, 3)
+                self.game_interface.dolphin_client.write_byte(0x8161A42B, 3)
+                self.game_interface.dolphin_client.write_byte(0x8161A437, 3)
+            else:
+                self.game_interface.dolphin_client.write_byte(0x81619253, 3)
+                self.game_interface.dolphin_client.write_byte(0x8161925f, 3)
+                self.game_interface.dolphin_client.write_byte(0x8161926b, 3)
+                self.game_interface.dolphin_client.write_byte(0x81619277, 3)
 
 
     def update_connection_status(self):
