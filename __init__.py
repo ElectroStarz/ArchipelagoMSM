@@ -82,6 +82,7 @@ class MSMWorld(World):
     ut_can_gen_without_yaml = True
     ut_generation_options = (
         "enabled_sports",
+        "restrict_sports_mix",
         "include_tournaments",
         "include_exhibition",
         "include_alt_paths",
@@ -98,6 +99,7 @@ class MSMWorld(World):
         "boss_locations",
         "party_mode",
         "start_with_random_mushroom_cups",
+        "start_with_mushroom_cup",
         "character_sanity",
         "court_sanity",
         "special_sanity",
@@ -187,11 +189,24 @@ class MSMWorld(World):
             "v_points": {"value": self.options.v_points_win.value, "enabled": True}, # Volleyball always has win points
         }
 
-        # Alt Path should only be enable with Tournaments
+        # Alt Path should only be enabled with Tournaments
         if self.options.include_alt_paths.value and not self.options.include_tournaments.value:
             raise OptionError(
                 f"[Mario Sports Mix] {self.player_name} has Alt Paths enabled but they don't have Tournaments enabled!"
                 f"How are you expecting to access them?!"
+            )
+
+        if self.options.include_alt_paths.value and not self.options.enabled_sports.value:
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name} has Alt Paths enabled yet they have no enabled main sports!"
+            )
+
+        # Sports Mix doesn't send combined alt path checks so they need a main sport
+        if (self.options.include_alt_paths.value and self.options.alt_path_type.value >= 2
+                and not main_sports_enabled):
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name} has combined Alt Paths enabled but no main sport enabled, "
+                f"Sports Mix doesn't have any combined Alt Path checks!"
             )
 
         # Filter to get values only if 'enabled' is True
@@ -246,6 +261,13 @@ class MSMWorld(World):
             main_sports_enabled
         )
         has_party_match = bool(self.options.party_mode.value)
+
+        # Party Modes don't count for Special Sanity, needs a cup or exhibition match
+        if self.options.special_sanity.value and not (has_tournament_match or has_exhibition_match):
+            raise OptionError(
+                f"[Mario Sports Mix] {self.player_name}'s Special Sanity requires at least one playable "
+                f"tournament or exhibition match."
+            )
 
         if ((self.options.character_sanity.value or self.options.special_sanity.value) and
                 not (has_tournament_match or has_exhibition_match or has_party_match)):
@@ -320,13 +342,18 @@ class MSMWorld(World):
 
             # Goal/Boss Stuff
             "goal_condition": self.options.goal_condition.value,
+            "boss_locations": self.options.boss_locations.value,
             "behemoth_hp": self.options.behemoth_hp.value,
             "behemoth_king_hp": self.options.behemoth_king_hp.value,
             "win_cups_amount": self.options.win_cups_amount.value,
 
             # Unlock Stuff
             "enabled_sports": self.options.enabled_sports.value,
+            "restrict_sports_mix": self.options.restrict_sports_mix.value,
+            "include_tournaments": self.options.include_tournaments.value,
+            "include_exhibition": self.options.include_exhibition.value,
             "start_with_mushroom_cup": self.options.start_with_mushroom_cup.value,
+            "start_with_random_mushroom_cups": self.options.start_with_random_mushroom_cups.value,
             "sports_mix_unlock": self.options.sports_mix_unlock.value,
             "exhibition_difficulties": self.options.exhibition_difficulties.value,
             "hard_tournament_difficulty": self.options.hard_tournament_difficulty.value,

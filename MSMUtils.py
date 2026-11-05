@@ -57,7 +57,7 @@ def generate_exhibition_locations(sports, ex_type, difficulties):
             # Universal exhibitions still need at least one main sport to play.
             # Sports Mix by itself cannot satisfy the exhibition rule.
             if any(sport in courts_by_sport for sport in sports):
-                for court in courts_list:
+                for court in get_universal_exhibition_courts(sports):
                     locations.append(f"Exhibition: Beat {court} ({diff})")
 
     return locations
@@ -72,3 +72,23 @@ def get_enabled_sport_courts(enabled_sports):
     enabled_courts.add("Behemoth Stage")
 
     return enabled_courts
+
+
+def get_progressive_court_count(enabled_sports):
+    """How many Progressive Courts create_courts makes."""
+    return len(get_enabled_sport_courts(enabled_sports))
+
+
+def get_progressive_cup_count(enabled_sports, hard_enabled):
+    """How many Progressive Cups create_cups makes (3, +3 for Hard, +3 for Sports Mix)."""
+    count = 3
+    if hard_enabled:
+        count += 3
+    if "Sports Mix" in enabled_sports:
+        count += 3
+    return count
+
+def get_universal_exhibition_courts(enabled_sports):
+    """Courts Universal exhibitions can use, only ones the enabled sports can unlock."""
+    reachable = get_enabled_sport_courts(enabled_sports)
+    return [court for court in courts_list if court in reachable]

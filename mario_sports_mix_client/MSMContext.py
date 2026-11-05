@@ -37,14 +37,13 @@ from .common_address_library import AddressLib
 
 logger = logging.getLogger("Client")
 
-id_to_name = {data.id: name for name, data in item_table.items()}
 CLIENT_VERSION = "3.1.3"
 COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1", "3.1.2"]
 
-not_match_prefix = ["s39", "s34", "s21", "s31", "s32", "s33"]
+NOT_MATCH_PREFIXES = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
 # Messages that get displayed when the user does /status
-status_messages = {
+STATUS_MESSAGES = {
     ConnectionState.IN_MATCH: "In Match",
     ConnectionState.IN_BOSS: "In Boss",
     ConnectionState.IN_MENU: "In Main Menu",
@@ -57,7 +56,7 @@ status_messages = {
     ConnectionState.CONNECTED: "Connected to Dolphin!",
 }
 
-player_score_addresses = [
+PLAYER_SCORE_ADDRESSES = [
     PlayerAddresses.Score.score_period_1,
     PlayerAddresses.Score.score_period_2,
     PlayerAddresses.Score.score_period_3,
@@ -65,7 +64,7 @@ player_score_addresses = [
     PlayerAddresses.Score.score_period_5,
 ]
 
-opponent_score_addresses = [
+OPPONENT_SCORE_ADDRESSES = [
     OpponentAddresses.Score.score_period_1,
     OpponentAddresses.Score.score_period_2,
     OpponentAddresses.Score.score_period_3,
@@ -73,14 +72,14 @@ opponent_score_addresses = [
     OpponentAddresses.Score.score_period_5,
 ]
 
-character_names = [
+CHARACTER_NAMES = [
     "mario", "luigi", "peach", "daisy", "yoshi", "wario", "waluigi",
     "donkey_kong", "diddy_kong", "toad", "bowser", "bowser_jr",
     "moogle", "white_mage", "black_mage", "ninja", "cactuar", "slime"
 ]
 
 # Court IDs in the order they appear in the cups
-tournament_round_stages = {
+TOURNAMENT_ROUND_COURTS = {
     "Basketball": {
         "Mushroom": ["s01", "s02", "s05"],
         "Flower": ["s06", "s17", "s07"],
@@ -103,13 +102,13 @@ tournament_round_stages = {
     },
 }
 
-tournament_map_cups = {
+TOURNAMENT_MAP_CUPS = {
     "s31": "Mushroom Cup",
     "s32": "Flower Cup",
     "s33": "Star Cup",
 }
 
-id_to_char = {
+ID_TO_CHARACTER = {
     255: "None",
     0: "Mario", 1: "Luigi", 2: "Peach", 3: "Daisy", 4: "Yoshi",
     5: "Wario", 6: "Waluigi", 7: "Donkey Kong", 8: "Diddy Kong", 9: "Toad",
@@ -119,7 +118,7 @@ id_to_char = {
 }
 
 # Costumes linked to their ID with the character
-costume_database = {
+COSTUME_DATABASE = {
     "Yoshi": {1: "Pink Yoshi", 2: "Light Blue Yoshi", 3: "Yellow Yoshi"},
     "Toad": {1: "Blue Toad", 2: "Green Toad", 3: "Yellow Toad"},
     "Slime": {1: "She-Slime", 2: "Metal Slime"},
@@ -136,6 +135,7 @@ LOCATION_STORAGE_CATEGORY = "msm_locations"
 CUSTOM_STORAGE_CATEGORY = "msm_customization"
 # Build the reverse lookup once so persisted AP location IDs can be shown as local names.
 LOCATION_ID_TO_NAME = {location_id: name for name, location_id in LOCATION_NAME_TO_ID.items()}
+ITEM_ID_TO_NAME = {data.id: name for name, data in item_table.items()}
 
 
 class MSMCommandProcessor(SuperCommandProcessor):
@@ -180,9 +180,10 @@ class MSMCommandProcessor(SuperCommandProcessor):
         except ValueError:
             logger.info(f"Error: '{amount}' is not a valid number! Please enter an integer.")
 
-    def _cmd_read_address(self, address: str, addr_type: str, *pointers: str):
+    def _cmd_read_address(self, no_offset: str, address: str, addr_type: str, *pointers: str):
         """Read the value of any address - Used for diagnostic purposes.
-        :param address: Should look like 0x80000000 (8 digits after 0x),
+        :param no_offset: Don't use the offset when calculating what address to read. Only required for NTSC-U (y/n).
+        :param address: Should look like 0x80000000 (8 digits after 0x).
         :param addr_type: Any from Byte, Halfword, Word, Float or String.
         :param pointers: Optional and should look like 0x1F4, 0x8,"""
 
@@ -215,6 +216,8 @@ class MSMCommandProcessor(SuperCommandProcessor):
         client = self.ctx.game_interface.dolphin_client
         result = ""
 
+        no_offset = True if no_offset.casefold() == "y" else False
+
         match addr_type.lower():
             case "byte":
                 result = client.read_byte(final_address)
@@ -234,8 +237,8 @@ class MSMCommandProcessor(SuperCommandProcessor):
         # Format final_address with hex() makes it easier to read back.
         if dc.GAME_VERSION == "PAL":
             log_message = f"[Memory Read - PAL] {addr_type.title()} at {hex(final_address)}. Result: {result}"
-        elif dc.GAME_VERSION == "NTSC-U" and is_save_addr(address):
-            log_message = f"[Memory Read - NTSC-U] {addr_type.title()} at {hex(final_address)} (In Exceptions). Result: {result}"
+        elif dc.GAME_VERSION == "NTSC-U" and (is_save_addr(address) or no_offset):
+            log_message = f"[Memory Read - NTSC-U] {addr_type.title()} at {hex(final_address)} (In Exceptions/Override). Result: {result}"
         elif dc.GAME_VERSION == "NTSC-U":
             log_message = f"[Memory Read - NTSC-U] {addr_type.title()} at {hex(final_address)} (Original Address: {address}). Result: {result}"
         else:
@@ -246,7 +249,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
 
     def _cmd_status(self):
         """Display the current dolphin connection status."""
-        logger.info(f"Connection Status: {status_messages[self.ctx.connection_state]}")
+        logger.info(f"Connection Status: {STATUS_MESSAGES[self.ctx.connection_state]}")
 
     def _cmd_reapply_unlocks(self):
         """Reapply unlocks if you don't have them!"""
@@ -300,6 +303,19 @@ class MSMCommandProcessor(SuperCommandProcessor):
         """Manually reset the cached values if address errors are coming up when switching regions"""
         self.ctx.addresslib.reset_all_addresses(logger)
 
+    def _cmd_goal_status(self):
+        """Prints the status of your goal"""
+
+        if self.ctx.slot:
+            match self.ctx.goal_condition:
+                case 1: logger.info(f"Behemoth: {'not' if not self.ctx.server_goaled else ''} defeated")
+                case 2: logger.info(f"Behemoth King: {'not' if not self.ctx.server_goaled else ''} defeated")
+                case 3: logger.info(f"Win Cups: {len(self.ctx.cups_won)}/{self.ctx.win_cups_amount}")
+                case 4: logger.info(f"Exhibition Tour: {len(self.ctx.exhibitions_won)}/{self.ctx.num_ex_locations}")
+                case 5: logger.info(f"Party Palooza: {len(self.ctx.party_won)}/30")
+        else:
+            logger.info("Not connected to a slot!")
+
     def _cmd_super_debug(self):
         """Prints out every piece of debug information I would want to know"""
         try:
@@ -317,6 +333,7 @@ class MSMCommandProcessor(SuperCommandProcessor):
             f"Match Status={self.ctx.game_interface.match_status()}\n"
             
             f"\n=== Boss/Goal Info ===\n"
+            f"Goal={self.ctx.goal_condition}\n"
             f"Behemoth={self.ctx.is_behemoth}, Behemoth King={self.ctx.is_behemoth_king}\n"
             f"Current HP={behemoth_hp}\n"
             f"Server Recognised Goal={self.ctx.server_goaled}\n"
@@ -971,7 +988,7 @@ class MSMContext(SuperContext):
                 continue
 
             item_id = item.item if hasattr(item, "item") else item[0]
-            item_name = id_to_name.get(item_id)
+            item_name = ITEM_ID_TO_NAME.get(item_id)
 
             if not item_name:
                 self.debug_log(f"Skipping unknown item id {item_id} at index {item_index}")
@@ -1409,7 +1426,7 @@ class MSMContext(SuperContext):
 
         ready_game = False
 
-        if match_status == 0 and court_id not in not_match_prefix:
+        if match_status == 0 and court_id not in NOT_MATCH_PREFIXES:
             if mode in ["Basketball", "Dodgeball", "Hockey"]:
                 ready_game = timer < max_time
             else:
@@ -1467,7 +1484,7 @@ class MSMContext(SuperContext):
 
         for index, network_item in enumerate(self.items_received):
             item_id = network_item.item
-            item_name = id_to_name.get(item_id)
+            item_name = ITEM_ID_TO_NAME.get(item_id)
             if index not in self.items_handled:
                 if item_name is None:
                     continue
@@ -1572,7 +1589,7 @@ class MSMContext(SuperContext):
     async def handle_all_characters(self):
         """Handles the unlocking of characters using functions for characters with costume"""
 
-        for char in character_names:
+        for char in CHARACTER_NAMES:
 
             if char in ["slime", "ninja", "white_mage", "black_mage"] and self.overriding_ff_unlocks:
                 return
@@ -3329,7 +3346,7 @@ class MSMContext(SuperContext):
 
             elif self.character_sanity == 2:
                 for char, costume in zip(char_list, costume_list):
-                    if char in costume_database and costume != 0:
+                    if char in COSTUME_DATABASE and costume != 0:
                         await self.send_costume_character_sanity(*char_list, *costume_list)
                     else:
                         await self.send_character_character_sanity(*char_list)
@@ -3371,8 +3388,8 @@ class MSMContext(SuperContext):
 
         for character, costume_byte in zipped:
 
-            if character in costume_database and costume_byte not in (0, 255) and character != "None":
-                costume_db = costume_database[character]
+            if character in COSTUME_DATABASE and costume_byte not in (0, 255) and character != "None":
+                costume_db = COSTUME_DATABASE[character]
 
                 # Fetch the string name
                 costume_name = costume_db.get(costume_byte, None)
@@ -3393,7 +3410,7 @@ class MSMContext(SuperContext):
         court_id, court_name = self.game_interface.get_court()
 
         if court_name is not None and court_name in self.unlocked_courts:
-            if court_id not in not_match_prefix:
+            if court_id not in NOT_MATCH_PREFIXES:
                 await self.check_location(f"Win on {court_name}")
 
     # --- Special Sanity ---
@@ -3867,7 +3884,7 @@ class MSMContext(SuperContext):
                         if mode != "Harmony Hustle":
                             # Volleyball is stupid
                             if mode == "Volleyball":
-                                for score in opponent_score_addresses:
+                                for score in OPPONENT_SCORE_ADDRESSES:
                                     self.game_interface.dolphin_client.write_word(get_address(score), 500)
 
                             else:
@@ -3900,7 +3917,7 @@ class MSMContext(SuperContext):
                             self.game_interface.dolphin_client.write_word(addr, new_points)
                             total_points = sum(
                                 self.game_interface.dolphin_client.read_word(get_address(addr)) for addr in
-                                opponent_score_addresses)
+                                OPPONENT_SCORE_ADDRESSES)
                             logger.info(f"Opponent now has {total_points} points!")
                         else:
                             # Lists start at 0, we need to take away one from the value
@@ -3923,7 +3940,7 @@ class MSMContext(SuperContext):
                                      PlayerAddresses.character_3]
 
                             value = self.game_interface.dolphin_client.read_byte(chars[random_char])
-                            character = id_to_char[value]
+                            character = ID_TO_CHARACTER[value]
 
                             logger.info(f"Watch out! It may not look like it, but {character} is on {health} HP!")
 
@@ -3962,7 +3979,7 @@ class MSMContext(SuperContext):
 
         # If we're not in the state where we've died to deathlink, or we're in some kind of menu/cutscene,
         # set received_death to false
-        if (match_status == 0 and (self.timer_reset() and self.mode_has_timer(mode))) or court_id in not_match_prefix:
+        if (match_status == 0 and (self.timer_reset() and self.mode_has_timer(mode))) or court_id in NOT_MATCH_PREFIXES:
             self.received_death = False
 
         if mode == "Volleyball" and match_status == 0 and timer != 1:
@@ -4166,7 +4183,7 @@ class MSMContext(SuperContext):
                 # Check the 16th's place to see if already rando'd or not (also do you even call it the 16th's place idk)
 
                 if not ((mode >> 4) == 1 or (mode >> 4) == 9):
-                    new_stage = int(tournament_round_stages[new_sport][current_cup][round - 1][-2:])
+                    new_stage = int(TOURNAMENT_ROUND_COURTS[new_sport][current_cup][round - 1][-2:])
 
                     self.game_interface.dolphin_client.write_byte(mode_address, sports_to_value[new_sport] + 0x10)
                     self.game_interface.dolphin_client.write_byte(stage_address, new_stage)

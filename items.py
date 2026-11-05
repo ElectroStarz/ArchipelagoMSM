@@ -626,7 +626,7 @@ def create_all_items(world: "MSMWorld") -> None:
     sws = world.options.start_with_sports.value
     if sws != 0:
         precollect = world.random.sample(enabled_main_sports, min(sws, len(enabled_main_sports)))
-        
+
         for sport in enabled_main_sports:
             if sport in precollect:
                 world.push_precollected(world.create_item(sport))
@@ -740,7 +740,11 @@ def create_courts(world: "MSMWorld", itempool, precollected_courts):
             for court in other_courts:
                 itempool.append(world.create_item(court))
         else:
-            if world.options.start_with_mushroom_cup.value == StartWithMushroomCup.option_random_cups:
+            # Random cup start gives the mushroom courts out in create_cups,
+            # no cups means nothing makes them so they have to go in the pool
+            has_cups = bool(world.options.include_tournaments.value and world.options.enabled_sports.value)
+
+            if world.options.start_with_mushroom_cup.value == StartWithMushroomCup.option_random_cups and has_cups:
                 for court in other_courts:
                     itempool.append(world.create_item(court))
             else:
@@ -749,8 +753,8 @@ def create_courts(world: "MSMWorld", itempool, precollected_courts):
 
     elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
         total_courts = MSMUtils.get_enabled_sport_courts(world.options.enabled_sports)
-        total_court_count = len(total_courts)
-        precollect_amount = len([court for court in total_courts if court in ["Mario Stadium", "Peach's Castle"
+        total_court_count = MSMUtils.get_progressive_court_count(world.options.enabled_sports)
+        precollect_amount = len([court for court in total_courts if court in ["Mario Stadium", "Peach's Castle",
                                                                               "Koopa Troopa Beach", "Toad Park", "DK Dock"]])
 
         if world.options.start_with_mushroom_cup.value != StartWithMushroomCup.option_none:
@@ -774,15 +778,9 @@ def create_cups(world: "MSMWorld", itempool, precollected_courts):
     # --- Progressive Cups ---
     if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
 
-        # Base: 3 Standard Cups (Mushroom, Flower, Star)
-        total_progressive_cups = 3
-
-        # If Hard mode is enabled, add 3 more for the Hard Tournament tiers
-        if world.options.hard_tournament_difficulty.value:
-            total_progressive_cups += 3  # 6 items
-
-        if "Sports Mix" in enabled_sports:
-            total_progressive_cups += 3  # 9 items max
+        # Same count rules.py uses so the thresholds can't go past what exists
+        hard_enabled = bool(world.options.hard_tournament_difficulty.value)
+        total_progressive_cups = MSMUtils.get_progressive_cup_count(enabled_sports, hard_enabled)
 
         start_option = world.options.start_with_mushroom_cup.value
 
@@ -793,7 +791,8 @@ def create_cups(world: "MSMWorld", itempool, precollected_courts):
         elif start_option == StartWithMushroomCup.option_hard_difficulty:
             precollected_count = 1  # Starts with Tier 1
         elif start_option in (StartWithMushroomCup.option_both, StartWithMushroomCup.option_random_cups):
-            precollected_count = 2  # Starts with Tier 1 and Tier 2 equivalent
+            # Tier 2 is Mushroom Hard, only exists with Hard Tournaments on
+            precollected_count = 2 if hard_enabled else 1
 
         # Push free starting levels to inventory
         for _ in range(precollected_count):
@@ -1051,6 +1050,11 @@ def create_item_with_correct_classification(world: "MSMWorld", name: str) -> MSM
     # Character Sanity (Costumes)
     if world.options.character_sanity.value == CharacterSanity.option_characters_and_costumes:
         if name in character_costumes:
+            classification = IC.progression
+
+    # Special Sanity
+    if world.options.special_sanity.value:
+        if name in characters or name in miis:
             classification = IC.progression
 
     return MSMItem(name, classification, ITEM_NAME_TO_ID[name], world.player)

@@ -2329,7 +2329,7 @@ def create_regular_locations(world: MSMWorld) -> None:
 
                 locations = get_location_names_with_ids([
                     f"Exhibition: Beat {court} ({difficulty})"
-                    for court in courts_list
+                    for court in get_universal_exhibition_courts(world.options.enabled_sports.value)
                 ])
 
                 world.get_region("Exhibition").add_locations(locations, MSMLocation)
@@ -2419,16 +2419,13 @@ def create_regular_locations(world: MSMWorld) -> None:
 
         # An exhibition option with no selected difficulties creates no matches,
         # so it must not create otherwise-unreachable Court Sanity checks.
-        if (world.options.include_exhibition.value and
-                world.options.exhibition_difficulties.value and
-                enabled_main_sports):
-
+        if world.options.include_exhibition.value and world.options.exhibition_difficulties.value and enabled_main_sports:
 
             if world.options.exhibition_type.value == ExhibitionType.option_all_sports:
                 for sport in enabled_main_sports:
                     playable_courts.update(exhibition_courts[sport])
             else:
-                playable_courts.update(courts_list)
+                playable_courts.update(get_universal_exhibition_courts(world.options.enabled_sports.value))
 
         for mode in world.options.party_mode.value:
             playable_courts.update(party_mode_courts.get(mode, set()))

@@ -127,7 +127,21 @@ party_mode_to_dict = {
 class DevException(Exception):
     pass
 
-# --- NEW HELPER ENGINE ---
+# --- HELPER ENGINE ---
+
+def _clamp_progressive_courts(world: MSMWorld, needed: int) -> int:
+    """Caps the threshold at how many Progressive Courts actually exist."""
+    return min(needed, get_progressive_court_count(world.options.enabled_sports.value))
+
+
+def _clamp_progressive_cups(world: MSMWorld, needed: int) -> int:
+    """Caps the threshold at how many Progressive Cups actually exist."""
+    total = get_progressive_cup_count(
+        world.options.enabled_sports.value,
+        bool(world.options.hard_tournament_difficulty.value),
+    )
+    return min(needed, total)
+
 
 def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: str | None = None, round_num: int | None = 1, cup_name: str | None = None) -> Rule:
     """Dynamically returns Progressive Court or Individual Court."""
@@ -161,7 +175,7 @@ def court_rule(world: MSMWorld, court_name: str, sm: bool = False, pm: str | Non
             return Has(court_name)
 
     elif world.options.court_unlock_type.value == CourtUnlockType.option_progressive_court:
-        return Has("Progressive Court", courts_dict[court_name])
+        return Has("Progressive Court", _clamp_progressive_courts(world, courts_dict[court_name]))
 
     else:
         return Has(court_name)
@@ -234,8 +248,13 @@ def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
     cup_tiers = ["Mushroom", "Flower", "Star"]
     base_index = cup_tiers.index(cup_name)  # 0, 1, or 2
 
+    # Mushroom Hard only exists with Hard Tournaments on, so don't shift
+    # the Normal cups up without it or Star ends up needing a 4th item
+    hard_enabled = bool(world.options.hard_tournament_difficulty.value)
+    start_both = (world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both) and hard_enabled
+
     if category == "Normal":
-        if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both:
+        if start_both:
             if "Mushroom" in cup_name:
                 return base_index + 1  # 1
             else:
@@ -243,7 +262,7 @@ def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
         else:
             return base_index + 1  # 1
     elif category == "Hard":
-        if world.options.start_with_mushroom_cup == StartWithMushroomCup.option_both:
+        if start_both:
             if "Mushroom" in cup_name:
                 return base_index + 2  # 2nd Prog item is now Mushroom Cup (Hard)
             else:
@@ -263,7 +282,7 @@ def get_unified_cup_level(world: MSMWorld, category: str, cup_name: str) -> int:
 def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str) -> Rule:
     """Returns either the Unified Progressive item requirement, or the Individual item requirement."""
     if world.options.cup_unlock_type.value == CupUnlockType.option_progressive_cup:
-        needed_count = get_unified_cup_level(world, category, cup_name)
+        needed_count = _clamp_progressive_cups(world, get_unified_cup_level(world, category, cup_name))
         return Has("Progressive Cup", needed_count)
     else:
         # If Sports Mix
@@ -277,7 +296,7 @@ def cup_rule(world: MSMWorld, sport: str, cup_name: str, category: str) -> Rule:
 def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int) -> Rule:
     enabled_sports = [sport for sport in world.options.enabled_sports.value]
 
-    if not world.options.restrict_sports_mix:
+    if not world.options.restrict_sports_mix.value:
         enabled_sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
 
     required_courts = set()
@@ -294,7 +313,7 @@ def sports_mix_court_rule(world: MSMWorld, cup_name: str, round_num: int) -> Rul
             if courts_dict[court] > needed_count:
                 needed_count = courts_dict[court]
 
-        return Has("Progressive Court", needed_count)
+        return Has("Progressive Court", _clamp_progressive_courts(world, needed_count))
 
     else:
         return HasAll(*required_courts)
@@ -531,7 +550,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                 if not enabled_main_sports:
                     continue
 
-                for court in courts_list:
+                for court in get_universal_exhibition_courts(world.options.enabled_sports.value):
                     location = world.get_location(f"Exhibition: Beat {court} ({difficulty})")
                     world.set_rule(
                         location,
@@ -738,8 +757,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                             f"{sport}: Beat {difficulty} {cup} Cup Round {round_num}"
                         )
 
-            if (world.options.include_exhibition.value and
-                    world.options.exhibition_difficulties.value):
+            if world.options.include_exhibition.value and world.options.exhibition_difficulties.value:
                 if world.options.exhibition_type.value == ExhibitionType.option_all_sports:
 
                     for sport in world.options.enabled_sports.value:
@@ -751,7 +769,7 @@ def set_all_location_rules(world: MSMWorld) -> None:
                                 )
 
                 elif any(sport in main_sports for sport in world.options.enabled_sports.value):
-                    if court_name in courts_list:
+                    if court_name in get_universal_exhibition_courts(world.options.enabled_sports.value):
                         for difficulty in world.options.exhibition_difficulties.value:
                             match_locations.append(
                                 f"Exhibition: Beat {court_name} ({difficulty})"
