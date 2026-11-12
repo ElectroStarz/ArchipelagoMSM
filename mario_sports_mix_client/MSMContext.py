@@ -3521,7 +3521,7 @@ class MSMContext(SuperContext):
             return
 
         court_id, court_name = self.game_interface.get_court()
-        
+
         if self.game_interface.get_mode() == "Harmony Hustle":
             court_name = hh_song_to_court.get(court_name, court_name)
         
@@ -4266,6 +4266,12 @@ class MSMContext(SuperContext):
 
     # === QOL Stuff ===
 
+    async def remove_tutorials(self):
+        self.game_interface.dolphin_client.write_byte(get_address(TutorialPlayed.basketball), 0x03)
+        self.game_interface.dolphin_client.write_byte(get_address(TutorialPlayed.volleyball), 0x03)
+        self.game_interface.dolphin_client.write_byte(get_address(TutorialPlayed.dodgeball), 0x03)
+        self.game_interface.dolphin_client.write_byte(get_address(TutorialPlayed.hockey), 0x03)
+
     async def restrict_sports_mix_sports(self):
 
         # Placeholder
@@ -4697,6 +4703,9 @@ class MSMContext(SuperContext):
         await self.replace_all_opponent_characters()
         await self.spawn_control()
 
+        # Remove tutorials
+        await self.remove_tutorials()
+        
         # Sports Mix Restriction
         await self.restrict_sports_mix_sports()
 
