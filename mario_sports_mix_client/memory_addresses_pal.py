@@ -175,9 +175,10 @@ class TournamentAddresses:
 
     alt_path_condition_fufilled = 0x804D6FBC  # Byte | Also checks for winning Alt Path missions
 
-    mushroom_alt_paths_unlocked = 0x804D6FFD  # Byte | Bit 0 = Normal | Bit 1 = Hard
+    # Old addresses, controlls current tournament only, keeping JIC.
+    """mushroom_alt_paths_unlocked = 0x804D6FFD  # Byte | Bit 0 = Normal | Bit 1 = Hard
     flower_alt_paths_unlocked = 0x804D701D  # Byte
-    star_alt_paths_unlocked = 0x804D703D  # Byte | Also controls Final Fantasy Character Spawns
+    star_alt_paths_unlocked = 0x804D703D  # Byte | Also controls Final Fantasy Character Spawns"""
 
     flower_inner_bridges_toggle = 0x804D701E  # Byte
     flower_outer_bridges_toggle = 0x804D701F  # Byte
@@ -370,6 +371,9 @@ class BasketballAddresses:
         tabs = 0x90226D98  # Byte | 2 = Normal, 3 = Normal + Hard
         normal_cups = 0x90226D99  # Byte
         hard_cups = 0x90226D9A  # Byte
+        mushroom_alt_paths_unlocked = 0x902274E5  # Byte | Bit 0 = Normal | Bit 1 = Hard
+        flower_alt_paths_unlocked = 0x90227505 # Byte | Bit 0 = Normal | Bit 1 = Hard
+        star_alt_paths_unlocked = 0x90227525 # Byte | Bit 0 = Normal | Bit 1 = Hard
 
     class Exhibition:
         tabs = 0x90226D38  # Byte
@@ -407,6 +411,9 @@ class DodgeballAddresses:
         tabs = 0x90226DB0  # Byte
         normal_cups = 0x90226DB1  # Byte
         hard_cups = 0x90226DB2  # Byte
+        mushroom_alt_paths_unlocked = 0x902284E5  # Byte | Bit 0 = Normal | Bit 1 = Hard
+        flower_alt_paths_unlocked = 0x90228505 # Byte | Bit 0 = Normal | Bit 1 = Hard
+        star_alt_paths_unlocked = 0x90228525 # Byte | Bit 0 = Normal | Bit 1 = Hard
 
     class Exhibition:
         tabs = 0x90226D50  # Byte
@@ -445,6 +452,9 @@ class VolleyballAddresses:
         tabs = 0x90226DA4  # Byte
         normal_cups = 0x90226DA5  # Byte
         hard_cups = 0x90226DA6  # Byte
+        mushroom_alt_paths_unlocked = 0x90227CE5  # Byte | Bit 0 = Normal | Bit 1 = Hard
+        flower_alt_paths_unlocked = 0x90227D05 # Byte | Bit 0 = Normal | Bit 1 = Hard
+        star_alt_paths_unlocked = 0x90227D25 # Byte | Bit 0 = Normal | Bit 1 = Hard
 
     class Exhibition:
         tabs = 0x90226D44  # Byte
@@ -482,6 +492,9 @@ class HockeyAddresses:
         tabs = 0x90226DBC  # Byte
         normal_cups = 0x90226DBD  # Byte
         hard_cups = 0x90226DBE  # Byte
+        mushroom_alt_paths_unlocked = 0x90228CE5  # Byte | Bit 0 = Normal | Bit 1 = Hard
+        flower_alt_paths_unlocked = 0x90228D05 # Byte | Bit 0 = Normal | Bit 1 = Hard
+        star_alt_paths_unlocked = 0x90228D25 # Byte | Bit 0 = Normal | Bit 1 = Hard
 
     class Exhibition:
         tabs = 0x90226D5C  # Byte
@@ -518,6 +531,9 @@ class SportsMixAddresses:
 
     class Tournament:
         cups = 0x90226D9C  # Byte
+        mushroom_alt_paths_unlocked = 0x902294E5  # Byte | 0 = No | 8 = Yes |
+        flower_alt_paths_unlocked = 0x90229505 # Byte | 0 = No | 8 = Yes |
+        star_alt_paths_unlocked = 0x90229525 # Byte | 0 = No | 8 = Yes |
 
 
 class BossAddresses:
