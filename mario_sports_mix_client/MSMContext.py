@@ -652,6 +652,7 @@ class MSMContext(SuperContext):
         self.custom_basket_time: int = 0
         self.enable_b_points: bool = False
         self.b_points_win: int = 0
+        self.b_bjr_multiplier: int = 0
         self.b_period: int = 0
 
         self.custom_dodge_time: int = 0
@@ -659,11 +660,13 @@ class MSMContext(SuperContext):
         self.d_max_health: int = 0
 
         self.v_points_win: int = 0
+        self.v_bjr_multiplier: int = 0
         self.v_period: int = 0
 
         self.custom_hockey_time: int = 0
         self.enable_h_points: bool = False
         self.h_points_win: int = 0
+        self.h_bjr_multiplier: int = 0
         self.h_period: int = 0
 
         self.party_modes: tuple = ()
@@ -1060,6 +1063,7 @@ class MSMContext(SuperContext):
             self.custom_basket_time = self.slot_data.get("basket_time", 2)
             self.enable_b_points = self.slot_data.get("enable_b_points_win", False)
             self.b_points_win = self.slot_data.get("b_points_win", 15)
+            self.b_bjr_multiplier = self.slot_data.get("bbjr_multiplier", 300)
             self.b_period = self.slot_data.get("b_period", 2)
 
             self.custom_dodge_time = self.slot_data.get("dodge_time", 3)
@@ -1067,11 +1071,13 @@ class MSMContext(SuperContext):
             self.d_max_health = self.slot_data.get("d_max_health", 100)
 
             self.v_points_win = self.slot_data.get("v_points_win", 15)
+            self.v_bjr_multiplier = self.slot_data.get("vbjr_multiplier", 200)
             self.v_period = self.slot_data.get("v_period", 2)
 
             self.custom_hockey_time = self.slot_data.get("hockey_time", 3)
             self.enable_h_points = self.slot_data.get("enable_h_points_win", False)
             self.h_points_win = self.slot_data.get("h_points_win", 15)
+            self.h_bjr_multiplier = self.slot_data.get("hbjr_multiplier", 300)
             self.h_period = self.slot_data.get("h_period", 2)
 
             # Party Mode Data
@@ -3023,8 +3029,8 @@ class MSMContext(SuperContext):
                 # Checks if the player OR opponent has reached the points to win, if so, set timer to 0 which ends
                 # the period
                 if court_name == "Bowser Jr. Blvd.":
-                    multiplied = (self.b_points_win * 5) + 50
-                    points_to_win = int(round(multiplied, 1))
+                    multiplied = self.b_points_win * (self.b_bjr_multiplier / 100.0)
+                    points_to_win = round(multiplied)
                 else:
                     points_to_win = self.b_points_win
 
@@ -3041,8 +3047,8 @@ class MSMContext(SuperContext):
 
         elif sport == "Volleyball":
             if court_name == "Bowser Jr. Blvd.":
-                multiplied = self.v_points_win * 2
-                points_to_win = int(round(multiplied, 1))
+                multiplied = self.v_points_win * (self.v_bjr_multiplier / 100.0)
+                points_to_win = round(multiplied)
             else:
                 points_to_win = self.v_points_win
 
@@ -3056,8 +3062,8 @@ class MSMContext(SuperContext):
                 # Checks if the player OR opponent has reached the points to win, if so, set timer to 0 which ends
                 # the period
                 if court_name == "Bowser Jr. Blvd.":
-                    multiplied = (self.h_points_win * 5) + 50
-                    points_to_win = int(round(multiplied, 1))
+                    multiplied = self.h_points_win * (self.h_bjr_multiplier / 100.0)
+                    points_to_win = round(multiplied)
                 else:
                     points_to_win = self.h_points_win
 
@@ -4705,7 +4711,7 @@ class MSMContext(SuperContext):
 
         # Remove tutorials
         await self.remove_tutorials()
-        
+
         # Sports Mix Restriction
         await self.restrict_sports_mix_sports()
 

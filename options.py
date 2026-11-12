@@ -364,14 +364,18 @@ class EnableBPointsWin(Choice):
 
 
 class BPointsToWin(Range):
-    """Set the required amount of points to win
-    NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
-    to the nearest 1 decimal place"""
+    """Set the required amount of points to win"""
     display_name = "Points to Win"
-    range_start = 10
-    range_end = 50
+    range_start = 1
+    range_end = 99
     default = 30
 
+class BBowserJrMultiplier(Range):
+    """Set what % multiplier is applied to Points to Win for Bowser Jr. Blvd"""
+    display_name = "Bowser Jr. Blvd. Multiplier"
+    range_start = 100
+    range_end = 1000
+    default = 300
 
 class BPeriod(Range):
     """How many periods do you want to be playing?
@@ -422,27 +426,29 @@ class DPeriod(Range):
     default = 1
 
 
-class DMaxHealth(Choice):
-    """How much health should everyone have?"""
+class DMaxHealth(Range):
+    """How much health should everyone have?
+    For reference, a standard dodgeball hit deals 30hp."""
     display_name = "Health Amount"
-    option_100 = 100
-    option_150 = 150
-    option_200 = 200
-    option_250 = 250
-    option_300 = 300
+    range_start = 1
+    range_end = 999
     default = 100
 
 
 # --- Volleyball ---
 class VPointsToWin(Range):
-    """Set the required amount of points to win
-    NOTE: The requirement for Bowser Jr. Blvd. is value x 2 rounded
-    to the nearest 1 decimal place"""
+    """Set the required amount of points to win"""
     display_name = "Points to Win"
-    range_start = 10
-    range_end = 20
+    range_start = 1
+    range_end = 99
     default = 10
 
+class VBowserJrMultiplier(Range):
+    """Set what % multiplier is applied to Points to Win for Bowser Jr. Blvd"""
+    display_name = "Bowser Jr. Blvd. Multiplier"
+    range_start = 100
+    range_end = 1000
+    default = 200
 
 class VPeriod(Range):
     """How many sets do you want to be playing?
@@ -496,14 +502,18 @@ class EnableHPointsWin(Choice):
 
 
 class HPointsToWin(Range):
-    """Set the required amount of points to win
-    NOTE: The requirement for Bowser Jr. Blvd. is (value x 5) + 50 rounded
-    to the nearest 1 decimal place"""
+    """Set the required amount of points to win"""
     display_name = "Points to Win"
-    range_start = 10
-    range_end = 50
-    default = 20
+    range_start = 1
+    range_end = 99
+    default = 10
 
+class HBowserJrMultiplier(Range):
+    """Set what % multiplier is applied to Points to Win for Bowser Jr. Blvd"""
+    display_name = "Bowser Jr. Blvd. Multiplier"
+    range_start = 100
+    range_end = 1000
+    default = 300
 
 class HPeriod(Range):
     """How many periods do you want to be playing?
@@ -674,6 +684,7 @@ msm_option_groups = [
         BasketTime,
         EnableBPointsWin,
         BPointsToWin,
+        BBowserJrMultiplier,
         BPeriod,
     ]),
     OptionGroup("Dodgeball Tournament Options", [
@@ -683,12 +694,14 @@ msm_option_groups = [
     ]),
     OptionGroup("Volleyball Tournament Options", [
         VPointsToWin,
+        VBowserJrMultiplier,
         VPeriod,
     ]),
     OptionGroup("Hockey Tournament Options", [
         HockeyTime,
         EnableHPointsWin,
         HPointsToWin,
+        HBowserJrMultiplier,
         HPeriod,
     ]),
     OptionGroup("Goal Options", [
@@ -768,6 +781,7 @@ class MSMOptions(PerGameCommonOptions):
     basket_time: BasketTime
     enable_b_points_win: EnableBPointsWin
     b_points_win: BPointsToWin
+    bbjr_multiplier: BBowserJrMultiplier
     b_period: BPeriod
 
     dodge_time: DodgeTime
@@ -775,11 +789,13 @@ class MSMOptions(PerGameCommonOptions):
     d_max_health: DMaxHealth
 
     v_points_win: VPointsToWin
+    vbjr_multiplier: VBowserJrMultiplier
     v_period: VPeriod
 
     hockey_time: HockeyTime
     enable_h_points_win: EnableHPointsWin
     h_points_win: HPointsToWin
+    hbjr_multiplier: HBowserJrMultiplier
     h_period: HPeriod
 
     # Party Mode
