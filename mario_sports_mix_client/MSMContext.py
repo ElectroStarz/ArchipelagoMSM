@@ -1894,6 +1894,9 @@ class MSMContext(SuperContext):
         current_cup = self.game_interface.get_tournament_cup()
         current_round = self.game_interface.get_tournament_round()
 
+        cups = ["Mushroom", "Flower", "Star"]
+        sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
+
         if self.alt_paths_enabled:
 
             # Flower Cup Bridges always accessible
@@ -1910,9 +1913,6 @@ class MSMContext(SuperContext):
             if self.alt_paths_always_spawn and current_node <= 17:
                 self.game_interface.dolphin_client.write_byte(alt_path_spawn, 1)
                 await self.check_write(alt_path_spawn, "byte", 1)
-
-            cups = ["Mushroom", "Flower", "Star"]
-            sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
 
             # Values for Mushroom, Flower, and Star Cup
             basketball_values = [0, 0, 0]
