@@ -225,24 +225,54 @@ class DeathlinkConsequence(Choice):
 
 
 # --- Action Specific Settings ---
-class DeathlinkOpponentScorePoints(Range):
+class DeathlinkOpponentScorePointsBasketball(Range):
     """How many points should the opponent get to send a deathlink?
     Requires Deathlink on & Every Number Of Points action"""
-    display_name = "[DL-A] Opponent Scores Points"
+    display_name = "[DL-A] Opponent Scores Points (Basketball)"
     range_start = 1
-    range_end = 20
+    range_end = 99
     default = 10
 
+class DeathlinkOpponentScorePointsVolleyball(Range):
+    """How many points should the opponent get to send a deathlink?
+    Requires Deathlink on & Every Number Of Points action"""
+    display_name = "[DL-A] Opponent Scores Points (Volleyball)"
+    range_start = 1
+    range_end = 99
+    default = 10
+
+class DeathlinkOpponentScorePointsHockey(Range):
+    """How many points should the opponent get to send a deathlink?
+    Requires Deathlink on & Every Number Of Points action"""
+    display_name = "[DL-A] Opponent Scores Points (Hockey)"
+    range_start = 1
+    range_end = 99
+    default = 10
 
 # --- Consequence Specific Settings ---
-class DeathlinkOpponentGetPoints(Range):
+class DeathlinkOpponentGetPointsBasketball(Range):
     """How many points should the opponent get when receiving a deathlink?
     Requires Deathlink on & Opponent Gains Point consequence"""
-    display_name = "[DL-C] Opponent Gets Points"
+    display_name = "[DL-C] Opponent Gets Points (Basketball)"
     range_start = 1
-    range_end = 20
+    range_end = 99
     default = 10
 
+class DeathlinkOpponentGetPointsVolleyball(Range):
+    """How many points should the opponent get when receiving a deathlink?
+    Requires Deathlink on & Opponent Gains Point consequence"""
+    display_name = "[DL-C] Opponent Gets Points (Volleyball)"
+    range_start = 1
+    range_end = 99
+    default = 10
+
+class DeathlinkOpponentGetPointsHockey(Range):
+    """How many points should the opponent get when receiving a deathlink?
+    Requires Deathlink on & Opponent Gains Point consequence"""
+    display_name = "[DL-C] Opponent Gets Points (Hockey)"
+    range_start = 1
+    range_end = 99
+    default = 10
 
 class DeathlinkBossHealthRecovered(Range):
     """What percentage of the boss' health should be recovered when sent a deathlink?
@@ -252,15 +282,14 @@ class DeathlinkBossHealthRecovered(Range):
     range_end = 100
     default = 20
 
-
 class DeathlinkDodgeballHealthLost(Range):
     """**ONLY FOR DODGEBALL**
     How much health will you lose when you get
     sent a deathlink if you're in dodgeball?"""
     display_name = "[DL-C] Dodgeball Health Lost"
-    range_start = 0
-    range_end = 100
-    default = 20
+    range_start = 1
+    range_end = 999
+    default = 30
 
 
 # === Sanity Settings ===
@@ -724,9 +753,13 @@ msm_option_groups = [
     OptionGroup("Deathlink Options", [
         Deathlink,
         DeathlinkAction,
-        DeathlinkOpponentScorePoints,
+        DeathlinkOpponentScorePointsBasketball,
+        DeathlinkOpponentScorePointsVolleyball,
+        DeathlinkOpponentScorePointsHockey,
         DeathlinkConsequence,
-        DeathlinkOpponentGetPoints,
+        DeathlinkOpponentGetPointsBasketball,
+        DeathlinkOpponentGetPointsVolleyball,
+        DeathlinkOpponentGetPointsHockey,
         DeathlinkBossHealthRecovered,
         DeathlinkDodgeballHealthLost,
     ]),
@@ -807,8 +840,12 @@ class MSMOptions(PerGameCommonOptions):
     deathlink: Deathlink
     deathlink_action: DeathlinkAction
     deathlink_consequence: DeathlinkConsequence
-    deathlink_opponent_scores_points: DeathlinkOpponentScorePoints
-    deathlink_opponent_get_points: DeathlinkOpponentGetPoints
+    deathlink_opponent_scores_points_basketball: DeathlinkOpponentScorePointsBasketball
+    deathlink_opponent_scores_points_volleyball: DeathlinkOpponentScorePointsVolleyball
+    deathlink_opponent_scores_points_hockey: DeathlinkOpponentScorePointsHockey
+    deathlink_opponent_get_points_basketball: DeathlinkOpponentGetPointsBasketball
+    deathlink_opponent_get_points_volleyball: DeathlinkOpponentGetPointsVolleyball
+    deathlink_opponent_get_points_hockey: DeathlinkOpponentGetPointsHockey
     deathlink_boss_health_recovered: DeathlinkBossHealthRecovered
     deathlink_dodgeball_health_lost: DeathlinkDodgeballHealthLost
 

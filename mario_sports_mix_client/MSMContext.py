@@ -341,9 +341,13 @@ class MSMCommandProcessor(SuperCommandProcessor):
             f"\n=== Deathlink Info ===\n"
             f"Enabled={self.ctx.deathlink_enabled}\n"
             f"Action={self.ctx.deathlink_action}\n"
-            f"DL-A Points={self.ctx.deathlink_o_scores_points}\n"
+            f"DL-A(B) Points={self.ctx.deathlink_o_scores_points_basketball}\n"
+            f"DL-A(V) Points={self.ctx.deathlink_o_scores_points_volleyball}\n"
+            f"DL-A(H) Points={self.ctx.deathlink_o_scores_points_hockey}\n"
             f"Consequence={self.ctx.deathlink_consequence}\n"
-            f"DL-C Opp Points={self.ctx.deathlink_o_get_points}\n"
+            f"DL-C(B) Opp Points={self.ctx.deathlink_o_get_points_basketball}\n"
+            f"DL-C(V) Opp Points={self.ctx.deathlink_o_get_points_volleyball}\n"
+            f"DL-C(H) Opp Points={self.ctx.deathlink_o_get_points_hockey}\n"
             f"DL-C Dodge Lost={self.ctx.deathlink_dodge_health_lost}\n"
             f"DL-C Boss Recover={self.ctx.deathlink_boss_recovered}\n"
             
@@ -643,8 +647,12 @@ class MSMContext(SuperContext):
         self.deathlink_enabled: bool = False
         self.deathlink_action: int = 0
         self.deathlink_consequence: int = 0
-        self.deathlink_o_get_points: int = 0
-        self.deathlink_o_scores_points: int = 0
+        self.deathlink_o_get_points_basketball: int = 0
+        self.deathlink_o_get_points_volleyball: int = 0
+        self.deathlink_o_get_points_hockey: int = 0
+        self.deathlink_o_scores_points_basketball: int = 0
+        self.deathlink_o_scores_points_volleyball: int = 0
+        self.deathlink_o_scores_points_hockey: int = 0
         self.deathlink_boss_recovered: float = 0.0
         self.deathlink_dodge_health_lost: int = 0
 
@@ -1049,8 +1057,13 @@ class MSMContext(SuperContext):
             self.deathlink_enabled = self.slot_data.get("deathlink", False)
             self.deathlink_action = self.slot_data.get("deathlink_action", 0)
             self.deathlink_consequence = self.slot_data.get("deathlink_consequence", 0)
-            self.deathlink_o_get_points = self.slot_data.get("deathlink_opponent_get_points", 3)
-            self.deathlink_o_scores_points = self.slot_data.get("deathlink_opponent_scores_points", 15)
+            self.deathlink_o_get_points_basketball = self.slot_data.get("deathlink_opponent_get_points_basketball", 3)
+            self.deathlink_o_get_points_volleyball = self.slot_data.get("deathlink_opponent_get_points_volleyball", 3)
+            self.deathlink_o_get_points_hockey = self.slot_data.get("deathlink_opponent_get_points_hockey", 3)
+            self.deathlink_o_scores_points_basketball = self.slot_data.get("deathlink_opponent_scores_points_basketball", 15)
+            self.deathlink_o_scores_points_volleyball = self.slot_data.get("deathlink_opponent_scores_points_volleyball", 15)
+            self.deathlink_o_scores_points_hockey = self.slot_data.get("deathlink_opponent_scores_points_hockey", 15)
+
             self.deathlink_boss_recovered = self.slot_data.get("deathlink_boss_health_recovered", 20)
             self.deathlink_dodge_health_lost = self.slot_data.get("deathlink_dodgeball_health_lost", 20)
 
@@ -1900,6 +1913,9 @@ class MSMContext(SuperContext):
         current_cup = self.game_interface.get_tournament_cup()
         current_round = self.game_interface.get_tournament_round()
 
+        cups = ["Mushroom", "Flower", "Star"]
+        sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
+
         if self.alt_paths_enabled:
 
             # Flower Cup Bridges always accessible
@@ -1917,8 +1933,7 @@ class MSMContext(SuperContext):
                 self.game_interface.dolphin_client.write_byte(alt_path_spawn, 1)
                 await self.check_write(alt_path_spawn, "byte", 1)
 
-            cups = ["Mushroom", "Flower", "Star"]
-            sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
+            
 
             # Values for Mushroom, Flower, and Star Cup
             basketball_values = [0, 0, 0]
@@ -3928,33 +3943,34 @@ class MSMContext(SuperContext):
                 await self.send_death(f"{self.player_names[self.slot]} has lost to the might of the Behemoth{type}...")
 
     def has_score_reached_threshold(self) -> bool:
-        """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points) in
+        """Check when the opponent has got the required amount of points (self.deathlink_o_scores_points_{sport}) in
         everything but dodgeball - Used for DL-C Opponent gains points. Returns True if yes, False if no"""
 
         addr = self.game_interface.get_opponent_score_addr(self.party_mode_opponent, True)
         current_opponent_score = self.game_interface.dolphin_client.read_word(addr)
         mode = self.game_interface.get_mode()
 
+        if mode not in ["Basketball", "Volleyball", "Hockey"]:
+            return False
+
         if self.previous_opponent_score is None:
             self.previous_opponent_score = current_opponent_score
             return False
 
-        # If the score drops, a new match started.
-        # Reset our tracker to the new lower score and return False.
         if current_opponent_score < self.previous_opponent_score:
             self.previous_opponent_score = current_opponent_score
             return False
 
-        # Check the difference
-        score_increase = current_opponent_score - self.previous_opponent_score
-
-        if mode in ["Basketball", "Volleyball", "Dodgeball", "Hockey"]:
-            needed = self.deathlink_o_scores_points
+        # Fun math fact given a number x, the next multiple of n > x is (floor(x/n) + 1) * n :D
+        if mode == "Basketball":
+            needed = ((self.previous_opponent_score // self.deathlink_o_scores_points_basketball)+1)*self.deathlink_o_scores_points_basketball
+        elif mode == "Volleyball":
+            needed = ((self.previous_opponent_score // self.deathlink_o_scores_points_volleyball)+1)*self.deathlink_o_scores_points_volleyball
         else:
-            needed = self.deathlink_o_scores_points * 20
+            needed = ((self.previous_opponent_score // self.deathlink_o_scores_points_hockey)+1)*self.deathlink_o_scores_points_hockey
 
         # If the threshold is met, update the tracker and return True
-        if score_increase >= needed:
+        if current_opponent_score >= needed:
             # Reset the "previous" score to the current one so it can start counting up again
             self.previous_opponent_score = current_opponent_score
             return True
