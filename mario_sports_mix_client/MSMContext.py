@@ -1463,7 +1463,7 @@ class MSMContext(SuperContext):
                     except RuntimeError:
                         ready_game = False
 
-        if timer == 0 and self.mode_has_timer(mode):
+        if timer == 0 and self.mode_has_timer(mode) and not self.game_interface.is_in_boss():
             ready_game = False
 
         # print(f"RG {ready_game}, SB {set_break}, MT_ST {match_started}")
@@ -2600,6 +2600,10 @@ class MSMContext(SuperContext):
         return player_score + opponent_score
 
     def update_scoring_item_suppression(self):
+
+        if self.game_interface.is_in_boss():
+            return
+        
         score_total = self.current_match_score_total()
 
         if self.last_match_score_total is None:
