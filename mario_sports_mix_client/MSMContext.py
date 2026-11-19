@@ -37,8 +37,8 @@ from .common_address_library import AddressLib
 
 logger = logging.getLogger("Client")
 
-CLIENT_VERSION = "3.1.4"
-COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1", "3.1.2", "3.1.3"]
+CLIENT_VERSION = "3.1.5"
+COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1", "3.1.2", "3.1.3", "3.1.4"]
 
 NOT_MATCH_PREFIXES = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
@@ -1444,7 +1444,7 @@ class MSMContext(SuperContext):
                     except RuntimeError:
                         ready_game = False
 
-        if timer == 0 and self.mode_has_timer(mode):
+        if if timer == 0 and self.mode_has_timer(mode) and not self.game_interface.is_in_boss():
             ready_game = False
 
         # print(f"RG {ready_game}, SB {set_break}, MT_ST {match_started}")
@@ -2579,6 +2579,10 @@ class MSMContext(SuperContext):
         return player_score + opponent_score
 
     def update_scoring_item_suppression(self):
+
+        if self.game_interface.is_in_boss():
+            return
+        
         score_total = self.current_match_score_total()
 
         if self.last_match_score_total is None:
