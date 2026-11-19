@@ -537,7 +537,7 @@ class SportsMixAddresses:
 
 
 class BossAddresses:
-    behemoth_hp = 0x805C1B50  # Float | Has Pointers | In CAL
+    behemoth_hp = 0x804D0F74  # Float | Has Pointers | In CAL
 
 
 class NTSCUAddresses:
