@@ -606,7 +606,7 @@ class MSMContext(SuperContext):
 
     settings = get_settings()["mario_sports_mix_settings"]
     auto_open: bool = settings["auto_open"]
-    dolphin_exe_path: str = settings["dolphin_exe_path"]
+    dolphin_path: str = settings["dolphin_path"]
     msm_iso_path: str = settings["msm_iso_path"]
 
     # Here as placeholders, most will be replaced upon connection by slot data
@@ -1215,7 +1215,7 @@ class MSMContext(SuperContext):
 
 
     def open_dolphin(self, batch_mode=True):
-        if not self.dolphin_exe_path:
+        if not self.dolphin_path:
             logger.info("Dolphin executable path not set in host.yaml")
             return False
 
@@ -1223,15 +1223,15 @@ class MSMContext(SuperContext):
             logger.info("Game file not set in host.yaml")
             return False
 
-        if not os.path.exists(self.dolphin_exe_path):
-            logger.info(f"Error: Dolphin executable not found at '{self.dolphin_exe_path}'")
+        if not os.path.exists(self.dolphin_path):
+            logger.info(f"Error: Dolphin executable not found at '{self.dolphin_path}'")
             return False
 
         if not os.path.exists(self.msm_iso_path):
             logger.info(f"Error: Game file not found at '{self.msm_iso_path}'")
             return False
 
-        cmd = [self.dolphin_exe_path, "-e", self.msm_iso_path]
+        cmd = [self.dolphin_path, "-e", self.msm_iso_path]
 
         if batch_mode:
             # Makes it so the Dolphin main window doesn't show up, only the game

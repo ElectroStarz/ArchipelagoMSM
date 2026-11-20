@@ -1,5 +1,6 @@
 from logging import Logger
 from typing import Any
+import os
 import psutil
 import dolphin_memory_engine as dme
 import asyncio
@@ -43,25 +44,24 @@ class DolphinClient:
 
     @staticmethod
     def get_running_dolphin_processes() -> list[str]:
-        """Return the names of running supported Dolphin processes."""
-        running_processes = []
-
-        # Iterate through all running processes across the OS
-        for proc in psutil.process_iter(['name']):
+        running = []
+        for proc in psutil.process_iter(['name', 'exe', 'cmdline']):
             try:
-                process_name = proc.info['name']
-                if process_name is None:
-                    continue
+                candidates = {proc.info['name']}
+                if proc.info.get('exe'):
+                    candidates.add(os.path.basename(proc.info['exe']))
+                cmdline = proc.info.get('cmdline') or []
+                if cmdline:
+                    candidates.add(os.path.basename(cmdline[0]))
 
-                # Windows adds .exe; normalise it and compare case-insensitively
-                # so the same aliases work on Windows, macOS, and Linux.
-                normalised_name = process_name.casefold().removesuffix(".exe")
-                if normalised_name in SUPPORTED_DOLPHIN_PROCESS_NAMES:
-                    running_processes.append(process_name)
+                for name in filter(None, candidates):
+                    normalised = name.casefold().removesuffix(".exe")
+                    if normalised in SUPPORTED_DOLPHIN_PROCESS_NAMES:
+                        running.append(name)
+                        break
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
-
-        return running_processes
+        return running
 
     @classmethod
     def check_for_dolphin(cls):

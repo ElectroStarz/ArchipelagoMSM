@@ -31,23 +31,15 @@ class MSMSettings(settings.Group):
             return super().browse(filetypes, **kwargs)
 
 
-    class DolphinExePath(settings.UserFilePath):
+    class DolphinPath(settings.UserFilePath):
         """A path to your installation of Dolphin Emulator"""
         is_exe = True
         required = True
 
         def browse(self, filetypes=None, **kwargs):
-            from Utils import is_windows
-
-            # Set up the file filter based on the operating system
-            if not filetypes:
-                # Windows uses .exe, macOS uses .app (or no extension for Linux binaries)
-                valid_exts = [".exe"] if is_windows else ["", ".app"]
-                filetypes = [("Dolphin Emulator", valid_exts)]
-
             return super().browse(filetypes, **kwargs)
 
 
     auto_open: AutoOpenMSM | bool = False
     msm_iso_path: MSMISOPath | str = MSMISOPath("mario_sports_mix.iso")
-    dolphin_exe_path: DolphinExePath | str = DolphinExePath("dolphin.exe")
+    dolphin_path: DolphinPath | str = DolphinPath("dolphin.exe")
