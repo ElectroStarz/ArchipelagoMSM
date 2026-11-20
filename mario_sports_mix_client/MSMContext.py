@@ -1444,7 +1444,7 @@ class MSMContext(SuperContext):
                     except RuntimeError:
                         ready_game = False
 
-        if if timer == 0 and self.mode_has_timer(mode) and not self.game_interface.is_in_boss():
+        if timer == 0 and self.mode_has_timer(mode) and not self.game_interface.is_in_boss():
             ready_game = False
 
         # print(f"RG {ready_game}, SB {set_break}, MT_ST {match_started}")
