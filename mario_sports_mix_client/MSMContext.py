@@ -1897,6 +1897,28 @@ class MSMContext(SuperContext):
         cups = ["Mushroom", "Flower", "Star"]
         sports = ["Basketball", "Dodgeball", "Volleyball", "Hockey"]
 
+        # Values for Mushroom, Flower, and Star Cup
+        basketball_values = [0, 0, 0]
+        dodgeball_values = [0, 0, 0]
+        volleyball_values = [0, 0, 0]
+        hockey_values = [0, 0, 0]
+        sports_mix_values = [0, 0, 0]
+        global_values = [0, 0, 0]
+
+        sport_values = {
+            "Basketball": basketball_values,
+            "Dodgeball": dodgeball_values,
+            "Volleyball": volleyball_values,
+            "Hockey": hockey_values,
+            "Sports Mix": sports_mix_values
+        }
+        sport_addresses = {
+            "Basketball": BasketballAddresses,
+            "Dodgeball": DodgeballAddresses,
+            "Volleyball": VolleyballAddresses,
+            "Hockey": HockeyAddresses,
+        }
+
         if self.alt_paths_enabled:
 
             # Flower Cup Bridges always accessible
@@ -1913,28 +1935,6 @@ class MSMContext(SuperContext):
             if self.alt_paths_always_spawn and current_node <= 17:
                 self.game_interface.dolphin_client.write_byte(alt_path_spawn, 1)
                 await self.check_write(alt_path_spawn, "byte", 1)
-
-            # Values for Mushroom, Flower, and Star Cup
-            basketball_values = [0, 0, 0]
-            dodgeball_values = [0, 0, 0]
-            volleyball_values = [0, 0, 0]
-            hockey_values = [0, 0, 0]
-            sports_mix_values = [0, 0, 0]
-            global_values = [0, 0, 0]
-
-            sport_values = {
-                "Basketball": basketball_values,
-                "Dodgeball": dodgeball_values,
-                "Volleyball": volleyball_values,
-                "Hockey": hockey_values,
-                "Sports Mix": sports_mix_values
-            }
-            sport_addresses = {
-                "Basketball": BasketballAddresses,
-                "Dodgeball": DodgeballAddresses,
-                "Volleyball": VolleyballAddresses,
-                "Hockey": HockeyAddresses,
-            }
 
             if current_node > 0x17 and not current_node == 0xFF:
                 self.in_alt_path = True
