@@ -37,8 +37,8 @@ from .common_address_library import AddressLib
 
 logger = logging.getLogger("Client")
 
-CLIENT_VERSION = "3.1.5"
-COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1", "3.1.2", "3.1.3", "3.1.4"]
+CLIENT_VERSION = "3.1.6"
+COMPATIBLE_VERSIONS = ["3.1.0", "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5"]
 
 NOT_MATCH_PREFIXES = ["s39", "s34", "s21", "s31", "s32", "s33"]
 
