@@ -617,7 +617,7 @@ class Pointers:
             b1 = [0x54, 0x0, 0x90, 0x1B4]
 
     class Boss:
-        behemoth_hp_offsets = [0x34, 0x1F0]
+        behemoth_hp_offsets = [0x20, 0x34, 0x1F0]
         max_hp_offsets = [0x20, 0x34, 0x1F4]
 
 
