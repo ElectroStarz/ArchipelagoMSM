@@ -107,7 +107,7 @@ def is_save_addr(address):
                   PartyMode.FeedPetey.Tabs, PartyMode.HarmonyHustle.Tabs,
                   PartyMode.BobOmbDodge.Tabs, PartyMode.SmashSkate.Tabs,
 
-                  CupsWonMultiple, GamesPlayed, WonStarCups,
+                  CupsWonMultiple, GamesPlayed, WonStarCups, TutorialPlayed,
     )
 
     # If any of the variables inside those classes are in the classes that are in the exceptions tuple
